@@ -98,7 +98,7 @@ public class MainActivity extends android.support.v4.app.FragmentActivity implem
     }
     
     private void goToPosition(Location location) {
-        if (checkReady()) {
+        if (checkReady() && location != null) {
             CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude()))
                                           .zoom(15.5f)
                                           .bearing(0)
