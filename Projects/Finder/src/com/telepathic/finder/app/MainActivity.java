@@ -1,5 +1,6 @@
 package com.telepathic.finder.app;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -36,7 +37,8 @@ public class MainActivity extends android.support.v4.app.FragmentActivity implem
         setContentView(R.layout.main);
         setUpMapIfNeeded();
         mLocationProvider = LocationProvider.getInstance(getApplicationContext());
-        
+        Intent intent = new Intent(this, TestActivity.class);
+        startActivity(intent);
     }
     
     @Override

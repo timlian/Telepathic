@@ -51,6 +51,12 @@
             
         </service>
         
+        <activity 
+            android:name="com.telepathic.finder.app.TestActivity"
+            android:label="@string/test_activity"
+            android:screenOrientation="portrait">
+            
+        </activity>
     </application>
 
 </manifest>
