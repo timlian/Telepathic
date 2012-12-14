@@ -25,4 +25,10 @@ public class HomeActivity extends Activity {
         Intent intent = new Intent(this, TestActivity.class);
         startActivity(intent);
     }
+    
+    public void onBusTestClicked2(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        
+    }
 }

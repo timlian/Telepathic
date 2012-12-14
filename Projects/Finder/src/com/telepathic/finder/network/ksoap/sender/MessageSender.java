@@ -50,8 +50,8 @@ public class MessageSender implements Sender
         // Tim: do not know how to handle it
         //return null;
     //} 
-    
-    throw new RuntimeException("没有可用的监听器，请设置监听器");
+    return null;
+    //throw new RuntimeException("娌℃湁鍙敤鐨勭洃鍚櫒锛岃璁剧疆鐩戝惉鍣�);
   }
 
   private void send2(ClientMessage paramClientMessage)
@@ -92,7 +92,7 @@ public class MessageSender implements Sender
         {
           Log.w("MessageSender", localException);
           Log.w("MessageSender", localException.getMessage());
-          if (!choseListener(paramClientMessage).onError(new Exception("网络连接失败，请重试"), this, paramClientMessage))
+          if (!choseListener(paramClientMessage).onError(new Exception("缃戠粶杩炴帴澶辫触锛岃閲嶈瘯"), this, paramClientMessage))
             localException.printStackTrace();
         }
         if ((this.autoRetry) && (this.retryTime > 0))
@@ -100,7 +100,7 @@ public class MessageSender implements Sender
           this.retryTime = (-1 + this.retryTime);
           try
           {
-            Log.i("MessageSender", paramClientMessage.getMethodName() + "进入Sender自动" + this.retryLantency / 1000L + "重试发送请求！");
+            //Log.i("MessageSender", paramClientMessage.getMethodName() + "杩涘叆Sender鑷姩" + this.retryLantency / 1000L + "閲嶈瘯鍙戦�璇锋眰锛�);
             Thread.sleep(this.retryLantency);
             send2(paramClientMessage);
           }
@@ -147,7 +147,7 @@ public class MessageSender implements Sender
   public int getSendedCount()
   {
     if (this.envelopSender == null)
-      throw new RuntimeException("消息没有被发送，请先发送消息");
+      throw new RuntimeException("娑堟伅娌℃湁琚彂閫侊紝璇峰厛鍙戦�娑堟伅");
     return this.envelopSender.getSendedCount();
   }
 

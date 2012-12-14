@@ -4,9 +4,10 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="16" />
+    <uses-sdk 
+        android:minSdkVersion="5" 
+        android:targetSdkVersion="8">
+    </uses-sdk>
 
     <permission
           android:name="com.telepathic.finder.permission.MAPS_RECEIVE"
@@ -18,32 +19,40 @@
      <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
      
+     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
      
+     
+     <!--  
      <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
+        -->
+     
+     <supports-screens android:largeScreens="true"
+        android:normalScreens="false" android:smallScreens="true"
+        android:resizeable="true" android:anyDensity="true"/>
      
     <application
         android:allowBackup="true"
+        android:name=".app.FinderApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         
          <!-- debug -->
+         <!--  
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyA5a96DbdcVvJrtdEzRIdGyHComKtsWWiI" />
+            -->
         
         <activity
             android:name="com.telepathic.finder.app.HomeActivity"
             android:label="@string/app_name" 
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         
         <service 
@@ -54,7 +63,9 @@
         <activity 
             android:name="com.telepathic.finder.app.TestActivity"
             android:label="@string/test_activity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="sensor" 
+            android:configChanges="orientation|keyboardHidden">
+                        
         </activity>
         
         
@@ -62,6 +73,20 @@
             android:name="com.telepathic.finder.app.BusLocationActivity"
             android:label="@string/home_activity"
             android:screenOrientation="portrait" >
+        </activity>
+        
+         <activity 
+            android:name="com.telepathic.finder.app.MainActivity"
+            android:label="@string/test_activity"
+            android:screenOrientation="sensor" 
+            android:configChanges="orientation|keyboardHidden">
+            
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            
         </activity>
         
     </application>

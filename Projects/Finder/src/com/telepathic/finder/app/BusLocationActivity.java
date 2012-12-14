@@ -5,14 +5,14 @@ import android.location.Location;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.CancelableCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+//import com.google.android.gms.maps.CameraUpdate;
+//import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.GoogleMap;
+//import com.google.android.gms.maps.GoogleMap.CancelableCallback;
+//import com.google.android.gms.maps.SupportMapFragment;
+//import com.google.android.gms.maps.model.CameraPosition;
+//import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.service.LocationProvider;
@@ -29,7 +29,7 @@ public class BusLocationActivity extends android.support.v4.app.FragmentActivity
     /**
      * Note that this may be null if the Google Play services APK is not available.
      */
-    private GoogleMap mMap;
+   // private GoogleMap mMap;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,15 +69,15 @@ public class BusLocationActivity extends android.support.v4.app.FragmentActivity
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
-        }
+//        if (mMap == null) {
+//            // Try to obtain the map from the SupportMapFragment.
+//            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+//                    .getMap();
+//            // Check if we were successful in obtaining the map.
+//            if (mMap != null) {
+//                setUpMap();
+//            }
+//        }
     }
 
     /**
@@ -87,26 +87,26 @@ public class BusLocationActivity extends android.support.v4.app.FragmentActivity
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(30, 104)).title("Tim Lian"));
+       // mMap.addMarker(new MarkerOptions().position(new LatLng(30, 104)).title("Tim Lian"));
     }
     
     /**
      * Change the camera position by animating the camera.
      */
-    private void changeCamera(CameraUpdate update, CancelableCallback callback) {
-        mMap.animateCamera(update, callback);
-    }
+//    private void changeCamera(CameraUpdate update, CancelableCallback callback) {
+//        //mMap.animateCamera(update, callback);
+//    }
     
     private void goToPosition(Location location) {
-        if (checkReady() && location != null) {
-            CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude()))
-                                          .zoom(15.5f)
-                                          .bearing(0)
-                                          .tilt(25)
-                                          .build();
-            changeCamera(CameraUpdateFactory.newCameraPosition(position), null);
-            mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Telepathic - Position #" + mPositionCount++));
-        }
+//        if (checkReady() && location != null) {
+//            CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude()))
+//                                          .zoom(15.5f)
+//                                          .bearing(0)
+//                                          .tilt(25)
+//                                          .build();
+//            changeCamera(CameraUpdateFactory.newCameraPosition(position), null);
+//            mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Telepathic - Position #" + mPositionCount++));
+//        }
         
     }
     
@@ -115,10 +115,10 @@ public class BusLocationActivity extends android.support.v4.app.FragmentActivity
      * all entry points that call methods on the Google Maps API.
      */
     private boolean checkReady() {
-        if (mMap == null) {
-            Toast.makeText(this, R.string.map_not_ready, Toast.LENGTH_SHORT).show();
-            return false;
-        }
+//        if (mMap == null) {
+//            Toast.makeText(this, R.string.map_not_ready, Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
         return true;
     }
 
