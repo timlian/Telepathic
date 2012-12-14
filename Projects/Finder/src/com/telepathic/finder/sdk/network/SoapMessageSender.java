@@ -18,12 +18,6 @@ public class SoapMessageSender {
 
     private static int CONNECTION_TIME_OUT = 1000 * 30;
 
-    private NetWorkAdapter mNetWorkAdapter;
-
-    public SoapMessageSender(NetWorkAdapter netWorkAdapter) {
-        mNetWorkAdapter = netWorkAdapter;
-    }
-
     public void sendMessage(RPCRequest request) throws IOException, XmlPullParserException {
         if (request == null) {
             throw new IllegalArgumentException("SoapMessageSender.sendMessage: request parameter is NULL!");
@@ -41,6 +35,6 @@ public class SoapMessageSender {
         if (ClientLog.DEBUG) {
             Log.d(TAG, "Received Response: " + soapEnvelope.bodyIn.toString());
         }
-        mNetWorkAdapter.onRequestComplete(soapEnvelope.bodyIn);
+        request.onResponse(soapEnvelope.bodyIn);
       }
 }

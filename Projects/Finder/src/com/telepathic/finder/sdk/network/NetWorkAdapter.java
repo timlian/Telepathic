@@ -15,8 +15,6 @@ public class NetWorkAdapter {
     private static final String TAG = "NetWorkAdapter";
 
     private ConcurrentLinkedQueue<RPCRequest> mRequestQueue;
-    private ConcurrentLinkedQueue<RPCRequest> mResponseQueue;
-
     private SoapMessageSender mSoapMessageSender;
 
     private HandlerThread mThread;
@@ -28,7 +26,6 @@ public class NetWorkAdapter {
             RPCRequest request = mRequestQueue.poll();
             if (request != null) {
                 sendRequest(request);
-                mResponseQueue.add(request);
             }
             mRequestHandler.postDelayed(this, 500);
         }
@@ -36,9 +33,8 @@ public class NetWorkAdapter {
 
     public NetWorkAdapter() {
         mRequestQueue  = new ConcurrentLinkedQueue<RPCRequest>();
-        mResponseQueue = new ConcurrentLinkedQueue<RPCRequest>();
 
-        mSoapMessageSender = new SoapMessageSender(this);
+        mSoapMessageSender = new SoapMessageSender();
 
         mThread = new HandlerThread("Request Handler Thread");
         mThread.start();
@@ -66,28 +62,6 @@ public class NetWorkAdapter {
                 }
             }
         }).start();
-    }
-
-    private void handleResponse(String response, SoapObject resultObject) {
-        Iterator<RPCRequest> requestIterator = mResponseQueue.iterator();
-        while (requestIterator.hasNext()) {
-            RPCRequest request = (RPCRequest) requestIterator.next();
-            if (response.equals(request.getMethodName()+"Response")) {
-                request.onResponse(resultObject);
-            }
-        }
-    }
-
-    public void onRequestComplete(Object result) {
-        if (result instanceof SoapObject) {
-            SoapObject resultObject = (SoapObject) result;
-            handleResponse(resultObject.getName(), resultObject);
-
-        } else if (result instanceof SoapFault) {
-
-        } else {
-
-        }
     }
 
 }

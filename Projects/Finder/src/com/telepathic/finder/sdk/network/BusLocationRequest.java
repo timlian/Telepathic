@@ -27,8 +27,8 @@ public class BusLocationRequest extends RPCRequest {
     }
 
     @Override
-    void onResponse(SoapObject result) {
-        SoapObject resultObject = (SoapObject) result.getProperty("getBusLocationResult");
+    void onResponse(Object result) {
+        SoapObject resultObject = (SoapObject) ((SoapObject)result).getProperty("getBusLocationResult");
         if (resultObject != null) {
             resultObject = (SoapObject) resultObject.getProperty("diffgram");
             if (resultObject != null) {

@@ -31,5 +31,5 @@ abstract class RPCRequest {
         return mRpc.getName();
     }
 
-    abstract void onResponse(SoapObject result);
+    abstract void onResponse(Object result);
 }

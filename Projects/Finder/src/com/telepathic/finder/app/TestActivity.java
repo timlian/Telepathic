@@ -9,6 +9,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.BusLineListener;
@@ -63,8 +64,15 @@ public class TestActivity extends Activity {
         }
 
         @Override
-        public void onError(String errorMessage) {
-            // TODO Auto-generated method stub
+        public void onError(final String errorMessage) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSendButton.setEnabled(true);
+                    mTextBusInfo.setText("");
+                    Toast.makeText(TestActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 
@@ -99,9 +107,15 @@ public class TestActivity extends Activity {
         }
 
         @Override
-        public void onError(String errorMessage) {
-            // TODO Auto-generated method stub
-
+        public void onError(final String errorMessage) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSendButton.setEnabled(true);
+                    mTextBusInfo.setText("");
+                    Toast.makeText(TestActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 }
