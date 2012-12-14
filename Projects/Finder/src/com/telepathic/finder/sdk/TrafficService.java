@@ -33,6 +33,4 @@ public class TrafficService implements ITrafficService {
         BusLocationRequest request = new BusLocationRequest(lineNumber, gpsNumber, lastStation, listener);
         mNetWorkAdapter.execute(request);
     }
-
-
 }
