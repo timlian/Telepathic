@@ -1,0 +1,12 @@
+getBusLocationResponse{
+	getBusLocationResult=anyType{
+		schema=anyType{
+			element=anyType{complexType=anyType{choice=anyType{element=anyType{complexType=anyType{sequence=anyType{element=anyType{}; element=anyType{}; element=anyType{}; element=anyType{}; }; }; }; }; }; }; 
+		}; 
+		diffgram=anyType{
+			NewDataSet=anyType{
+				Table1=anyType{lineNumber=102; distance=1; code=200; msg=³É¹¦; }; 
+			}; 
+		}; 
+	}; 
+}
