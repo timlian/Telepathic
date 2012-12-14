@@ -5,15 +5,15 @@ import com.telepathic.finder.sdk.network.BusLocationRequest;
 import com.telepathic.finder.sdk.network.NetWorkAdapter;
 
 public class TrafficService implements ITrafficService {
-    
+
     private static TrafficService mInstance;
-    
+
     private NetWorkAdapter mNetWorkAdapter;
-    
+
     private TrafficService() {
         mNetWorkAdapter = new NetWorkAdapter();
     }
-    
+
     public static synchronized TrafficService getTrafficService() {
         if (mInstance == null) {
             mInstance = new TrafficService();
@@ -33,6 +33,6 @@ public class TrafficService implements ITrafficService {
         BusLocationRequest request = new BusLocationRequest(lineNumber, gpsNumber, lastStation, listener);
         mNetWorkAdapter.execute(request);
     }
-    
+
 
 }

@@ -97,7 +97,7 @@ public abstract class AbstractEnvelop
           checkAndSetListenerOnSubenvelop((Envelop)localObject);
         }
       }
-    } 
+    }
     throw new RuntimeException("数据内容错误");
 }
 }

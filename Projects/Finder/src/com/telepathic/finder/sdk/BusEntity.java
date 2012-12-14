@@ -12,7 +12,7 @@ abstract class BusEntity {
     protected String getStringValue(String key) {
         return (String) contents.get(key);
     }
-    
+
     protected void setValue(String key, Object value) {
         contents.put(key, value);
     }

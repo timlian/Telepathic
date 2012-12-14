@@ -5,32 +5,32 @@ import org.ksoap2.serialization.SoapObject;
 import com.telepathic.finder.sdk.BusEntityKeys.BusLineRouteKeys;
 
 public class BusLineRoute extends BusEntity implements BusLineRouteKeys {
-    
+
     public BusLineRoute(SoapObject object) {
         parseRoute(object);
     }
-    
+
     @SuppressWarnings("unchecked")
     public ArrayList<BusStation> getStations() {
         return (ArrayList<BusStation>) getValue(KEY_STATIONS);
     }
-    
+
     public String getLineName() {
         return getStringValue(KEY_LINE_NAME);
     }
-    
+
     public String getDepartureTime() {
         return getStringValue(KEY_DEPARTURE_TIME);
     }
-    
+
     public String getCloseoffTime() {
         return getStringValue(KEY_CLOSE_OFF_TIME);
     }
-    
+
     public String getType() {
         return getStringValue(KEY_TYPE);
     }
-    
+
     private void parseRoute(SoapObject object) {
         setValue(KEY_LINE_NAME, object.getPrimitivePropertyAsString(KEY_LINE_NAME));
         setValue(KEY_DEPARTURE_TIME, object.getPrimitivePropertyAsString(KEY_DEPARTURE_TIME));

@@ -114,7 +114,7 @@ public class ParallelEnvelopSender implements Sender
             localParallelEnvelop.getSendContent().remove(paramEnvelop);
             return;
           }
-          else 
+          else
           {
             if ((paramEnvelop instanceof ParallelEnvelop))
             {

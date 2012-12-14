@@ -5,7 +5,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
-    <!--  
+    <!--
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,7 +13,7 @@
         android:layout_centerVertical="true"
         android:text="@string/hello_world" />
     -->
-    <LinearLayout 
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
@@ -21,26 +21,26 @@
             android:id="@+id/text_latitude"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="latitude: " 
+            android:text="latitude: "
             android:textSize="18sp" />
         <TextView
-            android:id="@+id/text_longitude" 
+            android:id="@+id/text_longitude"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="longitude: " 
+            android:text="longitude: "
             android:textSize="18sp" />
     </LinearLayout>
-    
+
     <Button
-        android:id="@+id/start_get_location" 
+        android:id="@+id/start_get_location"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
+        android:layout_height="wrap_content"
         android:text="Start Getting Location"/>
-    
+
     <Button
-        android:id="@+id/stop_get_location" 
+        android:id="@+id/stop_get_location"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
+        android:layout_height="wrap_content"
         android:text="Stop Getting Location"/>
 
 </LinearLayout>

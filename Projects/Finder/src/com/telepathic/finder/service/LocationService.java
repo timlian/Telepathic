@@ -19,15 +19,15 @@ import android.util.Log;
 public class LocationService extends Service {
 
     private static final String TAG = "LocationService";
-    
+
     private static final int TWO_MINUTES = 1000 * 60 * 2;
-    
+
     private LocationManager mLocationManager;
-    
+
     private Location mBestLocation;
-    
+
     private LocationProvider mLocationProvider;
-    
+
     LocationListener mLocationListener = new LocationListener() {
         /**
          *  Called when a new location is found by the location provider.
@@ -42,20 +42,20 @@ public class LocationService extends Service {
         public void onProviderEnabled(String provider) {}
 
         public void onProviderDisabled(String provider) {}
-        
+
       };
-      
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-    
+
     @Override
     public void onCreate() {
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        
+
         mLocationProvider = LocationProvider.getInstance(getApplicationContext());
-        
+
         boolean isGpsProviderEnabled = false;
         try {
             isGpsProviderEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -65,7 +65,7 @@ public class LocationService extends Service {
         if (isGpsProviderEnabled) {
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
         }
-        
+
         boolean isNetworkProviderEnabled = false;
         try {
             isNetworkProviderEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -75,7 +75,7 @@ public class LocationService extends Service {
         if (isNetworkProviderEnabled) {
             mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
         }
-        
+
         Location lastGpsLocation = null;
         if (isGpsProviderEnabled ) {
             lastGpsLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -83,7 +83,7 @@ public class LocationService extends Service {
                 ClientLog.debug(TAG, "last location from gps: " + lastGpsLocation.getLatitude() + ", " + lastGpsLocation.getLongitude());
             }
         }
-        
+
         Location lastNetworkLocation = null;
         if (isNetworkProviderEnabled) {
             lastNetworkLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -91,20 +91,20 @@ public class LocationService extends Service {
                 Log.d(TAG, "last location from network: " + lastNetworkLocation.getLatitude() + ", " + lastNetworkLocation.getLongitude());
             }
         }
-        
+
         if (isBetterLocation(lastGpsLocation, lastNetworkLocation)) {
             setBestLocation(lastGpsLocation);
         } else {
             setBestLocation(lastNetworkLocation);
         }
     }
-    
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // TODO Auto-generated method stub
         return super.onStartCommand(intent, flags, startId);
     }
-    
+
     /** Determines whether one Location reading is better than the current Location fix
      * @param location  The new Location that you want to evaluate
      * @param currentBestLocation  The current Location fix, to which you want to compare the new one
@@ -162,7 +162,7 @@ public class LocationService extends Service {
     public void onDestroy() {
         mLocationManager.removeUpdates(mLocationListener);
     }
-    
+
     private void setBestLocation(Location location) {
         mBestLocation = location;
         mLocationProvider.notifyLocationUpdate(mBestLocation);

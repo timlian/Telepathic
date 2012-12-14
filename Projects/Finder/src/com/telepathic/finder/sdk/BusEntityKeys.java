@@ -2,7 +2,7 @@ package com.telepathic.finder.sdk;
 
 
 public class BusEntityKeys {
-    
+
     public interface BusLineRouteKeys {
         // Bus line route constant keys
         public static final String KEY_LINE_NAME = "lineName";
@@ -12,6 +12,6 @@ public class BusEntityKeys {
         public static final String KEY_STATIONS = "stations";
         public static final String KEY_STATIONS_ALIASES = "stationAliases";
     }
-    
+
     private BusEntityKeys() {}
 }

@@ -6,17 +6,17 @@ import com.telepathic.finder.sdk.BusLineListener;
 import com.telepathic.finder.sdk.BusLineRoute;
 
 public class BusLineRouteRequest extends RPCRequest {
-    
+
     private static final String METHOD_NAME = "getBusLineRoute";
-    
+
     private BusLineListener mListener;
-    
+
     public BusLineRouteRequest(String line, BusLineListener listener) {
         super(METHOD_NAME);
         addParameter("busLine", line);
         mListener = listener;
     }
-    
+
     @Override
     public void onResponse(SoapObject result) {
         SoapObject resultObject = (SoapObject) result.getProperty("getBusLineRouteResult");

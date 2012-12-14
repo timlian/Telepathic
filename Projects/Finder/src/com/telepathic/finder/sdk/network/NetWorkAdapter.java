@@ -13,15 +13,15 @@ import android.os.HandlerThread;
 
 public class NetWorkAdapter {
     private static final String TAG = "NetWorkAdapter";
-    
+
     private ConcurrentLinkedQueue<RPCRequest> mRequestQueue;
     private ConcurrentLinkedQueue<RPCRequest> mResponseQueue;
-    
+
     private SoapMessageSender mSoapMessageSender;
-    
+
     private HandlerThread mThread;
     private Handler mRequestHandler;
-    
+
     private Runnable mHanRunnable = new Runnable() {
         @Override
         public void run() {
@@ -33,26 +33,26 @@ public class NetWorkAdapter {
             mRequestHandler.postDelayed(this, 500);
         }
     };
-    
+
     public NetWorkAdapter() {
         mRequestQueue  = new ConcurrentLinkedQueue<RPCRequest>();
         mResponseQueue = new ConcurrentLinkedQueue<RPCRequest>();
-        
+
         mSoapMessageSender = new SoapMessageSender(this);
-        
+
         mThread = new HandlerThread("Request Handler Thread");
         mThread.start();
         mRequestHandler = new Handler(mThread.getLooper());
         mRequestHandler.post(mHanRunnable);
-        
+
     }
-    
+
     public void execute(final RPCRequest request) {
         if (request != null) {
             mRequestQueue.add(request);
         }
     }
-    
+
     private void sendRequest(final RPCRequest request) {
         new Thread(new Runnable() {
             @Override
@@ -67,7 +67,7 @@ public class NetWorkAdapter {
             }
         }).start();
     }
-    
+
     private void handleResponse(String response, SoapObject resultObject) {
         Iterator<RPCRequest> requestIterator = mResponseQueue.iterator();
         while (requestIterator.hasNext()) {
@@ -77,16 +77,16 @@ public class NetWorkAdapter {
             }
         }
     }
-    
+
     public void onRequestComplete(Object result) {
         if (result instanceof SoapObject) {
             SoapObject resultObject = (SoapObject) result;
             handleResponse(resultObject.getName(), resultObject);
-            
+
         } else if (result instanceof SoapFault) {
-            
+
         } else {
-            
+
         }
     }
 

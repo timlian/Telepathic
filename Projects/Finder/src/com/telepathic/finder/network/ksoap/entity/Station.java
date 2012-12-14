@@ -27,7 +27,7 @@ public class Station
     if (this == paramObject) {
         return bool;
     }
-    else 
+    else
     {
       if (paramObject == null)
       {

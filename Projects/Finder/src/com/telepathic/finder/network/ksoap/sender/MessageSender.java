@@ -37,7 +37,7 @@ public class MessageSender implements Sender
   {
     if (paramClientMessage.getListener() != null) {
         return paramClientMessage.getListener();
-    } 
+    }
     if (this.listener != null) {
         return listener;
     }
@@ -49,7 +49,7 @@ public class MessageSender implements Sender
 //        }
         // Tim: do not know how to handle it
         //return null;
-    //} 
+    //}
     return null;
     //throw new RuntimeException("娌℃湁鍙敤鐨勭洃鍚櫒锛岃璁剧疆鐩戝惉鍣�);
   }

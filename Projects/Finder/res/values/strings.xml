@@ -6,8 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="home_activity">Home</string>
     <string name="bus_location">Bus Location</string>
-    <string name="bus_test">Bus Test</string>
-    <string name="bus_map_test">Bus Map Test</string>
+    <string name="bus_test">Bus Info Test</string>
     <string name="menu_settings">Settings</string>
     <string name="map_not_ready">Map is not ready yet</string>
 

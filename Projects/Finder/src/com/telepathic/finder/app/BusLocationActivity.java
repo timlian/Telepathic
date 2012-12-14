@@ -1,134 +1,233 @@
 package com.telepathic.finder.app;
 
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
-//import com.google.android.gms.maps.CameraUpdate;
-//import com.google.android.gms.maps.CameraUpdateFactory;
-//import com.google.android.gms.maps.GoogleMap;
-//import com.google.android.gms.maps.GoogleMap.CancelableCallback;
-//import com.google.android.gms.maps.SupportMapFragment;
-//import com.google.android.gms.maps.model.CameraPosition;
-//import com.google.android.gms.maps.model.LatLng;
-//import com.google.android.gms.maps.model.MarkerOptions;
-
+import com.baidu.mapapi.BMapManager;
+import com.baidu.mapapi.GeoPoint;
+import com.baidu.mapapi.LocationListener;
+import com.baidu.mapapi.MKAddrInfo;
+import com.baidu.mapapi.MKBusLineResult;
+import com.baidu.mapapi.MKDrivingRouteResult;
+import com.baidu.mapapi.MKGeneralListener;
+import com.baidu.mapapi.MKPoiInfo;
+import com.baidu.mapapi.MKPoiResult;
+import com.baidu.mapapi.MKRoute;
+import com.baidu.mapapi.MKSearch;
+import com.baidu.mapapi.MKSearchListener;
+import com.baidu.mapapi.MKSuggestionResult;
+import com.baidu.mapapi.MKTransitRouteResult;
+import com.baidu.mapapi.MKWalkingRouteResult;
+import com.baidu.mapapi.MapActivity;
+import com.baidu.mapapi.MapView;
+import com.baidu.mapapi.MyLocationOverlay;
+import com.baidu.mapapi.RouteOverlay;
 import com.telepathic.finder.R;
-import com.telepathic.finder.service.LocationProvider;
-import com.telepathic.finder.service.LocationProvider.LocationUpdateListener;
+import com.telepathic.finder.util.Utils;
 
-public class BusLocationActivity extends android.support.v4.app.FragmentActivity implements LocationUpdateListener {
-
+public class BusLocationActivity extends MapActivity {
     private static final String TAG = "MainActivity";
-    
-    private LocationProvider mLocationProvider;
-    
-    private int mPositionCount = 1;
-    
-    /**
-     * Note that this may be null if the Google Play services APK is not available.
-     */
-   // private GoogleMap mMap;
-    
+    private static final String DEV_KEY = "A963422DFFFC8530BDDC5FF0063205F9E2D98461";
+
+    private Button mBtnSearch = null;   // 搜索按钮
+
+    private MapView mMapView = null;    // 地图View
+    private MKSearch mSearch = null;    // 搜索模块，也可去掉地图模块独立使用
+    private String  mCityName = "成都";
+    private BMapManager mMapManager;
+    private MyLocationOverlay mLocationOverlay = null;  //定位图层
+    private LocationListener mLocationListener = null; //onResume时注册此listener，onPause时需要Remove
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bus_location);
-        setUpMapIfNeeded();
-        mLocationProvider = LocationProvider.getInstance(getApplicationContext());
+        setContentView(R.layout.buslinesearch);
+
+        mMapManager = new BMapManager(getApplication());
+        mMapManager.init(DEV_KEY, new MyGeneralListener());
+        mMapManager.start();
+        mMapManager.start(); // 如果使用地图SDK，请初始化地图
+        super.initMapActivity(mMapManager);
+
+        mMapView = (MapView) findViewById(R.id.bmapView);
+        mMapView.setBuiltInZoomControls(true);
+        // 设置在缩放动画过程中也显示overlay,默认为不绘制
+        mMapView.setDrawOverlayWhenZooming(true);
+
+        // 添加定位图层
+        mLocationOverlay = new MyLocationOverlay(this, mMapView);
+        mMapView.getOverlays().add(mLocationOverlay);
+
+        // 初始化搜索模块，注册事件监听
+        mSearch = new MKSearch();
+        mSearch.init(mMapManager, new MKSearchListener() {
+
+            @Override
+            public void onGetPoiDetailSearchResult(int type, int error) {
+            }
+
+            public void onGetPoiResult(MKPoiResult res, int type, int error) {
+                // 错误号可参考MKEvent中的定义
+                if (error != 0 || res == null) {
+                    Toast.makeText(BusLocationActivity.this, "抱歉，未找到结果",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // 找到公交路线poi node
+                MKPoiInfo curPoi = null;
+                int totalPoiNum = res.getNumPois();
+                for (int idx = 0; idx < totalPoiNum; idx++) {
+                    curPoi = res.getPoi(idx);
+                    Log.d(TAG, curPoi.toString());
+                    if (2 == curPoi.ePoiType) {
+                        // poi类型，0：普通点，1：公交站，2：公交线路，3：地铁站，4：地铁线路
+                        mSearch.busLineSearch(mCityName, curPoi.uid);
+                        break;
+                    }
+                }
+
+                // 没有找到公交信息
+                if (curPoi == null) {
+                    Toast.makeText(BusLocationActivity.this, "抱歉，未找到结果",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+            }
+
+            public void onGetDrivingRouteResult(MKDrivingRouteResult res,
+                    int error) {
+            }
+
+            public void onGetTransitRouteResult(MKTransitRouteResult res,
+                    int error) {
+            }
+
+            public void onGetWalkingRouteResult(MKWalkingRouteResult res,
+                    int error) {
+            }
+
+            public void onGetAddrResult(MKAddrInfo res, int error) {
+            }
+
+            public void onGetBusDetailResult(MKBusLineResult result, int iError) {
+                if (iError != 0 || result == null) {
+                    Toast.makeText(BusLocationActivity.this, "抱歉，未找到结果",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+                MKRoute myRoute = result.getBusRoute();
+                RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
+                // 此处仅展示一个方案作为示例
+                routeOverlay.setData(result.getBusRoute());
+                mMapView.getOverlays().clear();
+                mMapView.getOverlays().add(routeOverlay);
+                mMapView.invalidate();
+
+                mMapView.getController().animateTo(result.getBusRoute().getStart());
+            }
+
+            @Override
+            public void onGetSuggestionResult(MKSuggestionResult res, int arg1) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onGetRGCShareUrlResult(String arg0, int arg1) {
+                // TODO Auto-generated method stub
+
+            }
+
+        });
+
+        // 注册定位事件
+        mLocationListener = new LocationListener(){
+            @Override
+            public void onLocationChanged(Location location) {
+                if (location != null){
+                    GeoPoint pt = new GeoPoint((int)(location.getLatitude()*1e6), (int)(location.getLongitude()*1e6));
+                    mMapView.getController().animateTo(pt);
+                    mMapManager.getLocationManager().removeUpdates(this);
+                }
+            }
+        };
+
+        // 设定搜索按钮的响应
+        mBtnSearch = (Button) findViewById(R.id.search);
+
+        OnClickListener clickListener = new OnClickListener() {
+            public void onClick(View v) {
+                SearchButtonProcess(v);
+            }
+        };
+
+        mBtnSearch.setOnClickListener(clickListener);
+
+
     }
-    
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setUpMapIfNeeded();
-        mLocationProvider.registerListener(this);
+
+    void SearchButtonProcess(View v) {
+        if (mBtnSearch.equals(v)) {
+            EditText editSearchKey = (EditText) findViewById(R.id.searchkey);
+            String searchKey = editSearchKey.getText().toString();
+            mSearch.poiSearchInCity(mCityName, editSearchKey.getText().toString());
+            Utils.hideSoftKeyboard(this, editSearchKey);
+        }
     }
-    
+
     @Override
     protected void onPause() {
+        mMapManager.getLocationManager().removeUpdates(mLocationListener);
+        mLocationOverlay.disableMyLocation();
+        mLocationOverlay.disableCompass(); // 关闭指南针
+        mMapManager.stop();
         super.onPause();
-        mLocationProvider.unregisterListener(this);
     }
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p>
-     * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView
-     * MapView}) will show a prompt for the user to install/update the Google Play services APK on
-     * their device.
-     * <p>
-     * A user can return to this Activity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the Activity may not have been
-     * completely destroyed during this process (it is likely that it would only be stopped or
-     * paused), {@link #onCreate(Bundle)} may not be called again so we should call this method in
-     * {@link #onResume()} to guarantee that it will be called.
-     */
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-//        if (mMap == null) {
-//            // Try to obtain the map from the SupportMapFragment.
-//            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-//                    .getMap();
-//            // Check if we were successful in obtaining the map.
-//            if (mMap != null) {
-//                setUpMap();
+
+    @Override
+    protected void onResume() {
+        mMapManager.getLocationManager().requestLocationUpdates(mLocationListener);
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableCompass(); // 打开指南针
+        mMapManager.start();
+        super.onResume();
+    }
+
+    @Override
+    protected boolean isRouteDisplayed() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+ // 常用事件监听，用来处理通常的网络错误，授权验证错误等
+    static class MyGeneralListener implements MKGeneralListener {
+        @Override
+        public void onGetNetworkState(int iError) {
+            Log.d("MyGeneralListener", "onGetNetworkState error is "+ iError);
+//            Toast.makeText(BMapApiDemoApp.mDemoApp.getApplicationContext(), "您的网络出错啦！",
+//                    Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onGetPermissionState(int iError) {
+            Log.d("MyGeneralListener", "onGetPermissionState error is "+ iError);
+//            if (iError ==  MKEvent.ERROR_PERMISSION_DENIED) {
+//                // 授权Key错误：
+//                Toast.makeText(BMapApiDemoApp.mDemoApp.getApplicationContext(),
+//                        "请在BMapApiDemoApp.java文件输入正确的授权Key！",
+//                        Toast.LENGTH_LONG).show();
+//                BMapApiDemoApp.mDemoApp.m_bKeyRight = false;
 //            }
-//        }
+        }
     }
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
-    private void setUpMap() {
-       // mMap.addMarker(new MarkerOptions().position(new LatLng(30, 104)).title("Tim Lian"));
-    }
-    
-    /**
-     * Change the camera position by animating the camera.
-     */
-//    private void changeCamera(CameraUpdate update, CancelableCallback callback) {
-//        //mMap.animateCamera(update, callback);
-//    }
-    
-    private void goToPosition(Location location) {
-//        if (checkReady() && location != null) {
-//            CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude()))
-//                                          .zoom(15.5f)
-//                                          .bearing(0)
-//                                          .tilt(25)
-//                                          .build();
-//            changeCamera(CameraUpdateFactory.newCameraPosition(position), null);
-//            mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Telepathic - Position #" + mPositionCount++));
-//        }
-        
-    }
-    
-    /**
-     * When the map is not ready the CameraUpdateFactory cannot be used. This should be called on
-     * all entry points that call methods on the Google Maps API.
-     */
-    private boolean checkReady() {
-//        if (mMap == null) {
-//            Toast.makeText(this, R.string.map_not_ready, Toast.LENGTH_SHORT).show();
-//            return false;
-//        }
-        return true;
-    }
 
-    @Override
-    public void onLocationUpdate(Location location) {
-        goToPosition(location);
-    }
-    
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }

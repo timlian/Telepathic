@@ -10,7 +10,7 @@ public class BusStation {
     private String mName;
     private String mStationGPS;
     private String mType;
-    
+
     public BusStation() {}
 
     public BusStation(String paramString) {
@@ -23,7 +23,7 @@ public class BusStation {
       if (this == paramObject) {
           return bool;
       }
-      else 
+      else
       {
         if (paramObject == null)
         {

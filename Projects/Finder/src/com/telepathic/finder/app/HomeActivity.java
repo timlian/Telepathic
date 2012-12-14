@@ -9,7 +9,7 @@ import android.view.View;
 
 public class HomeActivity extends Activity {
     private static final String TAG = "HomeActivity";
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,15 +20,9 @@ public class HomeActivity extends Activity {
         Intent intent = new Intent(this, BusLocationActivity.class);
         startActivity(intent);
     }
-    
+
     public void onBusTestClicked(View view) {
         Intent intent = new Intent(this, TestActivity.class);
         startActivity(intent);
-    }
-    
-    public void onBusTestClicked2(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        
     }
 }

@@ -10,15 +10,15 @@ import android.widget.Toast;
 
 public class FinderApplication extends Application {
     static FinderApplication mDemoApp;
-    
+
     //百度MapAPI的管理类
     BMapManager mBMapMan = null;
-    
+
     // 授权Key
     // 申请地址：http://developer.baidu.com/map/android-mobile-apply-key.htm
     String mStrKey = "A963422DFFFC8530BDDC5FF0063205F9E2D98461";
     boolean m_bKeyRight = true; // 授权Key正确，验证通过
-    
+
     // 常用事件监听，用来处理通常的网络错误，授权验证错误等
     static class MyGeneralListener implements MKGeneralListener {
         @Override
@@ -33,7 +33,7 @@ public class FinderApplication extends Application {
             Log.d("MyGeneralListener", "onGetPermissionState error is "+ iError);
             if (iError ==  MKEvent.ERROR_PERMISSION_DENIED) {
                 // 授权Key错误：
-                Toast.makeText(FinderApplication.mDemoApp.getApplicationContext(), 
+                Toast.makeText(FinderApplication.mDemoApp.getApplicationContext(),
                         "请在BMapApiDemoApp.java文件输入正确的授权Key！",
                         Toast.LENGTH_LONG).show();
                 FinderApplication.mDemoApp.m_bKeyRight = false;

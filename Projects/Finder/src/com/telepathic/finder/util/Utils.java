@@ -5,7 +5,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 public class Utils {
-    
+
     private Utils() {}
 
     public static void hideSoftKeyboard(Context c, EditText v) {
