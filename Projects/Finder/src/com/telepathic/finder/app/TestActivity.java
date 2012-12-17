@@ -48,7 +48,7 @@ public class TestActivity extends Activity {
                 mSendButton.setEnabled(false);
                 mTextBusInfo.setText("Waiting...");
                 Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
-//                mTrafficService.getBusLocation(lineName, "鏂颁細灞曚腑蹇冨叕浜ょ珯", "鏂颁細灞曚腑蹇冨叕浜ょ珯", null);
+                //mTrafficService.getBusLocation(lineName, "新会展中心公交站", "新会展中心公交站", null);
             }
         });
     }

@@ -1,11 +1,8 @@
 package com.telepathic.finder.sdk.network;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.ksoap2.SoapFault;
-import org.ksoap2.serialization.SoapObject;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.os.Handler;
