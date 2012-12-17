@@ -9,6 +9,8 @@ import com.telepathic.finder.sdk.BusLineRoute;
 public class BusLineRouteRequest extends RPCRequest {
 
     private static final String METHOD_NAME = "getBusLineRoute";
+    
+    private static final String KEY_RESPONSE = "getBusLineRouteResult";
 
     private BusLineListener mListener;
 
@@ -18,30 +20,51 @@ public class BusLineRouteRequest extends RPCRequest {
         mListener = listener;
     }
 
-    private int getErrorCode(SoapObject returnInfo) {
-        int retCode = -1;
-        String errCode = returnInfo.getPrimitivePropertyAsString("code");
-        String errMessage = returnInfo.getPrimitivePropertyAsString("msg");
-        retCode = Integer.parseInt(errCode);
-        if (retCode != 200 && mListener != null) {
-            mListener.onError(errMessage);
+    @Override
+    public void onRequestComplete(Object result, String errorMessage) {
+        if (errorMessage != null) {
+            if (mListener != null) {
+                mListener.onError(errorMessage);
+            }
+            return ;
         }
-        return retCode;
+        if (result instanceof SoapObject) {
+            final SoapObject response = (SoapObject)((SoapObject)result).getProperty(KEY_RESPONSE);
+            process(response);
+        } else if (result instanceof SoapFault) {
+            
+        } else {
+            throw new RuntimeException("Unknown Exception!!!");
+        }
     }
     
-    private void process(SoapObject result) {
-        SoapObject resultObject = (SoapObject) result.getProperty("getBusLineRouteResult");
-        if (resultObject != null) {
-            resultObject = (SoapObject) resultObject.getProperty("diffgram");
-            if (resultObject != null) {
-                resultObject = (SoapObject) resultObject.getProperty("NewDataSet");
-                if (resultObject != null) {
-                    if (getErrorCode((SoapObject) resultObject.getProperty(0)) == 200) {
-                        for(int i = 0; i < resultObject.getPropertyCount(); i++) {
-                            BusLineRoute route = new BusLineRoute((SoapObject) resultObject.getProperty(i));
+    /* 
+     * Line route response data entry example:
+     * 
+     * {lineName=111; departureTime=06:00; closeOffTime=22:00; type=上行; stations=火车南站综合交通枢纽站,盛和一路西站,新南天地站,桐梓林小区站,紫竹北路站,紫荆北路站,紫荆西路站,紫荆西路西站,紫荆西路创业路口站,创业路二环路口南站,永丰立交桥西站,二环路南四段站,红牌楼站,二环路西一段南站,武侯大道口站,二环路少陵路口站,清水河站,二环路西一段站,二环路光华大道口站,新成温路口站,锦西路东站,锦西路西站,青羊大道中站,青羊大道北站,黄忠小区站,蜀汉路同和路口站,蜀汉路站,蜀汉路西站,三环路羊犀立交桥东站,蜀汉西路站,高家村站,土桥村站,高家小区站; stationAliases= , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ; code=200; msg=成功; }
+     * 
+     */
+    private void process(SoapObject response) {
+        if (response != null) {
+            final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
+            if (diffGram != null) {
+                final SoapObject newDataSet = (SoapObject) diffGram.getProperty(KEY_NEW_DATA_SET);
+                if (newDataSet != null) {
+                    final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
+                    final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
+                    final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
+                    if (NO_ERROR == Integer.parseInt(errorCode)) {
+                        SoapObject dataEntry = null;
+                        for(int i = 0; i < newDataSet.getPropertyCount(); i++) {
+                            dataEntry = (SoapObject)newDataSet.getProperty(i);
+                            BusLineRoute route = new BusLineRoute(dataEntry);
                             if (mListener != null && i == 0) {
                                 mListener.onSuccess(route);
                             }
+                        }
+                    } else {
+                        if (mListener != null) {
+                            mListener.onError(errorMessage);
                         }
                     }
                 }
@@ -49,20 +72,4 @@ public class BusLineRouteRequest extends RPCRequest {
         }
     }
     
-    @Override
-    public void onRequestComplete(Object response, String errorMessage) {
-        if (errorMessage != null) {
-            if (mListener != null) {
-                mListener.onError(errorMessage);
-            }
-            return ;
-        }
-        if (response instanceof SoapObject) {
-            process((SoapObject) response);
-        } else if (response instanceof SoapFault) {
-            
-        } else {
-            throw new RuntimeException("Unknown Exception!!!");
-        }
-    }
 }

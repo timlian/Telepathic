@@ -62,19 +62,20 @@ public class NetWorkAdapter {
         soapEnvelope.dotNet  = true;
         soapEnvelope.setOutputSoapObject(rpcMessage);
         HttpTransportSE localHttpTransportSE = new HttpTransportSE(TRAFFIC_SERVICE_URI, CONNECTION_TIME_OUT);
+        String errorMessage = null;
         try {
             localHttpTransportSE.call(request.getSoapAction(), soapEnvelope);
             if (ClientLog.DEBUG && soapEnvelope.bodyIn != null) {
                 Log.d(TAG, "Received Response: " + soapEnvelope.bodyIn.toString());
             }
-            request.onRequestComplete(soapEnvelope.bodyIn, null);
         } catch (Exception e) {
-            String errorMessage = e.getLocalizedMessage();
+            errorMessage = e.getLocalizedMessage();
             if (errorMessage == null) {
                 errorMessage = "Unknown Error!!!";
             }
             Log.e(TAG, "send() - " + errorMessage);
-            request.onRequestComplete(soapEnvelope.bodyIn, errorMessage);
+            
         }
+        request.onRequestComplete(soapEnvelope.bodyIn, errorMessage);
       }
 }

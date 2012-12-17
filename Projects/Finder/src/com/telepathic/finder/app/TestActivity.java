@@ -46,8 +46,8 @@ public class TestActivity extends Activity {
             public void onClick(View v) {
                 String lineName = mEditText.getText().toString();
 //                mTrafficService.getBusLineRoute(lineName, new MyBusLineListener());
-//                mSendButton.setEnabled(false);
-//                mTextBusInfo.setText("Waiting...");
+                mSendButton.setEnabled(false);
+                mTextBusInfo.setText("Waiting...");
 //                Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
 //                mTrafficService.getBusLocation(lineName, "新会展中心公交站", "新会展中心公交站", new MyBusLocationListener());
                 mTrafficService.getChargeRecords("01545529", 30, new MyChargeRecordsListener());

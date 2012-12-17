@@ -2,17 +2,16 @@ package com.telepathic.finder.sdk.network;
 
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
-
-import com.telepathic.finder.sdk.BusLineRoute;
 import com.telepathic.finder.sdk.ChargeRecordsListener;
-
-import android.util.Log;
 
 public class BusChargeRecordRequest extends RPCRequest {
     private static final String METHOD_NAME = "getConsumerRecords";
     
     private static final String KEY_CARD_ID = "cardID";
     private static final String KEY_COUNT = "count";
+    
+    private static final String KEY_RESPONSE = "getConsumerRecordsResult";
+
     
     private ChargeRecordsListener mListener;
     
@@ -24,30 +23,54 @@ public class BusChargeRecordRequest extends RPCRequest {
     }
     
     @Override
-    public void onRequestComplete(Object response, String errorMessage) {
+    public void onRequestComplete(Object result, String errorMessage) {
         if (errorMessage != null) {
             if (mListener != null) {
                 mListener.onError(errorMessage);
             }
             return ;
         }
-        if (response instanceof SoapObject) {
-            process((SoapObject) response);
-        } else if (response instanceof SoapFault) {
+        if (result instanceof SoapObject) {
+            final SoapObject response = (SoapObject)((SoapObject)result).getProperty(KEY_RESPONSE);
+            process(response);
+        } else if (result instanceof SoapFault) {
             
         } else {
             throw new RuntimeException("Unknown Exception!!!");
         }
     }
     
-    private void process(SoapObject result) {
-        SoapObject resultObject = (SoapObject) result.getProperty("getConsumerRecordsResult");
-        if (resultObject != null) {
-            resultObject = (SoapObject) resultObject.getProperty("diffgram");
-            if (resultObject != null) {
-                resultObject = (SoapObject) resultObject.getProperty("NewDataSet");
-                if (resultObject != null) {
-                    mListener.onSuccess(resultObject.toString());
+    /* 
+     * Charge records response data entry example:
+     * 
+     * {lineNumber=102; busNumber=031164; cardID=000101545529; consumerTime=2012-6-30 21:39:51; consumerCount=2; residualCount=6; code=200; msg=³É¹¦; }
+     *
+     */
+    private void process(SoapObject response) {
+        if (response != null) {
+            final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
+            if (diffGram != null) {
+                final SoapObject newDataSet = (SoapObject) diffGram.getProperty(KEY_NEW_DATA_SET);
+                if (newDataSet != null) {
+                    final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
+                    final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
+                    final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
+                    if (NO_ERROR == Integer.parseInt(errorCode)) {
+                        SoapObject dataEntry = null;
+                        StringBuilder chargeRecords = new StringBuilder();
+                        for(int i = 0; i < newDataSet.getPropertyCount(); i++) {
+                            dataEntry = (SoapObject) newDataSet.getProperty(i);
+                            // Todo: parse the charge record objects.
+                            chargeRecords.append(dataEntry.toString() + "\n\n");
+                        }
+                        if (mListener != null) {
+                            mListener.onSuccess(chargeRecords.toString());
+                        }
+                    } else {
+                        if (mListener != null) {
+                            mListener.onError(errorMessage);
+                        }
+                    }
                 }
             }
         }

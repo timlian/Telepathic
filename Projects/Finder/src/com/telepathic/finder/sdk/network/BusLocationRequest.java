@@ -5,16 +5,17 @@ import org.ksoap2.serialization.SoapObject;
 
 import com.telepathic.finder.sdk.BusLocationListener;
 
-import android.util.Log;
-
 public class BusLocationRequest extends RPCRequest {
 
     private static final String METHOD_NAME = "getBusLocation";
-
+    
+    private static final String KEY_RESPONSE = "getBusLineRouteResult";
     private static final String KEY_LINE_NUMBER  = "lineNumber";
     private static final String KEY_GPS_NUMBER = "GPSNumber";
     private static final String KEY_LAST_STATION = "lastStation";
     private static final String KEY_DISTANCE = "distance";
+    
+
 
     private BusLocationListener mListener;
 
@@ -25,33 +26,50 @@ public class BusLocationRequest extends RPCRequest {
         addParameter(KEY_LINE_NUMBER, lineName);
         mListener = listener;
     }
-
-    private int getErrorCode(SoapObject returnInfo) {
-        int retCode = -1;
-        String errCode = returnInfo.getPrimitivePropertyAsString("code");
-        String errMessage = returnInfo.getPrimitivePropertyAsString("msg");
-        retCode = Integer.parseInt(errCode);
-        if (retCode != 200 && mListener != null) {
-            mListener.onError(errMessage);
+    
+    @Override
+    void onRequestComplete(Object result, String errorMessage) {
+        if (errorMessage != null) {
+            if (mListener != null) {
+                mListener.onError(errorMessage);
+            }
+            return ;
         }
-        return retCode;
+        if (result instanceof SoapObject) {
+            final SoapObject response = (SoapObject)((SoapObject)result).getProperty(KEY_RESPONSE);
+            process(response);
+        } else if (result instanceof SoapFault) {
+            
+        } else {
+            throw new RuntimeException("Unknown Exception!!!");
+        }
+
     }
     
+    /*
+     * Location response data example:
+     * 
+     * {lineNumber=102; distance=1; code=200; msg=³É¹¦; }
+     * 
+     */
     private void process(SoapObject response) {
-        SoapObject resultObject = (SoapObject) ((SoapObject)response).getProperty("getBusLocationResult");
-        if (resultObject != null) {
-            resultObject = (SoapObject) resultObject.getProperty("diffgram");
-            if (resultObject != null) {
-                resultObject = (SoapObject) resultObject.getProperty("NewDataSet");
-                if (resultObject != null) {
-                    resultObject = (SoapObject) resultObject.getProperty("Table1");
-                    if (resultObject != null) {
-                        if (getErrorCode(resultObject) == 200) {
-                            String lineNumber = resultObject.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
-                            String distance = resultObject.getPrimitivePropertyAsString(KEY_DISTANCE);
-                            if (mListener != null) {
-                                mListener.onSuccess(lineNumber, distance);
-                            }
+        if (response != null) {
+            final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
+            if (diffGram != null) {
+                final SoapObject newDataSet = (SoapObject) diffGram.getProperty(KEY_NEW_DATA_SET);
+                if (newDataSet != null) {
+                    final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
+                    final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
+                    final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
+                    if (NO_ERROR == Integer.parseInt(errorCode)) {
+                        final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
+                        final String distance = firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE);
+                        if (mListener != null) {
+                            mListener.onSuccess(lineNumber, distance);
+                        }
+                    } else {
+                        if (mListener != null) {
+                            mListener.onError(errorMessage);
                         }
                     }
                 }
@@ -59,21 +77,4 @@ public class BusLocationRequest extends RPCRequest {
         } 
     }
     
-    @Override
-    void onRequestComplete(Object response, String errorMessage) {
-        if (errorMessage != null) {
-            if (mListener != null) {
-                mListener.onError(errorMessage);
-            }
-            return ;
-        }
-        if (response instanceof SoapObject) {
-            process((SoapObject) response);
-        } else if (response instanceof SoapFault) {
-            
-        } else {
-            throw new RuntimeException("Unknown Exception!!!");
-        }
-
-    }
 }

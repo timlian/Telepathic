@@ -5,6 +5,14 @@ import org.ksoap2.serialization.SoapObject;
 abstract class RPCRequest {
 
     private static final String NAMESPACE = "http://tempuri.org/";
+    
+    protected static final String KEY_DIFF_GRAM = "diffgram";
+    protected static final String KEY_NEW_DATA_SET = "NewDataSet";
+    
+    protected static final String KEY_ERROR_CODE = "code";
+    protected static final String KEY_ERROR_MESSAGE = "msg";
+    
+    protected static final int NO_ERROR = 200;
 
     private SoapObject mRpc;
 
@@ -14,7 +22,7 @@ abstract class RPCRequest {
 
     protected void addParameter(String key, Object value) {
         if (key == null) {
-            throw new IllegalArgumentException("参数名不能为null");
+            throw new IllegalArgumentException("The parameter key is null.");
         }
         mRpc.addProperty(key, value);
     }
@@ -31,5 +39,5 @@ abstract class RPCRequest {
         return mRpc.getName();
     }
 
-    abstract void onRequestComplete(Object response, String errorMessage);
+    abstract void onRequestComplete(Object result, String errorMessage);
 }
