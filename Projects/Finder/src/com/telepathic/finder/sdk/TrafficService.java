@@ -1,5 +1,6 @@
 package com.telepathic.finder.sdk;
 
+import com.telepathic.finder.sdk.network.BusChargeRecordRequest;
 import com.telepathic.finder.sdk.network.BusLineRouteRequest;
 import com.telepathic.finder.sdk.network.BusLocationRequest;
 import com.telepathic.finder.sdk.network.NetWorkAdapter;
@@ -31,6 +32,12 @@ public class TrafficService implements ITrafficService {
     public void getBusLocation(String lineNumber, String gpsNumber,
             String lastStation, BusLocationListener listener) {
         BusLocationRequest request = new BusLocationRequest(lineNumber, gpsNumber, lastStation, listener);
+        mNetWorkAdapter.execute(request);
+    }
+    
+    @Override
+    public void getChargeRecords(String cardId, int count, ChargeRecordsListener listener) {
+        BusChargeRecordRequest request = new BusChargeRecordRequest(cardId, String.valueOf(count), listener);
         mNetWorkAdapter.execute(request);
     }
 }

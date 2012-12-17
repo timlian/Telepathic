@@ -16,6 +16,7 @@ import com.telepathic.finder.sdk.BusLineListener;
 import com.telepathic.finder.sdk.BusLineRoute;
 import com.telepathic.finder.sdk.BusLocationListener;
 import com.telepathic.finder.sdk.BusStation;
+import com.telepathic.finder.sdk.ChargeRecordsListener;
 import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
@@ -44,11 +45,12 @@ public class TestActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String lineName = mEditText.getText().toString();
-                //mTrafficService.getBusLineRoute(lineName, new MyBusLineListener());
-                mSendButton.setEnabled(false);
-                mTextBusInfo.setText("Waiting...");
-                Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
-                mTrafficService.getBusLocation(lineName, "新会展中心公交站", "新会展中心公交站", new MyBusLocationListener());
+//                mTrafficService.getBusLineRoute(lineName, new MyBusLineListener());
+//                mSendButton.setEnabled(false);
+//                mTextBusInfo.setText("Waiting...");
+//                Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
+//                mTrafficService.getBusLocation(lineName, "新会展中心公交站", "新会展中心公交站", new MyBusLocationListener());
+                mTrafficService.getChargeRecords("01545529", 30, new MyChargeRecordsListener());
             }
         });
     }
@@ -117,5 +119,35 @@ public class TestActivity extends Activity {
                 }
             });
         }
+    }
+    
+    private class MyChargeRecordsListener implements ChargeRecordsListener {
+
+        @Override
+        public void onSuccess(final String result) {
+            runOnUiThread(new Runnable() {
+                
+                @Override
+                public void run() {
+                    mSendButton.setEnabled(true);
+                    mTextBusInfo.setText(result);
+                }
+            });
+            
+        }
+
+        @Override
+        public void onError(final String errorMessage) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSendButton.setEnabled(true);
+                    mTextBusInfo.setText("");
+                    Toast.makeText(TestActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+            });
+            
+        }
+        
     }
 }
