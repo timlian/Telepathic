@@ -1,8 +1,8 @@
 package com.telepathic.finder.sdk.network;
 
+import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 
-import com.telepathic.finder.sdk.BusLineRoute;
 import com.telepathic.finder.sdk.BusLocationListener;
 
 import android.util.Log;
@@ -26,9 +26,19 @@ public class BusLocationRequest extends RPCRequest {
         mListener = listener;
     }
 
-    @Override
-    void onResponse(Object result) {
-        SoapObject resultObject = (SoapObject) ((SoapObject)result).getProperty("getBusLocationResult");
+    private int getErrorCode(SoapObject returnInfo) {
+        int retCode = -1;
+        String errCode = returnInfo.getPrimitivePropertyAsString("code");
+        String errMessage = returnInfo.getPrimitivePropertyAsString("msg");
+        retCode = Integer.parseInt(errCode);
+        if (retCode != 200 && mListener != null) {
+            mListener.onError(errMessage);
+        }
+        return retCode;
+    }
+    
+    private void process(SoapObject response) {
+        SoapObject resultObject = (SoapObject) ((SoapObject)response).getProperty("getBusLocationResult");
         if (resultObject != null) {
             resultObject = (SoapObject) resultObject.getProperty("diffgram");
             if (resultObject != null) {
@@ -36,18 +46,34 @@ public class BusLocationRequest extends RPCRequest {
                 if (resultObject != null) {
                     resultObject = (SoapObject) resultObject.getProperty("Table1");
                     if (resultObject != null) {
-                        Log.d("BusLocationRequest", resultObject.toString());
-                        String lineNumber = resultObject.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
-                        String distance = resultObject.getPrimitivePropertyAsString(KEY_DISTANCE);
-                        if (mListener != null) {
-                            mListener.onSuccess(lineNumber, distance);
+                        if (getErrorCode(resultObject) == 200) {
+                            String lineNumber = resultObject.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
+                            String distance = resultObject.getPrimitivePropertyAsString(KEY_DISTANCE);
+                            if (mListener != null) {
+                                mListener.onSuccess(lineNumber, distance);
+                            }
                         }
                     }
                 }
             }
-        }
+        } 
     }
+    
+    @Override
+    void onRequestComplete(Object response, String errorMessage) {
+        if (errorMessage != null) {
+            if (mListener != null) {
+                mListener.onError(errorMessage);
+            }
+            return ;
+        }
+        if (response instanceof SoapObject) {
+            process((SoapObject) response);
+        } else if (response instanceof SoapFault) {
+            
+        } else {
+            throw new RuntimeException("Unknown Exception!!!");
+        }
 
-
-
+    }
 }

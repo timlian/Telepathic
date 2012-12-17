@@ -1,18 +1,23 @@
 package com.telepathic.finder.sdk.network;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.xmlpull.v1.XmlPullParserException;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import com.telepathic.finder.util.ClientLog;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 
 public class NetWorkAdapter {
     private static final String TAG = "NetWorkAdapter";
+    
+    private static final String TRAFFIC_SERVICE_URI = "http://client.10628106.com:4800/TrafficService.asmx";
+
+    private static int CONNECTION_TIME_OUT = 1000 * 30;
 
     private ConcurrentLinkedQueue<RPCRequest> mRequestQueue;
-    private SoapMessageSender mSoapMessageSender;
 
     private HandlerThread mThread;
     private Handler mRequestHandler;
@@ -22,7 +27,7 @@ public class NetWorkAdapter {
         public void run() {
             RPCRequest request = mRequestQueue.poll();
             if (request != null) {
-                sendRequest(request);
+                send(request);
             }
             mRequestHandler.postDelayed(this, 500);
         }
@@ -30,8 +35,6 @@ public class NetWorkAdapter {
 
     public NetWorkAdapter() {
         mRequestQueue  = new ConcurrentLinkedQueue<RPCRequest>();
-
-        mSoapMessageSender = new SoapMessageSender();
 
         mThread = new HandlerThread("Request Handler Thread");
         mThread.start();
@@ -46,19 +49,32 @@ public class NetWorkAdapter {
         }
     }
 
-    private void sendRequest(final RPCRequest request) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mSoapMessageSender.sendMessage(request);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                }
+    private void send(final RPCRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request is NULL!");
+        }
+        SoapObject rpcMessage = request.getSoapMessage();
+        if (ClientLog.DEBUG) {
+            Log.d(TAG, "Sent Request: " + rpcMessage.toString());
+        }
+        SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(110);
+        soapEnvelope.bodyOut = rpcMessage;
+        soapEnvelope.dotNet  = true;
+        soapEnvelope.setOutputSoapObject(rpcMessage);
+        HttpTransportSE localHttpTransportSE = new HttpTransportSE(TRAFFIC_SERVICE_URI, CONNECTION_TIME_OUT);
+        try {
+            localHttpTransportSE.call(request.getSoapAction(), soapEnvelope);
+            if (ClientLog.DEBUG && soapEnvelope.bodyIn != null) {
+                Log.d(TAG, "Received Response: " + soapEnvelope.bodyIn.toString());
             }
-        }).start();
-    }
-
+            request.onRequestComplete(soapEnvelope.bodyIn, null);
+        } catch (Exception e) {
+            String errorMessage = e.getLocalizedMessage();
+            if (errorMessage == null) {
+                errorMessage = "Unknown Error!!!";
+            }
+            Log.e(TAG, "send() - " + errorMessage);
+            request.onRequestComplete(soapEnvelope.bodyIn, errorMessage);
+        }
+      }
 }

@@ -44,11 +44,11 @@ public class TestActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String lineName = mEditText.getText().toString();
-                mTrafficService.getBusLineRoute(lineName, new MyBusLineListener());
+                //mTrafficService.getBusLineRoute(lineName, new MyBusLineListener());
                 mSendButton.setEnabled(false);
                 mTextBusInfo.setText("Waiting...");
                 Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
-                //mTrafficService.getBusLocation(lineName, "新会展中心公交站", "新会展中心公交站", null);
+                mTrafficService.getBusLocation(lineName, "新会展中心公交站", "新会展中心公交站", new MyBusLocationListener());
             }
         });
     }

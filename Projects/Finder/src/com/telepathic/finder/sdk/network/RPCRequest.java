@@ -31,5 +31,5 @@ abstract class RPCRequest {
         return mRpc.getName();
     }
 
-    abstract void onResponse(Object result);
+    abstract void onRequestComplete(Object response, String errorMessage);
 }

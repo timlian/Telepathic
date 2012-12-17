@@ -50,10 +50,16 @@ public class BusLineRouteRequest extends RPCRequest {
     }
     
     @Override
-    public void onResponse(Object result) {
-        if (result instanceof SoapObject) {
-            process((SoapObject) result);
-        } else if (result instanceof SoapFault) {
+    public void onRequestComplete(Object response, String errorMessage) {
+        if (errorMessage != null) {
+            if (mListener != null) {
+                mListener.onError(errorMessage);
+            }
+            return ;
+        }
+        if (response instanceof SoapObject) {
+            process((SoapObject) response);
+        } else if (response instanceof SoapFault) {
             
         } else {
             throw new RuntimeException("Unknown Exception!!!");
