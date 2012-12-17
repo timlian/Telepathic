@@ -14,7 +14,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:hint="Enter bus line number" />
+            android:hint="Enter bus line or card number" />
 
         <Button
             android:id="@+id/search"

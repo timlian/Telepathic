@@ -44,13 +44,24 @@ public class TestActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                String lineName = mEditText.getText().toString();
-//                mTrafficService.getBusLineRoute(lineName, new MyBusLineListener());
-                mSendButton.setEnabled(false);
-                mTextBusInfo.setText("Waiting...");
-//                Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
-//                mTrafficService.getBusLocation(lineName, "新会展中心公交站", "新会展中心公交站", new MyBusLocationListener());
-                mTrafficService.getChargeRecords("01545529", 30, new MyChargeRecordsListener());
+                String number = mEditText.getText().toString();
+                if (number.length()> 0 && number.length() < 4) {
+                    mTrafficService.getBusLineRoute(number, new MyBusLineListener());
+                    //mTrafficService.getBusLocation(number, "新会展中心公交站", "新会展中心公交站", new MyBusLocationListener());
+                    mSendButton.setEnabled(false);
+                    mTextBusInfo.setText("fetching bus line route for " + number + " ... ");
+                    Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
+                } else if (number.length() == 8) {
+                    mTrafficService.getChargeRecords(number, 10, new MyChargeRecordsListener());
+                    mSendButton.setEnabled(false);
+                    mTextBusInfo.setText("fetching charge records for " + number + " ... ");
+                    Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Please enter the correct parameter.",
+                            Toast.LENGTH_SHORT).show();
+                }
+                
             }
         });
     }
