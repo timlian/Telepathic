@@ -61,7 +61,7 @@ public class TestActivity extends Activity {
                             "Please enter the correct parameter.",
                             Toast.LENGTH_SHORT).show();
                 }
-                
+
             }
         });
     }
@@ -131,20 +131,20 @@ public class TestActivity extends Activity {
             });
         }
     }
-    
+
     private class MyChargeRecordsListener implements ChargeRecordsListener {
 
         @Override
         public void onSuccess(final String result) {
             runOnUiThread(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
                     mTextBusInfo.setText(result);
                 }
             });
-            
+
         }
 
         @Override
@@ -157,8 +157,8 @@ public class TestActivity extends Activity {
                     Toast.makeText(TestActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
             });
-            
+
         }
-        
+
     }
 }

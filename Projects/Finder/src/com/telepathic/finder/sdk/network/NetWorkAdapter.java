@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class NetWorkAdapter {
     private static final String TAG = "NetWorkAdapter";
-    
+
     private static final String TRAFFIC_SERVICE_URI = "http://client.10628106.com:4800/TrafficService.asmx";
 
     private static int CONNECTION_TIME_OUT = 1000 * 30;
@@ -74,7 +74,7 @@ public class NetWorkAdapter {
                 errorMessage = "Unknown Error!!!";
             }
             Log.e(TAG, "send() - " + errorMessage);
-            
+
         }
         request.onRequestComplete(soapEnvelope.bodyIn, errorMessage);
       }

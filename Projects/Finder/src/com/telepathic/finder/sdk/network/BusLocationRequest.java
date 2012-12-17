@@ -8,13 +8,13 @@ import com.telepathic.finder.sdk.BusLocationListener;
 public class BusLocationRequest extends RPCRequest {
 
     private static final String METHOD_NAME = "getBusLocation";
-    
+
     private static final String KEY_RESPONSE = "getBusLineRouteResult";
     private static final String KEY_LINE_NUMBER  = "lineNumber";
     private static final String KEY_GPS_NUMBER = "GPSNumber";
     private static final String KEY_LAST_STATION = "lastStation";
     private static final String KEY_DISTANCE = "distance";
-    
+
 
 
     private BusLocationListener mListener;
@@ -26,7 +26,7 @@ public class BusLocationRequest extends RPCRequest {
         addParameter(KEY_LINE_NUMBER, lineName);
         mListener = listener;
     }
-    
+
     @Override
     void onRequestComplete(Object result, String errorMessage) {
         if (errorMessage != null) {
@@ -39,18 +39,18 @@ public class BusLocationRequest extends RPCRequest {
             final SoapObject response = (SoapObject)((SoapObject)result).getProperty(KEY_RESPONSE);
             process(response);
         } else if (result instanceof SoapFault) {
-            
+
         } else {
             throw new RuntimeException("Unknown Exception!!!");
         }
 
     }
-    
+
     /*
      * Location response data example:
-     * 
+     *
      * {lineNumber=102; distance=1; code=200; msg=³É¹¦; }
-     * 
+     *
      */
     private void process(SoapObject response) {
         if (response != null) {
@@ -74,7 +74,7 @@ public class BusLocationRequest extends RPCRequest {
                     }
                 }
             }
-        } 
+        }
     }
-    
+
 }

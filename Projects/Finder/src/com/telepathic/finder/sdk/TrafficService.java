@@ -34,7 +34,7 @@ public class TrafficService implements ITrafficService {
         BusLocationRequest request = new BusLocationRequest(lineNumber, gpsNumber, lastStation, listener);
         mNetWorkAdapter.execute(request);
     }
-    
+
     @Override
     public void getChargeRecords(String cardId, int count, ChargeRecordsListener listener) {
         BusChargeRecordRequest request = new BusChargeRecordRequest(cardId, String.valueOf(count), listener);

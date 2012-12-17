@@ -18,9 +18,9 @@ public interface ITrafficService {
      * @return
      */
     public void getBusLocation(String lineNumber, String gpsNumber, String lastStation, BusLocationListener listener);
-    
+
     /**
-     * 
+     *
      * @param cardId
      * @param count
      */
