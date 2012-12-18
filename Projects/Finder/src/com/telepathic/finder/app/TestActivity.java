@@ -3,6 +3,8 @@ package com.telepathic.finder.app;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +24,7 @@ import com.telepathic.finder.util.Utils;
 
 public class TestActivity extends Activity {
     private static final String TAG = "TestActivity";
+    private static final int DIALOG_WAITING = 2;
 
     private Button mSendButton;
     private EditText mEditText;
@@ -56,6 +59,7 @@ public class TestActivity extends Activity {
                     mSendButton.setEnabled(false);
                     mTextBusInfo.setText("fetching charge records for " + number + " ... ");
                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
+                    showDialog(DIALOG_WAITING);
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "Please enter the correct parameter.",
@@ -66,6 +70,19 @@ public class TestActivity extends Activity {
         });
     }
 
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        if (id == DIALOG_WAITING) {
+            ProgressDialog prgDlg = new ProgressDialog(this);
+            prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            prgDlg.setMessage(getResources().getString(R.string.find_ic_card_records));
+            prgDlg.setIndeterminate(true);
+            prgDlg.setCancelable(false);
+            return prgDlg;
+        }
+        return null;
+    }
+    
     private class MyBusLineListener implements BusLineListener {
 
         @Override
@@ -142,6 +159,7 @@ public class TestActivity extends Activity {
                 public void run() {
                     mSendButton.setEnabled(true);
                     mTextBusInfo.setText(result);
+                    dismissDialog(DIALOG_WAITING);
                 }
             });
 
@@ -154,6 +172,7 @@ public class TestActivity extends Activity {
                 public void run() {
                     mSendButton.setEnabled(true);
                     mTextBusInfo.setText("");
+                    dismissDialog(DIALOG_WAITING);
                     Toast.makeText(TestActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
             });

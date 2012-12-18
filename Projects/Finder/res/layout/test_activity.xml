@@ -8,19 +8,21 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
+        
         <EditText
             android:id="@+id/searchkey"
             android:layout_width="0dip"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:hint="IC card number" />
+            android:hint="@string/ic_card_hint" />
 
         <Button
             android:id="@+id/search"
-            android:text="find"
+            android:text="@string/find"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+        
     </LinearLayout>
 
     <ScrollView

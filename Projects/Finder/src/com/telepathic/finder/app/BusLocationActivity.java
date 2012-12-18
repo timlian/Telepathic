@@ -1,5 +1,7 @@
 package com.telepathic.finder.app;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,7 +36,8 @@ import com.telepathic.finder.util.Utils;
 public class BusLocationActivity extends MapActivity {
     private static final String TAG = "MainActivity";
     private static final String DEV_KEY = "A963422DFFFC8530BDDC5FF0063205F9E2D98461";
-
+    private static final int DIALOG_WAITING = 1;
+    
     private Button mBtnSearch = null;   // ËÑË÷°´Å¥
 
     private MapView mMapView = null;    // µØÍ¼View
@@ -132,6 +135,8 @@ public class BusLocationActivity extends MapActivity {
                 mMapView.invalidate();
 
                 mMapView.getController().animateTo(result.getBusRoute().getStart());
+                mBtnSearch.setEnabled(true);
+                dismissDialog(DIALOG_WAITING);
             }
 
             @Override
@@ -180,6 +185,8 @@ public class BusLocationActivity extends MapActivity {
             String searchKey = editSearchKey.getText().toString();
             mSearch.poiSearchInCity(mCityName, editSearchKey.getText().toString());
             Utils.hideSoftKeyboard(this, editSearchKey);
+            mBtnSearch.setEnabled(false);
+            showDialog(DIALOG_WAITING);
         }
     }
 
@@ -201,6 +208,19 @@ public class BusLocationActivity extends MapActivity {
         super.onResume();
     }
 
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        if (id == DIALOG_WAITING) {
+            ProgressDialog prgDlg = new ProgressDialog(this);
+            prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            prgDlg.setMessage(getResources().getString(R.string.find_bus_route));
+            prgDlg.setIndeterminate(true);
+            prgDlg.setCancelable(false);
+            return prgDlg;
+        }
+        return null;
+    }
+    
     @Override
     protected boolean isRouteDisplayed() {
         // TODO Auto-generated method stub
