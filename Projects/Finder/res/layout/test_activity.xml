@@ -14,11 +14,11 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:hint="Enter bus line or card number" />
+            android:hint="IC card number" />
 
         <Button
             android:id="@+id/search"
-            android:text="get"
+            android:text="find"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -30,7 +30,7 @@
         <TextView
             android:id="@+id/bus_info"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />"
+            android:layout_height="wrap_content" />
 
     </ScrollView>
 
