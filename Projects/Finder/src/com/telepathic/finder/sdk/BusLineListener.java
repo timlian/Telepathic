@@ -1,8 +1,10 @@
 package com.telepathic.finder.sdk;
 
+import java.util.ArrayList;
+
 public interface BusLineListener {
 
-    public void onSuccess(BusLineRoute route);
+    public void onSuccess(ArrayList<BusLineRoute> route);
 
     public void onError(String errorMessage);
 }

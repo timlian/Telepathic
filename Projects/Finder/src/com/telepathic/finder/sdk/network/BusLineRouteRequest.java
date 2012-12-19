@@ -1,5 +1,7 @@
 package com.telepathic.finder.sdk.network;
 
+import java.util.ArrayList;
+
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 
@@ -55,12 +57,13 @@ public class BusLineRouteRequest extends RPCRequest {
                     final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
                     if (NO_ERROR == Integer.parseInt(errorCode)) {
                         SoapObject dataEntry = null;
+                        ArrayList<BusLineRoute> busLine = new ArrayList<BusLineRoute>();
                         for(int i = 0; i < newDataSet.getPropertyCount(); i++) {
                             dataEntry = (SoapObject)newDataSet.getProperty(i);
-                            BusLineRoute route = new BusLineRoute(dataEntry);
-                            if (mListener != null && i == 0) {
-                                mListener.onSuccess(route);
-                            }
+                            busLine.add(new BusLineRoute(dataEntry));
+                        }
+                        if (mListener != null) {
+                            mListener.onSuccess(busLine);
                         }
                     } else {
                         if (mListener != null) {

@@ -86,8 +86,8 @@ public class TestActivity extends Activity {
     private class MyBusLineListener implements BusLineListener {
 
         @Override
-        public void onSuccess(final BusLineRoute route) {
-            mBusLineRoute = route;
+        public void onSuccess(final ArrayList<BusLineRoute> busLine) {
+            mBusLineRoute = busLine.get(0);
             ArrayList<BusStation> stations = mBusLineRoute.getStations();
             final String lastStation = stations.get(stations.size() - 1).getName();
             mTrafficService.getBusLocation(mBusLineRoute.getLineName(), lastStation, lastStation, new MyBusLocationListener());

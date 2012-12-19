@@ -1,7 +1,12 @@
 package com.telepathic.finder.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.R.integer;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,14 +28,19 @@ import com.baidu.mapapi.MKPoiResult;
 import com.baidu.mapapi.MKRoute;
 import com.baidu.mapapi.MKSearch;
 import com.baidu.mapapi.MKSearchListener;
+import com.baidu.mapapi.MKStep;
 import com.baidu.mapapi.MKSuggestionResult;
 import com.baidu.mapapi.MKTransitRouteResult;
 import com.baidu.mapapi.MKWalkingRouteResult;
 import com.baidu.mapapi.MapActivity;
 import com.baidu.mapapi.MapView;
 import com.baidu.mapapi.MyLocationOverlay;
+import com.baidu.mapapi.Overlay;
+import com.baidu.mapapi.OverlayItem;
 import com.baidu.mapapi.RouteOverlay;
 import com.telepathic.finder.R;
+import com.telepathic.finder.sdk.BusLocationListener;
+import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
@@ -46,12 +56,16 @@ public class BusLocationActivity extends MapActivity {
     private BMapManager mMapManager;
     private MyLocationOverlay mLocationOverlay = null;  //定位图层
     private LocationListener mLocationListener = null; //onResume时注册此listener，onPause时需要Remove
-
+    private TrafficService mTrafficService;
+    private String mBusLine;
+    private MKRoute mBusRoute;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.buslinesearch);
 
+        mTrafficService = TrafficService.getTrafficService();
         mMapManager = new BMapManager(getApplication());
         mMapManager.init(DEV_KEY, new MyGeneralListener());
         mMapManager.start();
@@ -126,7 +140,12 @@ public class BusLocationActivity extends MapActivity {
                             Toast.LENGTH_LONG).show();
                     return;
                 }
-                MKRoute myRoute = result.getBusRoute();
+                mBusRoute = result.getBusRoute();
+                debugMKBusLine(result);
+                //debugMkRoute(result.getBusRoute());
+                MKRoute route = result.getBusRoute();
+                int lastStationIdx = route.getNumSteps() - 1;
+                final String lastStation = route.getStep(lastStationIdx).getContent();
                 RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
                 // 此处仅展示一个方案作为示例
                 routeOverlay.setData(result.getBusRoute());
@@ -135,6 +154,9 @@ public class BusLocationActivity extends MapActivity {
                 mMapView.invalidate();
 
                 mMapView.getController().animateTo(result.getBusRoute().getStart());
+                
+                mTrafficService.getBusLocation(mBusLine, lastStation, lastStation, new MyBusLocationListener());
+                
                 mBtnSearch.setEnabled(true);
                 dismissDialog(DIALOG_WAITING);
             }
@@ -182,11 +204,43 @@ public class BusLocationActivity extends MapActivity {
     void SearchButtonProcess(View v) {
         if (mBtnSearch.equals(v)) {
             EditText editSearchKey = (EditText) findViewById(R.id.searchkey);
-            String searchKey = editSearchKey.getText().toString();
-            mSearch.poiSearchInCity(mCityName, editSearchKey.getText().toString());
+            mBusLine = editSearchKey.getText().toString();
+            mSearch.poiSearchInCity(mCityName, mBusLine);
             Utils.hideSoftKeyboard(this, editSearchKey);
             mBtnSearch.setEnabled(false);
             showDialog(DIALOG_WAITING);
+        }
+    }
+    
+    private void debugMKBusLine(MKBusLineResult result) {
+        Log.d("Test", "bus name: " + result.getBusName());
+        MKStep firstStation = result.getStation(0);
+        Log.d("Test", "startion 0: " + firstStation.getContent() + ", " + firstStation.getPoint());
+    }
+    
+    /*
+     * MKRoute.ROUTE_TYPE_UNKNOW   = 0
+     * MKRoute.ROUTE_TYPE_DRIVING  = 1
+     * MKRoute.ROUTE_TYPE_WALKING  = 2
+     * MKRoute.ROUTE_TYPE_BUS_LINE = 3
+     */
+    private void debugMkRoute(MKRoute route) {
+//        ArrayList<ArrayList<GeoPoint>> pointList = route.getArrayPoints();
+//        ArrayList<GeoPoint> points = null; 
+//        for(int i = 0; i < pointList.size(); i++) {
+//            Log.d("Test", "#" + i);
+//            points = pointList.get(i);
+//            for(int j = 0; j < points.size(); j++) {
+//                Log.d("Test", "##" + j + " " + points.get(j).toString());
+//            }
+//        }
+//        Log.d("Test", "index: " + route.getIndex());
+//        Log.d("Test", "steps: " + route.getNumSteps());
+        
+        MKStep step = null;
+        for (int idx = 0; idx < route.getNumSteps(); idx++) {
+            step = route.getStep(idx);
+            Log.d("Test", "station: " + step.getContent() + "location: " + step.getPoint());
         }
     }
 
@@ -247,6 +301,75 @@ public class BusLocationActivity extends MapActivity {
 //                BMapApiDemoApp.mDemoApp.m_bKeyRight = false;
 //            }
         }
+    }
+    
+    private void addMarker(MKStep station) {
+     // 创建标记maker  
+        Drawable marker = getResources().getDrawable(R.drawable.icon);  
+        // 为maker定义位置和边界  
+        marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());  
+        
+        /** 
+         * 创建自定义的ItemizedOverlay 
+         */  
+        CustomItemizedOverlay overlay = new CustomItemizedOverlay(marker, this);  
+        
+        /** 
+         * 创建并添加第一个标记：柳峰的家乡（经度：87.493147 纬度：47.118440） 
+         */  
+        // 构造一个经纬度点   
+        // 创建标记（新疆福海县）   
+        OverlayItem overlayItem = new OverlayItem(station.getPoint(), mBusLine, station.getContent());  
+        // 将标记添加到图层中（可添加多个OverlayItem）   
+        overlay.addOverlay(overlayItem);  
+        
+        /** 
+         * 往地图上添加自定义的ItemizedOverlay 
+         */  
+        List<Overlay> mapOverlays = mMapView.getOverlays();  
+        mapOverlays.add(overlay);  
+  
+        /** 
+         * 取得地图控制器对象，用于控制MapView 
+         */  
+        //mMapView.getController().setCenter(markPoint);  
+        //mMapView.getController().setZoom(9);
+ 
+    }
+    
+    private class MyBusLocationListener implements BusLocationListener {
+
+        @Override
+        public void onSuccess(String lineNumber, final String distance) {
+            runOnUiThread(new Runnable() {
+                
+                @Override
+                public void run() {
+                 // TODO Auto-generated method stub
+                    Toast.makeText(BusLocationActivity.this, "success: " + distance, Toast.LENGTH_SHORT).show();
+                    //mMapView.getController().animateTo(result.getBusRoute().getStart());
+                    MKStep curStation = mBusRoute.getStep(mBusRoute.getNumSteps() - Integer.parseInt(distance));
+                    addMarker(curStation);
+                    
+                }
+            });
+            
+        }
+
+        @Override
+        public void onError(final String errorMessage) {
+            runOnUiThread( new Runnable() {
+                
+                @Override
+                public void run() {
+                 // TODO Auto-generated method stub
+                    Toast.makeText(BusLocationActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                    
+                }
+            });
+            
+        }
+        
     }
 
 
