@@ -1,9 +1,7 @@
 package com.telepathic.finder.app;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import android.R.integer;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
@@ -47,6 +45,8 @@ public class BusLocationActivity extends MapActivity {
     private static final String TAG = "MainActivity";
     private static final String DEV_KEY = "A963422DFFFC8530BDDC5FF0063205F9E2D98461";
     private static final int DIALOG_WAITING = 1;
+    
+    private static final int MAP_ZOOM_LEVEL = 14;
     
     private Button mBtnSearch = null;   // 搜索按钮
 
@@ -182,6 +182,7 @@ public class BusLocationActivity extends MapActivity {
                 if (location != null){
                     GeoPoint pt = new GeoPoint((int)(location.getLatitude()*1e6), (int)(location.getLongitude()*1e6));
                     mMapView.getController().animateTo(pt);
+                    mMapView.getController().setZoom(MAP_ZOOM_LEVEL);
                     mMapManager.getLocationManager().removeUpdates(this);
                 }
             }
@@ -305,7 +306,7 @@ public class BusLocationActivity extends MapActivity {
     
     private void addMarker(MKStep station) {
      // 创建标记maker  
-        Drawable marker = getResources().getDrawable(R.drawable.icon);  
+        Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);  
         // 为maker定义位置和边界  
         marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());  
         
@@ -315,26 +316,16 @@ public class BusLocationActivity extends MapActivity {
         CustomItemizedOverlay overlay = new CustomItemizedOverlay(marker, this);  
         
         /** 
-         * 创建并添加第一个标记：柳峰的家乡（经度：87.493147 纬度：47.118440） 
+         * 创建并添加第一个标记：
          */  
-        // 构造一个经纬度点   
-        // 创建标记（新疆福海县）   
         OverlayItem overlayItem = new OverlayItem(station.getPoint(), mBusLine, station.getContent());  
-        // 将标记添加到图层中（可添加多个OverlayItem）   
         overlay.addOverlay(overlayItem);  
-        
         /** 
          * 往地图上添加自定义的ItemizedOverlay 
          */  
         List<Overlay> mapOverlays = mMapView.getOverlays();  
         mapOverlays.add(overlay);  
-  
-        /** 
-         * 取得地图控制器对象，用于控制MapView 
-         */  
-        //mMapView.getController().setCenter(markPoint);  
-        //mMapView.getController().setZoom(9);
- 
+        mMapView.getController().animateTo(station.getPoint());
     }
     
     private class MyBusLocationListener implements BusLocationListener {
