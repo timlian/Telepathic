@@ -9,7 +9,7 @@ public class BusLocationRequest extends RPCRequest {
 
     private static final String METHOD_NAME = "getBusLocation";
 
-    private static final String KEY_RESPONSE = "getBusLineRouteResult";
+    private static final String KEY_RESPONSE = "getBusLocationResult";
     private static final String KEY_LINE_NUMBER  = "lineNumber";
     private static final String KEY_GPS_NUMBER = "GPSNumber";
     private static final String KEY_LAST_STATION = "lastStation";
