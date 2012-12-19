@@ -20,7 +20,6 @@ import com.baidu.mapapi.LocationListener;
 import com.baidu.mapapi.MKAddrInfo;
 import com.baidu.mapapi.MKBusLineResult;
 import com.baidu.mapapi.MKDrivingRouteResult;
-import com.baidu.mapapi.MKGeneralListener;
 import com.baidu.mapapi.MKPoiInfo;
 import com.baidu.mapapi.MKPoiResult;
 import com.baidu.mapapi.MKRoute;
@@ -42,8 +41,8 @@ import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
-    private static final String TAG = "MainActivity";
-    private static final String DEV_KEY = "A963422DFFFC8530BDDC5FF0063205F9E2D98461";
+    private static final String TAG = "BusLocationActivity";
+    
     private static final int DIALOG_WAITING = 1;
     
     private static final int MAP_ZOOM_LEVEL = 14;
@@ -53,6 +52,7 @@ public class BusLocationActivity extends MapActivity {
     private MapView mMapView = null;    // 地图View
     private MKSearch mSearch = null;    // 搜索模块，也可去掉地图模块独立使用
     private String  mCityName = "成都";
+    
     private BMapManager mMapManager;
     private MyLocationOverlay mLocationOverlay = null;  //定位图层
     private LocationListener mLocationListener = null; //onResume时注册此listener，onPause时需要Remove
@@ -63,14 +63,16 @@ public class BusLocationActivity extends MapActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.buslinesearch);
-
-        mTrafficService = TrafficService.getTrafficService();
-        mMapManager = new BMapManager(getApplication());
-        mMapManager.init(DEV_KEY, new MyGeneralListener());
+        setContentView(R.layout.bus_location_view);
+        
+        // init map service 
+        FinderApplication app = (FinderApplication) getApplication();
+        mMapManager = app.getMapManager();
         mMapManager.start();
-        mMapManager.start(); // 如果使用地图SDK，请初始化地图
         super.initMapActivity(mMapManager);
+        
+        // init traffic service
+        mTrafficService = TrafficService.getTrafficService(mMapManager);
 
         mMapView = (MapView) findViewById(R.id.bmapView);
         mMapView.setBuiltInZoomControls(true);
@@ -278,32 +280,9 @@ public class BusLocationActivity extends MapActivity {
     
     @Override
     protected boolean isRouteDisplayed() {
-        // TODO Auto-generated method stub
         return false;
     }
 
- // 常用事件监听，用来处理通常的网络错误，授权验证错误等
-    static class MyGeneralListener implements MKGeneralListener {
-        @Override
-        public void onGetNetworkState(int iError) {
-            Log.d("MyGeneralListener", "onGetNetworkState error is "+ iError);
-//            Toast.makeText(BMapApiDemoApp.mDemoApp.getApplicationContext(), "您的网络出错啦！",
-//                    Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onGetPermissionState(int iError) {
-            Log.d("MyGeneralListener", "onGetPermissionState error is "+ iError);
-//            if (iError ==  MKEvent.ERROR_PERMISSION_DENIED) {
-//                // 授权Key错误：
-//                Toast.makeText(BMapApiDemoApp.mDemoApp.getApplicationContext(),
-//                        "请在BMapApiDemoApp.java文件输入正确的授权Key！",
-//                        Toast.LENGTH_LONG).show();
-//                BMapApiDemoApp.mDemoApp.m_bKeyRight = false;
-//            }
-        }
-    }
-    
     private void addMarker(MKStep station) {
      // 创建标记maker  
         Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);  
@@ -362,6 +341,4 @@ public class BusLocationActivity extends MapActivity {
         }
         
     }
-
-
 }

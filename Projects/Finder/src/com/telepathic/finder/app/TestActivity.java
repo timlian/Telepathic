@@ -38,7 +38,7 @@ public class TestActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_activity);
 
-        mTrafficService = TrafficService.getTrafficService();
+        mTrafficService = TrafficService.getTrafficService(null);
 
         mEditText = (EditText) findViewById(R.id.searchkey);
         mTextBusInfo = (TextView) findViewById(R.id.bus_info);
@@ -47,6 +47,7 @@ public class TestActivity extends Activity {
 
             @Override
             public void onClick(View v) {
+                mTrafficService.getBusStationLines();
                 String number = mEditText.getText().toString();
                 if (number.length()> 0 && number.length() < 4) {
                     mTrafficService.getBusLineRoute(number, new MyBusLineListener());
