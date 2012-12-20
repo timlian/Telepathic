@@ -71,7 +71,7 @@ public class NetWorkAdapter {
         } catch (Exception e) {
             errorMessage = e.getLocalizedMessage();
             if (errorMessage == null) {
-                errorMessage = "Unknown Error!!!";
+                errorMessage = e.toString();
             }
             Log.e(TAG, "send() - " + errorMessage);
 
