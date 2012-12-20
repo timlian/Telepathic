@@ -44,8 +44,12 @@ public class TrafficService implements ITrafficService {
     }
     
     public void getBusStationLines() {
-        BusStationLinesRequest request = new BusStationLinesRequest("新会展中心公交站", "1", "10");
-        mNetWorkAdapter.execute(request);
+        BusStationLinesRequest request1 = new BusStationLinesRequest("新会展中心公交站", "1", "10");
+        BusStationLinesRequest request2 = new BusStationLinesRequest("天府软件园东侧站", "1", "10");
+        BusStationLinesRequest request3 = new BusStationLinesRequest("天华路站", "1", "10");
+        mNetWorkAdapter.execute(request1);
+        mNetWorkAdapter.execute(request2);
+        mNetWorkAdapter.execute(request3);
     }
     
     @Override

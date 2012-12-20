@@ -14,5 +14,9 @@
     <string name="ic_card_hint">IC card number</string>
     <string name="find_bus_route">Finding bus route, please wait.</string>
     <string name="find_ic_card_records">Finding ic card records, please wait.</string>
+    <string name="select_bus_route">Select the bus route</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="default_city">成都</string>
 
 </resources>
