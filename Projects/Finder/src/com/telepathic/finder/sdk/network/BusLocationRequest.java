@@ -3,7 +3,10 @@ package com.telepathic.finder.sdk.network;
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 
-import com.telepathic.finder.sdk.BusLocationListener;
+import com.baidu.mapapi.MKRoute;
+import com.telepathic.finder.sdk.TrafficListener.BusLocationListener;
+import com.telepathic.finder.sdk.BusRoute;
+import com.telepathic.finder.sdk.TrafficService;
 
 public class BusLocationRequest extends RPCRequest {
 
@@ -15,24 +18,27 @@ public class BusLocationRequest extends RPCRequest {
     private static final String KEY_LAST_STATION = "lastStation";
     private static final String KEY_DISTANCE = "distance";
 
-
-
     private BusLocationListener mListener;
+    
+    private TrafficService mService;
+    private BusRoute mBusRoute;
 
-    public BusLocationRequest(String lineName, String gpsNumber, String lastStation, BusLocationListener listener) {
-        super(METHOD_NAME);
-        addParameter(KEY_GPS_NUMBER, gpsNumber);
-        addParameter(KEY_LAST_STATION, lastStation);
-        addParameter(KEY_LINE_NUMBER, lineName);
-        mListener = listener;
+    public BusLocationRequest(TrafficService service, BusRoute route, BusLocationListener listener) {
+          super(METHOD_NAME);
+          mService = service;
+          mBusRoute = route;
+          addParameter(KEY_GPS_NUMBER, route.getLastStation());
+          addParameter(KEY_LAST_STATION, route.getLastStation());
+          addParameter(KEY_LINE_NUMBER, route.getLineNumber());
+          mListener = listener;
     }
 
     @Override
     void onRequestComplete(Object result, String errorMessage) {
         if (errorMessage != null) {
-            if (mListener != null) {
-                mListener.onError(errorMessage);
-            }
+//            if (mListener != null) {
+//                mListener.onError(errorMessage);
+//            }
             return ;
         }
         if (result instanceof SoapObject) {
@@ -46,6 +52,14 @@ public class BusLocationRequest extends RPCRequest {
 
     }
 
+    private void notifyLocUpdated(String lineNumber, int distance) {
+        if (mListener != null && distance >= 0 ) {
+            MKRoute route = mBusRoute.getRoute();
+            int loc = mBusRoute.getStationCount() - distance - 1;
+            mListener.onLocationUpdated(route.getStep(loc));
+        }
+    }
+    
     /*
      * Location response data example:
      *
@@ -64,13 +78,11 @@ public class BusLocationRequest extends RPCRequest {
                     if (NO_ERROR == Integer.parseInt(errorCode)) {
                         final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
                         final String distance = firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE);
-                        if (mListener != null) {
-                            mListener.onSuccess(lineNumber, distance);
-                        }
+                        notifyLocUpdated(lineNumber, Integer.parseInt(distance));
                     } else {
-                        if (mListener != null) {
-                            mListener.onError(errorMessage);
-                        }
+//                        if (mListener != null) {
+//                            mListener.onError(errorMessage);
+//                        }
                     }
                 }
             }

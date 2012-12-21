@@ -1,5 +1,7 @@
 package com.telepathic.finder.sdk;
 
+import com.telepathic.finder.sdk.TrafficListener.BusLocationListener;
+
 public interface ITrafficService {
 
     /**

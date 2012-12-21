@@ -30,7 +30,18 @@ public class Utils {
         }
     }
     
-    public static ArrayList<String> getBusLineNumber(String text) {
+    public static boolean isValidBusLineNumber(String number) {
+        boolean ret = false;
+        if (number != null) {
+            final String busLineNumber = number.trim();
+            if (number.length() != 0) {
+                ret = busLineNumber.matches(BUS_LINE_NUM_ECPRESSION);
+            }
+        }
+        return ret;
+    }
+    
+    public static ArrayList<String> parseBusLineNumber(String text) {
         Pattern p = Pattern.compile(BUS_LINE_NUM_ECPRESSION); 
         Matcher m = p.matcher(text); 
         ArrayList<String> busLineNumbers = new ArrayList<String>();

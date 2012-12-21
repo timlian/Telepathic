@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.BusLineListener;
 import com.telepathic.finder.sdk.BusLineRoute;
-import com.telepathic.finder.sdk.BusLocationListener;
 import com.telepathic.finder.sdk.BusStation;
 import com.telepathic.finder.sdk.ChargeRecordsListener;
 import com.telepathic.finder.sdk.TrafficService;
@@ -91,7 +90,7 @@ public class TestActivity extends Activity {
             mBusLineRoute = busLine.get(0);
             ArrayList<BusStation> stations = mBusLineRoute.getStations();
             final String lastStation = stations.get(stations.size() - 1).getName();
-            mTrafficService.getBusLocation(mBusLineRoute.getLineName(), lastStation, lastStation, new MyBusLocationListener());
+            mTrafficService.getBusLocation(mBusLineRoute.getLineName(), lastStation, lastStation, null);
         }
 
         @Override
@@ -107,48 +106,48 @@ public class TestActivity extends Activity {
         }
     }
 
-    private class MyBusLocationListener implements BusLocationListener {
-
-        @Override
-        public void onSuccess(String lineNumber, final String distance) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    StringBuffer buffer = new StringBuffer();
-                    buffer.append(mBusLineRoute.getLineName() + "路");
-                    buffer.append(" 方向: " + mBusLineRoute.getType());
-                    buffer.append(" 首车: "+ mBusLineRoute.getDepartureTime());
-                    buffer.append(" 末车: " + mBusLineRoute.getCloseoffTime());
-                    buffer.append("\n\n");
-                    ArrayList<BusStation> stations = mBusLineRoute.getStations();
-                    int currentPosition = stations.size() - Integer.parseInt(distance) - 1;
-                    for(int i = 0; i < stations.size(); i++) {
-                        buffer.append(i + 1 + ".");
-                        buffer.append(stations.get(i).getName());
-                        if (currentPosition == i) {
-                            buffer.append("     Here!!!");
-                        }
-                        buffer.append("\n");
-                    }
-                    mSendButton.setEnabled(true);
-                    mTextBusInfo.setText(buffer.toString());
-                }
-            });
-
-        }
-
-        @Override
-        public void onError(final String errorMessage) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSendButton.setEnabled(true);
-                    mTextBusInfo.setText("");
-                    Toast.makeText(TestActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-    }
+//    private class MyBusLocationListener implements BusLocationListener {
+//
+//        @Override
+//        public void onSuccess(String lineNumber, final String distance) {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    StringBuffer buffer = new StringBuffer();
+//                    buffer.append(mBusLineRoute.getLineName() + "路");
+//                    buffer.append(" 方向: " + mBusLineRoute.getType());
+//                    buffer.append(" 首车: "+ mBusLineRoute.getDepartureTime());
+//                    buffer.append(" 末车: " + mBusLineRoute.getCloseoffTime());
+//                    buffer.append("\n\n");
+//                    ArrayList<BusStation> stations = mBusLineRoute.getStations();
+//                    int currentPosition = stations.size() - Integer.parseInt(distance) - 1;
+//                    for(int i = 0; i < stations.size(); i++) {
+//                        buffer.append(i + 1 + ".");
+//                        buffer.append(stations.get(i).getName());
+//                        if (currentPosition == i) {
+//                            buffer.append("     Here!!!");
+//                        }
+//                        buffer.append("\n");
+//                    }
+//                    mSendButton.setEnabled(true);
+//                    mTextBusInfo.setText(buffer.toString());
+//                }
+//            });
+//
+//        }
+//
+//        @Override
+//        public void onError(final String errorMessage) {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mSendButton.setEnabled(true);
+//                    mTextBusInfo.setText("");
+//                    Toast.makeText(TestActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+//                }
+//            });
+//        }
+//    }
 
     private class MyChargeRecordsListener implements ChargeRecordsListener {
 
