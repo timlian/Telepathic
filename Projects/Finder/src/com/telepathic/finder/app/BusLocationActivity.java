@@ -231,7 +231,9 @@ public class BusLocationActivity extends MapActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    updateBusLocation(busLocation);
+                    if (busLocation != null) {
+                        updateBusLocation(busLocation);
+                    }
                 }
             });
         }

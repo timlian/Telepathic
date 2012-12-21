@@ -1,6 +1,7 @@
 package com.telepathic.finder.sdk;
 
 import com.baidu.mapapi.BMapManager;
+import com.baidu.mapapi.MKRoute;
 import com.telepathic.finder.sdk.TrafficListener.BusLocationListener;
 import com.telepathic.finder.sdk.network.BusChargeRecordRequest;
 import com.telepathic.finder.sdk.network.BusLineRouteRequest;
@@ -16,11 +17,13 @@ public class TrafficService implements ITrafficService {
     private NetWorkAdapter mNetWorkAdapter;
     private BusRoutesStore mRoutesStore;
     private MapSearchHandler mSearchHandler;
+    private BusLocationHandler mBusLocationHandler;
     
     private TrafficService(BMapManager manager) {
         mNetWorkAdapter = new NetWorkAdapter();
         mRoutesStore = new BusRoutesStore();
         mSearchHandler = new MapSearchHandler(manager, mRoutesStore);
+        mBusLocationHandler = new BusLocationHandler(this, mNetWorkAdapter);
     }
 
     public static synchronized TrafficService getTrafficService(BMapManager manager) {
@@ -64,8 +67,7 @@ public class TrafficService implements ITrafficService {
     }
     
     public void retrieveBusLocation(BusRoute route) {
-        BusLocationRequest request = new BusLocationRequest(this, route, mLocationListener);
-        mNetWorkAdapter.execute(request);
+        mBusLocationHandler.retrieveBusLocation(route);
     }
     
     public void registerBusLocationListener(BusLocationListener listener) {
@@ -74,6 +76,10 @@ public class TrafficService implements ITrafficService {
     
     public void unregisterBusLocationListener(BusLocationListener listener) {
         mLocationListener = null;
+    }
+    
+    public BusLocationListener getBusLocationListener() {
+        return mLocationListener;
     }
     
     public void getBusStationLines() {
@@ -94,4 +100,5 @@ public class TrafficService implements ITrafficService {
     public BusRoutesStore getRoutesStore() {
         return mRoutesStore;
     }
+    
 }
