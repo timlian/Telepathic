@@ -65,7 +65,7 @@ public class BusLocationRequest extends RPCRequest {
 
     private void setPositionCursor(int distance) {
     	if (distance >= 0) {
-        	mPosCursor -= distance - 1;
+        	mPosCursor = mPosCursor - distance - 1;
         } else {
         	mPosCursor = INVALID_POS_CURSOR;
         }
