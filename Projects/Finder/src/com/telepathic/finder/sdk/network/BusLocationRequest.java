@@ -25,6 +25,14 @@ public class BusLocationRequest extends RPCRequest {
           addParameter(KEY_LAST_STATION, lastStation);
           mListener = listener;
     }
+    
+    public BusLocationRequest(BusRoute route, BusLocationListener listener) {
+        super(METHOD_NAME);
+        addParameter(KEY_LINE_NUMBER, route.getLineNumber());
+        addParameter(KEY_GPS_NUMBER, route.getLastStation());
+        addParameter(KEY_LAST_STATION, route.getLastStation());
+        mListener = listener;
+  }
 
     @Override
     void onRequestComplete(Object result, String errorMessage) {
