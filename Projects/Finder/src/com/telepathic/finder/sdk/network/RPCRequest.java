@@ -39,9 +39,9 @@ abstract class RPCRequest {
         return mRpc.getName();
     }
 
-    abstract void onRequestComplete(Object result, String errorMessage);
+    abstract void onResponse(Object result, String errorMessage);
     
-    protected boolean isDone() {
+    protected boolean isComplete() {
     	return true;
     }
 }

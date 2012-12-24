@@ -23,7 +23,7 @@ public class BusLineRouteRequest extends RPCRequest {
     }
 
     @Override
-    public void onRequestComplete(Object result, String errorMessage) {
+    public void onResponse(Object result, String errorMessage) {
         if (errorMessage != null) {
             if (mListener != null) {
                 mListener.onError(errorMessage);

@@ -41,12 +41,12 @@ public class BusLocationRequest extends RPCRequest {
   }
 
     @Override
-    protected boolean isDone() {
+    protected boolean isComplete() {
     	return mPosCursor <= 0;
     }
     
     @Override
-    void onRequestComplete(Object result, String errorMessage) {
+    void onResponse(Object result, String errorMessage) {
         if (errorMessage != null) {
             if (mListener != null) {
                 mListener.onError(errorMessage);
@@ -70,7 +70,7 @@ public class BusLocationRequest extends RPCRequest {
         	mPosCursor = INVALID_POS_CURSOR;
         }
     	
-    	if (!isDone()) {
+        if (!isComplete()) {
     		addParameter(KEY_GPS_NUMBER, mRoute.getStationName(mPosCursor));
     	}
     }

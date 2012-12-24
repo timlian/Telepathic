@@ -19,7 +19,7 @@ public class BusStationLinesRequest extends RPCRequest {
      * Table1=anyType{station=新会展中心公交站; stationAlias=anyType{}; stationGPS=50023; lineName=84,102,115,298,118; }; 
      */
     @Override
-    void onRequestComplete(Object result, String errorMessage) {
+    void onResponse(Object result, String errorMessage) {
         // TODO Auto-generated method stub
         
     }
