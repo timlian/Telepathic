@@ -15,7 +15,11 @@ public class BusLocationRequest extends RPCRequest {
     private static final String KEY_GPS_NUMBER = "GPSNumber";
     private static final String KEY_LAST_STATION = "lastStation";
     private static final String KEY_DISTANCE = "distance";
+    private static final int INVALID_POS_CURSOR = -1;
 
+    private BusRoute mRoute;
+    private int mPosCursor;
+    
     private BusLocationListener mListener;
     
     public BusLocationRequest(String lineNumber,String currentStation, String lastStation, BusLocationListener listener) {
@@ -31,9 +35,16 @@ public class BusLocationRequest extends RPCRequest {
         addParameter(KEY_LINE_NUMBER, route.getLineNumber());
         addParameter(KEY_GPS_NUMBER, route.getLastStation());
         addParameter(KEY_LAST_STATION, route.getLastStation());
+        mRoute = route;
+        mPosCursor = route.getStationCount() - 1;
         mListener = listener;
   }
 
+    @Override
+    protected boolean isDone() {
+    	return mPosCursor <= 0;
+    }
+    
     @Override
     void onRequestComplete(Object result, String errorMessage) {
         if (errorMessage != null) {
@@ -52,6 +63,18 @@ public class BusLocationRequest extends RPCRequest {
         }
     }
 
+    private void setPositionCursor(int distance) {
+    	if (distance >= 0) {
+        	mPosCursor -= distance - 1;
+        } else {
+        	mPosCursor = INVALID_POS_CURSOR;
+        }
+    	
+    	if (!isDone()) {
+    		addParameter(KEY_GPS_NUMBER, mRoute.getStationName(mPosCursor));
+    	}
+    }
+    
     /*
      * Location response data example:
      *
@@ -69,9 +92,10 @@ public class BusLocationRequest extends RPCRequest {
                     final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
                     if (NO_ERROR == Integer.parseInt(errorCode)) {
                         final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
-                        final String distance = firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE);
-                        if (mListener != null) {
-                            mListener.onSuccess(lineNumber, Integer.parseInt(distance));
+                        final int distance = Integer.parseInt(firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE));
+                        setPositionCursor(distance);
+                        if (mListener != null && mPosCursor > 0) {
+                            mListener.onSuccess(mRoute.getStation(mPosCursor));
                         }
                     } else {
                         if (mListener != null) {

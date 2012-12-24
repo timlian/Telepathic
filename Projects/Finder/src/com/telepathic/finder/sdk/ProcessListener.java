@@ -1,5 +1,7 @@
 package com.telepathic.finder.sdk;
 
+import com.baidu.mapapi.MKStep;
+
 public abstract interface ProcessListener {
     
     public abstract interface BusLocationListener {
@@ -8,7 +10,7 @@ public abstract interface ProcessListener {
          * @param lineNumber
          * @param errorMessage
          */
-        public void onSuccess(String lineNumber, int distance);
+        public void onSuccess(MKStep station);
 
         /**
          * 

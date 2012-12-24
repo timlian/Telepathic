@@ -77,5 +77,13 @@ public class NetWorkAdapter {
 
         }
         request.onRequestComplete(soapEnvelope.bodyIn, errorMessage);
+        onRequestComplete(request);
       }
+    
+    private void onRequestComplete(RPCRequest request) {
+    	if (!request.isDone()) {
+    		execute(request);
+    	}
+    }
+    
 }

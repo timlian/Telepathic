@@ -2,6 +2,7 @@ package com.telepathic.finder.sdk;
 
 import java.util.ArrayList;
 
+import com.baidu.mapapi.MKStep;
 import com.telepathic.finder.sdk.ProcessListener;
 import com.telepathic.finder.sdk.network.BusLocationRequest;
 import com.telepathic.finder.sdk.network.NetWorkAdapter;
@@ -20,9 +21,7 @@ public class BusLocationHandler {
     
     public void retrieveBusLocation(BusRoute route) {
         mBusRoute = route;
-        BusLocationRequest request = new BusLocationRequest(
-                route.getLineNumber(), route.getLastStation(),
-                route.getLastStation(), new MyBusLocationListener());
+        BusLocationRequest request = new BusLocationRequest(route, new MyBusLocationListener());
         mNetWorkAdapter.execute(request);
     }
     
@@ -39,14 +38,9 @@ public class BusLocationHandler {
     private class MyBusLocationListener implements ProcessListener.BusLocationListener {
         
         @Override
-        public void onSuccess(String lineNumber, int distance) {
+        public void onSuccess(MKStep station) {
             if (mService.getBusLocationListener() != null) {
-                mService.getBusLocationListener().onLocationUpdated(mBusRoute.getStation(distance));
-                int index = mBusRoute.setIndex(distance);
-                if (mBusRoute.needContinue()) {
-                    BusLocationRequest request = new BusLocationRequest(mBusRoute.getLineNumber(), mBusRoute.getStationName(index), mBusRoute.getLastStation(), this);
-                    mNetWorkAdapter.execute(request);
-                }
+                mService.getBusLocationListener().onLocationUpdated(station);
             }
         }
 

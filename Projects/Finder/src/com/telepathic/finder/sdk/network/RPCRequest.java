@@ -40,4 +40,8 @@ abstract class RPCRequest {
     }
 
     abstract void onRequestComplete(Object result, String errorMessage);
+    
+    protected boolean isDone() {
+    	return true;
+    }
 }

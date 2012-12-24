@@ -7,25 +7,10 @@ import com.baidu.mapapi.MKStep;
 public class BusRoute {
     private MKRoute mRoute;
     private String mLineNumber;
-    private int mIndex;
     
     public BusRoute(String number, MKRoute route) {
         mRoute = route;
         mLineNumber = number;
-        mIndex = getStationCount() - 1;
-    }
-    
-    public int setIndex(int distance) {
-        mIndex -= distance;
-        return mIndex;
-    }
-    
-    public boolean needContinue() {
-        if (mIndex > 0) {
-            return true;
-        } else {
-            return false;
-        }
     }
     
     public MKRoute getRoute() {
@@ -44,16 +29,11 @@ public class BusRoute {
         return getStationName(getStationCount() - 1);
     }
     
-    public MKStep getStation(int distance) {
-        int position = mIndex;
-        if (distance > 0) {
-            position -= distance;
-        }
-        if (position > 0) {
-            return mRoute.getStep(position);
-        } else {
+    public MKStep getStation(int index) {
+    	if (index < 0 || index >= getStationCount()) {
             return null;
-        }
+        } 
+    	return mRoute.getStep(index);
     }
     
     public String getStationName(int index) {
