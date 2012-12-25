@@ -121,7 +121,6 @@ public class BusLocationActivity extends MapActivity {
     protected void onPause() {
         mMapManager.getLocationManager().removeUpdates(mLocationListener);
         mLocationOverlay.disableMyLocation();
-        mLocationOverlay.disableCompass();
         mMapManager.stop();
         mTrafficService.unregisterBusLocationListener(mBusLocationListener);
         super.onPause();
@@ -131,7 +130,6 @@ public class BusLocationActivity extends MapActivity {
     protected void onResume() {
         mMapManager.getLocationManager().requestLocationUpdates(mLocationListener);
         mLocationOverlay.enableMyLocation();
-        mLocationOverlay.enableCompass();
         mMapManager.start();
         mTrafficService.registerBusLocationListener(mBusLocationListener);
         super.onResume();
@@ -169,27 +167,27 @@ public class BusLocationActivity extends MapActivity {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.select_bus_route).setSingleChoiceItems(busRoutes, 0, null)
-                .setOnCancelListener(new OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        mBtnSearch.setEnabled(true);
-                    }
-                }).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                        final int selectedPosition = ((AlertDialog)dialog).getListView()
-                                .getCheckedItemPosition();
-                        final MKPoiInfo busRouteInfo = busRoutePois.get(selectedPosition);
-                        searchBusRoute(busRouteInfo.city, busRouteInfo.uid);
-                    }
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        mBtnSearch.setEnabled(true);
-                        dialog.dismiss();
-                    }
-                }).create().show();
+        .setOnCancelListener(new OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                mBtnSearch.setEnabled(true);
+            }
+        }).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+                final int selectedPosition = ((AlertDialog)dialog).getListView()
+                        .getCheckedItemPosition();
+                final MKPoiInfo busRouteInfo = busRoutePois.get(selectedPosition);
+                searchBusRoute(busRouteInfo.city, busRouteInfo.uid);
+            }
+        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                mBtnSearch.setEnabled(true);
+                dialog.dismiss();
+            }
+        }).create().show();
     }
 
     private void searchBusRoute(String city, String uid) {
@@ -215,18 +213,18 @@ public class BusLocationActivity extends MapActivity {
         /**
          * 创建自定义的ItemizedOverlay
          */
-         CustomItemizedOverlay overlay = new CustomItemizedOverlay(marker, this);
-         /**
-          * 创建并添加第一个标记：
-          */
-         OverlayItem overlayItem = new OverlayItem(station.getPoint(), "", station.getContent());
-         overlay.addOverlay(overlayItem);
-         /**
-          * 往地图上添加自定义的ItemizedOverlay
-          */
-         List<Overlay> mapOverlays = mMapView.getOverlays();
-         mapOverlays.add(overlay);
-         mMapView.getController().animateTo(station.getPoint());
+        CustomItemizedOverlay overlay = new CustomItemizedOverlay(marker, this);
+        /**
+         * 创建并添加第一个标记：
+         */
+        OverlayItem overlayItem = new OverlayItem(station.getPoint(), "", station.getContent());
+        overlay.addOverlay(overlayItem);
+        /**
+         * 往地图上添加自定义的ItemizedOverlay
+         */
+        List<Overlay> mapOverlays = mMapView.getOverlays();
+        mapOverlays.add(overlay);
+        mMapView.getController().animateTo(station.getPoint());
     }
 
     private class MyBusLocationListener implements BusLocationListener {
