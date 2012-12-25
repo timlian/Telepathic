@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -36,18 +37,18 @@ import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
     private static final String TAG = "BusLocationActivity";
-    
-    private static final int CUSTOM_DIALOG_ID_START = 100;
-    
-    private static final int BUS_LINE_SEARCH_DLG  = CUSTOM_DIALOG_ID_START + 1;
-    
-    private static final int MAP_ZOOM_LEVEL = 14;
-    
-    private Button mBtnSearch;  
 
-    private MapView mMapView;    
+    private static final int CUSTOM_DIALOG_ID_START = 100;
+
+    private static final int BUS_LINE_SEARCH_DLG  = CUSTOM_DIALOG_ID_START + 1;
+
+    private static final int MAP_ZOOM_LEVEL = 14;
+
+    private Button mBtnSearch;
+
+    private MapView mMapView;
     private BMapManager mMapManager;
-    
+
     private MyLocationOverlay mLocationOverlay;  //定位图层
     private LocationListener mLocationListener; //onResume时注册此listener，onPause时需要Remove
     private TrafficService mTrafficService;
@@ -56,19 +57,19 @@ public class BusLocationActivity extends MapActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bus_location_view);
-        
+
         mBtnSearch = (Button) findViewById(R.id.search);
-        
+
         mBusLocationListener = new MyBusLocationListener();
-        // init map service 
+        // init map service
         FinderApplication app = (FinderApplication) getApplication();
         mMapManager = app.getMapManager();
         mMapManager.start();
         super.initMapActivity(mMapManager);
-        
+
         // init traffic service
         mTrafficService = TrafficService.getTrafficService(mMapManager);
-        
+
         mMapView = (MapView) findViewById(R.id.bmapView);
         mMapView.setBuiltInZoomControls(true);
         // 设置在缩放动画过程中也显示overlay,默认为不绘制
@@ -77,7 +78,7 @@ public class BusLocationActivity extends MapActivity {
         // 添加定位图层
         mLocationOverlay = new MyLocationOverlay(this, mMapView);
         mMapView.getOverlays().add(mLocationOverlay);
-        
+
         // 注册定位事件
         mLocationListener = new LocationListener(){
             @Override
@@ -103,24 +104,24 @@ public class BusLocationActivity extends MapActivity {
                 // showDialog(BUS_LINE_SEARCH_DLG);
                 mTrafficService.searchBusLine(city, busNumber,
                         new BusLineListener() {
-                            @Override
-                            public void done(ArrayList<MKPoiInfo> busPois,
-                                    int error) {
-                                showBusRoutesDlg(busPois);
-                            }
-                        });
+                    @Override
+                    public void done(ArrayList<MKPoiInfo> busPois,
+                            int error) {
+                        showBusRoutesDlg(busPois);
+                    }
+                });
             } else {
                 Toast.makeText(this, R.string.invalid_input_hint,
                         Toast.LENGTH_LONG).show();
             }
         }
     }
-    
+
     @Override
     protected void onPause() {
         mMapManager.getLocationManager().removeUpdates(mLocationListener);
         mLocationOverlay.disableMyLocation();
-        mLocationOverlay.disableCompass(); 
+        mLocationOverlay.disableCompass();
         mMapManager.stop();
         mTrafficService.unregisterBusLocationListener(mBusLocationListener);
         super.onPause();
@@ -130,7 +131,7 @@ public class BusLocationActivity extends MapActivity {
     protected void onResume() {
         mMapManager.getLocationManager().requestLocationUpdates(mLocationListener);
         mLocationOverlay.enableMyLocation();
-        mLocationOverlay.enableCompass(); 
+        mLocationOverlay.enableCompass();
         mMapManager.start();
         mTrafficService.registerBusLocationListener(mBusLocationListener);
         super.onResume();
@@ -140,52 +141,55 @@ public class BusLocationActivity extends MapActivity {
     protected Dialog onCreateDialog(int id, Bundle args) {
         Dialog retDialog = null;
         switch (id) {
-        case BUS_LINE_SEARCH_DLG:
-            ProgressDialog prgDlg = new ProgressDialog(this);
-            prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            prgDlg.setMessage(getResources().getString(R.string.find_bus_route));
-            prgDlg.setIndeterminate(true);
-            prgDlg.setCancelable(false);
-            retDialog = prgDlg;
-            break;
-            
-        default:
-            break;
+            case BUS_LINE_SEARCH_DLG:
+                ProgressDialog prgDlg = new ProgressDialog(this);
+                prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                prgDlg.setMessage(getResources().getString(R.string.find_bus_route));
+                prgDlg.setIndeterminate(true);
+                prgDlg.setCancelable(false);
+                retDialog = prgDlg;
+                break;
+
+            default:
+                break;
         }
         return retDialog;
     }
-    
-    
+
+
     @Override
     protected boolean isRouteDisplayed() {
         return false;
     }
-    
+
     private void showBusRoutesDlg(final ArrayList<MKPoiInfo> busRoutePois) {
         final String[] busRoutes = new String[busRoutePois.size()];
         for (int idx = 0; idx < busRoutePois.size(); idx++) {
             busRoutes[idx] = busRoutePois.get(idx).name;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.select_bus_route)
-                .setSingleChoiceItems(busRoutes, 0, null)
-                .setPositiveButton(R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                    int whichButton) {
-                                dialog.dismiss();
-                                final int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
-                                final MKPoiInfo busRouteInfo = busRoutePois.get(selectedPosition);
-                                searchBusRoute(busRouteInfo.city, busRouteInfo.uid);
-                            }
-                        })
-                .setNegativeButton(R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                    int whichButton) {
-                                dialog.dismiss();
-                            }
-                        }).create().show();
+        builder.setTitle(R.string.select_bus_route).setSingleChoiceItems(busRoutes, 0, null)
+                .setOnCancelListener(new OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        mBtnSearch.setEnabled(true);
+                    }
+                }).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                        final int selectedPosition = ((AlertDialog)dialog).getListView()
+                                .getCheckedItemPosition();
+                        final MKPoiInfo busRouteInfo = busRoutePois.get(selectedPosition);
+                        searchBusRoute(busRouteInfo.city, busRouteInfo.uid);
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        mBtnSearch.setEnabled(true);
+                        dialog.dismiss();
+                    }
+                }).create().show();
     }
 
     private void searchBusRoute(String city, String uid) {
@@ -204,27 +208,27 @@ public class BusLocationActivity extends MapActivity {
             }
         });
     }
-    
+
     private void updateBusLocation(MKStep station) {
-        Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);  
-        marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());  
-        /** 
-         * 创建自定义的ItemizedOverlay 
-         */  
-        CustomItemizedOverlay overlay = new CustomItemizedOverlay(marker, this);  
-        /** 
-         * 创建并添加第一个标记：
-         */  
-        OverlayItem overlayItem = new OverlayItem(station.getPoint(), "", station.getContent());  
-        overlay.addOverlay(overlayItem);  
-        /** 
-         * 往地图上添加自定义的ItemizedOverlay 
-         */  
-        List<Overlay> mapOverlays = mMapView.getOverlays();  
-        mapOverlays.add(overlay);  
-        mMapView.getController().animateTo(station.getPoint());
+        Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);
+        marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
+        /**
+         * 创建自定义的ItemizedOverlay
+         */
+         CustomItemizedOverlay overlay = new CustomItemizedOverlay(marker, this);
+         /**
+          * 创建并添加第一个标记：
+          */
+         OverlayItem overlayItem = new OverlayItem(station.getPoint(), "", station.getContent());
+         overlay.addOverlay(overlayItem);
+         /**
+          * 往地图上添加自定义的ItemizedOverlay
+          */
+         List<Overlay> mapOverlays = mMapView.getOverlays();
+         mapOverlays.add(overlay);
+         mMapView.getController().animateTo(station.getPoint());
     }
-    
+
     private class MyBusLocationListener implements BusLocationListener {
         @Override
         public void onLocationUpdated(final MKStep busLocation) {
@@ -248,5 +252,5 @@ public class BusLocationActivity extends MapActivity {
             });
         }
     }
-    
+
 }
