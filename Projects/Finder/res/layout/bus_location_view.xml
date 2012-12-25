@@ -15,7 +15,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:background="@drawable/bg_search_bar"
-        android:padding="3dp" >
+        android:paddingLeft="5dp"
+        android:paddingRight="8dp" >
 
         <ImageButton
             android:id="@+id/search"
@@ -23,8 +24,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:gravity="center"
             android:onClick="onSearchClicked"
+            android:background="@drawable/search_button_selector"
             android:src="@drawable/ic_btn_poi_search_normal" />
 
         <RelativeLayout
@@ -40,7 +44,8 @@
                 android:layout_centerVertical="true"
                 android:hint="@string/bus_number_hint"
                 android:paddingRight="32dp"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:digits="0123456789abcdABCD" />
 
             <ImageView
                 android:id="@+id/iv_speak"
@@ -48,7 +53,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:src="@android:drawable/ic_btn_speak_now" />
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:src="@drawable/speak_header_selector"
+                android:onClick="onSpeakClicked" />
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

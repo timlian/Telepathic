@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.baidu.mapapi.BMapManager;
@@ -46,7 +47,9 @@ public class BusLocationActivity extends MapActivity {
 
     private ImageButton mBtnSearch;
 
-    private AutoCompleteTextView editSearchKey;
+    private AutoCompleteTextView mTvSearchKey;
+
+    private ImageView mIvSpeak;
 
     private MapView mMapView;
     private BMapManager mMapManager;
@@ -62,7 +65,9 @@ public class BusLocationActivity extends MapActivity {
 
         mBtnSearch = (ImageButton) findViewById(R.id.search);
 
-        editSearchKey = (AutoCompleteTextView) findViewById(R.id.search_key);
+        mTvSearchKey = (AutoCompleteTextView) findViewById(R.id.search_key);
+
+        mIvSpeak = (ImageView)findViewById(R.id.iv_speak);
 
         mBusLocationListener = new MyBusLocationListener();
         // init map service
@@ -99,10 +104,10 @@ public class BusLocationActivity extends MapActivity {
 
     public void onSearchClicked(View v) {
         if (mBtnSearch.equals(v)) {
-            String busNumber = editSearchKey.getText().toString();
+            String busNumber = mTvSearchKey.getText().toString();
             if (Utils.isValidBusLineNumber(busNumber)) {
                 String city = getResources().getString(R.string.default_city);
-                Utils.hideSoftKeyboard(this, editSearchKey);
+                Utils.hideSoftKeyboard(this, mTvSearchKey);
                 mBtnSearch.setEnabled(false);
                 // showDialog(BUS_LINE_SEARCH_DLG);
                 mTrafficService.searchBusLine(city, busNumber,
@@ -117,6 +122,11 @@ public class BusLocationActivity extends MapActivity {
                 Toast.makeText(this, R.string.invalid_input_hint,
                         Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    public void onSpeakClicked(View v){
+        if (mIvSpeak.equals(v)){
         }
     }
 
