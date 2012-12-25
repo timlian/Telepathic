@@ -12,8 +12,8 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.baidu.mapapi.BMapManager;
@@ -44,7 +44,9 @@ public class BusLocationActivity extends MapActivity {
 
     private static final int MAP_ZOOM_LEVEL = 14;
 
-    private Button mBtnSearch;
+    private ImageButton mBtnSearch;
+
+    private AutoCompleteTextView editSearchKey;
 
     private MapView mMapView;
     private BMapManager mMapManager;
@@ -58,7 +60,9 @@ public class BusLocationActivity extends MapActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bus_location_view);
 
-        mBtnSearch = (Button) findViewById(R.id.search);
+        mBtnSearch = (ImageButton) findViewById(R.id.search);
+
+        editSearchKey = (AutoCompleteTextView) findViewById(R.id.search_key);
 
         mBusLocationListener = new MyBusLocationListener();
         // init map service
@@ -95,7 +99,6 @@ public class BusLocationActivity extends MapActivity {
 
     public void onSearchClicked(View v) {
         if (mBtnSearch.equals(v)) {
-            EditText editSearchKey = (EditText) findViewById(R.id.search_key);
             String busNumber = editSearchKey.getText().toString();
             if (Utils.isValidBusLineNumber(busNumber)) {
                 String city = getResources().getString(R.string.default_city);

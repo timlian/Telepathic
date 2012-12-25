@@ -1,35 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
     
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-	    <EditText
-	        android:id="@+id/search_key"
-	        android:layout_width="0dip"
-	        android:layout_weight="1"
-	        android:layout_height="wrap_content"
-	        android:hint="@string/bus_number_hint" 
-	        android:inputType="number" />
-	
-	    <Button
-	        android:id="@+id/search"
-	        android:text="@string/find"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content" 
-	        android:onClick="onSearchClicked" />
-	    
-	</LinearLayout>
-	
     <com.baidu.mapapi.MapView
         android:id="@+id/bmapView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:clickable="true" />
+    
+    <RelativeLayout
+        android:layout_alignParentTop="true"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/bg_search_bar"
+        android:padding="3dp" >
 
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:onClick="onSearchClicked"
+            android:src="@drawable/ic_btn_poi_search_normal" />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/search" >
+
+            <AutoCompleteTextView
+                android:id="@+id/search_key"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:hint="@string/bus_number_hint"
+                android:paddingRight="32dp"
+                android:singleLine="true" />
+
+            <ImageView
+                android:id="@+id/iv_speak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@android:drawable/ic_btn_speak_now" />
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>
