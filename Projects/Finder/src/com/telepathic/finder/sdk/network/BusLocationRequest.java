@@ -71,7 +71,7 @@ public class BusLocationRequest extends RPCRequest {
         }
     	
         if (!isComplete()) {
-    		addParameter(KEY_GPS_NUMBER, mRoute.getStationName(mPosCursor));
+    		setParameter(KEY_GPS_NUMBER, mRoute.getStationName(mPosCursor));
     	}
     }
     

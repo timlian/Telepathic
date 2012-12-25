@@ -27,6 +27,20 @@ abstract class RPCRequest {
         mRpc.addProperty(key, value);
     }
 
+    protected void setParameter(String key, Object value) {
+        Object property = mRpc.getProperty(key);
+        if (property != null) {
+            for(int idx = 0; idx < mRpc.getPropertyCount(); idx++) {
+                if (property.equals(mRpc.getProperty(idx))) {
+                    mRpc.setProperty(idx, value);
+                    break;
+                }
+            }
+        } else {
+            mRpc.addProperty(key, value);
+        }
+    }
+    
     public SoapObject getSoapMessage() {
         return mRpc;
     }
