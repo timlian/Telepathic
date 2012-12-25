@@ -3,8 +3,8 @@ package com.telepathic.finder.sdk.network;
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 
-import com.telepathic.finder.sdk.ProcessListener.BusLocationListener;
 import com.telepathic.finder.sdk.BusRoute;
+import com.telepathic.finder.sdk.ProcessListener.BusLocationListener;
 
 public class BusLocationRequest extends RPCRequest {
 
@@ -19,17 +19,17 @@ public class BusLocationRequest extends RPCRequest {
 
     private BusRoute mRoute;
     private int mPosCursor;
-    
+
     private BusLocationListener mListener;
-    
+
     public BusLocationRequest(String lineNumber,String currentStation, String lastStation, BusLocationListener listener) {
-          super(METHOD_NAME);
-          addParameter(KEY_LINE_NUMBER, lineNumber);
-          addParameter(KEY_GPS_NUMBER, currentStation);
-          addParameter(KEY_LAST_STATION, lastStation);
-          mListener = listener;
+        super(METHOD_NAME);
+        addParameter(KEY_LINE_NUMBER, lineNumber);
+        addParameter(KEY_GPS_NUMBER, currentStation);
+        addParameter(KEY_LAST_STATION, lastStation);
+        mListener = listener;
     }
-    
+
     public BusLocationRequest(BusRoute route, BusLocationListener listener) {
         super(METHOD_NAME);
         addParameter(KEY_LINE_NUMBER, route.getLineNumber());
@@ -38,13 +38,13 @@ public class BusLocationRequest extends RPCRequest {
         mRoute = route;
         mPosCursor = route.getStationCount() - 1;
         mListener = listener;
-  }
+    }
 
     @Override
     protected boolean isComplete() {
-    	return mPosCursor <= 0;
+        return mPosCursor <= 0;
     }
-    
+
     @Override
     void onResponse(Object result, String errorMessage) {
         if (errorMessage != null) {
@@ -64,17 +64,17 @@ public class BusLocationRequest extends RPCRequest {
     }
 
     private void setPositionCursor(int distance) {
-    	if (distance >= 0) {
-        	mPosCursor = mPosCursor - distance - 1;
+        if (distance > 0) {
+            mPosCursor = mPosCursor - distance;
         } else {
-        	mPosCursor = INVALID_POS_CURSOR;
+            mPosCursor = mPosCursor - 1;
         }
-    	
+
         if (!isComplete()) {
-    		setParameter(KEY_GPS_NUMBER, mRoute.getStationName(mPosCursor));
-    	}
+            setParameter(KEY_GPS_NUMBER, mRoute.getStationName(mPosCursor));
+        }
     }
-    
+
     /*
      * Location response data example:
      *
@@ -94,7 +94,7 @@ public class BusLocationRequest extends RPCRequest {
                         final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
                         final int distance = Integer.parseInt(firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE));
                         setPositionCursor(distance);
-                        if (mListener != null && mPosCursor > 0) {
+                        if (mListener != null && mPosCursor >= 0 && distance >= 0) {
                             mListener.onSuccess(mRoute.getStation(mPosCursor));
                         }
                     } else {
