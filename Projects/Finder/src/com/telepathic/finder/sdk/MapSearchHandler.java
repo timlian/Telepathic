@@ -57,6 +57,7 @@ public class MapSearchHandler implements MKSearchListener {
     @Override
     public void onGetPoiResult(MKPoiResult res, int type, int error) {
         ArrayList<MKPoiInfo> busPois = null;
+        String busLineNumber = null;
         if (error == 0 || res != null) {
             ArrayList<MKPoiInfo> allPois = res.getAllPoi();
             if (allPois != null && allPois.size() > 0) {
@@ -64,13 +65,16 @@ public class MapSearchHandler implements MKSearchListener {
                 for(MKPoiInfo poiInfo : allPois) {
                     // poi类型，0：普通点，1：公交站，2：公交线路，3：地铁站，4：地铁线路
                     if (poiInfo.ePoiType == 2) {
+                    	if (busLineNumber == null) {
+                    		busLineNumber = Utils.parseBusLineNumber(poiInfo.name).get(0);
+                    	}
                         busPois.add(poiInfo);
                     }
                 }
             }
         }
         if (mBusLineListener != null) {
-            mBusLineListener.done(busPois, error);
+            mBusLineListener.done(busLineNumber, busPois, error);
         }
     }
     
@@ -108,4 +112,5 @@ public class MapSearchHandler implements MKSearchListener {
     public void onGetWalkingRouteResult(MKWalkingRouteResult arg0, int arg1) {
         // Nothing need to do.
     }
+    
 }

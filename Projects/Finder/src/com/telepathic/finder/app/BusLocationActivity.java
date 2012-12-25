@@ -37,8 +37,7 @@ import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
-    private static final String TAG = "BusLocationActivity";
-
+    
     private static final int CUSTOM_DIALOG_ID_START = 100;
 
     private static final int BUS_LINE_SEARCH_DLG  = CUSTOM_DIALOG_ID_START + 1;
@@ -113,9 +112,11 @@ public class BusLocationActivity extends MapActivity {
                 mTrafficService.searchBusLine(city, busNumber,
                         new BusLineListener() {
                     @Override
-                    public void done(ArrayList<MKPoiInfo> busPois,
+                    public void done(String busLineNumber, ArrayList<MKPoiInfo> busPois,
                             int error) {
-                        showBusRoutesDlg(busPois);
+                    	if (busPois != null && busPois.size() > 0) {
+                    		showBusRoutesDlg(busLineNumber, busPois);
+                    	}
                     }
                 });
             } else {
@@ -173,13 +174,16 @@ public class BusLocationActivity extends MapActivity {
         return false;
     }
 
-    private void showBusRoutesDlg(final ArrayList<MKPoiInfo> busRoutePois) {
+    private void showBusRoutesDlg(String busLineNumber, final ArrayList<MKPoiInfo> busRoutePois) {
         final String[] busRoutes = new String[busRoutePois.size()];
         for (int idx = 0; idx < busRoutePois.size(); idx++) {
-            busRoutes[idx] = busRoutePois.get(idx).name;
+        	int startPos = busRoutePois.get(idx).name.indexOf('(');
+        	int endPos   = busRoutePois.get(idx).name.indexOf(')');
+        	busRoutes[idx] = busRoutePois.get(idx).name.substring(startPos+1, endPos);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.select_bus_route).setSingleChoiceItems(busRoutes, 0, null)
+        final String titleText = String.format(getResources().getString(R.string.select_bus_route), busLineNumber);
+        builder.setTitle(titleText).setSingleChoiceItems(busRoutes, 0, null)
         .setOnCancelListener(new OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {

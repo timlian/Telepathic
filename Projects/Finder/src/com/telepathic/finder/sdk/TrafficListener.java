@@ -12,7 +12,7 @@ public abstract interface TrafficListener {
          * 
          * @param busPois
          */
-       public void done(ArrayList<MKPoiInfo> busPois, int error);
+       public void done(String busLineNumber, ArrayList<MKPoiInfo> busPois, int error);
         
     }
     
