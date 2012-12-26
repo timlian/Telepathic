@@ -20,6 +20,19 @@
     <string name="default_city">成都</string>
     <string name="invalid_input_hint">请输入正确的公交车路线号码</string>
     
+    <!-- speech recognize notice -->
+    <string name="no_voice_search_title">Notice</string>
+    <string name="no_voice_search_msg">The speech recognize function need Google Voice Search to support, do you want to download it now?</string>
+    <string name="no_voice_search_cancel">Cancel</string>
+    <string name="no_voice_search_browser">From web</string>
+    <string name="no_voice_search_download">From market</string>
+    <string name="no_market_title">No App Store</string>
+    <string name="no_market_msg">You cellphone isn\'t install any app store to handle the request. Do you want to download it from browser?</string>
+    <string name="no_market_cancel">Cancel</string>
+    <string name="no_market_download">Download from browser</string>
+    <string name="speak_busline_number">Please speak out busline number</string>
+    <string name="no_matches_busline">No matches bus line</string>
+    
     <!-- Baidu map error message definition -->
     <string name="error_location_falied">定位失败</string>
     <string name="error_network_connect">网络连接错误</string>

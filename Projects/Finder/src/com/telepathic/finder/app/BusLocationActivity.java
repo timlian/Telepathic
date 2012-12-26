@@ -2,16 +2,23 @@ package com.telepathic.finder.app;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -42,6 +49,14 @@ public class BusLocationActivity extends MapActivity {
     private static final int CUSTOM_DIALOG_ID_START = 100;
 
     private static final int BUS_LINE_SEARCH_DLG  = CUSTOM_DIALOG_ID_START + 1;
+
+    private static final int DOWN_VOICE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 2;
+
+    private static final int DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG = CUSTOM_DIALOG_ID_START + 3;
+
+    private static final int CUSTOM_INTENT_REQUEST_CODE_START = 0x1000;
+
+    private static final int START_SPEECH_RECOGNIZE = CUSTOM_INTENT_REQUEST_CODE_START + 1;
 
     private static final int MAP_ZOOM_LEVEL = 14;
 
@@ -127,7 +142,35 @@ public class BusLocationActivity extends MapActivity {
 
     public void onSpeakClicked(View v){
         if (mIvSpeak.equals(v)){
+            mTvSearchKey.setText("");
+            startSpeechRecognize();
         }
+    }
+
+    private void startSpeechRecognize() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getResources().getString(R.string.speak_busline_number));
+        try {
+            startActivityForResult(intent, START_SPEECH_RECOGNIZE);
+        } catch (ActivityNotFoundException ex) {
+            showDialog(DOWN_VOICE_SEARCH_DLG);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == START_SPEECH_RECOGNIZE && resultCode == RESULT_OK) {
+            ArrayList<String> matches = data
+                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            try {
+                new recognizeResultTask().execute(matches);
+            } catch (RejectedExecutionException ex) {
+                ex.printStackTrace();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -160,7 +203,70 @@ public class BusLocationActivity extends MapActivity {
                 prgDlg.setCancelable(false);
                 retDialog = prgDlg;
                 break;
-
+            case DOWN_VOICE_SEARCH_DLG:
+                AlertDialog.Builder vsDlg = new AlertDialog.Builder(BusLocationActivity.this)
+                .setTitle(R.string.no_voice_search_title)
+                .setMessage(R.string.no_voice_search_msg)
+                .setNegativeButton(R.string.no_voice_search_cancel,
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setNeutralButton(R.string.no_voice_search_browser, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(
+                                Intent.ACTION_VIEW);
+                        intent.setData(Uri
+                                .parse("http://m.wandoujia.com/apps/com.google.android.voicesearch"));
+                        startActivity(intent);
+                    }
+                })
+                .setPositiveButton(R.string.no_voice_search_download,
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+                        installIntent.setData(Uri
+                                .parse("market://details?id=com.google.android.voicesearch"));
+                        try {
+                            startActivity(installIntent);
+                        } catch (ActivityNotFoundException ex) {
+                            dialog.dismiss();
+                            showDialog(DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG);
+                        }
+                    }
+                });
+                retDialog = vsDlg.create();
+                break;
+            case DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG:
+                AlertDialog.Builder vsBrowserDlg = new AlertDialog.Builder(BusLocationActivity.this)
+                .setTitle(R.string.no_market_title)
+                .setMessage(R.string.no_market_msg)
+                .setNegativeButton(R.string.no_market_cancel,
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(
+                            DialogInterface dialog,
+                            int which) {
+                    }
+                })
+                .setPositiveButton(R.string.no_market_download,
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(
+                            DialogInterface dialog,
+                            int which) {
+                        Intent intent = new Intent(
+                                Intent.ACTION_VIEW);
+                        intent.setData(Uri
+                                .parse("http://m.wandoujia.com/apps/com.google.android.voicesearch"));
+                        startActivity(intent);
+                    }
+                });
+                retDialog = vsBrowserDlg.create();
+                break;
             default:
                 break;
         }
@@ -261,6 +367,41 @@ public class BusLocationActivity extends MapActivity {
                     Toast.makeText(BusLocationActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
             });
+        }
+    }
+
+    private class recognizeResultTask extends AsyncTask<ArrayList<String>, Void, ArrayList<String>> {
+
+        @Override
+        protected ArrayList<String> doInBackground(ArrayList<String>... params) {
+            ArrayList<String> result = new ArrayList<String>();
+            for (String recognize : params[0]) {
+                String busLineNo = Utils.formatRecognizeData(recognize);
+                if (busLineNo != null) {
+                    result.add(busLineNo);
+                }
+            }
+            return Utils.removeDuplicateWithOrder(result);
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> result) {
+            mTvSearchKey.setAdapter(null);
+            if (result.size() > 1) {
+                mTvSearchKey.setText(result.get(0));
+                result.remove(0);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                        BusLocationActivity.this, android.R.layout.simple_dropdown_item_1line,
+                        result);
+                mTvSearchKey.setAdapter(adapter);
+                mTvSearchKey.showDropDown();
+            } else if (result.size() == 1) {
+                mTvSearchKey.setText(result.get(0));
+            } else {
+                Toast.makeText(BusLocationActivity.this, R.string.no_matches_busline,
+                        Toast.LENGTH_SHORT).show();
+            }
+            super.onPostExecute(result);
         }
     }
 
