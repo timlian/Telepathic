@@ -48,6 +48,7 @@ public class BusLocationRequest extends RPCRequest {
     @Override
     void onResponse(Object result, String errorMessage) {
         if (errorMessage != null) {
+        	mPosCursor = INVALID_POS_CURSOR;
             if (mListener != null) {
                 mListener.onError(errorMessage);
             }
