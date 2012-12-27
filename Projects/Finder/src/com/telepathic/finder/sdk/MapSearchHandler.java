@@ -13,20 +13,20 @@ import com.baidu.mapapi.MKSearchListener;
 import com.baidu.mapapi.MKSuggestionResult;
 import com.baidu.mapapi.MKTransitRouteResult;
 import com.baidu.mapapi.MKWalkingRouteResult;
-
 import com.telepathic.finder.sdk.TrafficListener.BusLineListener;
 import com.telepathic.finder.sdk.TrafficListener.BusRouteListener;
 import com.telepathic.finder.util.Utils;
 
 public class MapSearchHandler implements MKSearchListener {
-    
+
     private MKSearch mMapSearch;
-    
+
     private BusLineListener mBusLineListener;
     private BusRouteListener mBusRouteListener;
     private BusRoutesStore mRoutesStore;
     private String uid;
-    
+    private boolean isCanceled = false;
+
     MapSearchHandler(BMapManager manager, BusRoutesStore store) {
         mMapSearch = new MKSearch();
         mMapSearch.init(manager, this);
@@ -37,13 +37,13 @@ public class MapSearchHandler implements MKSearchListener {
         mBusLineListener = listener;
         mMapSearch.poiSearchInCity(city, busNumber);
     }
-    
+
     public void searchBusRoute(String city, String routeUid, BusRouteListener listener) {
         uid = routeUid;
         mBusRouteListener = listener;
         mMapSearch.busLineSearch(city, routeUid);
     }
-    
+
     @Override
     public void onGetBusDetailResult(MKBusLineResult result, int error) {
         if (mBusRouteListener != null) {
@@ -53,9 +53,13 @@ public class MapSearchHandler implements MKSearchListener {
             mBusRouteListener.done(route, error);
         }
     }
-    
+
     @Override
     public void onGetPoiResult(MKPoiResult res, int type, int error) {
+        if (isCanceled) {
+            isCanceled = false;
+            return;
+        }
         ArrayList<MKPoiInfo> busPois = null;
         String busLineNumber = null;
         if (error == 0 || res != null) {
@@ -65,9 +69,9 @@ public class MapSearchHandler implements MKSearchListener {
                 for(MKPoiInfo poiInfo : allPois) {
                     // poi类型，0：普通点，1：公交站，2：公交线路，3：地铁站，4：地铁线路
                     if (poiInfo.ePoiType == 2) {
-                    	if (busLineNumber == null) {
-                    		busLineNumber = Utils.parseBusLineNumber(poiInfo.name).get(0);
-                    	}
+                        if (busLineNumber == null) {
+                            busLineNumber = Utils.parseBusLineNumber(poiInfo.name).get(0);
+                        }
                         busPois.add(poiInfo);
                     }
                 }
@@ -77,7 +81,11 @@ public class MapSearchHandler implements MKSearchListener {
             mBusLineListener.done(busLineNumber, busPois, error);
         }
     }
-    
+
+    public void cancel(){
+        isCanceled = true;
+    }
+
     @Override
     public void onGetAddrResult(MKAddrInfo arg0, int arg1) {
         // Nothing need to do.
@@ -112,5 +120,5 @@ public class MapSearchHandler implements MKSearchListener {
     public void onGetWalkingRouteResult(MKWalkingRouteResult arg0, int arg1) {
         // Nothing need to do.
     }
-    
+
 }

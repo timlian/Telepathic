@@ -123,13 +123,14 @@ public class BusLocationActivity extends MapActivity {
                 String city = getResources().getString(R.string.default_city);
                 Utils.hideSoftKeyboard(this, mTvSearchKey);
                 mBtnSearch.setEnabled(false);
-                // showDialog(BUS_LINE_SEARCH_DLG);
+                showDialog(BUS_LINE_SEARCH_DLG);
                 mTrafficService.searchBusLine(city, busNumber,
                         new BusLineListener() {
                     @Override
                     public void done(String busLineNumber, ArrayList<MKPoiInfo> busPois,
                             int error) {
                         if (busPois != null && busPois.size() > 0) {
+                            dismissDialog(BUS_LINE_SEARCH_DLG);
                             showBusRoutesDlg(busLineNumber, busPois);
                         }
                     }
@@ -201,7 +202,13 @@ public class BusLocationActivity extends MapActivity {
                 prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 prgDlg.setMessage(getResources().getString(R.string.find_bus_route));
                 prgDlg.setIndeterminate(true);
-                prgDlg.setCancelable(false);
+                prgDlg.setOnCancelListener(new OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        mBtnSearch.setEnabled(true);
+                        mTrafficService.cancelSearch();
+                    }
+                });
                 retDialog = prgDlg;
                 break;
             case DOWN_VOICE_SEARCH_DLG:
