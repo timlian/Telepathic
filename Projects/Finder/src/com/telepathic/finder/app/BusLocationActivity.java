@@ -44,7 +44,7 @@ import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
-    
+
     private static final int CUSTOM_DIALOG_ID_START = 100;
 
     private static final int BUS_LINE_SEARCH_DLG  = CUSTOM_DIALOG_ID_START + 1;
@@ -129,9 +129,9 @@ public class BusLocationActivity extends MapActivity {
                     @Override
                     public void done(String busLineNumber, ArrayList<MKPoiInfo> busPois,
                             int error) {
-                    	if (busPois != null && busPois.size() > 0) {
-                    		showBusRoutesDlg(busLineNumber, busPois);
-                    	}
+                        if (busPois != null && busPois.size() > 0) {
+                            showBusRoutesDlg(busLineNumber, busPois);
+                        }
                     }
                 });
             } else {
@@ -283,9 +283,9 @@ public class BusLocationActivity extends MapActivity {
     private void showBusRoutesDlg(String busLineNumber, final ArrayList<MKPoiInfo> busRoutePois) {
         final String[] busRoutes = new String[busRoutePois.size()];
         for (int idx = 0; idx < busRoutePois.size(); idx++) {
-        	int startPos = busRoutePois.get(idx).name.indexOf('(');
-        	int endPos   = busRoutePois.get(idx).name.indexOf(')');
-        	busRoutes[idx] = busRoutePois.get(idx).name.substring(startPos+1, endPos);
+            int startPos = busRoutePois.get(idx).name.indexOf('(');
+            int endPos   = busRoutePois.get(idx).name.indexOf(')');
+            busRoutes[idx] = busRoutePois.get(idx).name.substring(startPos+1, endPos);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final String titleText = String.format(getResources().getString(R.string.select_bus_route), busLineNumber);
@@ -401,6 +401,7 @@ public class BusLocationActivity extends MapActivity {
                 mTvSearchKey.showDropDown();
             } else if (result.size() == 1) {
                 mTvSearchKey.setText(result.get(0));
+                onSearchClicked(mBtnSearch);
             } else {
                 Toast.makeText(BusLocationActivity.this, R.string.no_matches_busline,
                         Toast.LENGTH_SHORT).show();
