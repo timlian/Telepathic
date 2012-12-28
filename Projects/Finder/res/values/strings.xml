@@ -5,6 +5,7 @@
     <string name="test_activity">IC Card Records</string>
     <string name="hello_world">Hello world!</string>
     <string name="home_activity">Home</string>
+    <string name="title_activity_tab_home">Home</string>
     <string name="bus_location">Map Location</string>
     <string name="bus_test">Card Records</string>
     <string name="menu_settings">Settings</string>
