@@ -18,6 +18,7 @@ import com.telepathic.finder.sdk.BusLineListener;
 import com.telepathic.finder.sdk.BusLineRoute;
 import com.telepathic.finder.sdk.BusStation;
 import com.telepathic.finder.sdk.ChargeRecordsListener;
+import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
@@ -152,13 +153,12 @@ public class TestActivity extends Activity {
     private class MyChargeRecordsListener implements ChargeRecordsListener {
 
         @Override
-        public void onSuccess(final String result) {
+        public void onSuccess(final ArrayList<ConsumerRecord> consumerRecords) {
             runOnUiThread(new Runnable() {
-
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
-                    mTextBusInfo.setText(result);
+                    //mTextBusInfo.setText(result);
                     dismissDialog(DIALOG_WAITING);
                 }
             });

@@ -2,7 +2,7 @@ package com.telepathic.finder.sdk;
 
 import com.baidu.mapapi.BMapManager;
 import com.telepathic.finder.sdk.TrafficListener.BusLocationListener;
-import com.telepathic.finder.sdk.network.BusChargeRecordRequest;
+import com.telepathic.finder.sdk.network.BusConsumerRecordRequest;
 import com.telepathic.finder.sdk.network.BusLineRouteRequest;
 import com.telepathic.finder.sdk.network.NetWorkAdapter;
 
@@ -91,7 +91,7 @@ public class TrafficService implements ITrafficService {
 
     @Override
     public void getChargeRecords(String cardId, int count, ChargeRecordsListener listener) {
-        BusChargeRecordRequest request = new BusChargeRecordRequest(cardId, String.valueOf(count), listener);
+        BusConsumerRecordRequest request = new BusConsumerRecordRequest(cardId, String.valueOf(count), listener);
         mNetWorkAdapter.execute(request);
     }
 
