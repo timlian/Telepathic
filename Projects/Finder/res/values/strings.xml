@@ -23,7 +23,9 @@
     <string name="line_number">公交路线:</string>
     <string name="bus_number">车牌号:</string>
     <string name="consumer_count">消费次数:</string>
+    <string name="consumer_amount">消费金额:</string>
     <string name="residual_count">剩余次数:</string>
+    <string name="residual_amount">剩余金额:</string>
 
     <!-- speech recognize notice -->
     <string name="no_voice_search_title">Notice</string>

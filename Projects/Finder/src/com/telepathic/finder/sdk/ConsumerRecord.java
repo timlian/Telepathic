@@ -1,5 +1,7 @@
 package com.telepathic.finder.sdk;
 
+import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
+
 /**
  * Note: This class has a natural ordering that is inconsistent with equals.
  *
@@ -30,12 +32,31 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
     /**
      * 消费次数
      */
-    private String mConsumerCount;
+    private int mConsumerCount;
 
+    /**
+     * 消费金额
+     */
+    private float mConsumerAmount;
+    
     /**
      * 剩余次数
      */
-    private String mResidualCount;
+    private int mResidualCount;
+    
+    /**
+     * 剩余金额
+     */
+    private float mResidualAmount;
+    
+    /**
+     * 消费类型
+     */
+    private ConsumerType mConsumerType;
+    
+    public enum ConsumerType {
+    	COUNT, ELECTRONIC_WALLET;
+    }
 
 
     public String getLineNumber() {
@@ -70,20 +91,50 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         mConsumerTime = consumerTime;
     }
 
-    public String getConsumerCount() {
+    public int getConsumerCount() {
+    	if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
+    		throw new IllegalConsumerTypeException();
+    	}
         return mConsumerCount;
     }
 
-    public void setConsumerCount(String consumerCount) {
+    public void setConsumerCount(int consumerCount) {
         mConsumerCount = consumerCount;
     }
 
-    public String getResidualCount() {
+    public int getResidualCount() {
         return mResidualCount;
     }
 
-    public void setResidualCount(String residualCount) {
+    public void setResidualCount(int residualCount) {
         mResidualCount = residualCount;
+    }
+    
+    public float getConsumerAmount() {
+    	if (mConsumerType == ConsumerType.COUNT) {
+    		throw new IllegalConsumerTypeException();
+    	}
+    	return mConsumerAmount;
+    }
+    
+    public void setConsumerAmount(float amount) {
+    	mConsumerAmount = amount;
+    }
+    
+    public float getResidualAmount() {
+    	return mResidualAmount;
+    }
+    
+    public void setResidualAmount(float amount) {
+    	mResidualAmount = amount; 
+    }
+    
+    public ConsumerType getConsumerType() {
+    	return mConsumerType;
+    }
+    
+    public void setConsumerType(ConsumerType type) {
+    	mConsumerType = type;
     }
 
     @Override
@@ -93,14 +144,14 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         builder.append("Bus Number: " + mBusNumber + ", ");
         builder.append("Card ID: " + mCardId + ", ");
         builder.append("Consumer Time: " + mConsumerTime + ", ");
-        builder.append("Consumer Count: " + mConsumerCount + ", ");
-        builder.append("Residual Count: " + mResidualCount);
+        builder.append("Consumer Amount: " + mConsumerAmount + ", ");
+        builder.append("Residual Amount: " + mResidualAmount);
         return builder.toString();
     }
 
     @Override
     public int compareTo(ConsumerRecord another) {
-        return mConsumerTime.compareTo(another.getConsumerTime());
+        return (0 - mConsumerTime.compareTo(another.getConsumerTime()));
     }
 
 }

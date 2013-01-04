@@ -1,14 +1,16 @@
 package com.telepathic.finder.sdk.network;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 
+import android.R.integer;
+
 import com.telepathic.finder.sdk.ChargeRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
+import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 
 public class BusConsumerRecordRequest extends RPCRequest {
     private static final String METHOD_NAME = "getConsumerRecords";
@@ -54,10 +56,11 @@ public class BusConsumerRecordRequest extends RPCRequest {
         }
     }
 
+
     /*
      * Charge records response data entry example:
      *
-     * {lineNumber=102; busNumber=031164; cardID=000101545529; consumerTime=2012-6-30 21:39:51; consumerCount=2; residualCount=6; code=200; msg=³É¹¦; }
+     * {lineNumber=102; busNumber=031164; cardID=000101545529; consumerTime=2012-6-30 21:39:51; consumerCount=2; residualCount=6; code=200; msg=ï¿½É¹ï¿½; }
      *
      */
     private void process(SoapObject response) {
@@ -72,26 +75,46 @@ public class BusConsumerRecordRequest extends RPCRequest {
                     if (NO_ERROR == Integer.parseInt(errorCode)) {
                         SoapObject dataEntry = null;
                         ArrayList<ConsumerRecord> consumerRecords = new ArrayList<ConsumerRecord>();
-                        for(int i = 0; i < newDataSet.getPropertyCount(); i++) {
-                            dataEntry = (SoapObject) newDataSet.getProperty(i);
+                        int startPos = 0, endPos = 0;
+                        ConsumerRecord lastRecord = null;
+                        for(int idx = 0; idx < newDataSet.getPropertyCount() ; idx++) {
+                            dataEntry = (SoapObject) newDataSet.getProperty(idx);
                             ConsumerRecord record = new ConsumerRecord();
                             record.setLineNumber(dataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER));
                             record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
                             record.setCardId(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
                             record.setConsumerTime(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
                             try {
-                                record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
+                                record.setConsumerCount(Integer.parseInt(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT)));
+                                record.setResidualCount(Integer.parseInt(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT)));
+                                record.setConsumerType(ConsumerType.COUNT);
+                                endPos++;
+                                if (lastRecord != null && lastRecord.getConsumerType() != record.getConsumerType()) {
+                                	final int residualCount = record.getResidualCount() + record.getConsumerCount();
+                                	updateResidualCount(consumerRecords, startPos, endPos, residualCount);
+                                	startPos = endPos;
+                                } 
                             } catch (RuntimeException e) {
-                                record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
+                            	try {
+	                                record.setConsumerAmount(Float.parseFloat(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT)));
+	                                record.setResidualAmount(Float.parseFloat(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT)));
+	                                record.setConsumerType(ConsumerType.ELECTRONIC_WALLET);
+	                                endPos++;
+	                                if (lastRecord != null && lastRecord.getConsumerType() != record.getConsumerType()) {
+	                                	final float amount = record.getResidualAmount() + record.getConsumerAmount();
+	                                	updateResidualAmount(consumerRecords, startPos, endPos, amount);
+	                                	startPos = endPos;
+	                                } 
+                            	} catch (RuntimeException ex) {
+                            		// Todo : ignore the exception
+                            	}
                             }
-                            try {
-                                record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
-                            } catch (RuntimeException e) {
-                                record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
-                            }
+                            lastRecord = record;
                             consumerRecords.add(record);
                         }
-                        //Collections.sort(consumerRecords);
+                        
+                        Collections.sort(consumerRecords);
+                        
                         if (mListener != null) {
                             mListener.onSuccess(consumerRecords);
                         }
@@ -103,6 +126,22 @@ public class BusConsumerRecordRequest extends RPCRequest {
                 }
             }
         }
+    }
+    
+    private static void updateResidualCount(ArrayList<ConsumerRecord> records, int start, int end, int residualCount) {
+    	ConsumerRecord record = null;
+    	for(int i = start; i < end; i++) {
+    		record = records.get(i);
+    		record.setResidualCount(residualCount);
+    	}
+    }
+    
+    private static void updateResidualAmount(ArrayList<ConsumerRecord> records, int start, int end, float amount) {
+    	ConsumerRecord record = null;
+    	for(int i = start; i < end; i++) {
+    		record = records.get(i);
+    		record.setResidualAmount(amount);
+    	}
     }
 
 }

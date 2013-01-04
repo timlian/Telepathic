@@ -20,6 +20,7 @@ import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.BusLineRoute;
 import com.telepathic.finder.sdk.ChargeRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
+import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
@@ -116,6 +117,7 @@ public class ConsumerRecordsActivity extends Activity {
         TextView consumerCount;
         TextView residualCount;
         TextView consumerTime;
+        TextView residualAmount;
     }
 
     private class ConsumerRecordsAdapter extends BaseAdapter {
@@ -156,6 +158,7 @@ public class ConsumerRecordsActivity extends Activity {
                 holder.consumerCount = (TextView) convertView.findViewById(R.id.consumer_count);
                 holder.residualCount = (TextView) convertView.findViewById(R.id.residual_count);
                 holder.consumerTime = (TextView) convertView.findViewById(R.id.consumer_time);
+                holder.residualAmount = (TextView) convertView.findViewById(R.id.residual_amount);
                 convertView.setTag(holder);
             }
             bindView(record, convertView);
@@ -166,8 +169,13 @@ public class ConsumerRecordsActivity extends Activity {
             RecordItemHolder holder = (RecordItemHolder) view.getTag();
             holder.lineNumber.setText(getResources().getString(R.string.line_number) + record.getLineNumber());
             holder.busNumber.setText(getResources().getString(R.string.bus_number) + record.getBusNumber());
-            holder.consumerCount.setText(getResources().getString(R.string.consumer_count) + record.getConsumerCount());
+            if (record.getConsumerType() == ConsumerType.COUNT) {
+				holder.consumerCount.setText(getResources().getString(R.string.consumer_count) + record.getConsumerCount());
+			} else if (record.getConsumerType() == ConsumerType.ELECTRONIC_WALLET) {
+				holder.consumerCount.setText(getResources().getString(R.string.consumer_amount) + record.getConsumerAmount());
+			} 
             holder.residualCount.setText(getResources().getString(R.string.residual_count) + record.getResidualCount());
+            holder.residualAmount.setText(getResources().getString(R.string.residual_amount) + record.getResidualAmount());
             holder.consumerTime.setText(record.getConsumerTime());
         }
 
