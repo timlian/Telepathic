@@ -22,7 +22,7 @@ public class HomeActivity extends Activity {
     }
 
     public void onBusTestClicked(View view) {
-        Intent intent = new Intent(this, TestActivity.class);
+        Intent intent = new Intent(this, ConsumerRecordsActivity.class);
         startActivity(intent);
     }
 }

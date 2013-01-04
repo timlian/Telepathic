@@ -23,6 +23,8 @@ public class BusConsumerRecordRequest extends RPCRequest {
     private static final String KEY_CONSUMER_TIME  = "consumerTime";
     private static final String KEY_CONSUMER_COUNT = "consumerCount";
     private static final String KEY_RESIDUAL_COUNT = "residualCount";
+    private static final String KEY_CONSUMER_AMOUNT = "consumerAmount";
+    private static final String KEY_RESIDUAL_AMOUNT = "residualAmount";
 
 
     private ChargeRecordsListener mListener;
@@ -77,11 +79,19 @@ public class BusConsumerRecordRequest extends RPCRequest {
                             record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
                             record.setCardId(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
                             record.setConsumerTime(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
-                            record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
-                            record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+                            try {
+                                record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
+                            } catch (RuntimeException e) {
+                                record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
+                            }
+                            try {
+                                record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+                            } catch (RuntimeException e) {
+                                record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
+                            }
                             consumerRecords.add(record);
                         }
-                        Collections.sort(consumerRecords);
+                        //Collections.sort(consumerRecords);
                         if (mListener != null) {
                             mListener.onSuccess(consumerRecords);
                         }

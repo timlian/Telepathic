@@ -40,7 +40,7 @@ public class TabHomeActivity extends TabActivity {
 
     private void setupTabWidget(){
         addTab(getString(R.string.bus_location), BusLocationActivity.class);
-        addTab(getString(R.string.bus_test), TestActivity.class);
+        addTab(getString(R.string.bus_test), ConsumerRecordsActivity.class);
     }
 
 }
