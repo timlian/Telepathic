@@ -397,7 +397,7 @@ public class BusLocationActivity extends MapActivity {
 
         @Override
         protected void onPostExecute(ArrayList<String> result) {
-            mTvSearchKey.setAdapter(null);
+           // mTvSearchKey.setAdapter(null);
             if (result.size() > 1) {
                 mTvSearchKey.setText(result.get(0));
                 result.remove(0);
