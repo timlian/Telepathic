@@ -9,12 +9,12 @@ import android.widget.Toast;
 
 public class FinderApplication extends Application {
     static FinderApplication mApp;
-    
+
     private BMapManager mBMapManager = null;
-    
+
     // Authentication Key
     private String mStrKey = "A963422DFFFC8530BDDC5FF0063205F9E2D98461";
-    boolean m_bKeyRight = true; 
+    boolean m_bKeyRight = true;
 
     // 常用事件监听，用来处理通常的网络错误，授权验证错误等
     private static class MyGeneralListener implements MKGeneralListener {
@@ -58,7 +58,7 @@ public class FinderApplication extends Application {
         }
         super.onTerminate();
     }
-    
+
     public BMapManager getMapManager() {
         return mBMapManager;
     }

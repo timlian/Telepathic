@@ -82,7 +82,7 @@ public class TestActivity extends Activity {
         }
         return null;
     }
-    
+
     private class MyBusLineListener implements BusLineListener {
 
         @Override

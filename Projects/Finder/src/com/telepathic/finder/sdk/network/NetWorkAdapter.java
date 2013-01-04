@@ -78,12 +78,12 @@ public class NetWorkAdapter {
         }
         onRequestComplete(request, soapEnvelope.bodyIn, errorMessage);
       }
-    
+
     private void onRequestComplete(RPCRequest request, Object response, String error) {
-		request.onResponse(response, error);
-		if (!request.isComplete()) {
-    		execute(request);
-    	}
+        request.onResponse(response, error);
+        if (!request.isComplete()) {
+            execute(request);
+        }
     }
-    
+
 }

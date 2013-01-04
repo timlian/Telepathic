@@ -38,7 +38,7 @@ public class TrafficService implements ITrafficService {
     }
 
     /**
-     * 
+     *
      * @param city
      * @param busNumber
      * @param listener
@@ -48,7 +48,7 @@ public class TrafficService implements ITrafficService {
     }
 
     /**
-     * 
+     *
      * @param city
      * @param routeUid
      * @param listener

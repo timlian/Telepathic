@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:drawableTop="@drawable/bus_location"
             android:onClick="onBusLocationClicked"
-            android:text="@string/bus_location" 
+            android:text="@string/bus_location"
             android:singleLine="false"
             android:ellipsize="none" />
 
@@ -25,8 +25,8 @@
             android:layout_height="wrap_content"
             android:drawableTop="@drawable/bus_test"
             android:onClick="onBusTestClicked"
-            android:text="@string/bus_test" 
-            android:singleLine="false" 
+            android:text="@string/bus_test"
+            android:singleLine="false"
             android:ellipsize="none" />
 
      </LinearLayout>

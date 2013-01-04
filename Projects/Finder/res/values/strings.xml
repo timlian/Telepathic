@@ -20,7 +20,7 @@
     <string name="cancel">Cancel</string>
     <string name="default_city">成都</string>
     <string name="invalid_input_hint">请输入正确的公交车路线号码</string>
-    
+
     <!-- speech recognize notice -->
     <string name="no_voice_search_title">Notice</string>
     <string name="no_voice_search_msg">The speech recognize function need Google Voice Search to support, do you want to download it now?</string>
@@ -33,7 +33,7 @@
     <string name="no_market_download">Download from browser</string>
     <string name="speak_busline_number">Please speak out busline number</string>
     <string name="no_matches_busline">No matches bus line</string>
-    
+
     <!-- Baidu map error message definition -->
     <string name="error_location_falied">定位失败</string>
     <string name="error_network_connect">网络连接错误</string>
@@ -41,5 +41,5 @@
     <string name="error_permission_denied">授权验证失败</string>
     <string name="error_result_not_found">未找到搜索结果</string>
     <string name="error_route_addr">路线搜索起点或终点有歧义</string>
-    
+
 </resources>

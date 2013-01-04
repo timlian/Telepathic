@@ -1,5 +1,10 @@
 package com.telepathic.finder.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,6 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.os.Environment;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -87,4 +96,126 @@ public class Utils {
         list.addAll(newlist);
         return list;
     }
+
+    /**
+     * Copy the application database files to external storage
+     */
+     public static void copyAppDatabaseFiles(String packageName) throws IOException {
+         File dbDirectory = new File("/data/data/" + packageName + "/databases/");
+         if (dbDirectory.exists()) {
+             File[] dbFiles = dbDirectory.listFiles();
+             for(int i = 0; i < dbFiles.length; i++) {
+                 copyFileToExternalStorage(dbFiles[i]);
+             }
+         }
+     }
+
+     /**
+      * Copy the application normal files to external storage
+      */
+      public static void copyAppPreferenceFiles(String packageName) throws IOException {
+          File prefsDirectory = new File("/data/data/" + packageName + "/shared_prefs/");
+          if (prefsDirectory.exists()) {
+              File[] prefFiles = prefsDirectory.listFiles();
+              for(int i = 0; i < prefFiles.length; i++) {
+                  copyFileToExternalStorage(prefFiles[i]);
+              }
+          }
+      }
+
+     private static void copyFileToExternalStorage(File file) throws IOException {
+         FileInputStream fis = new FileInputStream(file);
+         String outFileName = Environment.getExternalStorageDirectory() + "/" + file.getName();
+         OutputStream output = new FileOutputStream(outFileName);
+         byte[] buffer = new byte[1024];
+         int length;
+         while ((length = fis.read(buffer)) > 0) {
+             output.write(buffer, 0, length);
+         }
+         output.flush();
+         output.close();
+         fis.close();
+     }
+
+     /**
+      * Print the content of the cursor
+      *
+      * @param cursor, The cursor, which content needs to be printed
+      * @param logTag, The log tag
+      */
+     public static void printCursorContent(Cursor cursor, String logTag) {
+         if (cursor == null) {
+             Log.d(logTag, "Cursor is NULL!");
+             return ;
+         }
+         final int columnSpace = 2;
+         ArrayList<Integer> columnWidth = new ArrayList<Integer>();
+         for (int columnIndex = 0; columnIndex < cursor.getColumnCount(); columnIndex++) {
+             String value = cursor.getColumnName(columnIndex);
+             int maxWidth = value.length();
+             if (cursor.moveToFirst()) {
+                 do {
+                     try {
+                         value = cursor.getString(columnIndex);
+                     } catch (Exception e) {
+                         value = "BLOB";
+                         Log.d(logTag, "Get value from " + cursor.getColumnName(columnIndex) + " failed. Caused by " + e.getLocalizedMessage());
+                     }
+                     if (!TextUtils.isEmpty(value) && value.length() > maxWidth) {
+                         maxWidth = value.length();
+                     }
+                 } while (cursor.moveToNext());
+             }
+             columnWidth.add(maxWidth + columnSpace);
+         }
+         ArrayList<ArrayList<String>> tableContent = new ArrayList<ArrayList<String>>();
+         for (int columnIndex = 0; columnIndex < cursor.getColumnCount(); columnIndex++) {
+             ArrayList<String> columnContent = new ArrayList<String>();
+             String value = cursor.getColumnName(columnIndex);
+             columnContent.add(appendColumnSpaces(value, columnWidth.get(columnIndex)));
+             if (cursor.moveToFirst()) {
+                 do {
+                     try {
+                         value = cursor.getString(columnIndex);
+                     } catch (Exception e) {
+                         value = "BLOB";
+                     }
+                     columnContent.add(appendColumnSpaces(value, columnWidth.get(columnIndex)));
+                 } while (cursor.moveToNext());
+             }
+             tableContent.add(columnContent);
+         }
+         // Including the header
+         int maxRowIndex = cursor.getCount() + 1;
+         for(int rowIndex = 0; rowIndex < maxRowIndex; rowIndex++) {
+             StringBuilder rowValues = new StringBuilder();
+             for (int columnIndex = 0; columnIndex < cursor.getColumnCount(); columnIndex++) {
+                 ArrayList<String> columnValues = tableContent.get(columnIndex);
+                 rowValues.append(columnValues.get(rowIndex));
+             }
+             Log.d(logTag, rowValues.toString());
+         }
+         // set the cursor back the first item
+         cursor.moveToFirst();
+     }
+
+     public static void printObjectId(Object obj, String logTag) {
+         Log.d(logTag, "Object ID: " + System.identityHashCode(obj));
+     }
+
+     private static String appendColumnSpaces(String value, int columnWidth) {
+         StringBuilder builder =  new StringBuilder();
+         int spaceCount;
+         if (value == null) {
+             builder.append("null");
+             spaceCount = columnWidth - 4;
+         } else {
+             builder.append(value);
+             spaceCount = columnWidth - value.length();
+         }
+         for (int i = 0; i < spaceCount; i++) {
+             builder.append(" ");
+         }
+         return builder.toString();
+     }
 }

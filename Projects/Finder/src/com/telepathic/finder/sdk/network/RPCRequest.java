@@ -40,7 +40,7 @@ abstract class RPCRequest {
             mRpc.addProperty(key, value);
         }
     }
-    
+
     public SoapObject getSoapMessage() {
         return mRpc;
     }
@@ -54,8 +54,8 @@ abstract class RPCRequest {
     }
 
     abstract void onResponse(Object result, String errorMessage);
-    
+
     protected boolean isComplete() {
-    	return true;
+        return true;
     }
 }
