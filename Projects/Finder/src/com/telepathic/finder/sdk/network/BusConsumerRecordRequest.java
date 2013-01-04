@@ -1,12 +1,9 @@
 package com.telepathic.finder.sdk.network;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
-
-import android.R.integer;
 
 import com.telepathic.finder.sdk.ChargeRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
@@ -106,14 +103,15 @@ public class BusConsumerRecordRequest extends RPCRequest {
 	                                	startPos = endPos;
 	                                } 
                             	} catch (RuntimeException ex) {
-                            		// Todo : ignore the exception
+                            		// Invalid data
+                            		break;
                             	}
                             }
                             lastRecord = record;
                             consumerRecords.add(record);
                         }
                         
-                        Collections.sort(consumerRecords);
+                      //  Collections.sort(consumerRecords);
                         
                         if (mListener != null) {
                             mListener.onSuccess(consumerRecords);
