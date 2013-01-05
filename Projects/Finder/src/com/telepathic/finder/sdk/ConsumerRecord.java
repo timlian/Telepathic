@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.util.Log;
+
 import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
 
 /**
@@ -165,17 +167,22 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
 				|| !mConsumerTime.equals(record.getConsumerTime())) {
 			return false;
 		}
+		
+		if (mResidualCount != record.getResidualCount()
+				|| mResidualAmount != record.getResidualAmount()) {
+			return false;
+		}
+		
 		if (mConsumerType == ConsumerType.COUNT) {
-			if (mConsumerCount != record.getConsumerCount()
-					|| mResidualCount != record.getResidualCount()) {
+			if (mConsumerCount != record.getConsumerCount()) {
 				return false;
 			}
 		} else if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
-			if (mConsumerAmount != record.getConsumerAmount()
-					|| mResidualAmount != record.getResidualAmount()) {
+			if (mConsumerAmount != record.getConsumerAmount()) {
 				return false;
 			}
 		}
+		
 		return true;
     }
     
@@ -185,9 +192,10 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         builder.append("Line Number: " + mLineNumber + ", ");
         builder.append("Bus Number: " + mBusNumber + ", ");
         builder.append("Card ID: " + mCardId + ", ");
-        builder.append("Consumer Time: " + mConsumerTime + ", ");
+        builder.append("Consumer Time: " + DATE_FORMAT.format(mConsumerTime) + ", ");
         builder.append("Consumer Amount: " + mConsumerAmount + ", ");
-        builder.append("Residual Amount: " + mResidualAmount);
+        builder.append("Residual Amount: " + mResidualAmount + ", ");
+        builder.append("Residual Count: " + mResidualCount);
         return builder.toString();
     }
 

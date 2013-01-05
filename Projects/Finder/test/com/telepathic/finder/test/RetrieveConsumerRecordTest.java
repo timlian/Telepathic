@@ -2,7 +2,9 @@ package com.telepathic.finder.test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.test.ApplicationTestCase;
 
@@ -68,26 +70,26 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
 	private static String[] getSourceData() {
 		String[] sourceData = 
 			{
-				"{lineNumber=102; busNumber=031162; cardID=000110808691; consumerTime=2013-1-1 15:39:33; consumerCount=2; residualCount=30; }" ,
-				"{lineNumber=188; busNumber=031186; cardID=000110808691; consumerTime=2012-12-21 18:35:37; consumerCount=2; residualCount=6; }",
-				"{lineNumber=102; busNumber=031149; cardID=000110808691; consumerTime=2012-12-15 20:40:37; consumerCount=2; residualCount=8; }", 
-				"{lineNumber=102; busNumber=031153; cardID=000110808691; consumerTime=2012-12-15 17:21:55; consumerCount=0; residualCount=10; }", 
-				"{lineNumber=185; busNumber=031144; cardID=000110808691; consumerTime=2012-12-15 17:08:52; consumerCount=2; residualCount=10; }",
-				"{lineNumber=188; busNumber=031190; cardID=000110808691; consumerTime=2012-12-15 14:07:10; consumerCount=0; residualCount=12; }",
-				"{lineNumber=185; busNumber=031195; cardID=000110808691; consumerTime=2012-12-15 12:14:36; consumerCount=2; residualCount=12; }",
-				"{lineNumber=102; busNumber=031164; cardID=000110808691; consumerTime=2012-12-9 18:42:06; consumerCount=2; residualCount=14; }",
-				"{lineNumber=102; busNumber=031158; cardID=000110808691; consumerTime=2012-12-2 21:08:27; consumerCount=0; residualCount=16; }",
-				"{lineNumber=112; busNumber=039141; cardID=000110808691; consumerTime=2012-12-2 20:54:23; consumerCount=2; residualCount=16; }",
-				"{lineNumber=102; busNumber=031156; cardID=000110808691; consumerTime=2012-12-2 16:33:48; consumerCount=2; residualCount=18; }",
-				"{lineNumber=185; busNumber=031228; cardID=000110808691; consumerTime=2012-12-2 10:44:08; consumerAmount=1.80; residualAmount=46.40; }", 
-				"{lineNumber=185; busNumber=031228; cardID=000110808691; consumerTime=2012-12-2 10:44:06; consumerAmount=1.80; residualAmount=48.20; }", 
-				"{lineNumber=102; busNumber=031153; cardID=000110808691; consumerTime=2012-10-14 19:10:33; consumerAmount=1.80; residualAmount=3.20; }",
-				"{lineNumber=50; busNumber=049182; cardID=000110808691; consumerTime=2012-10-3 10:41:41; consumerAmount=1.80; residualAmount=5; }",
-				"{lineNumber=50; busNumber=049543; cardID=000110808691; consumerTime=2012-9-29 9:13:45; consumerAmount=1.80; residualAmount=6.80; }",
-				"{lineNumber=188; busNumber=031181; cardID=000110808691; consumerTime=2012-9-23 11:51:44; consumerAmount=1.80; residualAmount=12.20; }",
-				"{lineNumber=185; busNumber=034006; cardID=000110808691; consumerTime=2012-8-27 10:31:19; consumerAmount=1.80; residualAmount=14; }",
-				"{lineNumber=102; busNumber=031158; cardID=000110808691; consumerTime=2012-8-26 16:47:37; consumerAmount=1.80; residualAmount=23; }",
-				"{lineNumber=185; busNumber=034639; cardID=000110808691; consumerTime=2012-8-25 17:38:47; consumerAmount=1.80; residualAmount=24.80; }",
+				"{lineNumber=102; busNumber=031162; cardID=000110808691; consumerTime=2013-1-1 15:39:33; consumerCount=2; residualCount=30;  residualAmount=46.40;}" ,
+				"{lineNumber=188; busNumber=031186; cardID=000110808691; consumerTime=2012-12-21 18:35:37; consumerCount=2; residualCount=6; residualAmount=46.40;}",
+				"{lineNumber=102; busNumber=031149; cardID=000110808691; consumerTime=2012-12-15 20:40:37; consumerCount=2; residualCount=8; residualAmount=46.40;}", 
+				"{lineNumber=102; busNumber=031153; cardID=000110808691; consumerTime=2012-12-15 17:21:55; consumerCount=0; residualCount=10; residualAmount=46.40;}", 
+				"{lineNumber=185; busNumber=031144; cardID=000110808691; consumerTime=2012-12-15 17:08:52; consumerCount=2; residualCount=10; residualAmount=46.40;}",
+				"{lineNumber=188; busNumber=031190; cardID=000110808691; consumerTime=2012-12-15 14:07:10; consumerCount=0; residualCount=12; residualAmount=46.40;}",
+				"{lineNumber=185; busNumber=031195; cardID=000110808691; consumerTime=2012-12-15 12:14:36; consumerCount=2; residualCount=12; residualAmount=46.40;}",
+				"{lineNumber=102; busNumber=031164; cardID=000110808691; consumerTime=2012-12-9 18:42:06; consumerCount=2; residualCount=14;  residualAmount=46.40;}",
+				"{lineNumber=102; busNumber=031158; cardID=000110808691; consumerTime=2012-12-2 21:08:27; consumerCount=0; residualCount=16;  residualAmount=46.40;}",
+				"{lineNumber=112; busNumber=039141; cardID=000110808691; consumerTime=2012-12-2 20:54:23; consumerCount=2; residualCount=16;  residualAmount=46.40;}",
+				"{lineNumber=102; busNumber=031156; cardID=000110808691; consumerTime=2012-12-2 16:33:48; consumerCount=2; residualCount=18;  residualAmount=46.40;}",
+				"{lineNumber=185; busNumber=031228; cardID=000110808691; consumerTime=2012-12-2 10:44:08; consumerAmount=1.80; residualAmount=46.40; residualCount=20;}", 
+				"{lineNumber=185; busNumber=031228; cardID=000110808691; consumerTime=2012-12-2 10:44:06; consumerAmount=1.80; residualAmount=48.20; residualCount=20;}", 
+				"{lineNumber=102; busNumber=031153; cardID=000110808691; consumerTime=2012-10-14 19:10:33; consumerAmount=1.80; residualAmount=3.20; residualCount=20;}",
+				"{lineNumber=50; busNumber=049182; cardID=000110808691; consumerTime=2012-10-3 10:41:41; consumerAmount=1.80; residualAmount=5; residualCount=20;}",
+				"{lineNumber=50; busNumber=049543; cardID=000110808691; consumerTime=2012-9-29 9:13:45; consumerAmount=1.80; residualAmount=6.80; residualCount=20;}",
+				"{lineNumber=188; busNumber=031181; cardID=000110808691; consumerTime=2012-9-23 11:51:44; consumerAmount=1.80; residualAmount=12.20; residualCount=20;}",
+				"{lineNumber=185; busNumber=034006; cardID=000110808691; consumerTime=2012-8-27 10:31:19; consumerAmount=1.80; residualAmount=14; residualCount=20;}",
+				"{lineNumber=102; busNumber=031158; cardID=000110808691; consumerTime=2012-8-26 16:47:37; consumerAmount=1.80; residualAmount=23; residualCount=20;}",
+				"{lineNumber=185; busNumber=034639; cardID=000110808691; consumerTime=2012-8-25 17:38:47; consumerAmount=1.80; residualAmount=24.80; residualCount=20;}",
 			};
 		return sourceData;
 	}
@@ -112,8 +114,14 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
 				Method method;
 				try {
 					final String methodName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-					method = ConsumerRecord.class.getMethod(methodName, String.class);
-					method.invoke(record, value);
+					if (methodName.equals("setConsumerTime")) {
+						method = ConsumerRecord.class.getMethod(methodName, Date.class);
+						method.invoke(record, ConsumerRecord.DATE_FORMAT.parse(value));
+					} else {
+						method = ConsumerRecord.class.getMethod(methodName, String.class);
+						method.invoke(record, value);
+					}
+					
 				} catch (NoSuchMethodException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {
@@ -121,6 +129,8 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				} catch (ParseException e) {
 					e.printStackTrace();
 				}
 			}
@@ -140,7 +150,7 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
 			assertNotNull(consumerRecords);
 			assertEquals(CONSUMER_RECORD_COUNT - 1, consumerRecords.size());
 			for(int idx = 0; idx < CONSUMER_RECORD_COUNT - 1; idx++) {
-				assertEquals(consumerRecords.get(idx), mBenchmark.get(idx));
+				assertEquals(mBenchmark.get(idx), consumerRecords.get(idx));
 			}
 			isDone = true;
 		}
