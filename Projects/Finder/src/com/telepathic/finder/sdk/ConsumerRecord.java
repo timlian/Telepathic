@@ -79,7 +79,7 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         return mCardId;
     }
 
-    public void setCardId(String cardId) {
+    public void setCardID(String cardId) {
         mCardId = cardId;
     }
 
@@ -98,16 +98,16 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         return mConsumerCount;
     }
 
-    public void setConsumerCount(int consumerCount) {
-        mConsumerCount = consumerCount;
+    public void setConsumerCount(String consumerCount) {
+        mConsumerCount = Integer.parseInt(consumerCount);
     }
 
     public int getResidualCount() {
         return mResidualCount;
     }
 
-    public void setResidualCount(int residualCount) {
-        mResidualCount = residualCount;
+    public void setResidualCount(String residualCount) {
+        mResidualCount = Integer.parseInt(residualCount);
     }
     
     public float getConsumerAmount() {
@@ -117,16 +117,16 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
     	return mConsumerAmount;
     }
     
-    public void setConsumerAmount(float amount) {
-    	mConsumerAmount = amount;
+    public void setConsumerAmount(String amount) {
+    	mConsumerAmount = Float.parseFloat(amount);
     }
     
     public float getResidualAmount() {
     	return mResidualAmount;
     }
     
-    public void setResidualAmount(float amount) {
-    	mResidualAmount = amount; 
+    public void setResidualAmount(String amount) {
+    	mResidualAmount = Float.parseFloat(amount); 
     }
     
     public ConsumerType getConsumerType() {
@@ -137,6 +137,41 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
     	mConsumerType = type;
     }
 
+    @Override
+    public boolean equals(Object object) {
+    	if (object == null) {
+    		return false;
+    	}
+    	if(!(object instanceof ConsumerRecord)) {
+    		return false;
+    	}
+    	ConsumerRecord record = (ConsumerRecord)object;
+    	if (this == record) {
+    		return true;
+    	}
+    	if (mConsumerType != record.getConsumerType()) {
+    		return false;
+    	}
+		if (!mLineNumber.equals(record.mLineNumber)
+				|| !mBusNumber.equals(mBusNumber)
+				|| !mCardId.equals(record.getCardId())
+				|| !mConsumerTime.equals(record.getConsumerTime())) {
+			return false;
+		}
+		if (mConsumerType == ConsumerType.COUNT) {
+			if (mConsumerCount != record.getConsumerCount()
+					|| mResidualCount != record.getResidualCount()) {
+				return false;
+			}
+		} else if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
+			if (mConsumerAmount != record.getConsumerAmount()
+					|| mResidualAmount != record.getResidualAmount()) {
+				return false;
+			}
+		}
+		return true;
+    }
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

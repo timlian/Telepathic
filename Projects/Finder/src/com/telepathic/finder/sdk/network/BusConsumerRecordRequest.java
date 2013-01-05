@@ -79,26 +79,26 @@ public class BusConsumerRecordRequest extends RPCRequest {
                             ConsumerRecord record = new ConsumerRecord();
                             record.setLineNumber(dataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER));
                             record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
-                            record.setCardId(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
+                            record.setCardID(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
                             record.setConsumerTime(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
                             try {
-                                record.setConsumerCount(Integer.parseInt(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT)));
-                                record.setResidualCount(Integer.parseInt(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT)));
+                                record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
+                                record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
                                 record.setConsumerType(ConsumerType.COUNT);
                                 if (lastRecord != null && lastRecord.getConsumerType() != record.getConsumerType()) {
                                     final int residualCount = record.getResidualCount() + record.getConsumerCount();
-                                    updateResidualCount(consumerRecords, startPos, endPos, residualCount);
+                                    updateResidualCount(consumerRecords, startPos, endPos, String.valueOf(residualCount));
                                     startPos = endPos;
                                 }
                                 endPos++;
                             } catch (RuntimeException e) {
                                 try {
-                                    record.setConsumerAmount(Float.parseFloat(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT)));
-                                    record.setResidualAmount(Float.parseFloat(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT)));
+                                    record.setConsumerAmount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
+                                    record.setResidualAmount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
                                     record.setConsumerType(ConsumerType.ELECTRONIC_WALLET);
                                     if (lastRecord != null && lastRecord.getConsumerType() != record.getConsumerType()) {
                                         final float amount = record.getResidualAmount() + record.getConsumerAmount();
-                                        updateResidualAmount(consumerRecords, startPos, endPos, amount);
+                                        updateResidualAmount(consumerRecords, startPos, endPos, String.valueOf(amount));
                                         startPos = endPos;
                                     }
                                     endPos++;
@@ -126,7 +126,7 @@ public class BusConsumerRecordRequest extends RPCRequest {
         }
     }
 
-    private static void updateResidualCount(ArrayList<ConsumerRecord> records, int start, int end, int residualCount) {
+    private static void updateResidualCount(ArrayList<ConsumerRecord> records, int start, int end, String residualCount) {
         ConsumerRecord record = null;
         for(int i = start; i < end; i++) {
             record = records.get(i);
@@ -134,7 +134,7 @@ public class BusConsumerRecordRequest extends RPCRequest {
         }
     }
 
-    private static void updateResidualAmount(ArrayList<ConsumerRecord> records, int start, int end, float amount) {
+    private static void updateResidualAmount(ArrayList<ConsumerRecord> records, int start, int end, String amount) {
         ConsumerRecord record = null;
         for(int i = start; i < end; i++) {
             record = records.get(i);
