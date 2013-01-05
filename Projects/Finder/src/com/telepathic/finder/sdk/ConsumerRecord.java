@@ -148,9 +148,6 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
 
     @Override
     public boolean equals(Object object) {
-    	if (object == null) {
-    		return false;
-    	}
     	if(!(object instanceof ConsumerRecord)) {
     		return false;
     	}
@@ -169,7 +166,7 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
 		}
 		
 		if (mResidualCount != record.getResidualCount()
-				|| mResidualAmount != record.getResidualAmount()) {
+				|| Float.compare(mResidualAmount, record.getResidualAmount()) != 0) {
 			return false;
 		}
 		
@@ -177,13 +174,20 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
 			if (mConsumerCount != record.getConsumerCount()) {
 				return false;
 			}
+			
 		} else if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
-			if (mConsumerAmount != record.getConsumerAmount()) {
+			if (Float.compare(mConsumerAmount,  record.getConsumerAmount()) != 0) {
 				return false;
 			}
 		}
 		
 		return true;
+    }
+    
+    @Override
+    public int hashCode() {
+    	// Todo: implement this method
+    	return super.hashCode();
     }
     
     @Override
