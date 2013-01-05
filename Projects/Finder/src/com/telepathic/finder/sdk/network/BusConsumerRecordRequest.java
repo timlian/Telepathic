@@ -85,34 +85,34 @@ public class BusConsumerRecordRequest extends RPCRequest {
                                 record.setConsumerCount(Integer.parseInt(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT)));
                                 record.setResidualCount(Integer.parseInt(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT)));
                                 record.setConsumerType(ConsumerType.COUNT);
-                                endPos++;
                                 if (lastRecord != null && lastRecord.getConsumerType() != record.getConsumerType()) {
-                                	final int residualCount = record.getResidualCount() + record.getConsumerCount();
-                                	updateResidualCount(consumerRecords, startPos, endPos, residualCount);
-                                	startPos = endPos;
-                                } 
+                                    final int residualCount = record.getResidualCount() + record.getConsumerCount();
+                                    updateResidualCount(consumerRecords, startPos, endPos, residualCount);
+                                    startPos = endPos;
+                                }
+                                endPos++;
                             } catch (RuntimeException e) {
-                            	try {
-	                                record.setConsumerAmount(Float.parseFloat(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT)));
-	                                record.setResidualAmount(Float.parseFloat(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT)));
-	                                record.setConsumerType(ConsumerType.ELECTRONIC_WALLET);
-	                                endPos++;
-	                                if (lastRecord != null && lastRecord.getConsumerType() != record.getConsumerType()) {
-	                                	final float amount = record.getResidualAmount() + record.getConsumerAmount();
-	                                	updateResidualAmount(consumerRecords, startPos, endPos, amount);
-	                                	startPos = endPos;
-	                                } 
-                            	} catch (RuntimeException ex) {
-                            		// Invalid data
-                            		break;
-                            	}
+                                try {
+                                    record.setConsumerAmount(Float.parseFloat(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT)));
+                                    record.setResidualAmount(Float.parseFloat(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT)));
+                                    record.setConsumerType(ConsumerType.ELECTRONIC_WALLET);
+                                    if (lastRecord != null && lastRecord.getConsumerType() != record.getConsumerType()) {
+                                        final float amount = record.getResidualAmount() + record.getConsumerAmount();
+                                        updateResidualAmount(consumerRecords, startPos, endPos, amount);
+                                        startPos = endPos;
+                                    }
+                                    endPos++;
+                                } catch (RuntimeException ex) {
+                                    // Invalid data
+                                    break;
+                                }
                             }
                             lastRecord = record;
                             consumerRecords.add(record);
                         }
-                        
-                      //  Collections.sort(consumerRecords);
-                        
+
+                        //  Collections.sort(consumerRecords);
+
                         if (mListener != null) {
                             mListener.onSuccess(consumerRecords);
                         }
@@ -125,21 +125,21 @@ public class BusConsumerRecordRequest extends RPCRequest {
             }
         }
     }
-    
+
     private static void updateResidualCount(ArrayList<ConsumerRecord> records, int start, int end, int residualCount) {
-    	ConsumerRecord record = null;
-    	for(int i = start; i < end; i++) {
-    		record = records.get(i);
-    		record.setResidualCount(residualCount);
-    	}
+        ConsumerRecord record = null;
+        for(int i = start; i < end; i++) {
+            record = records.get(i);
+            record.setResidualCount(residualCount);
+        }
     }
-    
+
     private static void updateResidualAmount(ArrayList<ConsumerRecord> records, int start, int end, float amount) {
-    	ConsumerRecord record = null;
-    	for(int i = start; i < end; i++) {
-    		record = records.get(i);
-    		record.setResidualAmount(amount);
-    	}
+        ConsumerRecord record = null;
+        for(int i = start; i < end; i++) {
+            record = records.get(i);
+            record.setResidualAmount(amount);
+        }
     }
 
 }
