@@ -1,5 +1,9 @@
 package com.telepathic.finder.sdk;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
 
 /**
@@ -9,6 +13,9 @@ import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
  *
  */
 public class ConsumerRecord implements Comparable<ConsumerRecord> {
+	
+	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
     /**
      * 公交路线号
      */
@@ -27,7 +34,7 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
     /**
      * 消费时间
      */
-    private String mConsumerTime;
+    private Date mConsumerTime;
 
     /**
      * 消费次数
@@ -83,12 +90,12 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         mCardId = cardId;
     }
 
-    public String getConsumerTime() {
+    public Date getConsumerTime() {
         return mConsumerTime;
     }
 
-    public void setConsumerTime(String consumerTime) {
-        mConsumerTime = consumerTime;
+    public void setConsumerTime(Date consumerTime) {
+    	mConsumerTime = consumerTime;
     }
 
     public int getConsumerCount() {
@@ -186,7 +193,7 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
 
     @Override
     public int compareTo(ConsumerRecord another) {
-        return (0 - mConsumerTime.compareTo(another.getConsumerTime()));
+        return mConsumerTime.compareTo(another.getConsumerTime());
     }
 
 }

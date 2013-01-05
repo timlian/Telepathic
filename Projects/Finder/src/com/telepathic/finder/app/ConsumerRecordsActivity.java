@@ -176,7 +176,7 @@ public class ConsumerRecordsActivity extends Activity {
 			} 
             holder.residualCount.setText(getResources().getString(R.string.residual_count) + record.getResidualCount());
             holder.residualAmount.setText(getResources().getString(R.string.residual_amount) + record.getResidualAmount());
-            holder.consumerTime.setText(record.getConsumerTime());
+            holder.consumerTime.setText(ConsumerRecord.DATE_FORMAT.format(record.getConsumerTime()));
         }
 
     }
