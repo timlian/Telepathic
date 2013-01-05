@@ -170,21 +170,21 @@ public class ConsumerRecordsActivity extends Activity {
             holder.lineNumber.setText(getResources().getString(R.string.line_number) + record.getLineNumber());
             holder.busNumber.setText(getResources().getString(R.string.bus_number) + record.getBusNumber());
             if (record.getConsumerType() == ConsumerType.COUNT) {
-				holder.consumerCount.setText(getResources().getString(R.string.consumer_count) + record.getConsumerCount());
-			} else if (record.getConsumerType() == ConsumerType.ELECTRONIC_WALLET) {
-				holder.consumerCount.setText(getResources().getString(R.string.consumer_amount) + record.getConsumerAmount());
-			} 
+                holder.consumerCount.setText(getResources().getString(R.string.consumer_count) + record.getConsumerCount());
+            } else if (record.getConsumerType() == ConsumerType.ELECTRONIC_WALLET) {
+                holder.consumerCount.setText(getResources().getString(R.string.consumer_amount) + record.getConsumerAmount());
+            }
             holder.consumerTime.setText(ConsumerRecord.DATE_FORMAT.format(record.getConsumerTime()));
             if (position == 0) {
-	            holder.residualCount.setText(getResources().getString(R.string.residual_count) + record.getResidualCount());
-	            holder.residualAmount.setText(getResources().getString(R.string.residual_amount) + record.getResidualAmount());
-	            holder.residualCount.setVisibility(View.VISIBLE);
-            	holder.residualAmount.setVisibility(View.VISIBLE);
+                holder.residualCount.setText(getResources().getString(R.string.residual_count) + record.getResidualCount());
+                holder.residualAmount.setText(getResources().getString(R.string.residual_amount) + record.getResidualAmount());
+                holder.residualCount.setVisibility(View.VISIBLE);
+                holder.residualAmount.setVisibility(View.VISIBLE);
             } else {
-            	holder.residualCount.setVisibility(View.GONE);
-            	holder.residualAmount.setVisibility(View.GONE);
+                holder.residualCount.setVisibility(View.GONE);
+                holder.residualAmount.setVisibility(View.GONE);
             }
-            
+
         }
 
     }
