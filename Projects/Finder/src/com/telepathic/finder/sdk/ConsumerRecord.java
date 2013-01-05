@@ -1,10 +1,7 @@
 package com.telepathic.finder.sdk;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import android.util.Log;
 
 import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
 
@@ -15,9 +12,9 @@ import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
  *
  */
 public class ConsumerRecord implements Comparable<ConsumerRecord> {
-	
-	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
+
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     /**
      * 公交路线号
      */
@@ -47,24 +44,24 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
      * 消费金额
      */
     private float mConsumerAmount;
-    
+
     /**
      * 剩余次数
      */
     private int mResidualCount;
-    
+
     /**
      * 剩余金额
      */
     private float mResidualAmount;
-    
+
     /**
      * 消费类型
      */
     private ConsumerType mConsumerType;
-    
+
     public enum ConsumerType {
-    	COUNT, ELECTRONIC_WALLET;
+        COUNT, ELECTRONIC_WALLET;
     }
 
 
@@ -97,13 +94,13 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
     }
 
     public void setConsumerTime(Date consumerTime) {
-    	mConsumerTime = consumerTime;
+        mConsumerTime = consumerTime;
     }
 
     public int getConsumerCount() {
-    	if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
-    		throw new IllegalConsumerTypeException();
-    	}
+        if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
+            throw new IllegalConsumerTypeException();
+        }
         return mConsumerCount;
     }
 
@@ -118,32 +115,32 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
     public void setResidualCount(String residualCount) {
         mResidualCount = Integer.parseInt(residualCount);
     }
-    
+
     public float getConsumerAmount() {
-    	if (mConsumerType == ConsumerType.COUNT) {
-    		throw new IllegalConsumerTypeException();
-    	}
-    	return mConsumerAmount;
+        if (mConsumerType == ConsumerType.COUNT) {
+            throw new IllegalConsumerTypeException();
+        }
+        return mConsumerAmount;
     }
-    
+
     public void setConsumerAmount(String amount) {
-    	mConsumerAmount = Float.parseFloat(amount);
+        mConsumerAmount = Float.parseFloat(amount);
     }
-    
+
     public float getResidualAmount() {
-    	return mResidualAmount;
+        return mResidualAmount;
     }
-    
+
     public void setResidualAmount(String amount) {
-    	mResidualAmount = Float.parseFloat(amount); 
+        mResidualAmount = Float.parseFloat(amount);
     }
-    
+
     public ConsumerType getConsumerType() {
-    	return mConsumerType;
+        return mConsumerType;
     }
-    
+
     public void setConsumerType(ConsumerType type) {
-    	mConsumerType = type;
+        mConsumerType = type;
     }
 
     @Override

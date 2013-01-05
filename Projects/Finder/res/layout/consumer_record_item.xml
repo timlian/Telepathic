@@ -36,29 +36,29 @@
             android:layout_weight="1"/>
 
         <TextView android:id="@+id/consumer_time"
-		        android:layout_height="wrap_content"
-		        android:layout_width="0dp"
-		        android:layout_weight="1"/>
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"/>
     </LinearLayout>
 
      <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
-        
-		    <TextView android:id="@+id/residual_count"
-	            android:layout_height="wrap_content"
-	            android:layout_width="0dp"
-	            android:layout_weight="1"
-	            android:visibility="gone"/>
-		    
-		     <TextView android:id="@+id/residual_amount"
-		        android:layout_height="wrap_content"
-		        android:layout_width="0dp"
-		        android:layout_weight="1"
-		        android:visibility="gone"/>
-	    
-	 </LinearLayout>
-    
+
+            <TextView android:id="@+id/residual_count"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"/>
+
+             <TextView android:id="@+id/residual_amount"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"/>
+
+     </LinearLayout>
+
 
 </LinearLayout>

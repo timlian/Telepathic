@@ -83,24 +83,24 @@ public class BusConsumerRecordRequest extends RPCRequest {
                             record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
                             record.setCardID(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
                             try {
-                            	final Date consumerDate = ConsumerRecord.DATE_FORMAT.parse(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
-								record.setConsumerTime(consumerDate);
-							} catch (ParseException ex) {
-								ex.printStackTrace();
-							}
+                                final Date consumerDate = ConsumerRecord.DATE_FORMAT.parse(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
+                                record.setConsumerTime(consumerDate);
+                            } catch (ParseException ex) {
+                                ex.printStackTrace();
+                            }
                             try {
                                 record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
                                 record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
                                 record.setConsumerType(ConsumerType.COUNT);
-                                if (lastRecord != null) { 
-                                	record.setResidualAmount(String.valueOf(lastRecord.getResidualAmount()));
+                                if (lastRecord != null) {
+                                    record.setResidualAmount(String.valueOf(lastRecord.getResidualAmount()));
                                     if(lastRecord.getConsumerType() != record.getConsumerType()) {
-	                                    final int residualCount = record.getResidualCount();
-	                                    updateResidualCount(consumerRecords, startPos, endPos, String.valueOf(residualCount));
-	                                    final float amount = lastRecord.getConsumerAmount() + lastRecord.getResidualAmount();
-	                                    record.setResidualAmount(String.valueOf(amount));
-	                                    startPos = endPos;
-	                                }
+                                        final int residualCount = record.getResidualCount();
+                                        updateResidualCount(consumerRecords, startPos, endPos, String.valueOf(residualCount));
+                                        final float amount = lastRecord.getConsumerAmount() + lastRecord.getResidualAmount();
+                                        record.setResidualAmount(String.valueOf(amount));
+                                        startPos = endPos;
+                                    }
                                 }
                                 endPos++;
                             } catch (RuntimeException e) {
@@ -109,14 +109,14 @@ public class BusConsumerRecordRequest extends RPCRequest {
                                     record.setResidualAmount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
                                     record.setConsumerType(ConsumerType.ELECTRONIC_WALLET);
                                     if (lastRecord != null) {
-                                    	record.setResidualCount(String.valueOf(lastRecord.getResidualCount()));
-                                    	if (lastRecord.getConsumerType() != record.getConsumerType()) {
-	                                        final float amount = record.getResidualAmount();
-	                                        updateResidualAmount(consumerRecords, startPos, endPos, String.valueOf(amount));
-	                                        final int count = lastRecord.getConsumerCount() + lastRecord.getResidualCount();
-	                                        record.setResidualCount(String.valueOf(count));
-	                                        startPos = endPos;
-                                    	}
+                                        record.setResidualCount(String.valueOf(lastRecord.getResidualCount()));
+                                        if (lastRecord.getConsumerType() != record.getConsumerType()) {
+                                            final float amount = record.getResidualAmount();
+                                            updateResidualAmount(consumerRecords, startPos, endPos, String.valueOf(amount));
+                                            final int count = lastRecord.getConsumerCount() + lastRecord.getResidualCount();
+                                            record.setResidualCount(String.valueOf(count));
+                                            startPos = endPos;
+                                        }
                                     }
                                     endPos++;
                                 } catch (RuntimeException ex) {
