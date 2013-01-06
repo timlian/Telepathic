@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.BusLineRoute;
-import com.telepathic.finder.sdk.ChargeRecordsListener;
+import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.TrafficService;
@@ -52,7 +52,7 @@ public class ConsumerRecordsActivity extends Activity {
                 mTrafficService.getBusStationLines();
                 String number = mEditText.getText().toString();
                 if (number.length() == 8) {
-                    mTrafficService.getChargeRecords(number, 30, new MyChargeRecordsListener());
+                    mTrafficService.retrieveConsumerRecords(number, 30, new MyChargeRecordsListener());
                     mSendButton.setEnabled(false);
                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
                     showDialog(DIALOG_WAITING);
@@ -82,7 +82,7 @@ public class ConsumerRecordsActivity extends Activity {
         return null;
     }
 
-    private class MyChargeRecordsListener implements ChargeRecordsListener {
+    private class MyChargeRecordsListener implements ConsumerRecordsListener {
 
         @Override
         public void onSuccess(final ArrayList<ConsumerRecord> consumerRecords) {

@@ -9,13 +9,13 @@ import java.util.Date;
 import android.test.ApplicationTestCase;
 
 import com.telepathic.finder.app.FinderApplication;
-import com.telepathic.finder.sdk.ChargeRecordsListener;
+import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.TrafficService;
 
 public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplication> {
-    private static final int CONSUMER_RECORD_COUNT = 21;
+    private static final int CONSUMER_RECORD_COUNT = 20;
     private static final String CARD_ID = "10808691";
 
     private FinderApplication mApp = null;
@@ -57,7 +57,7 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
         createBenchmark();
 
         TestChargeRecordsListener testChargeRecordsListener = new TestChargeRecordsListener();
-        mTrafficService.getChargeRecords(CARD_ID, CONSUMER_RECORD_COUNT, testChargeRecordsListener);
+        mTrafficService.retrieveConsumerRecords(CARD_ID, CONSUMER_RECORD_COUNT, testChargeRecordsListener);
         while(!testChargeRecordsListener.done()) {
             try {
                 Thread.sleep(500);
@@ -138,7 +138,7 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
         return record;
     }
 
-    private class TestChargeRecordsListener implements ChargeRecordsListener {
+    private class TestChargeRecordsListener implements ConsumerRecordsListener {
         private boolean isDone = false;
 
         public boolean done() {
@@ -148,8 +148,8 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
         @Override
         public void onSuccess(ArrayList<ConsumerRecord> consumerRecords) {
             assertNotNull(consumerRecords);
-            assertEquals(CONSUMER_RECORD_COUNT - 1, consumerRecords.size());
-            for(int idx = 0; idx < CONSUMER_RECORD_COUNT - 1; idx++) {
+            assertEquals(CONSUMER_RECORD_COUNT, consumerRecords.size());
+            for(int idx = 0; idx < CONSUMER_RECORD_COUNT; idx++) {
                 assertEquals(mBenchmark.get(idx), consumerRecords.get(idx));
             }
             isDone = true;

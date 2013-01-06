@@ -81,17 +81,17 @@ public class TrafficService implements ITrafficService {
     }
 
     public void getBusStationLines() {
-        //        BusStationLinesRequest request1 = new BusStationLinesRequest("ÐÂ»áÕ¹ÖÐÐÄ¹«½»Õ¾", "1", "10");
-        //        BusStationLinesRequest request2 = new BusStationLinesRequest("Ìì¸®Èí¼þÔ°¶«²àÕ¾", "1", "10");
-        //        BusStationLinesRequest request3 = new BusStationLinesRequest("Ìì»ªÂ·Õ¾", "1", "10");
+        //        BusStationLinesRequest request1 = new BusStationLinesRequest("ï¿½Â»ï¿½Õ¹ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½ï¿½Õ¾", "1", "10");
+        //        BusStationLinesRequest request2 = new BusStationLinesRequest("ï¿½ì¸®ï¿½ï¿½ï¿½Ô°ï¿½ï¿½ï¿½ï¿½Õ¾", "1", "10");
+        //        BusStationLinesRequest request3 = new BusStationLinesRequest("ï¿½ì»ªÂ·Õ¾", "1", "10");
         //        mNetWorkAdapter.execute(request1);
         //        mNetWorkAdapter.execute(request2);
         //        mNetWorkAdapter.execute(request3);
     }
 
     @Override
-    public void getChargeRecords(String cardId, int count, ChargeRecordsListener listener) {
-        BusConsumerRecordRequest request = new BusConsumerRecordRequest(cardId, String.valueOf(count), listener);
+    public void retrieveConsumerRecords(String cardId, int count, ConsumerRecordsListener listener) {
+        BusConsumerRecordRequest request = new BusConsumerRecordRequest(cardId, count, listener);
         mNetWorkAdapter.execute(request);
     }
 

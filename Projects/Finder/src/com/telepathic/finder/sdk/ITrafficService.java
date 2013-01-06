@@ -26,6 +26,6 @@ public interface ITrafficService {
      * @param cardId
      * @param count
      */
-    public void getChargeRecords(String cardId, int count, ChargeRecordsListener listener);
+    public void retrieveConsumerRecords(String cardId, int count, ConsumerRecordsListener listener);
 
 }

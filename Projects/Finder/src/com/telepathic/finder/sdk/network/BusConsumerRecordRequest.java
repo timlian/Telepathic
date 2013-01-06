@@ -7,7 +7,7 @@ import java.util.Date;
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 
-import com.telepathic.finder.sdk.ChargeRecordsListener;
+import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 
@@ -28,12 +28,12 @@ public class BusConsumerRecordRequest extends RPCRequest {
     private static final String KEY_RESIDUAL_AMOUNT = "residualAmount";
 
 
-    private ChargeRecordsListener mListener;
+    private ConsumerRecordsListener mListener;
 
-    public BusConsumerRecordRequest(String cardId, String count, ChargeRecordsListener listener) {
+    public BusConsumerRecordRequest(String cardId, int count, ConsumerRecordsListener listener) {
         super(METHOD_NAME);
         addParameter(KEY_CARD_ID, cardId);
-        addParameter(KEY_COUNT, count);
+        addParameter(KEY_COUNT, String.valueOf(count + 1));
         mListener = listener;
     }
 
