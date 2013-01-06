@@ -42,8 +42,8 @@ public class BusRoute {
         }
         String stationName = mRoute.getStep(index).getContent();
         if (stationName != null && stationName.length() != 0) {
-            if (stationName.charAt(stationName.length() - 1) != 'վ') {
-                stationName += "վ";
+            if (stationName.charAt(stationName.length() - 1) != '\u7AD9') {
+                stationName += '\u7AD9';
             }
         }
         return stationName;
