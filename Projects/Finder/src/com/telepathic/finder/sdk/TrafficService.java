@@ -4,6 +4,7 @@ import com.baidu.mapapi.BMapManager;
 import com.telepathic.finder.sdk.TrafficListener.BusLocationListener;
 import com.telepathic.finder.sdk.network.BusConsumerRecordRequest;
 import com.telepathic.finder.sdk.network.BusLineRouteRequest;
+import com.telepathic.finder.sdk.network.BusStationNameRequest;
 import com.telepathic.finder.sdk.network.NetWorkAdapter;
 
 public class TrafficService implements ITrafficService {
@@ -93,6 +94,11 @@ public class TrafficService implements ITrafficService {
     public void retrieveConsumerRecords(String cardId, int count, ConsumerRecordsListener listener) {
         BusConsumerRecordRequest request = new BusConsumerRecordRequest(cardId, count, listener);
         mNetWorkAdapter.execute(request);
+    }
+    
+    public void retrieveStationName(String busNumber, String gpsNumber) {
+    	BusStationNameRequest request = new BusStationNameRequest(busNumber, gpsNumber);
+    	mNetWorkAdapter.execute(request);
     }
 
     public BusRoutesStore getRoutesStore() {

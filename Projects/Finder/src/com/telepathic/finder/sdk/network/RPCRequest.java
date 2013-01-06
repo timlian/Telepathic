@@ -7,8 +7,10 @@ abstract class RPCRequest {
 
     private static final String NAMESPACE = "http://tempuri.org/";
 
-    protected static final String KEY_DIFF_GRAM = "diffgram";
-    protected static final String KEY_NEW_DATA_SET = "NewDataSet";
+    private static final String KEY_DIFF_GRAM = "diffgram";
+    private static final String KEY_NEW_DATA_SET = "NewDataSet";
+    private static final String KEY_DOCUMENT_ELEMENT = "DocumentElement";
+    
 
     protected static final String KEY_ERROR_CODE = "code";
     protected static final String KEY_ERROR_MESSAGE = "msg";
@@ -25,7 +27,7 @@ abstract class RPCRequest {
 
     protected abstract void handleError(String errorMessage);
 
-    protected abstract void handleResponse(SoapObject newDataSet);
+    protected abstract void handleResponse(SoapObject dataSet);
 
     protected void addParameter(String key, Object value) {
         if (key == null) {
@@ -78,28 +80,33 @@ abstract class RPCRequest {
          }
     }
 
-    private void process(SoapObject result) {
-        final SoapObject response = (SoapObject)result.getProperty(getResponseName());
-         if (response != null) {
-             final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
-             if (diffGram != null) {
-                 final SoapObject newDataSet = (SoapObject) diffGram.getProperty(KEY_NEW_DATA_SET);
-                 if (newDataSet != null) {
-                     final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
-                     final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
-                     final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
-                     if (NO_ERROR == Integer.parseInt(errorCode)) {
-                        if (firstDataEntry.getPropertyCount() > 2) {
-                            handleResponse(newDataSet);
-                        } else {
-                            handleError("No data.");
-                        }
-                     } else {
-                         handleError(errorMessage);
-                     }
-                 }
-             }
-         }
-    }
+	private void process(SoapObject result) {
+		final SoapObject response = (SoapObject) result.getProperty(getResponseName());
+		if (response != null) {
+			final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
+			if (diffGram != null) {
+				SoapObject dataSet = null;
+				try {
+					dataSet = (SoapObject) diffGram.getProperty(KEY_NEW_DATA_SET);
+				} catch (RuntimeException e) {
+					dataSet = (SoapObject) diffGram.getProperty(KEY_DOCUMENT_ELEMENT);
+				}
+				if (dataSet != null) {
+					final SoapObject firstDataEntry = (SoapObject) dataSet.getProperty(0);
+					final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
+					final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
+					if (NO_ERROR == Integer.parseInt(errorCode)) {
+						if (firstDataEntry.getPropertyCount() > 2) {
+							handleResponse(dataSet);
+						} else {
+							handleError("No data.");
+						}
+					} else {
+						handleError(errorMessage);
+					}
+				}
+			}
+		}
+	}
 
 }
