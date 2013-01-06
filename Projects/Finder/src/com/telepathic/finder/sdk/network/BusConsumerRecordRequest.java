@@ -73,39 +73,39 @@ public class BusConsumerRecordRequest extends RPCRequest {
                     final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
                     final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
                     if (NO_ERROR == Integer.parseInt(errorCode)) {
-                        SoapObject dataEntry = null;
-                        ArrayList<ConsumerRecord> consumerRecords = new ArrayList<ConsumerRecord>();
-                        int startPos = 0, endPos = 0;
-                        ConsumerRecord lastRecord = null;
-                        for(int idx = 0; idx < newDataSet.getPropertyCount() ; idx++) {
-                            dataEntry = (SoapObject) newDataSet.getProperty(idx);
-                            ConsumerRecord record = new ConsumerRecord();
-                            record.setLineNumber(dataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER));
-                            record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
-                            record.setCardID(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
-                            try {
-                                final Date consumerDate = Utils.parseDate(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
-                                record.setConsumerTime(consumerDate);
-                            } catch (ParseException ex) {
-                                ex.printStackTrace();
-                            }
-                            try {
-                                record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
-                                record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
-                                record.setConsumerType(ConsumerType.COUNT);
-                                if (lastRecord != null) {
-                                    record.setResidualAmount(String.valueOf(lastRecord.getResidualAmount()));
-                                    if(lastRecord.getConsumerType() != record.getConsumerType()) {
-                                        final int residualCount = record.getResidualCount();
-                                        updateResidualCount(consumerRecords, startPos, endPos, String.valueOf(residualCount));
-                                        final float amount = lastRecord.getConsumerAmount() + lastRecord.getResidualAmount();
-                                        record.setResidualAmount(String.valueOf(amount));
-                                        startPos = endPos;
-                                    }
-                                }
-                                endPos++;
-                            } catch (RuntimeException e) {
-                                try {
+                    	if (firstDataEntry.getPropertyCount() > 2) {
+	                        SoapObject dataEntry = null;
+	                        ArrayList<ConsumerRecord> consumerRecords = new ArrayList<ConsumerRecord>();
+	                        int startPos = 0, endPos = 0;
+	                        ConsumerRecord lastRecord = null;
+	                        for(int idx = 0; idx < newDataSet.getPropertyCount() ; idx++) {
+	                            dataEntry = (SoapObject) newDataSet.getProperty(idx);
+	                            ConsumerRecord record = new ConsumerRecord();
+	                            record.setLineNumber(dataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER));
+	                            record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
+	                            record.setCardID(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
+	                            try {
+	                                final Date consumerDate = Utils.parseDate(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
+	                                record.setConsumerTime(consumerDate);
+	                            } catch (ParseException ex) {
+	                                ex.printStackTrace();
+	                            }
+	                            try {
+	                                record.setConsumerCount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
+	                                record.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+	                                record.setConsumerType(ConsumerType.COUNT);
+	                                if (lastRecord != null) {
+	                                    record.setResidualAmount(String.valueOf(lastRecord.getResidualAmount()));
+	                                    if(lastRecord.getConsumerType() != record.getConsumerType()) {
+	                                        final int residualCount = record.getResidualCount();
+	                                        updateResidualCount(consumerRecords, startPos, endPos, String.valueOf(residualCount));
+	                                        final float amount = lastRecord.getConsumerAmount() + lastRecord.getResidualAmount();
+	                                        record.setResidualAmount(String.valueOf(amount));
+	                                        startPos = endPos;
+	                                    }
+	                                }
+	                                endPos++;
+	                            } catch (RuntimeException e) {
                                     record.setConsumerAmount(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
                                     record.setResidualAmount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
                                     record.setConsumerType(ConsumerType.ELECTRONIC_WALLET);
@@ -120,20 +120,19 @@ public class BusConsumerRecordRequest extends RPCRequest {
                                         }
                                     }
                                     endPos++;
-                                } catch (RuntimeException ex) {
-                                    // Invalid data
-                                    break;
-                                }
-                            }
-                            lastRecord = record;
-                            consumerRecords.add(record);
-                        }
-
-                        //  Collections.sort(consumerRecords);
-
-                        if (mListener != null) {
-                            mListener.onSuccess(consumerRecords);
-                        }
+	                            }
+	                            lastRecord = record;
+	                            consumerRecords.add(record);
+	                        }
+	
+	                        if (mListener != null) {
+	                            mListener.onSuccess(consumerRecords);
+	                        }
+	                    } else {
+	                    	if (mListener != null) {
+	                            mListener.onError("No data.");
+	                        }
+                    	}
                     } else {
                         if (mListener != null) {
                             mListener.onError(errorMessage);
