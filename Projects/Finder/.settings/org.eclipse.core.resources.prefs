@@ -2,4 +2,5 @@ eclipse.preferences.version=1
 encoding//src/com/telepathic/finder/app/BusLocationActivity.java=GBK
 encoding//src/com/telepathic/finder/app/ConsumerRecordsActivity.java=UTF-8
 encoding//src/com/telepathic/finder/sdk/ConsumerRecord.java=GBK
+encoding//src/com/telepathic/finder/sdk/network/BusLineRouteRequest.java=UTF-8
 encoding//src/com/telepathic/finder/sdk/network/BusStationLinesRequest.java=GBK

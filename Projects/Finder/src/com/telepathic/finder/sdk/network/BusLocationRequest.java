@@ -1,20 +1,19 @@
 package com.telepathic.finder.sdk.network;
 
-import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 
 import com.telepathic.finder.sdk.BusRoute;
 import com.telepathic.finder.sdk.ProcessListener.BusLocationListener;
 
 public class BusLocationRequest extends RPCRequest {
-
     private static final String METHOD_NAME = "getBusLocation";
-
-    private static final String KEY_RESPONSE = "getBusLocationResult";
+    private static final String RESPONSE_NAME = "getBusLocationResult";
+    
     private static final String KEY_LINE_NUMBER  = "lineNumber";
     private static final String KEY_GPS_NUMBER = "GPSNumber";
     private static final String KEY_LAST_STATION = "lastStation";
     private static final String KEY_DISTANCE = "distance";
+    
     private static final int INVALID_POS_CURSOR = -1;
 
     private BusRoute mRoute;
@@ -45,25 +44,6 @@ public class BusLocationRequest extends RPCRequest {
         return mPosCursor <= 0;
     }
 
-    @Override
-    void onResponse(Object result, String errorMessage) {
-        if (errorMessage != null) {
-            mPosCursor = INVALID_POS_CURSOR;
-            if (mListener != null) {
-                mListener.onError(errorMessage);
-            }
-            return ;
-        }
-        if (result instanceof SoapObject) {
-            final SoapObject response = (SoapObject)((SoapObject)result).getProperty(KEY_RESPONSE);
-            process(response);
-        } else if (result instanceof SoapFault) {
-
-        } else {
-            throw new RuntimeException("Unknown Exception!!!");
-        }
-    }
-
     private void setPositionCursor(int distance) {
         if (distance > 0) {
             mPosCursor = mPosCursor - distance;
@@ -76,36 +56,34 @@ public class BusLocationRequest extends RPCRequest {
         }
     }
 
-    /*
+
+	@Override
+	protected String getResponseName() {
+		return RESPONSE_NAME;
+	}
+
+	@Override
+	protected void handleError(String errorMessage) {
+		if (mListener != null) {
+			mListener.onError(errorMessage);
+		}
+	}
+
+	/*
      * Location response data example:
      *
-     * {lineNumber=102; distance=1; code=200; msg=³É¹¦; }
+     * {lineNumber=102; distance=1; code=200; msg=ï¿½É¹ï¿½; }
      *
      */
-    private void process(SoapObject response) {
-        if (response != null) {
-            final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
-            if (diffGram != null) {
-                final SoapObject newDataSet = (SoapObject) diffGram.getProperty(KEY_NEW_DATA_SET);
-                if (newDataSet != null) {
-                    final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
-                    final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
-                    final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
-                    if (NO_ERROR == Integer.parseInt(errorCode)) {
-                        final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
-                        final int distance = Integer.parseInt(firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE));
-                        setPositionCursor(distance);
-                        if (mListener != null && mPosCursor >= 0 && distance >= 0) {
-                            mListener.onSuccess(mRoute.getStation(mPosCursor));
-                        }
-                    } else {
-                        if (mListener != null) {
-                            mListener.onError(errorMessage);
-                        }
-                    }
-                }
-            }
-        }
-    }
+	@Override
+	protected void handleResponse(SoapObject newDataSet) {
+		final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
+		final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
+		final int distance = Integer.parseInt(firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE));
+		setPositionCursor(distance);
+		if (mListener != null && mPosCursor >= 0 && distance >= 0) {
+			mListener.onSuccess(mRoute.getStation(mPosCursor));
+		}
+	}
 
 }

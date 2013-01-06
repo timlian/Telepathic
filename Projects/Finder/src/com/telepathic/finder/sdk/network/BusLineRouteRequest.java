@@ -2,7 +2,6 @@ package com.telepathic.finder.sdk.network;
 
 import java.util.ArrayList;
 
-import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 
 import com.telepathic.finder.sdk.BusLineListener;
@@ -12,7 +11,7 @@ public class BusLineRouteRequest extends RPCRequest {
 
     private static final String METHOD_NAME = "getBusLineRoute";
 
-    private static final String KEY_RESPONSE = "getBusLineRouteResult";
+    private static final String RESPONSE_NAME = "getBusLineRouteResult";
 
     private BusLineListener mListener;
 
@@ -21,58 +20,36 @@ public class BusLineRouteRequest extends RPCRequest {
         addParameter("busLine", line);
         mListener = listener;
     }
+ 
+	@Override
+	protected String getResponseName() {
+		return RESPONSE_NAME;
+	}
 
-    @Override
-    public void onResponse(Object result, String errorMessage) {
-        if (errorMessage != null) {
-            if (mListener != null) {
-                mListener.onError(errorMessage);
-            }
-            return ;
-        }
-        if (result instanceof SoapObject) {
-            final SoapObject response = (SoapObject)((SoapObject)result).getProperty(KEY_RESPONSE);
-            process(response);
-        } else if (result instanceof SoapFault) {
+	@Override
+	protected void handleError(String errorMessage) {
+		if (mListener != null) {
+			mListener.onError(errorMessage);
+		}
+	}
 
-        } else {
-            throw new RuntimeException("Unknown Exception!!!");
-        }
-    }
-
-    /*
+	/*
      * Line route response data entry example:
      *
-     * {lineName=111; departureTime=06:00; closeOffTime=22:00; type=ÉÏÐÐ; stations=»ð³µÄÏÕ¾×ÛºÏ½»Í¨ÊàÅ¦Õ¾,Ê¢ºÍÒ»Â·Î÷Õ¾,ÐÂÄÏÌìµØÕ¾,Í©è÷ÁÖÐ¡ÇøÕ¾,×ÏÖñ±±Â·Õ¾,×Ï¾£±±Â·Õ¾,×Ï¾£Î÷Â·Õ¾,×Ï¾£Î÷Â·Î÷Õ¾,×Ï¾£Î÷Â·´´ÒµÂ·¿ÚÕ¾,´´ÒµÂ·¶þ»·Â·¿ÚÄÏÕ¾,ÓÀ·áÁ¢½»ÇÅÎ÷Õ¾,¶þ»·Â·ÄÏËÄ¶ÎÕ¾,ºìÅÆÂ¥Õ¾,¶þ»·Â·Î÷Ò»¶ÎÄÏÕ¾,Îäºî´óµÀ¿ÚÕ¾,¶þ»·Â·ÉÙÁêÂ·¿ÚÕ¾,ÇåË®ºÓÕ¾,¶þ»·Â·Î÷Ò»¶ÎÕ¾,¶þ»·Â·¹â»ª´óµÀ¿ÚÕ¾,ÐÂ³ÉÎÂÂ·¿ÚÕ¾,½õÎ÷Â·¶«Õ¾,½õÎ÷Â·Î÷Õ¾,ÇàÑò´óµÀÖÐÕ¾,ÇàÑò´óµÀ±±Õ¾,»ÆÖÒÐ¡ÇøÕ¾,ÊñººÂ·Í¬ºÍÂ·¿ÚÕ¾,ÊñººÂ·Õ¾,ÊñººÂ·Î÷Õ¾,Èý»·Â·ÑòÏ¬Á¢½»ÇÅ¶«Õ¾,ÊñººÎ÷Â·Õ¾,¸ß¼Ò´åÕ¾,ÍÁÇÅ´åÕ¾,¸ß¼ÒÐ¡ÇøÕ¾; stationAliases= , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ; code=200; msg=³É¹¦; }
+     * {lineName=111; departureTime=06:00; closeOffTime=22:00; type=ï¿½ï¿½ï¿½ï¿½; stations=ï¿½ï¿½ï¿½ï¿½Õ¾ï¿½ÛºÏ½ï¿½Í¨ï¿½ï¿½Å¦Õ¾,Ê¢ï¿½ï¿½Ò»Â·ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¾,Í©ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â·Õ¾,ï¿½Ï¾ï¿½ï¿½ï¿½Â·Õ¾,ï¿½Ï¾ï¿½ï¿½ï¿½Â·Õ¾,ï¿½Ï¾ï¿½ï¿½ï¿½Â·ï¿½ï¿½Õ¾,ï¿½Ï¾ï¿½ï¿½ï¿½Â·ï¿½ï¿½ÒµÂ·ï¿½ï¿½Õ¾,ï¿½ï¿½ÒµÂ·ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Ä¶ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â¥Õ¾,ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½Õ¾,ï¿½ï¿½Ë®ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½Ò»ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â·ï¿½â»ªï¿½ï¿½ï¿½ï¿½ï¿½Õ¾,ï¿½Â³ï¿½ï¿½ï¿½Â·ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½Õ¾,ï¿½ï¿½Â·Í¬ï¿½ï¿½Â·ï¿½ï¿½Õ¾,ï¿½ï¿½Â·Õ¾,ï¿½ï¿½Â·ï¿½ï¿½Õ¾,ï¿½ï¿½Â·ï¿½ï¿½Ï¬ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ï¿½Õ¾,ï¿½ï¿½ï¿½ï¿½Â·Õ¾,ï¿½ß¼Ò´ï¿½Õ¾,ï¿½ï¿½ï¿½Å´ï¿½Õ¾,ï¿½ß¼ï¿½Ð¡ï¿½ï¿½Õ¾; stationAliases= , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ; code=200; msg=ï¿½É¹ï¿½; }
      *
      */
-    private void process(SoapObject response) {
-        if (response != null) {
-            final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
-            if (diffGram != null) {
-                final SoapObject newDataSet = (SoapObject) diffGram.getProperty(KEY_NEW_DATA_SET);
-                if (newDataSet != null) {
-                    final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
-                    final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
-                    final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
-                    if (NO_ERROR == Integer.parseInt(errorCode)) {
-                        SoapObject dataEntry = null;
-                        ArrayList<BusLineRoute> busLine = new ArrayList<BusLineRoute>();
-                        for(int i = 0; i < newDataSet.getPropertyCount(); i++) {
-                            dataEntry = (SoapObject)newDataSet.getProperty(i);
-                            busLine.add(new BusLineRoute(dataEntry));
-                        }
-                        if (mListener != null) {
-                            mListener.onSuccess(busLine);
-                        }
-                    } else {
-                        if (mListener != null) {
-                            mListener.onError(errorMessage);
-                        }
-                    }
-                }
-            }
-        }
-    }
+	@Override
+	protected void handleResponse(SoapObject newDataSet) {
+		SoapObject dataEntry = null;
+		ArrayList<BusLineRoute> busLine = new ArrayList<BusLineRoute>();
+		for (int i = 0; i < newDataSet.getPropertyCount(); i++) {
+			dataEntry = (SoapObject) newDataSet.getProperty(i);
+			busLine.add(new BusLineRoute(dataEntry));
+		}
+		if (mListener != null) {
+			mListener.onSuccess(busLine);
+		}
+	}
 
 }
