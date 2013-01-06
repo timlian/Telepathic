@@ -22,11 +22,11 @@ abstract class RPCRequest {
     }
 
     protected abstract String getResponseName();
-    
+
     protected abstract void handleError(String errorMessage);
-    
+
     protected abstract void handleResponse(SoapObject newDataSet);
-    
+
     protected void addParameter(String key, Object value) {
         if (key == null) {
             throw new IllegalArgumentException("The parameter key is null.");
@@ -63,9 +63,9 @@ abstract class RPCRequest {
     protected boolean isComplete() {
         return true;
     }
-    
+
     public void onResponse(Object result, String errorMessage) {
-    	 if (errorMessage != null) {
+         if (errorMessage != null) {
              handleError(errorMessage);
              return ;
          }
@@ -77,10 +77,10 @@ abstract class RPCRequest {
              throw new RuntimeException("Unknown Exception!!!");
          }
     }
-    
+
     private void process(SoapObject result) {
-    	final SoapObject response = (SoapObject)result.getProperty(getResponseName());
-    	 if (response != null) {
+        final SoapObject response = (SoapObject)result.getProperty(getResponseName());
+         if (response != null) {
              final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
              if (diffGram != null) {
                  final SoapObject newDataSet = (SoapObject) diffGram.getProperty(KEY_NEW_DATA_SET);
@@ -89,17 +89,17 @@ abstract class RPCRequest {
                      final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
                      final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
                      if (NO_ERROR == Integer.parseInt(errorCode)) {
-                     	if (firstDataEntry.getPropertyCount() > 2) {
-                     		handleResponse(newDataSet);
-                     	} else {
-                     		handleError("No data.");
-                     	}
+                        if (firstDataEntry.getPropertyCount() > 2) {
+                            handleResponse(newDataSet);
+                        } else {
+                            handleError("No data.");
+                        }
                      } else {
-                    	 handleError(errorMessage);
+                         handleError(errorMessage);
                      }
                  }
              }
-    	 }
+         }
     }
-    
+
 }

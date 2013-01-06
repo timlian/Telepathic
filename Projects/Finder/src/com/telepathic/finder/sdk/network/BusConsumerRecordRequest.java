@@ -39,16 +39,16 @@ public class BusConsumerRecordRequest extends RPCRequest {
 
     @Override
     protected String getResponseName() {
-    	return RESPONSE_NAME;
+        return RESPONSE_NAME;
     }
 
     @Override
     protected void handleError(String errorMessage) {
-    	if (mListener != null) {
-    		mListener.onError(errorMessage);
-    	}
+        if (mListener != null) {
+            mListener.onError(errorMessage);
+        }
     }
-    
+
     /*
      * Consumer records response data entry example:
      *
@@ -107,12 +107,12 @@ public class BusConsumerRecordRequest extends RPCRequest {
             lastRecord = record;
             consumerRecords.add(record);
         }
-        
+
         if (mListener != null) {
             mListener.onSuccess(consumerRecords);
         }
     }
-    
+
     private static void updateResidualCount(ArrayList<ConsumerRecord> records, int start, int end, String residualCount) {
         ConsumerRecord record = null;
         for(int i = start; i < end; i++) {
@@ -128,5 +128,5 @@ public class BusConsumerRecordRequest extends RPCRequest {
             record.setResidualAmount(amount);
         }
     }
-    
+
 }

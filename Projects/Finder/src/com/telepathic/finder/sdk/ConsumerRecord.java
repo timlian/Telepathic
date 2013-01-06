@@ -143,60 +143,60 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
 
     @Override
     public boolean equals(Object object) {
-    	if(!(object instanceof ConsumerRecord)) {
-    		return false;
-    	}
-    	ConsumerRecord record = (ConsumerRecord)object;
-    	if (this == record) {
-    		return true;
-    	}
-    	if (mConsumerType != record.getConsumerType()) {
-    		return false;
-    	}
-		if (!mLineNumber.equals(record.mLineNumber)
-				|| !mBusNumber.equals(mBusNumber)
-				|| !mCardId.equals(record.getCardId())
-				|| !mConsumerTime.equals(record.getConsumerTime())) {
-			return false;
-		}
-		
-		if (mResidualCount != record.getResidualCount()
-				|| Float.compare(mResidualAmount, record.getResidualAmount()) != 0) {
-			return false;
-		}
-		
-		if (mConsumerType == ConsumerType.COUNT) {
-			if (mConsumerCount != record.getConsumerCount()) {
-				return false;
-			}
-			
-		} else if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
-			if (Float.compare(mConsumerAmount,  record.getConsumerAmount()) != 0) {
-				return false;
-			}
-		}
-		
-		return true;
+        if(!(object instanceof ConsumerRecord)) {
+            return false;
+        }
+        ConsumerRecord record = (ConsumerRecord)object;
+        if (this == record) {
+            return true;
+        }
+        if (mConsumerType != record.getConsumerType()) {
+            return false;
+        }
+        if (!mLineNumber.equals(record.mLineNumber)
+                || !mBusNumber.equals(mBusNumber)
+                || !mCardId.equals(record.getCardId())
+                || !mConsumerTime.equals(record.getConsumerTime())) {
+            return false;
+        }
+
+        if (mResidualCount != record.getResidualCount()
+                || Float.compare(mResidualAmount, record.getResidualAmount()) != 0) {
+            return false;
+        }
+
+        if (mConsumerType == ConsumerType.COUNT) {
+            if (mConsumerCount != record.getConsumerCount()) {
+                return false;
+            }
+
+        } else if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
+            if (Float.compare(mConsumerAmount,  record.getConsumerAmount()) != 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
-    
+
     @Override
     public int hashCode() {
-    	int result = 86;
-    	result = 31 * result + mLineNumber.hashCode();
-    	result = 31 * result + mBusNumber.hashCode();
-    	result = 31 * result + mCardId.hashCode();
-    	result = 31 * result + mConsumerTime.hashCode();
-    	if (mConsumerType == ConsumerType.COUNT) {
-    		result =  31 * result + mConsumerCount;
-    	}
-    	if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
-    		result = 31 * result + Float.floatToIntBits(mConsumerAmount);
-    	}
-    	result = 31 * result + mResidualCount;
-    	result = 31 * result + Float.floatToIntBits(mResidualAmount);
-    	return result;
+        int result = 86;
+        result = 31 * result + mLineNumber.hashCode();
+        result = 31 * result + mBusNumber.hashCode();
+        result = 31 * result + mCardId.hashCode();
+        result = 31 * result + mConsumerTime.hashCode();
+        if (mConsumerType == ConsumerType.COUNT) {
+            result =  31 * result + mConsumerCount;
+        }
+        if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
+            result = 31 * result + Float.floatToIntBits(mConsumerAmount);
+        }
+        result = 31 * result + mResidualCount;
+        result = 31 * result + Float.floatToIntBits(mResidualAmount);
+        return result;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
