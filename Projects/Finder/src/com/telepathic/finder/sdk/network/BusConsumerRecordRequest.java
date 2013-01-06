@@ -10,6 +10,7 @@ import org.ksoap2.serialization.SoapObject;
 import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
+import com.telepathic.finder.util.Utils;
 
 public class BusConsumerRecordRequest extends RPCRequest {
     private static final String METHOD_NAME = "getConsumerRecords";
@@ -83,7 +84,7 @@ public class BusConsumerRecordRequest extends RPCRequest {
                             record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
                             record.setCardID(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
                             try {
-                                final Date consumerDate = ConsumerRecord.DATE_FORMAT.parse(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
+                                final Date consumerDate = Utils.parseDate(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
                                 record.setConsumerTime(consumerDate);
                             } catch (ParseException ex) {
                                 ex.printStackTrace();

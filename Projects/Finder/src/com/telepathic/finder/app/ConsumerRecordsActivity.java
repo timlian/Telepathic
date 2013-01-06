@@ -174,7 +174,7 @@ public class ConsumerRecordsActivity extends Activity {
             } else if (record.getConsumerType() == ConsumerType.ELECTRONIC_WALLET) {
                 holder.consumerCount.setText(getResources().getString(R.string.consumer_amount) + record.getConsumerAmount());
             }
-            holder.consumerTime.setText(ConsumerRecord.DATE_FORMAT.format(record.getConsumerTime()));
+            holder.consumerTime.setText(Utils.formatDate(record.getConsumerTime()));
             if (position == 0) {
                 holder.residualCount.setText(getResources().getString(R.string.residual_count) + record.getResidualCount());
                 holder.residualAmount.setText(getResources().getString(R.string.residual_amount) + record.getResidualAmount());

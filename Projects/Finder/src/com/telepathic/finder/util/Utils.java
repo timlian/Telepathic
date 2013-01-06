@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +28,8 @@ public class Utils {
     private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([aAbBcCdD])?";
 
     private static final String START_WITH_ZERO_EXPRESSION = "^0+";
+    
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private Utils() {}
 
@@ -95,6 +100,17 @@ public class Utils {
         list.clear();
         list.addAll(newlist);
         return list;
+    }
+    
+    public static Date parseDate(String text) throws ParseException {
+    	if (text == null || text.length() == 0) {
+    		throw new IllegalArgumentException("Date text is empty.");
+    	}
+    	return DATE_FORMAT.parse(text);
+    }
+    
+    public static String formatDate(Date date) {
+    	return DATE_FORMAT.format(date);
     }
 
     /**

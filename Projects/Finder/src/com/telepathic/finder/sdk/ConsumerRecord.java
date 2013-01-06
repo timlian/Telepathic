@@ -1,9 +1,9 @@
 package com.telepathic.finder.sdk;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
+import com.telepathic.finder.util.Utils;
 
 /**
  * Note: This class has a natural ordering that is inconsistent with equals.
@@ -12,8 +12,6 @@ import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
  *
  */
 public class ConsumerRecord implements Comparable<ConsumerRecord> {
-
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * 公交路线号
@@ -183,8 +181,20 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
     
     @Override
     public int hashCode() {
-    	// Todo: implement this method
-    	return super.hashCode();
+    	int result = 86;
+    	result = 31 * result + mLineNumber.hashCode();
+    	result = 31 * result + mBusNumber.hashCode();
+    	result = 31 * result + mCardId.hashCode();
+    	result = 31 * result + mConsumerTime.hashCode();
+    	if (mConsumerType == ConsumerType.COUNT) {
+    		result =  31 * result + mConsumerCount;
+    	}
+    	if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
+    		result = 31 * result + Float.floatToIntBits(mConsumerAmount);
+    	}
+    	result = 31 * result + mResidualCount;
+    	result = 31 * result + Float.floatToIntBits(mResidualAmount);
+    	return result;
     }
     
     @Override
@@ -193,7 +203,7 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         builder.append("Line Number: " + mLineNumber + ", ");
         builder.append("Bus Number: " + mBusNumber + ", ");
         builder.append("Card ID: " + mCardId + ", ");
-        builder.append("Consumer Time: " + DATE_FORMAT.format(mConsumerTime) + ", ");
+        builder.append("Consumer Time: " + Utils.formatDate(mConsumerTime) + ", ");
         builder.append("Consumer Amount: " + mConsumerAmount + ", ");
         builder.append("Residual Amount: " + mResidualAmount + ", ");
         builder.append("Residual Count: " + mResidualCount);

@@ -13,6 +13,7 @@ import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.TrafficService;
+import com.telepathic.finder.util.Utils;
 
 public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplication> {
     private static final int CONSUMER_RECORD_COUNT = 20;
@@ -116,7 +117,7 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
                     final String methodName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
                     if (methodName.equals("setConsumerTime")) {
                         method = ConsumerRecord.class.getMethod(methodName, Date.class);
-                        method.invoke(record, ConsumerRecord.DATE_FORMAT.parse(value));
+                        method.invoke(record, Utils.parseDate(value));
                     } else {
                         method = ConsumerRecord.class.getMethod(methodName, String.class);
                         method.invoke(record, value);
