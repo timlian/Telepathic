@@ -9,9 +9,9 @@ import java.util.Date;
 import android.test.ApplicationTestCase;
 
 import com.telepathic.finder.app.FinderApplication;
-import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
+import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
@@ -71,6 +71,7 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
     private static String[] getSourceData() {
         String[] sourceData =
             {
+                "{lineNumber=102; busNumber=031154; cardID=000110808691; consumerTime=2013-1-1 19:23:59; consumerCount=2; residualCount=28; residualAmount=46.40;}",
                 "{lineNumber=102; busNumber=031162; cardID=000110808691; consumerTime=2013-1-1 15:39:33; consumerCount=2; residualCount=30;  residualAmount=46.40;}" ,
                 "{lineNumber=188; busNumber=031186; cardID=000110808691; consumerTime=2012-12-21 18:35:37; consumerCount=2; residualCount=6; residualAmount=46.40;}",
                 "{lineNumber=102; busNumber=031149; cardID=000110808691; consumerTime=2012-12-15 20:40:37; consumerCount=2; residualCount=8; residualAmount=46.40;}",
@@ -90,7 +91,6 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
                 "{lineNumber=188; busNumber=031181; cardID=000110808691; consumerTime=2012-9-23 11:51:44; consumerAmount=1.80; residualAmount=12.20; residualCount=20;}",
                 "{lineNumber=185; busNumber=034006; cardID=000110808691; consumerTime=2012-8-27 10:31:19; consumerAmount=1.80; residualAmount=14; residualCount=20;}",
                 "{lineNumber=102; busNumber=031158; cardID=000110808691; consumerTime=2012-8-26 16:47:37; consumerAmount=1.80; residualAmount=23; residualCount=20;}",
-                "{lineNumber=185; busNumber=034639; cardID=000110808691; consumerTime=2012-8-25 17:38:47; consumerAmount=1.80; residualAmount=24.80; residualCount=20;}",
             };
         return sourceData;
     }

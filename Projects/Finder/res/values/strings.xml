@@ -20,6 +20,9 @@
     <string name="cancel">Cancel</string>
     <string name="default_city">成都</string>
     <string name="invalid_input_hint">请输入正确的公交车路线号码</string>
+    
+    <!-- consumer record retrieve -->
+    <string name="card_id_error_notice">Please enter the correct parameter</string>
     <string name="line_number">公交路线:</string>
     <string name="bus_number">车牌号:</string>
     <string name="consumer_count">消费次数:</string>
