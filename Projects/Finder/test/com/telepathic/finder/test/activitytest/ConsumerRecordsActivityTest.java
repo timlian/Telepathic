@@ -85,6 +85,11 @@ ActivityInstrumentationTestCase2<ConsumerRecordsActivity> {
         mEditText.setText("108092345");
         mSendButton.performClick();
         assertEquals(mActivity.getResources().getString(R.string.card_id_error_notice), mEditText.getError());
+
+        // Test a non-existed card ID
+        mEditText.setError(null);
+        mEditText.setText("12345678");
+        mSendButton.performClick();
     }
 
 }
