@@ -104,6 +104,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 public void onCancel(DialogInterface dialog) {
                     isCanceled = true;
                     mTrafficService.cancelRetrieve();
+                    mSendButton.setEnabled(true);
                 }
             });
             return prgDlg;
