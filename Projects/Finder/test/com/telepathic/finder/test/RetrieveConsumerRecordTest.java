@@ -36,7 +36,7 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
         super.setUp();
         createApplication();
         mApp = getApplication();
-        mTrafficService = TrafficService.getTrafficService(mApp.getMapManager());
+        mTrafficService = TrafficService.getTrafficService(mApp.getMapManager(), getApplication());
     }
 
     @Override
@@ -96,47 +96,47 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
     }
     // {lineNumber=102; busNumber=031162; cardID=000110808691; consumerTime=2013-1-1 15:39:33; consumerCount=2; residualCount=30; }
     private static ConsumerRecord parseConsumerRecord(String data) {
-        ConsumerRecord record = new ConsumerRecord();
-        String[] properties = data.trim().replaceAll("[{}]", "").split(";");
-        String name  = null;
-        String value = null;
-        for(String property : properties) {
-            String[] item = property.trim().split("=");
-            if(item.length == 2) {
-                name  = item[0];
-                value = item[1];
-                if (record.getConsumerType() == null) {
-                    if (name.equals("consumerCount")) {
-                        record.setConsumerType(ConsumerType.COUNT);
-                    } else if (name.equals("consumerAmount")) {
-                        record.setConsumerType(ConsumerType.ELECTRONIC_WALLET);
-                    }
-                }
-                Method method;
-                try {
-                    final String methodName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-                    if (methodName.equals("setConsumerTime")) {
-                        method = ConsumerRecord.class.getMethod(methodName, Date.class);
-                        method.invoke(record, Utils.parseDate(value));
-                    } else {
-                        method = ConsumerRecord.class.getMethod(methodName, String.class);
-                        method.invoke(record, value);
-                    }
-
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return record;
+//        ConsumerRecord record = new ConsumerRecord();
+//        String[] properties = data.trim().replaceAll("[{}]", "").split(";");
+//        String name  = null;
+//        String value = null;
+//        for(String property : properties) {
+//            String[] item = property.trim().split("=");
+//            if(item.length == 2) {
+//                name  = item[0];
+//                value = item[1];
+//                if (record.getConsumerType() == null) {
+//                    if (name.equals("consumerCount")) {
+//                        record.setConsumerType(ConsumerType.COUNT);
+//                    } else if (name.equals("consumerAmount")) {
+//                        record.setConsumerType(ConsumerType.EWALLET);
+//                    }
+//                }
+//                Method method;
+//                try {
+//                    final String methodName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+//                    if (methodName.equals("setConsumerTime")) {
+//                        method = ConsumerRecord.class.getMethod(methodName, Date.class);
+//                        method.invoke(record, Utils.parseDate(value));
+//                    } else {
+//                        method = ConsumerRecord.class.getMethod(methodName, String.class);
+//                        method.invoke(record, value);
+//                    }
+//
+//                } catch (NoSuchMethodException e) {
+//                    e.printStackTrace();
+//                } catch (IllegalArgumentException e) {
+//                    e.printStackTrace();
+//                } catch (IllegalAccessException e) {
+//                    e.printStackTrace();
+//                } catch (InvocationTargetException e) {
+//                    e.printStackTrace();
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+        return null;
     }
 
     private class TestChargeRecordsListener implements ConsumerRecordsListener {

@@ -22,7 +22,7 @@ public class RetrieveStationNameRequestTest extends ApplicationTestCase<FinderAp
 		super.setUp();
 		createApplication();
 		mApp = getApplication();
-		mTrafficService = TrafficService.getTrafficService(mApp.getMapManager());
+		mTrafficService = TrafficService.getTrafficService(mApp.getMapManager(), getApplication());
 	}
 	 
 	public void test_retrieve_station_name() {

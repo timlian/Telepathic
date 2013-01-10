@@ -91,7 +91,7 @@ public class BusLocationActivity extends MapActivity {
         super.initMapActivity(mMapManager);
 
         // init traffic service
-        mTrafficService = TrafficService.getTrafficService(mMapManager);
+        mTrafficService = TrafficService.getTrafficService(mMapManager, getApplicationContext());
 
         mMapView = (MapView) findViewById(R.id.bmapView);
         mMapView.setBuiltInZoomControls(true);

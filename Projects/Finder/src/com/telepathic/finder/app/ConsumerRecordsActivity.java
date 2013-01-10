@@ -46,7 +46,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.consumer_records);
 
-        mTrafficService = TrafficService.getTrafficService(null);
+        mTrafficService = TrafficService.getTrafficService(null, getApplicationContext());
 
         mEditText = (AutoCompleteTextView) findViewById(R.id.searchkey);
         mSendButton = (Button) findViewById(R.id.search);
@@ -189,15 +189,15 @@ public class ConsumerRecordsActivity extends FragmentActivity {
             RecordItemHolder holder = (RecordItemHolder) view.getTag();
             holder.lineNumber.setText(getResources().getString(R.string.line_number) + record.getLineNumber());
             holder.busNumber.setText(getResources().getString(R.string.bus_number) + record.getBusNumber());
-            if (record.getConsumerType() == ConsumerType.COUNT) {
-                holder.consumerCount.setText(getResources().getString(R.string.consumer_count) + record.getConsumerCount());
-            } else if (record.getConsumerType() == ConsumerType.ELECTRONIC_WALLET) {
-                holder.consumerCount.setText(getResources().getString(R.string.consumer_amount) + record.getConsumerAmount());
+            if (record.getType() == ConsumerType.COUNT) {
+                holder.consumerCount.setText(getResources().getString(R.string.consumer_count) + record.getConsumption());
+            } else if (record.getType() == ConsumerType.EWALLET) {
+                holder.consumerCount.setText(getResources().getString(R.string.consumer_amount) + record.getConsumption());
             }
             holder.consumerTime.setText(Utils.formatDate(record.getConsumerTime()));
             if (position == 0) {
-                holder.residualCount.setText(getResources().getString(R.string.residual_count) + record.getResidualCount());
-                holder.residualAmount.setText(getResources().getString(R.string.residual_amount) + record.getResidualAmount());
+                holder.residualCount.setText(getResources().getString(R.string.residual_count) + record.getResidual());
+                holder.residualAmount.setText(getResources().getString(R.string.residual_amount) + record.getResidual());
                 holder.residualCount.setVisibility(View.VISIBLE);
                 holder.residualAmount.setVisibility(View.VISIBLE);
             } else {

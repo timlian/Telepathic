@@ -1,35 +1,46 @@
 package com.telepathic.finder.sdk;
 
+import android.content.Context;
+
 import com.baidu.mapapi.BMapManager;
 import com.telepathic.finder.sdk.TrafficListener.BusLocationListener;
 import com.telepathic.finder.sdk.network.BusConsumerRecordRequest;
 import com.telepathic.finder.sdk.network.BusLineRouteRequest;
 import com.telepathic.finder.sdk.network.BusStationNameRequest;
 import com.telepathic.finder.sdk.network.NetWorkAdapter;
+import com.telepathic.finder.sdk.store.ConsumptionStore;
 
 public class TrafficService implements ITrafficService {
 
     private static TrafficService mInstance;
-
+    private Context mAppContext;
+    
     private BusLocationListener mLocationListener;
 
     private NetWorkAdapter mNetWorkAdapter;
     private BusRoutesStore mRoutesStore;
+    private ConsumptionStore mConsumptionStore;
     private MapSearchHandler mSearchHandler;
     private BusLocationHandler mBusLocationHandler;
 
-    private TrafficService(BMapManager manager) {
+    private TrafficService(BMapManager manager, Context appContext) {
+    	mAppContext = appContext;
         mNetWorkAdapter = new NetWorkAdapter();
         mRoutesStore = new BusRoutesStore();
+        mConsumptionStore =  ConsumptionStore.getDefaultStore(mAppContext);
         mSearchHandler = new MapSearchHandler(manager, mRoutesStore);
         mBusLocationHandler = new BusLocationHandler(this, mNetWorkAdapter);
     }
 
-    public static synchronized TrafficService getTrafficService(BMapManager manager) {
+    public static synchronized TrafficService getTrafficService(BMapManager manager, Context appContext) {
         if (mInstance == null) {
-            mInstance = new TrafficService(manager);
+            mInstance = new TrafficService(manager, appContext);
         }
         return mInstance;
+    }
+    
+    public ConsumptionStore getConsumptionStore() {
+    	return mConsumptionStore;
     }
 
     @Override
@@ -92,7 +103,7 @@ public class TrafficService implements ITrafficService {
 
     @Override
     public void retrieveConsumerRecords(String cardId, int count, ConsumerRecordsListener listener) {
-        BusConsumerRecordRequest request = new BusConsumerRecordRequest(cardId, count, listener);
+        BusConsumerRecordRequest request = new BusConsumerRecordRequest(cardId, count, listener, mConsumptionStore);
         mNetWorkAdapter.execute(request);
     }
     

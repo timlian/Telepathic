@@ -2,7 +2,6 @@ package com.telepathic.finder.sdk;
 
 import java.util.Date;
 
-import com.telepathic.finder.sdk.exception.IllegalConsumerTypeException;
 import com.telepathic.finder.util.Utils;
 
 /**
@@ -11,7 +10,7 @@ import com.telepathic.finder.util.Utils;
  * @author Tim.Lian
  *
  */
-public class ConsumerRecord implements Comparable<ConsumerRecord> {
+public abstract class ConsumerRecord implements Comparable<ConsumerRecord> {
 
     /**
      * 公交路线号
@@ -33,36 +32,22 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
      */
     private Date mConsumerTime;
 
-    /**
-     * 消费次数
-     */
-    private int mConsumerCount;
-
-    /**
-     * 消费金额
-     */
-    private float mConsumerAmount;
-
-    /**
-     * 剩余次数
-     */
-    private int mResidualCount;
-
-    /**
-     * 剩余金额
-     */
-    private float mResidualAmount;
-
-    /**
-     * 消费类型
-     */
-    private ConsumerType mConsumerType;
-
+    
     public enum ConsumerType {
-        COUNT, ELECTRONIC_WALLET;
+        COUNT, EWALLET;
     }
 
 
+    public abstract ConsumerType getType();
+    
+    public abstract String getConsumption();
+    
+    public abstract void setConsumption(String consumption);
+    
+    public abstract String getResidual();
+    
+    public abstract void setResidual(String residual);
+    
     public String getLineNumber() {
         return mLineNumber;
     }
@@ -95,62 +80,17 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         mConsumerTime = consumerTime;
     }
 
-    public int getConsumerCount() {
-        if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
-            throw new IllegalConsumerTypeException();
-        }
-        return mConsumerCount;
-    }
-
-    public void setConsumerCount(String consumerCount) {
-        mConsumerCount = Integer.parseInt(consumerCount);
-    }
-
-    public int getResidualCount() {
-        return mResidualCount;
-    }
-
-    public void setResidualCount(String residualCount) {
-        mResidualCount = Integer.parseInt(residualCount);
-    }
-
-    public float getConsumerAmount() {
-        if (mConsumerType == ConsumerType.COUNT) {
-            throw new IllegalConsumerTypeException();
-        }
-        return mConsumerAmount;
-    }
-
-    public void setConsumerAmount(String amount) {
-        mConsumerAmount = Float.parseFloat(amount);
-    }
-
-    public float getResidualAmount() {
-        return mResidualAmount;
-    }
-
-    public void setResidualAmount(String amount) {
-        mResidualAmount = Float.parseFloat(amount);
-    }
-
-    public ConsumerType getConsumerType() {
-        return mConsumerType;
-    }
-
-    public void setConsumerType(ConsumerType type) {
-        mConsumerType = type;
-    }
-
     @Override
     public boolean equals(Object object) {
+    	 if (object == this) {
+             return true;
+         }
         if(!(object instanceof ConsumerRecord)) {
             return false;
         }
+        
         ConsumerRecord record = (ConsumerRecord)object;
-        if (this == record) {
-            return true;
-        }
-        if (mConsumerType != record.getConsumerType()) {
+        if (getType() != record.getType()) {
             return false;
         }
         if (!mLineNumber.equals(record.mLineNumber)
@@ -159,23 +99,6 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
                 || !mConsumerTime.equals(record.getConsumerTime())) {
             return false;
         }
-
-        if (mResidualCount != record.getResidualCount()
-                || Float.compare(mResidualAmount, record.getResidualAmount()) != 0) {
-            return false;
-        }
-
-        if (mConsumerType == ConsumerType.COUNT) {
-            if (mConsumerCount != record.getConsumerCount()) {
-                return false;
-            }
-
-        } else if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
-            if (Float.compare(mConsumerAmount,  record.getConsumerAmount()) != 0) {
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -186,14 +109,6 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         result = 31 * result + mBusNumber.hashCode();
         result = 31 * result + mCardId.hashCode();
         result = 31 * result + mConsumerTime.hashCode();
-        if (mConsumerType == ConsumerType.COUNT) {
-            result =  31 * result + mConsumerCount;
-        }
-        if (mConsumerType == ConsumerType.ELECTRONIC_WALLET) {
-            result = 31 * result + Float.floatToIntBits(mConsumerAmount);
-        }
-        result = 31 * result + mResidualCount;
-        result = 31 * result + Float.floatToIntBits(mResidualAmount);
         return result;
     }
 
@@ -204,9 +119,6 @@ public class ConsumerRecord implements Comparable<ConsumerRecord> {
         builder.append("Bus Number: " + mBusNumber + ", ");
         builder.append("Card ID: " + mCardId + ", ");
         builder.append("Consumer Time: " + Utils.formatDate(mConsumerTime) + ", ");
-        builder.append("Consumer Amount: " + mConsumerAmount + ", ");
-        builder.append("Residual Amount: " + mResidualAmount + ", ");
-        builder.append("Residual Count: " + mResidualCount);
         return builder.toString();
     }
 
