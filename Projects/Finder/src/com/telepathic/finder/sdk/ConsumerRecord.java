@@ -13,26 +13,25 @@ import com.telepathic.finder.util.Utils;
 public abstract class ConsumerRecord implements Comparable<ConsumerRecord> {
 
     /**
-     * ¹«½»Â·ÏßºÅ
+     * å…¬äº¤è·¯çº¿å·
      */
     private String mLineNumber;
 
     /**
-     * ¹«½»³µÅÆºÅ
+     * å…¬äº¤è½¦ç‰Œå·
      */
     private String mBusNumber;
 
     /**
-     * ¹«½»¿¨ºÅ
+     * å…¬äº¤å¡å·
      */
     private String mCardId;
 
     /**
-     * Ïû·ÑÊ±¼ä
+     * æ¶ˆè´¹æ—¶é—´
      */
     private Date mConsumerTime;
 
-    
     public enum ConsumerType {
         COUNT, EWALLET;
     }

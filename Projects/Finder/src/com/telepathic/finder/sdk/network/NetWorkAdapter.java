@@ -1,14 +1,16 @@
 package com.telepathic.finder.sdk.network;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-import com.telepathic.finder.util.ClientLog;
 
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+
+import com.telepathic.finder.util.ClientLog;
 
 public class NetWorkAdapter {
     private static final String TAG = "NetWorkAdapter";
@@ -40,13 +42,16 @@ public class NetWorkAdapter {
         mThread.start();
         mRequestHandler = new Handler(mThread.getLooper());
         mRequestHandler.post(mHanRunnable);
-
     }
 
     public void execute(final RPCRequest request) {
         if (request != null) {
             mRequestQueue.add(request);
         }
+    }
+
+    public void cancel(){
+        mThread.interrupt();
     }
 
     private void send(final RPCRequest request) {
@@ -77,7 +82,7 @@ public class NetWorkAdapter {
 
         }
         onRequestComplete(request, soapEnvelope.bodyIn, errorMessage);
-      }
+    }
 
     private void onRequestComplete(RPCRequest request, Object response, String error) {
         request.onResponse(response, error);

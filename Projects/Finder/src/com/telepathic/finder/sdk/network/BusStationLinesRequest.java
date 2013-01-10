@@ -28,8 +28,8 @@ public class BusStationLinesRequest extends RPCRequest {
     }
 
     /*
-     * Table1=anyType{station=新会展中心公交站; stationAlias=anyType{}; stationGPS=50022; lineName=298,115,84,118,102; totalNum=2; code=200; msg=成功; };
-     * Table1=anyType{station=新会展中心公交站; stationAlias=anyType{}; stationGPS=50023; lineName=84,102,115,298,118; };
+     * Table1=anyType{station=鏂颁細灞曚腑蹇冨叕浜ょ珯; stationAlias=anyType{}; stationGPS=50022; lineName=298,115,84,118,102; totalNum=2; code=200; msg=鎴愬姛; };
+     * Table1=anyType{station=鏂颁細灞曚腑蹇冨叕浜ょ珯; stationAlias=anyType{}; stationGPS=50023; lineName=84,102,115,298,118; };
      */
     @Override
     protected void handleResponse(SoapObject newDataSet) {

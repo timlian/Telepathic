@@ -3,9 +3,10 @@ package com.telepathic.finder.app;
 import java.util.ArrayList;
 import java.util.Map;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -40,6 +41,8 @@ public class ConsumerRecordsActivity extends FragmentActivity {
 
     private TrafficService mTrafficService;
     private BusLineRoute mBusLineRoute;
+
+    private volatile boolean isCanceled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +99,14 @@ public class ConsumerRecordsActivity extends FragmentActivity {
             prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             prgDlg.setMessage(getResources().getString(R.string.find_ic_card_records));
             prgDlg.setIndeterminate(true);
-            prgDlg.setCancelable(false);
+            prgDlg.setOnCancelListener(new OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    isCanceled = true;
+                    mTrafficService.cancelRetrieve();
+                    mSendButton.setEnabled(true);
+                }
+            });
             return prgDlg;
         }
         return null;
@@ -111,7 +121,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 public void run() {
                     mSendButton.setEnabled(true);
                     mListAdapter.updateRecords(consumerRecords);
-                    dismissDialog(DIALOG_WAITING);
+                    removeDialog(DIALOG_WAITING);
                 }
             });
 
@@ -123,8 +133,12 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
-                    dismissDialog(DIALOG_WAITING);
-                    Toast.makeText(ConsumerRecordsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                    removeDialog(DIALOG_WAITING);
+                    if (!isCanceled) {
+                        Toast.makeText(ConsumerRecordsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                    } else {
+                        isCanceled = false;
+                    }
                 }
             });
 

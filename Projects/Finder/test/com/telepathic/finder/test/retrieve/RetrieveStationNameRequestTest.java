@@ -1,4 +1,4 @@
-package com.telepathic.finder.test;
+package com.telepathic.finder.test.retrieve;
 
 import com.telepathic.finder.app.FinderApplication;
 import com.telepathic.finder.sdk.TrafficService;

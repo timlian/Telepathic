@@ -68,8 +68,8 @@ public class BusLocationActivity extends MapActivity {
     private MapView mMapView;
     private BMapManager mMapManager;
 
-    private MyLocationOverlay mLocationOverlay;  //定位图层
-    private LocationListener mLocationListener; //onResume时注册此listener，onPause时需要Remove
+    private MyLocationOverlay mLocationOverlay;  //瀹氫綅鍥惧眰
+    private LocationListener mLocationListener; //onResume鏃舵敞鍐屾listener锛宱nPause鏃堕渶瑕丷emove
     private TrafficService mTrafficService;
     private MyBusLocationListener mBusLocationListener;
     @Override
@@ -95,14 +95,14 @@ public class BusLocationActivity extends MapActivity {
 
         mMapView = (MapView) findViewById(R.id.bmapView);
         mMapView.setBuiltInZoomControls(true);
-        // 设置在缩放动画过程中也显示overlay,默认为不绘制
+        // 璁剧疆鍦ㄧ缉鏀惧姩鐢昏繃绋嬩腑涔熸樉绀簅verlay,榛樿涓轰笉缁樺埗
         mMapView.setDrawOverlayWhenZooming(true);
 
-        // 添加定位图层
+        // 娣诲姞瀹氫綅鍥惧眰
         mLocationOverlay = new MyLocationOverlay(this, mMapView);
         mMapView.getOverlays().add(mLocationOverlay);
 
-        // 注册定位事件
+        // 娉ㄥ唽瀹氫綅浜嬩欢
         mLocationListener = new LocationListener(){
             @Override
             public void onLocationChanged(Location location) {
@@ -130,7 +130,7 @@ public class BusLocationActivity extends MapActivity {
                     public void done(String busLineNumber, ArrayList<MKPoiInfo> busPois,
                             int error) {
                         if (busPois != null && busPois.size() > 0) {
-                            dismissDialog(BUS_LINE_SEARCH_DLG);
+                            removeDialog(BUS_LINE_SEARCH_DLG);
                             showBusRoutesDlg(busLineNumber, busPois);
                         }
                     }
@@ -341,16 +341,16 @@ public class BusLocationActivity extends MapActivity {
         Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);
         marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
         /**
-         * 创建自定义的ItemizedOverlay
+         * 鍒涘缓鑷畾涔夌殑ItemizedOverlay
          */
         CustomItemizedOverlay overlay = new CustomItemizedOverlay(marker, this);
         /**
-         * 创建并添加第一个标记：
+         * 鍒涘缓骞舵坊鍔犵涓�涓爣璁帮細
          */
         OverlayItem overlayItem = new OverlayItem(station.getPoint(), "", station.getContent());
         overlay.addOverlay(overlayItem);
         /**
-         * 往地图上添加自定义的ItemizedOverlay
+         * 寰�鍦板浘涓婃坊鍔犺嚜瀹氫箟鐨処temizedOverlay
          */
         List<Overlay> mapOverlays = mMapView.getOverlays();
         mapOverlays.add(overlay);
@@ -397,7 +397,7 @@ public class BusLocationActivity extends MapActivity {
 
         @Override
         protected void onPostExecute(ArrayList<String> result) {
-           // mTvSearchKey.setAdapter(null);
+            // mTvSearchKey.setAdapter(null);
             if (result.size() > 1) {
                 mTvSearchKey.setText(result.get(0));
                 result.remove(0);

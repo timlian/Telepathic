@@ -93,9 +93,9 @@ public class TrafficService implements ITrafficService {
     }
 
     public void getBusStationLines() {
-        //        BusStationLinesRequest request1 = new BusStationLinesRequest("�»�չ���Ĺ���վ", "1", "10");
-        //        BusStationLinesRequest request2 = new BusStationLinesRequest("�츮���԰����վ", "1", "10");
-        //        BusStationLinesRequest request3 = new BusStationLinesRequest("�컪·վ", "1", "10");
+        //        BusStationLinesRequest request1 = new BusStationLinesRequest("新会展中心公交站", "1", "10");
+        //        BusStationLinesRequest request2 = new BusStationLinesRequest("天府软件园东侧站", "1", "10");
+        //        BusStationLinesRequest request3 = new BusStationLinesRequest("天华路站", "1", "10");
         //        mNetWorkAdapter.execute(request1);
         //        mNetWorkAdapter.execute(request2);
         //        mNetWorkAdapter.execute(request3);
@@ -106,10 +106,10 @@ public class TrafficService implements ITrafficService {
         BusConsumerRecordRequest request = new BusConsumerRecordRequest(cardId, count, listener, mConsumptionStore);
         mNetWorkAdapter.execute(request);
     }
-    
+
     public void retrieveStationName(String busNumber, String gpsNumber) {
-    	BusStationNameRequest request = new BusStationNameRequest(busNumber, gpsNumber);
-    	mNetWorkAdapter.execute(request);
+        BusStationNameRequest request = new BusStationNameRequest(busNumber, gpsNumber);
+        mNetWorkAdapter.execute(request);
     }
 
     public BusRoutesStore getRoutesStore() {
@@ -118,6 +118,10 @@ public class TrafficService implements ITrafficService {
 
     public void cancelSearch() {
         mSearchHandler.cancel();
+    }
+
+    public void cancelRetrieve() {
+        mNetWorkAdapter.cancel();
     }
 
 }
