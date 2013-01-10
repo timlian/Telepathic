@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -27,7 +28,7 @@ import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
-public class ConsumerRecordsActivity extends Activity {
+public class ConsumerRecordsActivity extends FragmentActivity {
     private static final String TAG = "TestActivity";
     private static final int DIALOG_WAITING = 2;
     private static final String CARD_ID_CACHE = "card_id_cache";
