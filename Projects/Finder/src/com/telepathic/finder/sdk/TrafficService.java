@@ -95,10 +95,10 @@ public class TrafficService implements ITrafficService {
         BusConsumerRecordRequest request = new BusConsumerRecordRequest(cardId, count, listener);
         mNetWorkAdapter.execute(request);
     }
-    
+
     public void retrieveStationName(String busNumber, String gpsNumber) {
-    	BusStationNameRequest request = new BusStationNameRequest(busNumber, gpsNumber);
-    	mNetWorkAdapter.execute(request);
+        BusStationNameRequest request = new BusStationNameRequest(busNumber, gpsNumber);
+        mNetWorkAdapter.execute(request);
     }
 
     public BusRoutesStore getRoutesStore() {

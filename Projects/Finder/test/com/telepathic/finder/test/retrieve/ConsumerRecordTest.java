@@ -1,4 +1,4 @@
-package com.telepathic.finder.test;
+package com.telepathic.finder.test.retrieve;
 
 import java.text.ParseException;
 

@@ -110,7 +110,7 @@ public class ConsumerRecordsActivity extends Activity {
                 public void run() {
                     mSendButton.setEnabled(true);
                     mListAdapter.updateRecords(consumerRecords);
-                    dismissDialog(DIALOG_WAITING);
+                    removeDialog(DIALOG_WAITING);
                 }
             });
 
@@ -122,7 +122,7 @@ public class ConsumerRecordsActivity extends Activity {
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
-                    dismissDialog(DIALOG_WAITING);
+                    removeDialog(DIALOG_WAITING);
                     Toast.makeText(ConsumerRecordsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
             });

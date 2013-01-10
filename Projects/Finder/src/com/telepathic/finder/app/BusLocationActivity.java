@@ -130,7 +130,7 @@ public class BusLocationActivity extends MapActivity {
                     public void done(String busLineNumber, ArrayList<MKPoiInfo> busPois,
                             int error) {
                         if (busPois != null && busPois.size() > 0) {
-                            dismissDialog(BUS_LINE_SEARCH_DLG);
+                            removeDialog(BUS_LINE_SEARCH_DLG);
                             showBusRoutesDlg(busLineNumber, busPois);
                         }
                     }
@@ -397,7 +397,7 @@ public class BusLocationActivity extends MapActivity {
 
         @Override
         protected void onPostExecute(ArrayList<String> result) {
-           // mTvSearchKey.setAdapter(null);
+            // mTvSearchKey.setAdapter(null);
             if (result.size() > 1) {
                 mTvSearchKey.setText(result.get(0));
                 result.remove(0);
