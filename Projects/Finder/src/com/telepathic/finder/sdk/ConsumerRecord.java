@@ -14,47 +14,47 @@ import com.telepathic.finder.util.Utils;
 public class ConsumerRecord implements Comparable<ConsumerRecord> {
 
     /**
-     * ¹«½»Â·ÏßºÅ
+     * å…¬äº¤è·¯çº¿å·
      */
     private String mLineNumber;
 
     /**
-     * ¹«½»³µÅÆºÅ
+     * å…¬äº¤è½¦ç‰Œå·
      */
     private String mBusNumber;
 
     /**
-     * ¹«½»¿¨ºÅ
+     * å…¬äº¤å¡å·
      */
     private String mCardId;
 
     /**
-     * Ïû·ÑÊ±¼ä
+     * æ¶ˆè´¹æ—¶é—´
      */
     private Date mConsumerTime;
 
     /**
-     * Ïû·Ñ´ÎÊı
+     * æ¶ˆè´¹æ¬¡æ•°
      */
     private int mConsumerCount;
 
     /**
-     * Ïû·Ñ½ğ¶î
+     * æ¶ˆè´¹é‡‘é¢
      */
     private float mConsumerAmount;
 
     /**
-     * Ê£Óà´ÎÊı
+     * å‰©ä½™æ¬¡æ•°
      */
     private int mResidualCount;
 
     /**
-     * Ê£Óà½ğ¶î
+     * å‰©ä½™é‡‘é¢
      */
     private float mResidualAmount;
 
     /**
-     * Ïû·ÑÀàĞÍ
+     * æ¶ˆè´¹ç±»å‹
      */
     private ConsumerType mConsumerType;
 

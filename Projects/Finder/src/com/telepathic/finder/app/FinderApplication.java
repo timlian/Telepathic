@@ -1,11 +1,11 @@
 package com.telepathic.finder.app;
 
+import android.app.Application;
+import android.widget.Toast;
+
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.MKEvent;
 import com.baidu.mapapi.MKGeneralListener;
-
-import android.app.Application;
-import android.widget.Toast;
 
 public class FinderApplication extends Application {
     static FinderApplication mApp;
@@ -16,11 +16,11 @@ public class FinderApplication extends Application {
     private String mStrKey = "A963422DFFFC8530BDDC5FF0063205F9E2D98461";
     boolean m_bKeyRight = true;
 
-    // ³£ÓÃÊÂ¼ş¼àÌı£¬ÓÃÀ´´¦ÀíÍ¨³£µÄÍøÂç´íÎó£¬ÊÚÈ¨ÑéÖ¤´íÎóµÈ
+    // å¸¸ç”¨äº‹ä»¶ç›‘å¬ï¼Œç”¨æ¥å¤„ç†é€šå¸¸çš„ç½‘ç»œé”™è¯¯ï¼ŒæˆæƒéªŒè¯é”™è¯¯ç­‰
     private static class MyGeneralListener implements MKGeneralListener {
         @Override
         public void onGetNetworkState(int iError) {
-            Toast.makeText(FinderApplication.mApp.getApplicationContext(), "ÄúµÄÍøÂç³ö´íÀ²£¡",
+            Toast.makeText(FinderApplication.mApp.getApplicationContext(), "æ‚¨çš„ç½‘ç»œå‡ºé”™å•¦ï¼",
                     Toast.LENGTH_LONG).show();
         }
 
@@ -28,7 +28,7 @@ public class FinderApplication extends Application {
         public void onGetPermissionState(int iError) {
             if (iError ==  MKEvent.ERROR_PERMISSION_DENIED) {
                 Toast.makeText(FinderApplication.mApp.getApplicationContext(),
-                        "ÇëÔÚFinderApplication.javaÎÄ¼şÊäÈëÕıÈ·µÄÊÚÈ¨Key£¡",
+                        "è¯·åœ¨FinderApplication.javaæ–‡ä»¶è¾“å…¥æ­£ç¡®çš„æˆæƒKeyï¼",
                         Toast.LENGTH_LONG).show();
                 FinderApplication.mApp.m_bKeyRight = false;
             }
@@ -40,16 +40,16 @@ public class FinderApplication extends Application {
         mApp = this;
         mBMapManager = new BMapManager(this);
         boolean isSuccess = mBMapManager.init(this.mStrKey, new MyGeneralListener());
-        // ³õÊ¼»¯µØÍ¼sdk³É¹¦£¬ÉèÖÃ¶¨Î»¼àÌıÊ±¼ä
+        // åˆå§‹åŒ–åœ°å›¾sdkæˆåŠŸï¼Œè®¾ç½®å®šä½ç›‘å¬æ—¶é—´
         if (isSuccess) {
             mBMapManager.getLocationManager().setNotifyInternal(10, 5);
         } else {
-            // µØÍ¼sdk³õÊ¼»¯Ê§°Ü£¬²»ÄÜÊ¹ÓÃsdk
+            // åœ°å›¾sdkåˆå§‹åŒ–å¤±è´¥ï¼Œä¸èƒ½ä½¿ç”¨sdk
         }
         super.onCreate();
     }
 
-    //½¨ÒéÔÚÄúappµÄÍË³öÖ®Ç°µ÷ÓÃmapadpiµÄdestroy()º¯Êı£¬±ÜÃâÖØ¸´³õÊ¼»¯´øÀ´µÄÊ±¼äÏûºÄ
+    //å»ºè®®åœ¨æ‚¨appçš„é€€å‡ºä¹‹å‰è°ƒç”¨mapadpiçš„destroy()å‡½æ•°ï¼Œé¿å…é‡å¤åˆå§‹åŒ–å¸¦æ¥çš„æ—¶é—´æ¶ˆè€—
     @Override
     public void onTerminate() {
         if (mBMapManager != null) {
