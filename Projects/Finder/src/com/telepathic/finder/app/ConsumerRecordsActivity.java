@@ -1,5 +1,6 @@
 package com.telepathic.finder.app;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -43,7 +44,6 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private ConsumerRecordsAdapter mListAdapter;
 
     private TrafficService mTrafficService;
-    private BusLineRoute mBusLineRoute;
 
     private volatile boolean isCanceled = false;
 
@@ -84,6 +84,20 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
         mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
     }
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	ArrayList<String> cards = getCachedCards();
+    	if (cards.size() > 0) {
+    	try {
+			mListAdapter.updateRecords(mTrafficService.getConsumptionStore().getConsumptionRecords(cards.get(0)));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	}
+    }
 
     private void refreshCardIDCache(){
         SharedPreferences sharedPreferences = getSharedPreferences(CARD_ID_CACHE, MODE_PRIVATE);
@@ -96,6 +110,17 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(ConsumerRecordsActivity.this,
                 android.R.layout.simple_dropdown_item_1line, list);
         mEditText.setAdapter(adapter);
+    }
+    
+    private ArrayList<String> getCachedCards() {
+    	SharedPreferences sharedPreferences = getSharedPreferences(CARD_ID_CACHE, MODE_PRIVATE);
+
+        Map<String, ?> map = sharedPreferences.getAll();
+        ArrayList<String> list = new ArrayList<String>();
+        if (map.keySet() != null) {
+            list.addAll(map.keySet());
+        }
+        return list;
     }
 
     @Override

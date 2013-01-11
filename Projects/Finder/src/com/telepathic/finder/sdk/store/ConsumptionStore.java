@@ -94,8 +94,8 @@ public class ConsumptionStore {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		try {
 			Cursor cursor = db.query(TABLE_NAME, null,
-					ConsumptionColumns.CARD_ID + "= ?",
-					new String[] { cardId }, null, null,
+					ConsumptionColumns.CARD_ID + " like " + "\'%" + cardId
+							+ "%\'", null, null, null,
 					ConsumptionColumns.CONSUMPTION_TIME + " DESC");
 			if (cursor != null) {
 				try {
@@ -140,7 +140,7 @@ public class ConsumptionStore {
         // Called only once, first time the DB is created
         @Override
         public void onCreate(SQLiteDatabase db) {
-            String sql = "create table " + TABLE_NAME + " (" 
+            String sql = "CREATE TABLE " + TABLE_NAME + " (" 
                     + ConsumptionColumns._ID + " integer primary key, "
                     + ConsumptionColumns.CARD_ID + " text, "
                     + ConsumptionColumns.BUS_LINE_NUMBER + " text, " 
@@ -148,7 +148,9 @@ public class ConsumptionStore {
                     + ConsumptionColumns.CONSUMPTION_TIME + " text, "
                     + ConsumptionColumns.CONSUMPTION + " text, "
                     + ConsumptionColumns.RESIDUAL + " text, "
-                    + ConsumptionColumns.CONSUMPTION_TYPE + " text)";
+                    + ConsumptionColumns.CONSUMPTION_TYPE + " text, " 
+                    + "UNIQUE (" + ConsumptionColumns.CARD_ID + ", " 
+                    + ConsumptionColumns.CONSUMPTION_TIME + " )"+ " )";
             db.execSQL(sql);
             Log.d(TAG, "onCreated sql: " + sql);
         }
