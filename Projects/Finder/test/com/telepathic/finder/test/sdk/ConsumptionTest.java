@@ -18,7 +18,8 @@ import com.telepathic.finder.util.Utils;
 
 
 public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
-    private final int CONSUMER_RECORD_COUNT = 20;
+	private final int RETRIEVE_CONSUMER_RECORD_COUNT = 500;
+    private final int TEST_CONSUMER_RECORD_COUNT = 20;
     private final String CARD_ID = "10808691";
     
     // consumer records constant keys
@@ -90,7 +91,7 @@ public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
 
     public void test_retrieve_consumer_records() {
         TestChargeRecordsListener testChargeRecordsListener = new TestChargeRecordsListener();
-        mTrafficService.retrieveConsumerRecords(CARD_ID, CONSUMER_RECORD_COUNT, testChargeRecordsListener);
+        mTrafficService.retrieveConsumerRecords(CARD_ID, RETRIEVE_CONSUMER_RECORD_COUNT, testChargeRecordsListener);
         while(!testChargeRecordsListener.done()) {
             try {
                 Thread.sleep(500);
@@ -101,6 +102,9 @@ public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
     }
     
     public void test_store_consumer_records() {
+    	for(ConsumerRecord record : mTestConsumerRecords) {
+    		mConsumptionStore.insertRecord(record);
+    	}
     	for(ConsumerRecord record : mTestConsumerRecords) {
     		mConsumptionStore.insertRecord(record);
     	}
@@ -152,10 +156,14 @@ public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
 
         @Override
         public void onSuccess(ConsumptionInfo dataInfo) {
-            assertNotNull(dataInfo.getRecordList());
-            assertEquals(CONSUMER_RECORD_COUNT, dataInfo.getRecordList().size());
-            for(int idx = 0; idx < CONSUMER_RECORD_COUNT; idx++) {
-                assertEquals(mTestConsumerRecords.get(idx), dataInfo.getRecordList().get(idx));
+        	ArrayList<ConsumerRecord> consumerRecords = dataInfo.getRecordList();
+            assertNotNull(consumerRecords);
+            assertTrue(consumerRecords.size() >= TEST_CONSUMER_RECORD_COUNT);
+            final ConsumerRecord firstTestRecord = mTestConsumerRecords.get(0);
+            int position = consumerRecords.indexOf(firstTestRecord);
+            assertTrue(position != -1);
+            for(int idx = 0; idx < TEST_CONSUMER_RECORD_COUNT; idx++) {
+                assertEquals(mTestConsumerRecords.get(idx), consumerRecords.get(position++));
             }
             isDone = true;
         }
