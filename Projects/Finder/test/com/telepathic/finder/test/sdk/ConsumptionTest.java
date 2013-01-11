@@ -1,5 +1,6 @@
 package com.telepathic.finder.test.sdk;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -79,7 +80,7 @@ public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
         mConsumptionStore = ConsumptionStore.getDefaultStore(getApplication());
         createTestConsumerRecords();
     }
-
+    
     private void createTestConsumerRecords() {
     	mTestConsumerRecords = new ArrayList<ConsumerRecord>();
         ConsumerRecord record = null;
@@ -90,6 +91,7 @@ public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
     }
 
     public void test_retrieve_consumer_records() {
+    	mConsumptionStore.deleteAllRecords();
         TestChargeRecordsListener testChargeRecordsListener = new TestChargeRecordsListener();
         mTrafficService.retrieveConsumerRecords(CARD_ID, RETRIEVE_CONSUMER_RECORD_COUNT, testChargeRecordsListener);
         while(!testChargeRecordsListener.done()) {
@@ -102,6 +104,7 @@ public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
     }
     
     public void test_store_consumer_records() {
+    	mConsumptionStore.deleteAllRecords();
     	for(ConsumerRecord record : mTestConsumerRecords) {
     		mConsumptionStore.insertRecord(record);
     	}
@@ -109,6 +112,12 @@ public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
     		mConsumptionStore.insertRecord(record);
     	}
     	ArrayList<ConsumerRecord> consumerRecords = mConsumptionStore.getConsumptionRecords(CARD_ID);
+    	 try {
+ 			Utils.copyAppDatabaseFiles("com.telepathic.finder");
+ 		} catch (IOException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
     	assertEquals(mTestConsumerRecords.size(), consumerRecords.size());
     	for(int i = 0; i < mTestConsumerRecords.size(); i++) {
     		assertEquals(mTestConsumerRecords.get(i), consumerRecords.get(i));
@@ -174,5 +183,5 @@ public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
             isDone = true;
         }
     }
-
+    
 }

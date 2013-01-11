@@ -4,7 +4,6 @@
 
 package com.telepathic.finder.sdk.store;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
@@ -74,21 +73,34 @@ public class ConsumptionStore {
     	return result;
     }
     
+    public void deleteAllRecords() {
+    	SQLiteDatabase db = dbHelper.getWritableDatabase();
+    	try {
+        	db.delete(TABLE_NAME, null, null);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	} finally {
+    		db.close();
+    	}
+    }
+    
     private long insertOrIgnore(ContentValues values) {
-        Log.d(TAG, "insertOrIgnore on " + values);
         long retID = -1;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
             retID = db.insertWithOnConflict(TABLE_NAME, null, values,
                     SQLiteDatabase.CONFLICT_IGNORE);
         } catch (Exception e) {
-            Log.d(TAG, "Insertion failed: " + e.getLocalizedMessage());
+            Log.e(TAG, "Insertion failed: " + e.getLocalizedMessage());
         } finally {
+        	if (retID == -1) {
+        		Log.e(TAG, "Insertion failed: " + values.toString());
+        	}
             db.close();
         }
         return retID;
     }
-
+    
 	public ArrayList<ConsumerRecord> getConsumptionRecords(String cardId) {
 		ArrayList<ConsumerRecord> records = new ArrayList<ConsumerRecord>();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();

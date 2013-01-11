@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import org.ksoap2.serialization.SoapObject;
 
+import android.util.Log;
+
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumptionInfo;
@@ -66,6 +68,7 @@ public class BusConsumerRecordRequest extends RPCRequest {
         ConsumptionInfo info = new ConsumptionInfo();
         for(int idx = 0; idx < newDataSet.getPropertyCount() ; idx++) {
             dataEntry = (SoapObject) newDataSet.getProperty(idx);
+            Log.d("T", dataEntry.toString());
             try {
             	dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT);
             	record = new CountConsumerRecord();
