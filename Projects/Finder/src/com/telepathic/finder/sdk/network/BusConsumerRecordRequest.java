@@ -1,9 +1,7 @@
 package com.telepathic.finder.sdk.network;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.ksoap2.serialization.SoapObject;
 
@@ -82,12 +80,7 @@ public class BusConsumerRecordRequest extends RPCRequest {
             record.setLineNumber(dataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER));
             record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
             record.setCardID(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
-            try {
-                final Date consumerDate = Utils.parseDate(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME));
-                record.setConsumerTime(consumerDate);
-            } catch (ParseException ex) {
-                ex.printStackTrace();
-            }
+            record.setConsumerTime(Utils.parseDate(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME)));
 			switch (record.getType()) {
 			case COUNT:
 				record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));

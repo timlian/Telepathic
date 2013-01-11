@@ -102,11 +102,17 @@ public class Utils {
         return list;
     }
 
-    public static Date parseDate(String text) throws ParseException {
+    public static Date parseDate(String text) {
+    	Date result = null;
         if (text == null || text.length() == 0) {
             throw new IllegalArgumentException("Date text is empty.");
         }
-        return DATE_FORMAT.parse(text);
+        try {
+        	result = DATE_FORMAT.parse(text);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+        return result;
     }
 
     public static String formatDate(Date date) {

@@ -1,218 +1,303 @@
 package com.telepathic.finder.test.retrieve;
 
-import java.text.ParseException;
-
-import com.telepathic.finder.sdk.ConsumerRecord;
-import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
-import com.telepathic.finder.util.Utils;
-
 import android.test.AndroidTestCase;
 
-public class ConsumerRecordTest extends AndroidTestCase {
-//
-//    /**
-//     * x.equals(x) should return true
-//     */
-//    public void test_reflexive() throws ParseException {
-//        ConsumerRecord xRecord = new ConsumerRecord();
-//        xRecord.setLineNumber("102");
-//        xRecord.setBusNumber("031162");
-//        xRecord.setCardID("000110808691");
-//        xRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        xRecord.setConsumerCount("2");
-//        xRecord.setResidualCount("30");
-//        xRecord.setResidualAmount("46.40");
-//        xRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        assertTrue(xRecord.equals(xRecord));
-//    }
-//
-//    /**
-//     * x.equals(y) must return true if and only if y.equals(x) returns true
-//     */
-//    public void test_symmetric() throws ParseException {
-//        ConsumerRecord xRecord = new ConsumerRecord();
-//        xRecord.setLineNumber("102");
-//        xRecord.setBusNumber("031162");
-//        xRecord.setCardID("000110808691");
-//        xRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        xRecord.setConsumerCount("2");
-//        xRecord.setResidualCount("30");
-//        xRecord.setResidualAmount("46.40");
-//        xRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        ConsumerRecord yRecord = new ConsumerRecord();
-//        yRecord.setLineNumber("102");
-//        yRecord.setBusNumber("031162");
-//        yRecord.setCardID("000110808691");
-//        yRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        yRecord.setConsumerCount("2");
-//        yRecord.setResidualCount("30");
-//        yRecord.setResidualAmount("46.40");
-//        yRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        if (yRecord.equals(xRecord)) {
-//            assertTrue(xRecord.equals(yRecord));
-//        }
-//    }
-//
-//    /**
-//     *  if x.equals(y) returns true and y.equals(z) returns true, then x.equals(z) must return true.
-//     */
-//    public void test_transitive() throws ParseException {
-//        ConsumerRecord xRecord = new ConsumerRecord();
-//        xRecord.setLineNumber("102");
-//        xRecord.setBusNumber("031162");
-//        xRecord.setCardID("000110808691");
-//        xRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        xRecord.setConsumerCount("2");
-//        xRecord.setResidualCount("30");
-//        xRecord.setResidualAmount("46.40");
-//        xRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        ConsumerRecord yRecord = new ConsumerRecord();
-//        yRecord.setLineNumber("102");
-//        yRecord.setBusNumber("031162");
-//        yRecord.setCardID("000110808691");
-//        yRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        yRecord.setConsumerCount("2");
-//        yRecord.setResidualCount("30");
-//        yRecord.setResidualAmount("46.40");
-//        yRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        ConsumerRecord zRecord = new ConsumerRecord();
-//        zRecord.setLineNumber("102");
-//        zRecord.setBusNumber("031162");
-//        zRecord.setCardID("000110808691");
-//        zRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        zRecord.setConsumerCount("2");
-//        zRecord.setResidualCount("30");
-//        zRecord.setResidualAmount("46.40");
-//        zRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        if(xRecord.equals(yRecord) && yRecord.equals(zRecord)) {
-//            assertEquals(xRecord, zRecord);
-//        }
-//    }
-//
-//    /**
-//     * multiple invocations of x.equals(y)  consistently return  true or consistently return false
-//     */
-//    public void test_consistent() throws ParseException {
-//        ConsumerRecord xRecord = new ConsumerRecord();
-//        xRecord.setLineNumber("102");
-//        xRecord.setBusNumber("031162");
-//        xRecord.setCardID("000110808691");
-//        xRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        xRecord.setConsumerCount("2");
-//        xRecord.setResidualCount("30");
-//        xRecord.setResidualAmount("46.40");
-//        xRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        ConsumerRecord yRecord = new ConsumerRecord();
-//        yRecord.setLineNumber("102");
-//        yRecord.setBusNumber("031162");
-//        yRecord.setCardID("000110808691");
-//        yRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        yRecord.setConsumerCount("2");
-//        yRecord.setResidualCount("30");
-//        yRecord.setResidualAmount("46.40");
-//        yRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        if (xRecord.equals(yRecord)) {
-//            for(int i = 0; i < 10000; i++) {
-//                assertTrue(xRecord.equals(yRecord));
-//            }
-//        }
-//
-//        ConsumerRecord zRecord = new ConsumerRecord();
-//        zRecord.setLineNumber("103");
-//        zRecord.setBusNumber("031162");
-//        zRecord.setCardID("000110808691");
-//        zRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        zRecord.setConsumerCount("2");
-//        zRecord.setResidualCount("30");
-//        zRecord.setResidualAmount("46.40");
-//        zRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        if (!xRecord.equals(zRecord)) {
-//            for(int i = 0; i < 10000; i++) {
-//                assertFalse(xRecord.equals(zRecord));
-//            }
-//        }
-//    }
-//
-//    public void test_null() {
-//        ConsumerRecord record = new ConsumerRecord();
-//        assertFalse(record.equals(null));
-//    }
-//
-//    public void test_hashcode1() throws ParseException {
-//        ConsumerRecord xRecord = new ConsumerRecord();
-//        xRecord.setLineNumber("102");
-//        xRecord.setBusNumber("031162");
-//        xRecord.setCardID("000110808691");
-//        xRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        xRecord.setConsumerCount("2");
-//        xRecord.setResidualCount("30");
-//        xRecord.setResidualAmount("46.40");
-//        xRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        assertEquals(xRecord.hashCode(), xRecord.hashCode());
-//
-//        ConsumerRecord yRecord = new ConsumerRecord();
-//        yRecord.setLineNumber("102");
-//        yRecord.setBusNumber("031162");
-//        yRecord.setCardID("000110808691");
-//        yRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        yRecord.setConsumerCount("2");
-//        yRecord.setResidualCount("30");
-//        yRecord.setResidualAmount("46.40");
-//        yRecord.setConsumerType(ConsumerType.COUNT);
-//
-//        assertEquals(yRecord.hashCode(), yRecord.hashCode());
-//        assertEquals(xRecord.hashCode(), yRecord.hashCode());
-//
-//        ConsumerRecord zRecord = new ConsumerRecord();
-//        zRecord.setLineNumber("103");
-//        zRecord.setBusNumber("031162");
-//        zRecord.setCardID("000110808691");
-//        zRecord.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
-//        zRecord.setConsumerCount("2");
-//        zRecord.setResidualCount("30");
-//        zRecord.setResidualAmount("46.40");
-//        zRecord.setConsumerType(ConsumerType.COUNT);
-//        assertEquals(zRecord.hashCode(), zRecord.hashCode());
-//
-//        assertEquals(xRecord.hashCode(), yRecord.hashCode());
-//        assertTrue(xRecord.hashCode() != zRecord.hashCode());
-//
-//    }
-//
-//    public void test_hashcode2() throws ParseException {
-//        ConsumerRecord xRecord = new ConsumerRecord();
-//        xRecord.setLineNumber("185");
-//        xRecord.setBusNumber("031228");
-//        xRecord.setCardID("000110808691");
-//        xRecord.setConsumerTime(Utils.parseDate("2012-12-2 10:44:08"));
-//        xRecord.setConsumerAmount("1.80");
-//        xRecord.setResidualCount("20");
-//        xRecord.setResidualAmount("46.40");
-//        xRecord.setConsumerType(ConsumerType.EWALLET);
-//        assertEquals(xRecord.hashCode(), xRecord.hashCode());
-//
-//        ConsumerRecord yRecord = new ConsumerRecord();
-//        yRecord.setLineNumber("185");
-//        yRecord.setBusNumber("031228");
-//        yRecord.setCardID("000110808691");
-//        yRecord.setConsumerTime(Utils.parseDate("2012-12-2 10:44:08"));
-//        yRecord.setConsumerAmount("1.80");
-//        yRecord.setResidualCount("20");
-//        yRecord.setResidualAmount("46.40");
-//        yRecord.setConsumerType(ConsumerType.EWALLET);
-//        assertEquals(yRecord.hashCode(), yRecord.hashCode());
-//
-//        assertEquals(xRecord.hashCode(), yRecord.hashCode());
-//    }
+import com.telepathic.finder.sdk.ConsumerRecord;
+import com.telepathic.finder.sdk.CountConsumerRecord;
+import com.telepathic.finder.sdk.EWalletConsumerRecord;
+import com.telepathic.finder.util.Utils;
 
+public class ConsumerRecordTest extends AndroidTestCase {
+
+    /**
+     * x.equals(x) should return true
+     */
+    public void test_reflexive_1() {
+        ConsumerRecord record = new CountConsumerRecord();
+        record.setLineNumber("102");
+        record.setBusNumber("031162");
+        record.setCardID("000110808691");
+        record.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record.setConsumption("2");
+        record.setResidual("30");
+        assertEquals(record, record);
+    }
+    
+    /**
+     * x.equals(x) should return true
+     */
+    public void test_reflexive_2() {
+        ConsumerRecord record = new EWalletConsumerRecord();
+        record.setLineNumber("102");
+        record.setBusNumber("031162");
+        record.setCardID("000110808691");
+        record.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record.setConsumption("1.8");
+        record.setResidual("46.40");
+        assertEquals(record, record);
+    }
+
+    /**
+     * x.equals(y) must return true if and only if y.equals(x) returns true
+     */
+    public void test_symmetric_1() {
+        ConsumerRecord record1 = new CountConsumerRecord();
+        ConsumerRecord record2 = new CountConsumerRecord();
+        record1.setLineNumber("102");
+        record1.setBusNumber("031162");
+        record1.setCardID("000110808691");
+        record1.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record1.setConsumption("2");
+        record1.setResidual("30");
+
+        record2.setLineNumber("102");
+        record2.setBusNumber("031162");
+        record2.setCardID("000110808691");
+        record2.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record2.setConsumption("2");
+        record2.setResidual("30");
+        assertEquals(record1, record2);
+        assertEquals(record2, record1);
+    }
+    
+    /**
+     * x.equals(y) must return true if and only if y.equals(x) returns true
+     */
+    public void test_symmetric_2() {
+        ConsumerRecord record1 = new EWalletConsumerRecord();
+        ConsumerRecord record2 = new EWalletConsumerRecord();
+        record1.setLineNumber("102");
+        record1.setBusNumber("031162");
+        record1.setCardID("000110808691");
+        record1.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record1.setConsumption("1.80");
+        record1.setResidual("46.40");
+
+        record2.setLineNumber("102");
+        record2.setBusNumber("031162");
+        record2.setCardID("000110808691");
+        record2.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record2.setConsumption("1.80");
+        record2.setResidual("46.40");
+        assertEquals(record1, record2);
+        assertEquals(record2, record1);
+    }
+
+    /**
+     *  if x.equals(y) returns true and y.equals(z) returns true, then x.equals(z) must return true.
+     */
+    public void test_transitive_1() {
+        ConsumerRecord record1 = new CountConsumerRecord();
+        ConsumerRecord record2 = new CountConsumerRecord();
+        ConsumerRecord record3 = new CountConsumerRecord();
+        
+        record1.setLineNumber("102");
+        record1.setBusNumber("031162");
+        record1.setCardID("000110808691");
+        record1.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record1.setConsumption("2");
+        record1.setResidual("30");
+        
+        record2.setLineNumber("102");
+        record2.setBusNumber("031162");
+        record2.setCardID("000110808691");
+        record2.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record2.setConsumption("2");
+        record2.setResidual("30");
+        
+        record3.setLineNumber("102");
+        record3.setBusNumber("031162");
+        record3.setCardID("000110808691");
+        record3.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record3.setConsumption("2");
+        record3.setResidual("30");
+
+        assertEquals(record1, record2);
+        assertEquals(record2, record3);
+        assertEquals(record1, record3);
+
+    }
+    
+    /**
+     *  if x.equals(y) returns true and y.equals(z) returns true, then x.equals(z) must return true.
+     */
+    public void test_transitive_2() {
+        ConsumerRecord record1 = new EWalletConsumerRecord();
+        ConsumerRecord record2 = new EWalletConsumerRecord();
+        ConsumerRecord record3 = new EWalletConsumerRecord();
+        
+        record1.setLineNumber("102");
+        record1.setBusNumber("031162");
+        record1.setCardID("000110808691");
+        record1.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record1.setConsumption("1.80");
+        record1.setResidual("46.40");
+        
+        record2.setLineNumber("102");
+        record2.setBusNumber("031162");
+        record2.setCardID("000110808691");
+        record2.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record2.setConsumption("1.80");
+        record2.setResidual("46.40");
+        
+        record3.setLineNumber("102");
+        record3.setBusNumber("031162");
+        record3.setCardID("000110808691");
+        record3.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record3.setConsumption("1.80");
+        record3.setResidual("46.40");
+
+        assertEquals(record1, record2);
+        assertEquals(record2, record3);
+        assertEquals(record1, record3);
+
+    }
+
+    /**
+     * multiple invocations of x.equals(y)  consistently return  true or consistently return false
+     */
+    public void test_consistent_1() {
+        ConsumerRecord record1 = new CountConsumerRecord();
+        ConsumerRecord record2 = new CountConsumerRecord();
+        ConsumerRecord record3 = new CountConsumerRecord();
+        
+        record1.setLineNumber("102");
+        record1.setBusNumber("031162");
+        record1.setCardID("000110808691");
+        record1.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record1.setConsumption("2");
+        record1.setResidual("30");
+        
+        record2.setLineNumber("102");
+        record2.setBusNumber("031162");
+        record2.setCardID("000110808691");
+        record2.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record2.setConsumption("2");
+        record2.setResidual("30");
+        
+        record3.setLineNumber("103");
+        record3.setBusNumber("031162");
+        record3.setCardID("000110808691");
+        record3.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record3.setConsumption("2");
+		record3.setResidual("30");
+
+		for (int i = 0; i < 10000; i++) {
+			assertTrue(record1.equals(record2));
+			assertFalse(record1.equals(record3));
+		}
+    }
+    
+    /**
+     * multiple invocations of x.equals(y)  consistently return  true or consistently return false
+     */
+    public void test_consistent_2() {
+        ConsumerRecord record1 = new EWalletConsumerRecord();
+        ConsumerRecord record2 = new EWalletConsumerRecord();
+        ConsumerRecord record3 = new EWalletConsumerRecord();
+        
+        record1.setLineNumber("102");
+        record1.setBusNumber("031162");
+        record1.setCardID("000110808691");
+        record1.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record1.setConsumption("1.80");
+        record1.setResidual("46.40");
+        
+        record2.setLineNumber("102");
+        record2.setBusNumber("031162");
+        record2.setCardID("000110808691");
+        record2.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record2.setConsumption("1.80");
+        record2.setResidual("46.40");
+        
+        record3.setLineNumber("103");
+        record3.setBusNumber("031162");
+        record3.setCardID("000110808691");
+        record3.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record3.setConsumption("1.80");
+		record3.setResidual("46.40");
+
+		for (int i = 0; i < 10000; i++) {
+			assertTrue(record1.equals(record2));
+			assertFalse(record1.equals(record3));
+		}
+    }
+    
+
+    public void test_null() {
+        ConsumerRecord record1 = new CountConsumerRecord();
+        ConsumerRecord record2 = new EWalletConsumerRecord();
+        assertFalse(record1.equals(null));
+        assertFalse(record2.equals(null));
+    }
+
+    public void test_hashcode_1() {
+        ConsumerRecord record1 = new CountConsumerRecord();
+        ConsumerRecord record2 = new CountConsumerRecord();
+        ConsumerRecord record3 = new CountConsumerRecord();
+        
+        record1.setLineNumber("102");
+        record1.setBusNumber("031162");
+        record1.setCardID("000110808691");
+        record1.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record1.setConsumption("2");
+        record1.setResidual("30");
+        
+        record2.setLineNumber("102");
+        record2.setBusNumber("031162");
+        record2.setCardID("000110808691");
+        record2.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record2.setConsumption("2");
+        record2.setResidual("30");
+        
+        record3.setLineNumber("103");
+        record3.setBusNumber("031162");
+        record3.setCardID("000110808691");
+        record3.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record3.setConsumption("2");
+        record3.setResidual("30");
+        
+
+        assertEquals(record1.hashCode(), record1.hashCode());
+        assertEquals(record2.hashCode(), record2.hashCode());
+        assertEquals(record3.hashCode(), record3.hashCode());
+        
+        assertEquals(record1.hashCode(), record2.hashCode());
+        assertTrue(record1.hashCode() != record3.hashCode());
+    }
+    
+    public void test_hashcode_2() {
+        ConsumerRecord record1 = new EWalletConsumerRecord();
+        ConsumerRecord record2 = new EWalletConsumerRecord();
+        ConsumerRecord record3 = new EWalletConsumerRecord();
+        
+        record1.setLineNumber("102");
+        record1.setBusNumber("031162");
+        record1.setCardID("000110808691");
+        record1.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record1.setConsumption("1.80");
+        record1.setResidual("46.40");
+        
+        record2.setLineNumber("102");
+        record2.setBusNumber("031162");
+        record2.setCardID("000110808691");
+        record2.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record2.setConsumption("1.80");
+        record2.setResidual("46.40");
+        
+        record3.setLineNumber("103");
+        record3.setBusNumber("031162");
+        record3.setCardID("000110808691");
+        record3.setConsumerTime(Utils.parseDate("2013-1-1 15:39:33"));
+        record3.setConsumption("1.80");
+        record3.setResidual("46.40");
+        
+
+        assertEquals(record1.hashCode(), record1.hashCode());
+        assertEquals(record2.hashCode(), record2.hashCode());
+        assertEquals(record3.hashCode(), record3.hashCode());
+        
+        assertEquals(record1.hashCode(), record2.hashCode());
+        assertTrue(record1.hashCode() != record3.hashCode());
+    }
 }
