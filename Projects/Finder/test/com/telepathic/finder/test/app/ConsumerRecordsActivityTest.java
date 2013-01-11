@@ -1,5 +1,5 @@
 
-package com.telepathic.finder.test.activitytest;
+package com.telepathic.finder.test.app;
 
 import android.content.SharedPreferences;
 import android.test.ActivityInstrumentationTestCase2;

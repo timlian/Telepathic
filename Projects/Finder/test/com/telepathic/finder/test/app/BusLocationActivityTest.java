@@ -1,4 +1,4 @@
-package com.telepathic.finder.test.activitytest;
+package com.telepathic.finder.test.app;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;

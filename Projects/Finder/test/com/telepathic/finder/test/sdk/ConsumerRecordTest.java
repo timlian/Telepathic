@@ -1,4 +1,4 @@
-package com.telepathic.finder.test.retrieve;
+package com.telepathic.finder.test.sdk;
 
 import android.test.AndroidTestCase;
 

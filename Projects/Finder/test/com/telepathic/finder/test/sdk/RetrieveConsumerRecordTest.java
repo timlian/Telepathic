@@ -1,4 +1,4 @@
-package com.telepathic.finder.test.retrieve;
+package com.telepathic.finder.test.sdk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
