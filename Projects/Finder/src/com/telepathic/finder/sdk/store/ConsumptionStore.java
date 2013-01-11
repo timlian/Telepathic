@@ -89,7 +89,7 @@ public class ConsumptionStore {
         return retID;
     }
 
-	public ArrayList<ConsumerRecord> getConsumptionRecords(String cardId) throws ParseException {
+	public ArrayList<ConsumerRecord> getConsumptionRecords(String cardId) {
 		ArrayList<ConsumerRecord> records = new ArrayList<ConsumerRecord>();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		try {

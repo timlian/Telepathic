@@ -89,14 +89,10 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     protected void onResume() {
     	super.onResume();
     	ArrayList<String> cards = getCachedCards();
-    	if (cards.size() > 0) {
-    	try {
-			mListAdapter.updateRecords(mTrafficService.getConsumptionStore().getConsumptionRecords(cards.get(0)));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (cards.size() > 0) {
+			mListAdapter.updateRecords(mTrafficService.getConsumptionStore()
+					.getConsumptionRecords(cards.get(0)));
 		}
-    	}
     }
 
     private void refreshCardIDCache(){

@@ -13,10 +13,11 @@ import com.telepathic.finder.sdk.ConsumptionInfo;
 import com.telepathic.finder.sdk.CountConsumerRecord;
 import com.telepathic.finder.sdk.EWalletConsumerRecord;
 import com.telepathic.finder.sdk.TrafficService;
+import com.telepathic.finder.sdk.store.ConsumptionStore;
 import com.telepathic.finder.util.Utils;
 
 
-public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplication> {
+public class ConsumptionTest extends ApplicationTestCase<FinderApplication> {
     private final int CONSUMER_RECORD_COUNT = 20;
     private final String CARD_ID = "10808691";
     
@@ -57,13 +58,14 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
 
     private FinderApplication mApp = null;
     private TrafficService mTrafficService = null;
-    private ArrayList<ConsumerRecord> mBenchmark = null;
+    private ArrayList<ConsumerRecord> mTestConsumerRecords = null;
+    private ConsumptionStore mConsumptionStore = null;
 
-    public RetrieveConsumerRecordTest(Class<FinderApplication> applicationClass) {
+    public ConsumptionTest(Class<FinderApplication> applicationClass) {
         super(applicationClass);
     }
 
-    public RetrieveConsumerRecordTest() {
+    public ConsumptionTest() {
         super(FinderApplication.class);
     }
 
@@ -73,20 +75,16 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
         createApplication();
         mApp = getApplication();
         mTrafficService = TrafficService.getTrafficService(mApp.getMapManager(), getApplication());
-        createBenchmark();
+        mConsumptionStore = ConsumptionStore.getDefaultStore(getApplication());
+        createTestConsumerRecords();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    private void createBenchmark() {
-        mBenchmark = new ArrayList<ConsumerRecord>();
+    private void createTestConsumerRecords() {
+    	mTestConsumerRecords = new ArrayList<ConsumerRecord>();
         ConsumerRecord record = null;
         for(int i = 0; i < TEST_DATA.length; i++) {
             record = parseConsumerRecord(TEST_DATA[i]);
-            mBenchmark.add(record);
+            mTestConsumerRecords.add(record);
         }
     }
 
@@ -100,6 +98,17 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
                 e.printStackTrace();
             }
         }
+    }
+    
+    public void test_store_consumer_records() {
+    	for(ConsumerRecord record : mTestConsumerRecords) {
+    		mConsumptionStore.insertRecord(record);
+    	}
+    	ArrayList<ConsumerRecord> consumerRecords = mConsumptionStore.getConsumptionRecords(CARD_ID);
+    	assertEquals(mTestConsumerRecords.size(), consumerRecords.size());
+    	for(int i = 0; i < mTestConsumerRecords.size(); i++) {
+    		assertEquals(mTestConsumerRecords.get(i), consumerRecords.get(i));
+    	}
     }
 
     // {lineNumber=102; busNumber=031162; cardID=000110808691; consumerTime=2013-1-1 15:39:33; consumerCount=2; residualCount=30; }
@@ -146,7 +155,7 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
             assertNotNull(dataInfo.getRecordList());
             assertEquals(CONSUMER_RECORD_COUNT, dataInfo.getRecordList().size());
             for(int idx = 0; idx < CONSUMER_RECORD_COUNT; idx++) {
-                assertEquals(mBenchmark.get(idx), dataInfo.getRecordList().get(idx));
+                assertEquals(mTestConsumerRecords.get(idx), dataInfo.getRecordList().get(idx));
             }
             isDone = true;
         }
