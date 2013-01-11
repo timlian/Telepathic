@@ -1,10 +1,8 @@
 package com.telepathic.finder.sdk;
 
-import java.util.ArrayList;
-
 public interface ConsumerRecordsListener {
 
-    public void onSuccess(ArrayList<ConsumerRecord> consumerRecords);
+    public void onSuccess(ConsumptionInfo dataInfo);
 
     public void onError(String errorMessage);
 }

@@ -26,6 +26,7 @@ import com.telepathic.finder.sdk.BusLineRoute;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.ConsumerRecordsListener;
+import com.telepathic.finder.sdk.ConsumptionInfo;
 import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
@@ -35,6 +36,8 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private static final String CARD_ID_CACHE = "card_id_cache";
 
     private Button mSendButton;
+    private TextView mResidualCountText;
+    private TextView mResidualAmountText;
     private AutoCompleteTextView mEditText;
     private ListView mRecordList;
     private ConsumerRecordsAdapter mListAdapter;
@@ -77,6 +80,9 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         mListAdapter = new ConsumerRecordsAdapter();
         mRecordList = (ListView) findViewById(R.id.consumer_record_list);
         mRecordList.setAdapter(mListAdapter);
+        
+        mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
+        mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
     }
 
     private void refreshCardIDCache(){
@@ -115,12 +121,14 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private class MyChargeRecordsListener implements ConsumerRecordsListener {
 
         @Override
-        public void onSuccess(final ArrayList<ConsumerRecord> consumerRecords) {
+        public void onSuccess(final ConsumptionInfo dataInfo) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
-                    mListAdapter.updateRecords(consumerRecords);
+                    mResidualCountText.setText(getResources().getString(R.string.residual_count) + dataInfo.getResidualCount());
+                    mResidualAmountText.setText(getResources().getString(R.string.residual_amount) + dataInfo.getResidualAmount());
+                    mListAdapter.updateRecords(dataInfo.getRecordList());
                     removeDialog(DIALOG_WAITING);
                 }
             });
@@ -149,9 +157,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         TextView lineNumber;
         TextView busNumber;
         TextView consumerCount;
-        TextView residualCount;
         TextView consumerTime;
-        TextView residualAmount;
     }
 
     private class ConsumerRecordsAdapter extends BaseAdapter {
@@ -190,9 +196,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 holder.lineNumber = (TextView) convertView.findViewById(R.id.line_number);
                 holder.busNumber = (TextView) convertView.findViewById(R.id.bus_number);
                 holder.consumerCount = (TextView) convertView.findViewById(R.id.consumer_count);
-                holder.residualCount = (TextView) convertView.findViewById(R.id.residual_count);
                 holder.consumerTime = (TextView) convertView.findViewById(R.id.consumer_time);
-                holder.residualAmount = (TextView) convertView.findViewById(R.id.residual_amount);
                 convertView.setTag(holder);
             }
             bindView(position, record, convertView);
@@ -209,16 +213,6 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 holder.consumerCount.setText(getResources().getString(R.string.consumer_amount) + record.getConsumption());
             }
             holder.consumerTime.setText(Utils.formatDate(record.getConsumerTime()));
-            if (position == 0) {
-                holder.residualCount.setText(getResources().getString(R.string.residual_count) + record.getResidual());
-                holder.residualAmount.setText(getResources().getString(R.string.residual_amount) + record.getResidual());
-                holder.residualCount.setVisibility(View.VISIBLE);
-                holder.residualAmount.setVisibility(View.VISIBLE);
-            } else {
-                holder.residualCount.setVisibility(View.GONE);
-                holder.residualAmount.setVisibility(View.GONE);
-            }
-
         }
 
     }

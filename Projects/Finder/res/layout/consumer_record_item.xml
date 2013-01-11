@@ -9,6 +9,7 @@
     android:paddingBottom="3dp">
 
     <LinearLayout
+        
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
@@ -21,8 +22,8 @@
         <TextView android:id="@+id/bus_number"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:visibility="gone"/>
+            android:layout_weight="1"/>
+        
     </LinearLayout>
 
     <LinearLayout
@@ -39,26 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="1"/>
+        
     </LinearLayout>
-
-     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-            <TextView android:id="@+id/residual_count"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:visibility="gone"/>
-
-             <TextView android:id="@+id/residual_amount"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:visibility="gone"/>
-
-     </LinearLayout>
-
 
 </LinearLayout>

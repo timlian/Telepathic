@@ -12,6 +12,7 @@ import com.telepathic.finder.app.FinderApplication;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.ConsumerRecordsListener;
+import com.telepathic.finder.sdk.ConsumptionInfo;
 import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
 
@@ -147,11 +148,11 @@ public class RetrieveConsumerRecordTest extends ApplicationTestCase<FinderApplic
         }
 
         @Override
-        public void onSuccess(ArrayList<ConsumerRecord> consumerRecords) {
-            assertNotNull(consumerRecords);
-            assertEquals(CONSUMER_RECORD_COUNT, consumerRecords.size());
+        public void onSuccess(ConsumptionInfo dataInfo) {
+            assertNotNull(dataInfo.getRecordList());
+            assertEquals(CONSUMER_RECORD_COUNT, dataInfo.getRecordList().size());
             for(int idx = 0; idx < CONSUMER_RECORD_COUNT; idx++) {
-                assertEquals(mBenchmark.get(idx), consumerRecords.get(idx));
+                assertEquals(mBenchmark.get(idx), dataInfo.getRecordList().get(idx));
             }
             isDone = true;
         }

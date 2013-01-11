@@ -1,5 +1,6 @@
 package com.telepathic.finder.sdk.network;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,8 +8,8 @@ import java.util.Date;
 import org.ksoap2.serialization.SoapObject;
 
 import com.telepathic.finder.sdk.ConsumerRecord;
-import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.ConsumerRecordsListener;
+import com.telepathic.finder.sdk.ConsumptionInfo;
 import com.telepathic.finder.sdk.CountConsumerRecord;
 import com.telepathic.finder.sdk.EWalletConsumerRecord;
 import com.telepathic.finder.sdk.store.ConsumptionStore;
@@ -63,9 +64,8 @@ public class BusConsumerRecordRequest extends RPCRequest {
     protected void handleResponse(SoapObject newDataSet) {
         SoapObject dataEntry = null;
         ArrayList<ConsumerRecord> consumerRecords = new ArrayList<ConsumerRecord>();
-        int startPos = 0, endPos = 0;
-        ConsumerRecord lastRecord = null;
         ConsumerRecord record = null;
+        ConsumptionInfo info = new ConsumptionInfo();
         for(int idx = 0; idx < newDataSet.getPropertyCount() ; idx++) {
             dataEntry = (SoapObject) newDataSet.getProperty(idx);
             try {
@@ -88,54 +88,42 @@ public class BusConsumerRecordRequest extends RPCRequest {
             } catch (ParseException ex) {
                 ex.printStackTrace();
             }
-            if (record.getType() == ConsumerType.COUNT) {
-            	record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
-                record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
-                if (lastRecord != null) {
-                    record.setResidual(String.valueOf(lastRecord.getResidual()));
-                    if(lastRecord.getType() != record.getType()) {
-                    	updateResidual(consumerRecords, startPos, endPos, record.getResidual());
-                        final float amount = Float.valueOf(lastRecord.getConsumption()) + Float.valueOf(lastRecord.getResidual());
-                        record.setResidual(String.valueOf(amount));
-                        startPos = endPos;
-                    }
-                }
-                endPos++;
-            }
-            if (record.getType() == ConsumerType.EWALLET) {
-            	 record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
-                 record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
-                 if (lastRecord != null) {
-                     record.setResidual(String.valueOf(lastRecord.getResidual()));
-                     if (lastRecord.getType() != record.getType()) {
-                    	 updateResidual(consumerRecords, startPos, endPos, record.getResidual());
-                         final int count = Integer.valueOf(lastRecord.getConsumption()) + Integer.valueOf(lastRecord.getResidual());
-                         record.setResidual(String.valueOf(count));
-                         startPos = endPos;
-                     }
-                 }
-                 endPos++;
-            }
-            lastRecord = record;
+			switch (record.getType()) {
+			case COUNT:
+				record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
+				record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+				if (info.getResidualCount() == null) {
+					info.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+				}
+				break;
+			case EWALLET:
+				record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
+				record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
+				if (info.getResidualAmount() == null) {
+					info.setResidualAmount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
+				}
+				break;
+			default:
+				throw new RuntimeException("Unknown consumer type !!!");
+			}
             consumerRecords.add(record);
         }
-
+        info.setRecordList(consumerRecords);
+        
         if (mListener != null) {
-            mListener.onSuccess(consumerRecords);
+            mListener.onSuccess(info);
         }
         
         for (ConsumerRecord consumerRecord : consumerRecords) {
         	mStore.insertRecord(consumerRecord);
         }
-    }
-
-	private static void updateResidual(ArrayList<ConsumerRecord> records,
-			int start, int end, String residualCount) {
-		ConsumerRecord record = null;
-		for (int i = start; i < end; i++) {
-			record = records.get(i);
-			record.setResidual(residualCount);
+        
+        try {
+			Utils.copyAppDatabaseFiles("com.telepathic.finder");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-	}
+    }
 
 }
