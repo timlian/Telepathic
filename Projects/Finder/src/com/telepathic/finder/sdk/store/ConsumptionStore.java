@@ -44,6 +44,8 @@ public class ConsumptionStore {
     private final DbHelper dbHelper;
 
     private static ConsumptionStore defaultStore;
+    
+    private final Object mLock = new Object();
 
     public static synchronized ConsumptionStore getDefaultStore(Context context) {
         if (defaultStore == null) {
@@ -58,85 +60,95 @@ public class ConsumptionStore {
     }
 
     public long insertRecord(ConsumerRecord record) {
-    	long result = -1;
-    	if (record != null) {
-	    	ContentValues values = new ContentValues();
-	    	values.put(ConsumptionColumns.CARD_ID, record.getCardId());
-	    	values.put(ConsumptionColumns.BUS_LINE_NUMBER, record.getLineNumber());
-	    	values.put(ConsumptionColumns.LICENSE_PLATE_NUMBER, record.getBusNumber());
-	    	values.put(ConsumptionColumns.CONSUMPTION_TIME, Utils.formatDate(record.getConsumerTime()));
-	    	values.put(ConsumptionColumns.CONSUMPTION, record.getConsumption());
-	    	values.put(ConsumptionColumns.RESIDUAL, record.getResidual());
-	    	values.put(ConsumptionColumns.CONSUMPTION_TYPE, record.getType().toString());
-	    	result = insertOrIgnore(values);
-    	}
-    	return result;
+    	synchronized (mLock) {
+    		long result = -1;
+        	if (record != null) {
+    	    	ContentValues values = new ContentValues();
+    	    	values.put(ConsumptionColumns.CARD_ID, record.getCardId());
+    	    	values.put(ConsumptionColumns.BUS_LINE_NUMBER, record.getLineNumber());
+    	    	values.put(ConsumptionColumns.LICENSE_PLATE_NUMBER, record.getBusNumber());
+    	    	values.put(ConsumptionColumns.CONSUMPTION_TIME, Utils.formatDate(record.getConsumerTime()));
+    	    	values.put(ConsumptionColumns.CONSUMPTION, record.getConsumption());
+    	    	values.put(ConsumptionColumns.RESIDUAL, record.getResidual());
+    	    	values.put(ConsumptionColumns.CONSUMPTION_TYPE, record.getType().toString());
+    	    	result = insertOrIgnore(values);
+        	}
+        	return result;
+		}
     }
     
     public void deleteAllRecords() {
-    	SQLiteDatabase db = dbHelper.getWritableDatabase();
-    	try {
-        	db.delete(TABLE_NAME, null, null);
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	} finally {
-    		db.close();
-    	}
+    	synchronized (mLock) {
+    		SQLiteDatabase db = dbHelper.getWritableDatabase();
+        	try {
+            	db.delete(TABLE_NAME, null, null);
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        	} finally {
+        		db.close();
+        	}
+		}
     }
     
     private long insertOrIgnore(ContentValues values) {
-        long retID = -1;
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        try {
-            retID = db.insertWithOnConflict(TABLE_NAME, null, values,
-                    SQLiteDatabase.CONFLICT_IGNORE);
-        } catch (Exception e) {
-            Log.e(TAG, "Insertion failed: " + e.getLocalizedMessage());
-        } finally {
-        	if (retID == -1) {
-        		Log.e(TAG, "Insertion failed: " + values.toString());
-        	}
-            db.close();
-        }
-        return retID;
+    	synchronized (mLock) {
+    		  long retID = -1;
+    	        SQLiteDatabase db = dbHelper.getWritableDatabase();
+    	        try {
+    	            retID = db.insertWithOnConflict(TABLE_NAME, null, values,
+    	                    SQLiteDatabase.CONFLICT_IGNORE);
+    	        } catch (Exception e) {
+    	            Log.e(TAG, "Insertion failed: " + e.getLocalizedMessage());
+    	        } finally {
+    	        	if (retID == -1) {
+    	        		Log.e(TAG, "Insertion failed: " + values.toString());
+    	        	}
+    	            db.close();
+    	        }
+    	        return retID;
+		}
+      
     }
     
 	public ArrayList<ConsumerRecord> getConsumptionRecords(String cardId) {
-		ArrayList<ConsumerRecord> records = new ArrayList<ConsumerRecord>();
-		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		try {
-			Cursor cursor = db.query(TABLE_NAME, null,
-					ConsumptionColumns.CARD_ID + " like " + "\'%" + cardId
-							+ "%\'", null, null, null,
-					ConsumptionColumns.CONSUMPTION_TIME + " DESC");
-			if (cursor != null) {
-				try {
-					ConsumerRecord record = null;
-					while (cursor.moveToNext()) {
-						ConsumerType type = ConsumerType.valueOf(cursor.getString(IDX_CONSUMPTION_TYPE));
-						if (type == ConsumerType.COUNT) {
-							record = new CountConsumerRecord();
+		synchronized (mLock) {
+			ArrayList<ConsumerRecord> records = new ArrayList<ConsumerRecord>();
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+			try {
+				Cursor cursor = db.query(TABLE_NAME, null,
+						ConsumptionColumns.CARD_ID + " like " + "\'%" + cardId
+								+ "%\'", null, null, null,
+						ConsumptionColumns.CONSUMPTION_TIME + " DESC");
+				//cursor.setNotificationUri(null, null);
+				if (cursor != null) {
+					try {
+						ConsumerRecord record = null;
+						while (cursor.moveToNext()) {
+							ConsumerType type = ConsumerType.valueOf(cursor.getString(IDX_CONSUMPTION_TYPE));
+							if (type == ConsumerType.COUNT) {
+								record = new CountConsumerRecord();
+							}
+							if (type == ConsumerType.EWALLET) {
+								record = new EWalletConsumerRecord();
+							}
+							record.setCardID(cursor.getString(IDX_CARD_ID));
+							record.setBusNumber(cursor.getString(IDX_LICENSE_PLATE_NUMBER));
+							record.setLineNumber(cursor.getString(IDX_BUS_LINE_NUMBER));
+							record.setConsumerTime(Utils.parseDate(cursor.getString(IDX_CONSUMPTION_TIME)));
+							record.setConsumption(cursor.getString(IDX_CONSUMPTION));
+							record.setResidual(cursor.getString(IDX_RESIDUAL));
+							records.add(record);
 						}
-						if (type == ConsumerType.EWALLET) {
-							record = new EWalletConsumerRecord();
-						}
-						record.setCardID(cursor.getString(IDX_CARD_ID));
-						record.setBusNumber(cursor.getString(IDX_LICENSE_PLATE_NUMBER));
-						record.setLineNumber(cursor.getString(IDX_BUS_LINE_NUMBER));
-						record.setConsumerTime(Utils.parseDate(cursor.getString(IDX_CONSUMPTION_TIME)));
-						record.setConsumption(cursor.getString(IDX_CONSUMPTION));
-						record.setResidual(cursor.getString(IDX_RESIDUAL));
-						records.add(record);
+					} finally {
+						cursor.close();
 					}
-				} finally {
-					cursor.close();
-				}
 
+				}
+			} finally {
+				db.close();
 			}
-		} finally {
-			db.close();
+			return records;
 		}
-		return records;
 	}
     
     class DbHelper extends SQLiteOpenHelper {
