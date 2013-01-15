@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.telepathic.finder.R;
+import com.telepathic.finder.app.CardIdFragment.OnCardSelectedListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.ConsumerRecordsListener;
@@ -39,6 +40,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private AutoCompleteTextView mEditText;
     private ListView mRecordList;
     private ConsumerRecordsAdapter mListAdapter;
+    private CardIdFragment mFragment;
 
     private TrafficService mTrafficService;
 
@@ -80,6 +82,15 @@ public class ConsumerRecordsActivity extends FragmentActivity {
 
         mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
         mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
+
+        mFragment = (CardIdFragment)getSupportFragmentManager().findFragmentById(R.id.card_id_list);
+        mFragment.setOnCardSelectedListener(new OnCardSelectedListener() {
+            @Override
+            public void onCardSelected(String cardId) {
+                mListAdapter.updateRecords(mTrafficService.getConsumptionStore()
+                        .getConsumptionRecords(cardId));
+            }
+        });
     }
 
     @Override

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,16 +35,25 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
         mHostActivity = getActivity();
     }
 
+    public void setOnCardSelectedListener(OnCardSelectedListener listener) {
+        mListener = listener;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.card_list, container, false);
         mCardListView = (ListView) view.findViewById(R.id.card_list);
+        mCardListView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                arg1.setSelected(true);
+                mListener.onCardSelected(mCardListView.getItemAtPosition(arg2).toString());
+            }
+        });
         mCardListView.setAdapter(new MyAdapter());
         return view;
     }
-
 
     @Override
     public void onPause() {
