@@ -32,7 +32,6 @@ import com.telepathic.finder.util.Utils;
 public class ConsumerRecordsActivity extends FragmentActivity {
     private static final String TAG = "TestActivity";
     private static final int DIALOG_WAITING = 2;
-    private static final String CARD_ID_CACHE = "card_id_cache";
 
     private Button mSendButton;
     private TextView mResidualCountText;
@@ -61,7 +60,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 mTrafficService.getBusStationLines();
                 String number = mEditText.getText().toString();
                 if (number.length() == 8) {
-                    SharedPreferences preferences = getSharedPreferences(CARD_ID_CACHE, MODE_PRIVATE);
+                    SharedPreferences preferences = getSharedPreferences(Utils.CARD_ID_CACHE, MODE_PRIVATE);
                     preferences.edit().putString(number, number).commit();
                     mTrafficService.retrieveConsumerRecords(number, 30, new MyChargeRecordsListener());
                     mSendButton.setEnabled(false);
@@ -78,23 +77,23 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         mListAdapter = new ConsumerRecordsAdapter();
         mRecordList = (ListView) findViewById(R.id.consumer_record_list);
         mRecordList.setAdapter(mListAdapter);
-        
+
         mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
         mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
     }
-    
+
     @Override
     protected void onResume() {
-    	super.onResume();
-    	ArrayList<String> cards = getCachedCards();
-		if (cards.size() > 0) {
-			mListAdapter.updateRecords(mTrafficService.getConsumptionStore()
-					.getConsumptionRecords(cards.get(0)));
-		}
+        super.onResume();
+        ArrayList<String> cards = Utils.getCachedCards(this);
+        if (cards.size() > 0) {
+            mListAdapter.updateRecords(mTrafficService.getConsumptionStore()
+                    .getConsumptionRecords(cards.get(0)));
+        }
     }
 
     private void refreshCardIDCache(){
-        SharedPreferences sharedPreferences = getSharedPreferences(CARD_ID_CACHE, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Utils.CARD_ID_CACHE, MODE_PRIVATE);
 
         Map<String, ?> map = sharedPreferences.getAll();
         ArrayList<String> list = new ArrayList<String>();
@@ -104,17 +103,6 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(ConsumerRecordsActivity.this,
                 android.R.layout.simple_dropdown_item_1line, list);
         mEditText.setAdapter(adapter);
-    }
-    
-    private ArrayList<String> getCachedCards() {
-    	SharedPreferences sharedPreferences = getSharedPreferences(CARD_ID_CACHE, MODE_PRIVATE);
-
-        Map<String, ?> map = sharedPreferences.getAll();
-        ArrayList<String> list = new ArrayList<String>();
-        if (map.keySet() != null) {
-            list.addAll(map.keySet());
-        }
-        return list;
     }
 
     @Override
