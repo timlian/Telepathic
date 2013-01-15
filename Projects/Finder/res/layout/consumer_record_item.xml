@@ -31,7 +31,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
-        <TextView android:id="@+id/consumer_count"
+        <TextView android:id="@+id/consumption"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"/>

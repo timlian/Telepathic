@@ -1,6 +1,5 @@
 package com.telepathic.finder.app;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -23,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.telepathic.finder.R;
-import com.telepathic.finder.sdk.BusLineRoute;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.ConsumerRecordsListener;
@@ -147,8 +145,10 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
-                    mResidualCountText.setText(getResources().getString(R.string.residual_count) + dataInfo.getResidualCount());
-                    mResidualAmountText.setText(getResources().getString(R.string.residual_amount) + dataInfo.getResidualAmount());
+                    String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
+                    String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+                    mResidualCountText.setText(resiaualCount);
+                    mResidualAmountText.setText(resiaualAmount);
                     mListAdapter.updateRecords(dataInfo.getRecordList());
                     removeDialog(DIALOG_WAITING);
                 }
@@ -177,7 +177,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private static class RecordItemHolder {
         TextView lineNumber;
         TextView busNumber;
-        TextView consumerCount;
+        TextView consumption;
         TextView consumerTime;
     }
 
@@ -216,7 +216,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 RecordItemHolder holder = new RecordItemHolder();
                 holder.lineNumber = (TextView) convertView.findViewById(R.id.line_number);
                 holder.busNumber = (TextView) convertView.findViewById(R.id.bus_number);
-                holder.consumerCount = (TextView) convertView.findViewById(R.id.consumer_count);
+                holder.consumption = (TextView) convertView.findViewById(R.id.consumption);
                 holder.consumerTime = (TextView) convertView.findViewById(R.id.consumer_time);
                 convertView.setTag(holder);
             }
@@ -228,11 +228,13 @@ public class ConsumerRecordsActivity extends FragmentActivity {
             RecordItemHolder holder = (RecordItemHolder) view.getTag();
             holder.lineNumber.setText(getResources().getString(R.string.line_number) + record.getLineNumber());
             holder.busNumber.setText(getResources().getString(R.string.bus_number) + record.getBusNumber());
+            String comsumption = "";
             if (record.getType() == ConsumerType.COUNT) {
-                holder.consumerCount.setText(getResources().getString(R.string.consumer_count) + record.getConsumption());
+            	comsumption = getString(R.string.consumer_count, record.getConsumption());
             } else if (record.getType() == ConsumerType.EWALLET) {
-                holder.consumerCount.setText(getResources().getString(R.string.consumer_amount) + record.getConsumption());
+            	comsumption = getString(R.string.consumer_amount, record.getConsumption());
             }
+            holder.consumption.setText(comsumption);
             holder.consumerTime.setText(Utils.formatDate(record.getConsumerTime()));
         }
 
