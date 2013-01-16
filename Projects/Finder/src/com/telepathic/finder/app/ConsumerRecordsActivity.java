@@ -1,13 +1,11 @@
 package com.telepathic.finder.app;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -41,6 +39,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private ListView mRecordList;
     private ConsumerRecordsAdapter mListAdapter;
     private CardIdFragment mFragment;
+    private ArrayList<String> mCardIdList;
 
     private TrafficService mTrafficService;
 
@@ -62,13 +61,10 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 mTrafficService.getBusStationLines();
                 String number = mEditText.getText().toString();
                 if (number.length() == 8) {
-                    SharedPreferences preferences = getSharedPreferences(Utils.CARD_ID_CACHE, MODE_PRIVATE);
-                    preferences.edit().putString(number, number).commit();
                     mTrafficService.retrieveConsumerRecords(number, 30, new MyChargeRecordsListener());
                     mSendButton.setEnabled(false);
                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
                     showDialog(DIALOG_WAITING);
-                    refreshCardIDCache();
                 } else {
                     mEditText.setError(getResources().getString(R.string.card_id_error_notice));
                 }
@@ -87,32 +83,34 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         mFragment.setOnCardSelectedListener(new OnCardSelectedListener() {
             @Override
             public void onCardSelected(String cardId) {
-                mListAdapter.updateRecords(mTrafficService.getConsumptionStore()
-                        .getConsumptionRecords(cardId));
+                selectConsumptionRecordsByCardId(cardId);
             }
         });
+
+        if (mCardIdList.size() > 0){
+            selectConsumptionRecordsByIndex(0);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        ArrayList<String> cards = Utils.getCachedCards(this);
-        if (cards.size() > 0) {
-            mListAdapter.updateRecords(mTrafficService.getConsumptionStore()
-                    .getConsumptionRecords(cards.get(0)));
-        }
+    }
+
+    private void selectConsumptionRecordsByIndex(int index){
+        selectConsumptionRecordsByCardId(mCardIdList.get(index));
+    }
+
+    private void selectConsumptionRecordsByCardId(String cardId){
+        mListAdapter.updateRecords(mTrafficService.getConsumptionStore()
+                .getConsumptionRecords(cardId));
     }
 
     private void refreshCardIDCache(){
-        SharedPreferences sharedPreferences = getSharedPreferences(Utils.CARD_ID_CACHE, MODE_PRIVATE);
+        mCardIdList = Utils.getCachedCards(this);
 
-        Map<String, ?> map = sharedPreferences.getAll();
-        ArrayList<String> list = new ArrayList<String>();
-        if (map.keySet() != null) {
-            list.addAll(map.keySet());
-        }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(ConsumerRecordsActivity.this,
-                android.R.layout.simple_dropdown_item_1line, list);
+                android.R.layout.simple_dropdown_item_1line, mCardIdList);
         mEditText.setAdapter(adapter);
     }
 
@@ -144,12 +142,15 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
+                    Utils.addCachedCards(ConsumerRecordsActivity.this, mEditText.getText().toString());
                     String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
                     String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
                     mResidualCountText.setText(resiaualCount);
                     mResidualAmountText.setText(resiaualAmount);
                     mListAdapter.updateRecords(dataInfo.getRecordList());
+                    mFragment.selectItemByCardId(mEditText.getText().toString());
                     removeDialog(DIALOG_WAITING);
+                    refreshCardIDCache();
                 }
             });
 
@@ -229,9 +230,9 @@ public class ConsumerRecordsActivity extends FragmentActivity {
             holder.busNumber.setText(getResources().getString(R.string.bus_number) + record.getBusNumber());
             String comsumption = "";
             if (record.getType() == ConsumerType.COUNT) {
-            	comsumption = getString(R.string.consumer_count, record.getConsumption());
+                comsumption = getString(R.string.consumer_count, record.getConsumption());
             } else if (record.getType() == ConsumerType.EWALLET) {
-            	comsumption = getString(R.string.consumer_amount, record.getConsumption());
+                comsumption = getString(R.string.consumer_amount, record.getConsumption());
             }
             holder.consumption.setText(comsumption);
             holder.consumerTime.setText(Utils.formatDate(record.getConsumerTime()));

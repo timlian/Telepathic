@@ -4,11 +4,13 @@ package com.telepathic.finder.test.app;
 import android.content.SharedPreferences;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.ConsumerRecordsActivity;
+import com.telepathic.finder.util.Utils;
 
 public class ConsumerRecordsActivityTest extends
 ActivityInstrumentationTestCase2<ConsumerRecordsActivity> {
@@ -48,10 +50,11 @@ ActivityInstrumentationTestCase2<ConsumerRecordsActivity> {
 
     @UiThreadTest
     public void testSaveCardID() {
-        mEditText.setText("10802436");
-        mSendButton.performClick();
-        mEditText.setText("10808691");
-        mSendButton.performClick();
+        Utils.addCachedCards(mActivity, "10802436");
+        Utils.addCachedCards(mActivity, "10808691");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mActivity,
+                android.R.layout.simple_dropdown_item_1line, Utils.getCachedCards(mActivity));
+        mEditText.setAdapter(adapter);
         assertEquals(2, mEditText.getAdapter().getCount());
         String item1 = (String)mEditText.getAdapter().getItem(0);
         String item2 = (String)mEditText.getAdapter().getItem(1);

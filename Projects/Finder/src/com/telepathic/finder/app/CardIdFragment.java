@@ -63,6 +63,11 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
         super.onPause();
     }
 
+    public void selectItemByCardId(String cardId) {
+        mAdapter.notifyDataSetChanged();
+        mAdapter.setSelected(cardId);
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -127,6 +132,23 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
 
         public void setSelected(int position) {
             mSelectedItem = position;
+        }
+
+        public void setSelected(String cardId) {
+            int pos = mCardList.indexOf(cardId);
+            if(pos != -1) {
+                mSelectedItem = pos;
+            }
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            ArrayList<String> list = Utils.getCachedCards(getActivity());
+            if (list.size() <= 0) {
+                list.add("no item");
+            }
+            mCardList = list;
+            super.notifyDataSetChanged();
         }
     }
 

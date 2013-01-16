@@ -255,4 +255,9 @@ public class Utils {
         }
         return list;
     }
+
+    public static void addCachedCards(Context c, String cardId){
+        SharedPreferences preferences = c.getSharedPreferences(Utils.CARD_ID_CACHE, Context.MODE_PRIVATE);
+        preferences.edit().putString(cardId, cardId).commit();
+    }
 }
