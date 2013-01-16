@@ -20,6 +20,7 @@ import com.telepathic.finder.util.Utils;
 public class CardIdFragment extends android.support.v4.app.Fragment {
     private Activity mHostActivity;
     private ListView mCardListView;
+    private MyAdapter mAdapter;
 
     private OnCardSelectedListener mListener;
 
@@ -43,15 +44,17 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.card_list, container, false);
+        mAdapter = new MyAdapter();
         mCardListView = (ListView) view.findViewById(R.id.card_list);
         mCardListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                arg1.setSelected(true);
                 mListener.onCardSelected(mCardListView.getItemAtPosition(arg2).toString());
+                mAdapter.setSelected(arg2);
+                mAdapter.notifyDataSetInvalidated();
             }
         });
-        mCardListView.setAdapter(new MyAdapter());
+        mCardListView.setAdapter(mAdapter);
         return view;
     }
 
@@ -77,6 +80,8 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
     private class MyAdapter extends BaseAdapter {
 
         ArrayList<String> mCardList;
+
+        private int mSelectedItem = 0;
 
         MyAdapter() {
             ArrayList<String> list = Utils.getCachedCards(getActivity());
@@ -112,7 +117,16 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
             }
             CardItemHolder holder = (CardItemHolder) convertView.getTag();
             holder.cardIdText.setText(cardId);
+            if (position == mSelectedItem) {
+                convertView.setBackgroundResource(android.R.color.background_light);
+            } else {
+                convertView.setBackgroundResource(android.R.color.transparent);
+            }
             return convertView;
+        }
+
+        public void setSelected(int position) {
+            mSelectedItem = position;
         }
     }
 
