@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -184,6 +185,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         TextView busNumber;
         TextView consumption;
         TextView consumerTime;
+        ImageView consumeType;
     }
 
     private class ConsumerRecordsAdapter extends BaseAdapter {
@@ -223,6 +225,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 holder.busNumber = (TextView) convertView.findViewById(R.id.bus_number);
                 holder.consumption = (TextView) convertView.findViewById(R.id.consumption);
                 holder.consumerTime = (TextView) convertView.findViewById(R.id.consumer_time);
+                holder.consumeType = (ImageView) convertView.findViewById(R.id.img_consumption_type);
                 convertView.setTag(holder);
             }
             bindView(position, record, convertView);
@@ -236,8 +239,10 @@ public class ConsumerRecordsActivity extends FragmentActivity {
             String comsumption = "";
             if (record.getType() == ConsumerType.COUNT) {
                 comsumption = getString(R.string.consumer_count, record.getConsumption());
+                holder.consumeType.setImageResource(R.drawable.count);
             } else if (record.getType() == ConsumerType.EWALLET) {
                 comsumption = getString(R.string.consumer_amount, record.getConsumption());
+                holder.consumeType.setImageResource(R.drawable.ewallet);
             }
             holder.consumption.setText(comsumption);
             holder.consumerTime.setText(Utils.formatDate(record.getConsumerTime()));

@@ -25,7 +25,7 @@
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">Please enter the correct parameter</string>
     <string name="line_number">公交路线:</string>
-    <string name="bus_number">车牌号:</string>
+    <string name="bus_number">车辆编号:</string>
     
     <string name="consumer_count">消费次数: <xliff:g id="consumer_count" example="2">%1$s</xliff:g></string>
     <string name="consumer_amount">消费金额: <xliff:g id="consumer_amount" example="1.8">%1$s</xliff:g></string>
