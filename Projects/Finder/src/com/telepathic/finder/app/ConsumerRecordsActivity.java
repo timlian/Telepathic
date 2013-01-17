@@ -102,8 +102,13 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     }
 
     private void selectConsumptionRecordsByCardId(String cardId){
-        mListAdapter.updateRecords(mTrafficService.getConsumptionStore()
-                .getConsumptionRecords(cardId));
+        mEditText.setText(null);
+        ConsumptionInfo dataInfo = mTrafficService.getConsumptionStore().getConsumptionInfo(cardId);
+        String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
+        String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+        mResidualCountText.setText(resiaualCount);
+        mResidualAmountText.setText(resiaualAmount);
+        mListAdapter.updateRecords(dataInfo.getRecordList());
     }
 
     private void refreshCardIDCache(){

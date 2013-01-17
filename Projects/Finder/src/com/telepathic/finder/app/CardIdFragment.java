@@ -91,7 +91,7 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
         MyAdapter() {
             ArrayList<String> list = Utils.getCachedCards(getActivity());
             if (list.size() <= 0) {
-                list.add("no item");
+                list.add(getResources().getString(R.string.no_item_in_db));
             }
             mCardList = list;
         }
