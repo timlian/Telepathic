@@ -221,14 +221,14 @@ public class DropRefreshListView extends ListView implements OnScrollListener {
                                 isBack = true;
                                 changeHeaderViewByState();
 
-                                Log.v(LOG_TAG, "由done或者下拉刷新状态转变到松开刷新");
+                                Log.v(LOG_TAG, "From done or pull refresh to release refresh");
                             }
                             // Push to top
                             else if (tempY - startY <= 0) {
                                 mState = DONE;
                                 changeHeaderViewByState();
 
-                                Log.v(LOG_TAG, "由DOne或者下拉刷新状态转变到done状态");
+                                Log.v(LOG_TAG, "From done or pull refresh to done");
                             }
                         }
 
@@ -271,17 +271,6 @@ public class DropRefreshListView extends ListView implements OnScrollListener {
                 mTvTips.setText(R.string.release_to_refresh);
 
                 Log.v(LOG_TAG, "Release to refresh");
-                //            arrowImageView.setVisibility(View.VISIBLE);
-                //            progressBar.setVisibility(View.GONE);
-                //            tipsTextview.setVisibility(View.VISIBLE);
-                //            lastUpdatedTextView.setVisibility(View.VISIBLE);
-                //
-                //            arrowImageView.clearAnimation();
-                //            arrowImageView.startAnimation(animation);
-                //
-                //            tipsTextview.setText("松开刷新");
-                //
-                //            Log.v(TAG, "当前状态，松开刷新");
                 break;
             case PULL_TO_REFRESH:
                 mIvArrow.setVisibility(VISIBLE);
@@ -298,22 +287,6 @@ public class DropRefreshListView extends ListView implements OnScrollListener {
                     mTvTips.setText(R.string.pull_to_refresh);
                 }
                 Log.v(LOG_TAG, "Pull to refresh");
-                //            progressBar.setVisibility(View.GONE);
-                //            tipsTextview.setVisibility(View.VISIBLE);
-                //            lastUpdatedTextView.setVisibility(View.VISIBLE);
-                //            arrowImageView.clearAnimation();
-                //            arrowImageView.setVisibility(View.VISIBLE);
-                //            // 是由RELEASE_To_REFRESH状态转变来的
-                //            if (isBack) {
-                //                isBack = false;
-                //                arrowImageView.clearAnimation();
-                //                arrowImageView.startAnimation(reverseAnimation);
-                //
-                //                tipsTextview.setText("下拉刷新");
-                //            } else {
-                //                tipsTextview.setText("下拉刷新");
-                //            }
-                //            Log.v(TAG, "当前状态，下拉刷新");
                 break;
             case REFRESHING:
                 mHeaderView.setPadding(0, 0, 0, 0);
@@ -324,14 +297,6 @@ public class DropRefreshListView extends ListView implements OnScrollListener {
                 mTvTips.setText(R.string.refreshing);
 
                 Log.v(LOG_TAG, "Refreshing");
-                //
-                //            progressBar.setVisibility(View.VISIBLE);
-                //            arrowImageView.clearAnimation();
-                //            arrowImageView.setVisibility(View.GONE);
-                //            tipsTextview.setText("正在刷新...");
-                //            lastUpdatedTextView.setVisibility(View.VISIBLE);
-                //
-                //            Log.v(TAG, "当前状态,正在刷新...");
                 break;
             case DONE:
                 mHeaderView.setPadding(0, -1 * mHeadContentHeight, 0, 0);
@@ -342,14 +307,6 @@ public class DropRefreshListView extends ListView implements OnScrollListener {
                 mTvTips.setText(R.string.pull_to_refresh);
 
                 Log.v(LOG_TAG, "Done");
-                //
-                //            progressBar.setVisibility(View.GONE);
-                //            arrowImageView.clearAnimation();
-                //            arrowImageView.setImageResource(R.drawable.arrow_down);
-                //            tipsTextview.setText("下拉刷新");
-                //            lastUpdatedTextView.setVisibility(View.VISIBLE);
-                //
-                //            Log.v(TAG, "当前状态，done");
                 break;
         }
     }
@@ -367,16 +324,10 @@ public class DropRefreshListView extends ListView implements OnScrollListener {
 
     public void onRefreshComplete() {
         mState = DONE;
-        //        SimpleDateFormat format=new SimpleDateFormat("yyyy年MM月dd日  HH:mm");
-        //        String date=format.format(new Date());
-        //        lastUpdatedTextView.setText("最近更新:" + date);
         changeHeaderViewByState();
     }
 
     public void setAdapter(BaseAdapter adapter) {
-        //        SimpleDateFormat format=new SimpleDateFormat("yyyy年MM月dd日  HH:mm");
-        //        String date=format.format(new Date());
-        //        lastUpdatedTextView.setText("最近更新:" + date);
         super.setAdapter(adapter);
     }
 }
