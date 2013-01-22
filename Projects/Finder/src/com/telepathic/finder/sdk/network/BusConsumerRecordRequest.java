@@ -57,7 +57,7 @@ public class BusConsumerRecordRequest extends RPCRequest {
     /*
      * Consumer records response data entry example:
      *
-     * {lineNumber=102; busNumber=031164; cardID=000101545529; consumerTime=2012-6-30 21:39:51; consumerCount=2; residualCount=6; code=200; msg=�ɹ�; }
+     * {lineNumber=102; busNumber=031164; cardID=000101545529; consumerTime=2012-6-30 21:39:51; consumerCount=2; residualCount=6; code=200; msg=成功; }
      *
      */
     @Override
@@ -66,60 +66,65 @@ public class BusConsumerRecordRequest extends RPCRequest {
         ArrayList<ConsumerRecord> consumerRecords = new ArrayList<ConsumerRecord>();
         ConsumerRecord record = null;
         ConsumptionInfo info = new ConsumptionInfo();
-        for(int idx = 0; idx < newDataSet.getPropertyCount() ; idx++) {
+        int count = newDataSet.getPropertyCount();
+        if (count > 0) {
+            String cardId = ((SoapObject)newDataSet.getProperty(0)).getPropertyAsString(KEY_CARD_ID);
+            info.setCardId(cardId.substring(4));
+        }
+        for(int idx = 0; idx < count ; idx++) {
             dataEntry = (SoapObject) newDataSet.getProperty(idx);
             Log.d("T", dataEntry.toString());
             try {
-            	dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT);
-            	record = new CountConsumerRecord();
+                dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT);
+                record = new CountConsumerRecord();
             } catch (RuntimeException e) {
-            	try {
-            		dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT);
-            		record = new EWalletConsumerRecord();
-            	} catch (RuntimeException ex) {
-            		throw new RuntimeException("Unknown consumer record structure!!!");
-            	}
+                try {
+                    dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT);
+                    record = new EWalletConsumerRecord();
+                } catch (RuntimeException ex) {
+                    throw new RuntimeException("Unknown consumer record structure!!!");
+                }
             }
             record.setLineNumber(dataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER));
             record.setBusNumber(dataEntry.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
             record.setCardID(dataEntry.getPrimitivePropertyAsString(KEY_CARD_ID));
             record.setConsumerTime(Utils.parseDate(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME)));
-			switch (record.getType()) {
-			case COUNT:
-				record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
-				record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
-				if (info.getResidualCount() == null) {
-					info.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
-				}
-				break;
-			case EWALLET:
-				record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
-				record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
-				if (info.getResidualAmount() == null) {
-					info.setResidualAmount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
-				}
-				break;
-			default:
-				throw new RuntimeException("Unknown consumer type !!!");
-			}
+            switch (record.getType()) {
+                case COUNT:
+                    record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
+                    record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+                    if (info.getResidualCount() == null) {
+                        info.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+                    }
+                    break;
+                case EWALLET:
+                    record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
+                    record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
+                    if (info.getResidualAmount() == null) {
+                        info.setResidualAmount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("Unknown consumer type !!!");
+            }
             consumerRecords.add(record);
         }
         info.setRecordList(consumerRecords);
-        
+
         if (mListener != null) {
             mListener.onSuccess(info);
         }
-        
+
         for (ConsumerRecord consumerRecord : consumerRecords) {
-        	mStore.insertRecord(consumerRecord);
+            mStore.insertRecord(consumerRecord);
         }
-        
+
         try {
-			Utils.copyAppDatabaseFiles("com.telepathic.finder");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            Utils.copyAppDatabaseFiles("com.telepathic.finder");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 }

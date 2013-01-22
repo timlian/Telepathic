@@ -68,6 +68,10 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
         mAdapter.setSelected(cardId);
     }
 
+    public String getSelectedCardId() {
+        return mAdapter.getSelectedCardId();
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -139,6 +143,10 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
             if(pos != -1) {
                 mSelectedItem = pos;
             }
+        }
+
+        private String getSelectedCardId(){
+            return mCardList.get(mSelectedItem);
         }
 
         @Override

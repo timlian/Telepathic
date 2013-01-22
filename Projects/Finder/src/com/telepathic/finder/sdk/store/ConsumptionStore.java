@@ -114,6 +114,9 @@ public class ConsumptionStore {
     public ConsumptionInfo getConsumptionInfo(String cardId) {
         ArrayList<ConsumerRecord> consumerRecords = getConsumptionRecords(cardId);
         ConsumptionInfo info = new ConsumptionInfo();
+        if (consumerRecords.size() > 0) {
+            info.setCardId(cardId);
+        }
         for (ConsumerRecord record : consumerRecords) {
             switch(record.getType()){
                 case COUNT:

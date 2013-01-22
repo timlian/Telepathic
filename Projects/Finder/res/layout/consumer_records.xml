@@ -71,7 +71,7 @@
                     android:layout_weight="1" />
             </LinearLayout>
 
-            <ListView
+            <com.telepathic.finder.view.DropRefreshListView
                 android:id="@+id/consumer_record_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

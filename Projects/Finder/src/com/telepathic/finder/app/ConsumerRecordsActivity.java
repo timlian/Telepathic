@@ -16,7 +16,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +27,8 @@ import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumptionInfo;
 import com.telepathic.finder.sdk.TrafficService;
 import com.telepathic.finder.util.Utils;
+import com.telepathic.finder.view.DropRefreshListView;
+import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
 public class ConsumerRecordsActivity extends FragmentActivity {
     private static final String TAG = "TestActivity";
@@ -37,7 +38,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private TextView mResidualCountText;
     private TextView mResidualAmountText;
     private AutoCompleteTextView mEditText;
-    private ListView mRecordList;
+    private DropRefreshListView mRecordList;
     private ConsumerRecordsAdapter mListAdapter;
     private CardIdFragment mFragment;
     private ArrayList<String> mCardIdList;
@@ -74,7 +75,13 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         refreshCardIDCache();
 
         mListAdapter = new ConsumerRecordsAdapter();
-        mRecordList = (ListView) findViewById(R.id.consumer_record_list);
+        mRecordList = (DropRefreshListView) findViewById(R.id.consumer_record_list);
+        mRecordList.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mTrafficService.retrieveConsumerRecords(mFragment.getSelectedCardId(), 30, new MyChargeRecordsListener());
+            }
+        });
         mRecordList.setAdapter(mListAdapter);
 
         mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
@@ -148,15 +155,16 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
-                    Utils.addCachedCards(ConsumerRecordsActivity.this, mEditText.getText().toString());
+                    Utils.addCachedCards(ConsumerRecordsActivity.this, dataInfo.getCardId());
                     String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
                     String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
                     mResidualCountText.setText(resiaualCount);
                     mResidualAmountText.setText(resiaualAmount);
                     mListAdapter.updateRecords(dataInfo.getRecordList());
-                    mFragment.selectItemByCardId(mEditText.getText().toString());
+                    mFragment.selectItemByCardId(dataInfo.getCardId());
                     removeDialog(DIALOG_WAITING);
                     refreshCardIDCache();
+                    mRecordList.onRefreshComplete();
                 }
             });
 
@@ -174,6 +182,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                     } else {
                         isCanceled = false;
                     }
+                    mRecordList.onRefreshComplete();
                 }
             });
 
