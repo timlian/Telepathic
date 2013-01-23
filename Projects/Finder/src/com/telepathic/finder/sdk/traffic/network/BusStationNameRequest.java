@@ -1,12 +1,12 @@
-package com.telepathic.finder.sdk.network;
+package com.telepathic.finder.sdk.traffic.network;
 
 import org.ksoap2.serialization.SoapObject;
 
 import android.text.TextUtils;
 
-import com.telepathic.finder.sdk.BusStation;
-import com.telepathic.finder.sdk.TrafficeMonitor;
-import com.telepathic.finder.sdk.store.BusLineStation;
+import com.telepathic.finder.sdk.traffic.BusStation;
+import com.telepathic.finder.sdk.traffic.TrafficeMonitor;
+import com.telepathic.finder.sdk.traffic.store.BusLineStation;
 
 public class BusStationNameRequest extends RPCBaseRequest {
 	private static final String REQUEST_NAME = "translateToStation";

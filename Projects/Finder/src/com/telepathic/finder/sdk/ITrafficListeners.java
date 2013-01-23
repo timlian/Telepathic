@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import com.baidu.mapapi.MKPoiInfo;
 import com.baidu.mapapi.MKStep;
+import com.telepathic.finder.sdk.traffic.BusRoute;
+import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
 
-public interface TrafficListeners {
+public interface ITrafficListeners {
 
 	interface ConsumerRecordsListener {
 

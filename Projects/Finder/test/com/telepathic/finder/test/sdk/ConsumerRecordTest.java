@@ -2,9 +2,9 @@ package com.telepathic.finder.test.sdk;
 
 import android.test.AndroidTestCase;
 
-import com.telepathic.finder.sdk.ConsumerRecord;
-import com.telepathic.finder.sdk.CountConsumerRecord;
-import com.telepathic.finder.sdk.EWalletConsumerRecord;
+import com.telepathic.finder.sdk.traffic.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.CountConsumerRecord;
+import com.telepathic.finder.sdk.traffic.EWalletConsumerRecord;
 import com.telepathic.finder.util.Utils;
 
 public class ConsumerRecordTest extends AndroidTestCase {

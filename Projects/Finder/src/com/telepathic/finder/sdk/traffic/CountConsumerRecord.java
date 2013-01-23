@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk;
+package com.telepathic.finder.sdk.traffic;
 
 public class CountConsumerRecord extends ConsumerRecord {
 	 /**

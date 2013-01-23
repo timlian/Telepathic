@@ -2,7 +2,7 @@
  * 
  */
 
-package com.telepathic.finder.sdk.store;
+package com.telepathic.finder.sdk.traffic.store;
 
 import java.util.ArrayList;
 
@@ -13,12 +13,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.telepathic.finder.sdk.ConsumerRecord;
-import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
-import com.telepathic.finder.sdk.ConsumptionInfo;
-import com.telepathic.finder.sdk.CountConsumerRecord;
-import com.telepathic.finder.sdk.EWalletConsumerRecord;
-import com.telepathic.finder.sdk.store.Store.ConsumptionColumns;
+import com.telepathic.finder.sdk.traffic.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
+import com.telepathic.finder.sdk.traffic.CountConsumerRecord;
+import com.telepathic.finder.sdk.traffic.EWalletConsumerRecord;
+import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
+import com.telepathic.finder.sdk.traffic.store.Store.ConsumptionColumns;
 import com.telepathic.finder.util.Utils;
 
 /**

@@ -1,6 +1,6 @@
-package com.telepathic.finder.sdk.store;
+package com.telepathic.finder.sdk.traffic.store;
 
-import com.telepathic.finder.sdk.BusStation;
+import com.telepathic.finder.sdk.traffic.BusStation;
 
 public class BusLineStation extends BusStation {
 	private String mLineNumber;

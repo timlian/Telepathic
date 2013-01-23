@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk;
+package com.telepathic.finder.sdk.traffic;
 
 import java.util.ArrayList;
 
@@ -16,10 +16,13 @@ import com.baidu.mapapi.MKSuggestionResult;
 import com.baidu.mapapi.MKTransitRouteResult;
 import com.baidu.mapapi.MKWalkingRouteResult;
 
-import com.telepathic.finder.sdk.network.GetBusLocationRequest;
-import com.telepathic.finder.sdk.network.GetConsumerRecordRequest;
-import com.telepathic.finder.sdk.network.NetworkManager;
-import com.telepathic.finder.sdk.store.ConsumptionStore;
+import com.telepathic.finder.sdk.ITrafficListeners;
+import com.telepathic.finder.sdk.ITrafficMonitor;
+import com.telepathic.finder.sdk.ITrafficService;
+import com.telepathic.finder.sdk.traffic.network.GetBusLocationRequest;
+import com.telepathic.finder.sdk.traffic.network.GetConsumerRecordRequest;
+import com.telepathic.finder.sdk.traffic.network.NetworkManager;
+import com.telepathic.finder.sdk.traffic.store.ConsumptionStore;
 import com.telepathic.finder.util.Utils;
 
 public class TrafficManager {
@@ -122,7 +125,7 @@ public class TrafficManager {
 
 	}
 	
-	private class MyConsumerRecordsListener implements TrafficListeners.ConsumerRecordsListener {
+	private class MyConsumerRecordsListener implements ITrafficListeners.ConsumerRecordsListener {
 		@Override
 		public void onReceived(ConsumptionInfo info) {
 			for (ConsumerRecord consumerRecord : info.getRecordList()) {

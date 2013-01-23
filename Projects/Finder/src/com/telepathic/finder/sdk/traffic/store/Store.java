@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk.store;
+package com.telepathic.finder.sdk.traffic.store;
 
 import android.provider.BaseColumns;
 

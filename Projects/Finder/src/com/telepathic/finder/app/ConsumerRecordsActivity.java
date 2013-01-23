@@ -23,12 +23,12 @@ import android.widget.Toast;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.CardIdFragment.OnCardSelectedListener;
-import com.telepathic.finder.sdk.ConsumerRecord;
-import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
-import com.telepathic.finder.sdk.ConsumptionInfo;
+import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
-import com.telepathic.finder.sdk.TrafficListeners;
-import com.telepathic.finder.sdk.TrafficManager;
+import com.telepathic.finder.sdk.traffic.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
+import com.telepathic.finder.sdk.traffic.TrafficManager;
+import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
@@ -48,7 +48,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
 
     private ITrafficService mTrafficService;
     
-    private TrafficListeners.ErrorListener mErrorListener = new TrafficListeners.ErrorListener() {
+    private ITrafficListeners.ErrorListener mErrorListener = new ITrafficListeners.ErrorListener() {
 		@Override
 		public void done(final String error) {
 			runOnUiThread(new Runnable() {
@@ -67,7 +67,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
 		}
 	};
 	
-	private TrafficListeners.ConsumerRecordsListener mConsumerRecordsListener = new TrafficListeners.ConsumerRecordsListener() {
+	private ITrafficListeners.ConsumerRecordsListener mConsumerRecordsListener = new ITrafficListeners.ConsumerRecordsListener() {
 		
 		@Override
 		public void onReceived(final ConsumptionInfo dataInfo) {

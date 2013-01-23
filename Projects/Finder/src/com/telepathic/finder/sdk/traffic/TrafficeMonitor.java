@@ -1,14 +1,15 @@
-package com.telepathic.finder.sdk;
+package com.telepathic.finder.sdk.traffic;
 
 import java.util.ArrayList;
 
 import com.baidu.mapapi.MKPoiInfo;
 import com.baidu.mapapi.MKStep;
-import com.telepathic.finder.sdk.TrafficListeners.BusLineListener;
-import com.telepathic.finder.sdk.TrafficListeners.BusLocationListener;
-import com.telepathic.finder.sdk.TrafficListeners.BusRouteListener;
-import com.telepathic.finder.sdk.TrafficListeners.ConsumerRecordsListener;
-import com.telepathic.finder.sdk.TrafficListeners.ErrorListener;
+import com.telepathic.finder.sdk.ITrafficMonitor;
+import com.telepathic.finder.sdk.ITrafficListeners.BusLineListener;
+import com.telepathic.finder.sdk.ITrafficListeners.BusLocationListener;
+import com.telepathic.finder.sdk.ITrafficListeners.BusRouteListener;
+import com.telepathic.finder.sdk.ITrafficListeners.ConsumerRecordsListener;
+import com.telepathic.finder.sdk.ITrafficListeners.ErrorListener;
 
 public class TrafficeMonitor implements ITrafficMonitor {
 

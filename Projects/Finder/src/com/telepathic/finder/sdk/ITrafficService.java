@@ -1,5 +1,7 @@
 package com.telepathic.finder.sdk;
 
+import com.telepathic.finder.sdk.traffic.BusRoute;
+
 public interface ITrafficService {
 	/**
 	 * Search the bus line according to the specified bus line number.

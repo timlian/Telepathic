@@ -36,9 +36,9 @@ import com.baidu.mapapi.Overlay;
 import com.baidu.mapapi.OverlayItem;
 import com.baidu.mapapi.RouteOverlay;
 import com.telepathic.finder.R;
-import com.telepathic.finder.sdk.BusRoute;
+import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
-import com.telepathic.finder.sdk.TrafficListeners;
+import com.telepathic.finder.sdk.traffic.BusRoute;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
@@ -370,7 +370,7 @@ public class BusLocationActivity extends MapActivity {
         }
     }
     
-	private TrafficListeners.BusLineListener mBusLineListener = new TrafficListeners.BusLineListener() {
+	private ITrafficListeners.BusLineListener mBusLineListener = new ITrafficListeners.BusLineListener() {
 		@Override
 		public void onReceived(String busLineNumber,
 				ArrayList<MKPoiInfo> busPois) {
@@ -382,7 +382,7 @@ public class BusLocationActivity extends MapActivity {
 		}
 	};
 	
-	private TrafficListeners.BusRouteListener mBusRouteListener = new TrafficListeners.BusRouteListener() {
+	private ITrafficListeners.BusRouteListener mBusRouteListener = new ITrafficListeners.BusRouteListener() {
 		@Override
 		public void onReceived(BusRoute route) {
 			RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
@@ -397,7 +397,7 @@ public class BusLocationActivity extends MapActivity {
 		}
 	};
 	
-	private TrafficListeners.BusLocationListener mBusLocationListener = new TrafficListeners.BusLocationListener() {
+	private ITrafficListeners.BusLocationListener mBusLocationListener = new ITrafficListeners.BusLocationListener() {
 		@Override
 		public void onReceived(final MKStep station) {
 			runOnUiThread(new Runnable() {

@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk.network;
+package com.telepathic.finder.sdk.traffic.network;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 

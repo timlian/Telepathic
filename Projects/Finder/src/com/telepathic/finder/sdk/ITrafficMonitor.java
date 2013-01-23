@@ -1,10 +1,10 @@
 package com.telepathic.finder.sdk;
 
-import com.telepathic.finder.sdk.TrafficListeners.BusLineListener;
-import com.telepathic.finder.sdk.TrafficListeners.BusLocationListener;
-import com.telepathic.finder.sdk.TrafficListeners.BusRouteListener;
-import com.telepathic.finder.sdk.TrafficListeners.ConsumerRecordsListener;
-import com.telepathic.finder.sdk.TrafficListeners.ErrorListener;
+import com.telepathic.finder.sdk.ITrafficListeners.BusLineListener;
+import com.telepathic.finder.sdk.ITrafficListeners.BusLocationListener;
+import com.telepathic.finder.sdk.ITrafficListeners.BusRouteListener;
+import com.telepathic.finder.sdk.ITrafficListeners.ConsumerRecordsListener;
+import com.telepathic.finder.sdk.ITrafficListeners.ErrorListener;
 
 public interface ITrafficMonitor {
 

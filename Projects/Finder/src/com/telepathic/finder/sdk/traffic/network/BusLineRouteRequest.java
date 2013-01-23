@@ -1,10 +1,6 @@
-package com.telepathic.finder.sdk.network;
-
-import java.util.ArrayList;
+package com.telepathic.finder.sdk.traffic.network;
 
 import org.ksoap2.serialization.SoapObject;
-
-import com.telepathic.finder.sdk.BusLineRoute;
 
 public class BusLineRouteRequest extends RPCBaseRequest {
 
@@ -28,11 +24,11 @@ public class BusLineRouteRequest extends RPCBaseRequest {
     @Override
     protected void handleResponse(SoapObject newDataSet) {
         SoapObject dataEntry = null;
-        ArrayList<BusLineRoute> busLine = new ArrayList<BusLineRoute>();
-        for (int i = 0; i < newDataSet.getPropertyCount(); i++) {
-            dataEntry = (SoapObject) newDataSet.getProperty(i);
-            busLine.add(new BusLineRoute(dataEntry));
-        }
+//        ArrayList<BusLineRoute> busLine = new ArrayList<BusLineRoute>();
+//        for (int i = 0; i < newDataSet.getPropertyCount(); i++) {
+//            dataEntry = (SoapObject) newDataSet.getProperty(i);
+//            busLine.add(new BusLineRoute(dataEntry));
+//        }
     }
 
 }

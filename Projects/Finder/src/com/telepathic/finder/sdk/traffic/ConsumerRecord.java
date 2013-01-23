@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk;
+package com.telepathic.finder.sdk.traffic;
 
 import java.util.Date;
 
