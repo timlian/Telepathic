@@ -12,14 +12,14 @@ import android.util.Log;
 
 import com.telepathic.finder.util.ClientLog;
 
-public class NetWorkAdapter {
+public class NetworkManager {
     private static final String TAG = "NetWorkAdapter";
 
     private static final String TRAFFIC_SERVICE_URI = "http://client.10628106.com:4800/TrafficService.asmx";
 
     private static int CONNECTION_TIME_OUT = 1000 * 30;
 
-    private ConcurrentLinkedQueue<RPCRequest> mRequestQueue;
+    private ConcurrentLinkedQueue<RPCBaseRequest> mRequestQueue;
 
     private HandlerThread mThread;
     private Handler mRequestHandler;
@@ -27,7 +27,7 @@ public class NetWorkAdapter {
     private Runnable mHanRunnable = new Runnable() {
         @Override
         public void run() {
-            RPCRequest request = mRequestQueue.poll();
+            RPCBaseRequest request = mRequestQueue.poll();
             if (request != null) {
                 send(request);
             }
@@ -35,8 +35,8 @@ public class NetWorkAdapter {
         }
     };
 
-    public NetWorkAdapter() {
-        mRequestQueue  = new ConcurrentLinkedQueue<RPCRequest>();
+    public NetworkManager() {
+        mRequestQueue  = new ConcurrentLinkedQueue<RPCBaseRequest>();
 
         mThread = new HandlerThread("Request Handler Thread");
         mThread.start();
@@ -44,7 +44,7 @@ public class NetWorkAdapter {
         mRequestHandler.post(mHanRunnable);
     }
 
-    public void execute(final RPCRequest request) {
+    public void execute(final RPCBaseRequest request) {
         if (request != null) {
             mRequestQueue.add(request);
         }
@@ -54,7 +54,7 @@ public class NetWorkAdapter {
         mThread.interrupt();
     }
 
-    private void send(final RPCRequest request) {
+    private void send(final RPCBaseRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Request is NULL!");
         }
@@ -84,7 +84,7 @@ public class NetWorkAdapter {
         onRequestComplete(request, soapEnvelope.bodyIn, errorMessage);
     }
 
-    private void onRequestComplete(RPCRequest request, Object response, String error) {
+    private void onRequestComplete(RPCBaseRequest request, Object response, String error) {
         request.onResponse(response, error);
         if (!request.isComplete()) {
             execute(request);

@@ -2,6 +2,8 @@ package com.telepathic.finder.app;
 
 import java.util.ArrayList;
 
+import javax.xml.transform.ErrorListener;
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -23,15 +25,16 @@ import com.telepathic.finder.R;
 import com.telepathic.finder.app.CardIdFragment.OnCardSelectedListener;
 import com.telepathic.finder.sdk.ConsumerRecord;
 import com.telepathic.finder.sdk.ConsumerRecord.ConsumerType;
-import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumptionInfo;
-import com.telepathic.finder.sdk.TrafficService;
+import com.telepathic.finder.sdk.ITrafficService;
+import com.telepathic.finder.sdk.TrafficListeners;
+import com.telepathic.finder.sdk.TrafficManager;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
 public class ConsumerRecordsActivity extends FragmentActivity {
-    private static final String TAG = "TestActivity";
+    private static final String TAG = "ConsumerRecordsActivity";
     private static final int DIALOG_WAITING = 2;
 
     private Button mSendButton;
@@ -43,7 +46,49 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private CardIdFragment mFragment;
     private ArrayList<String> mCardIdList;
 
-    private TrafficService mTrafficService;
+    private ITrafficService mTrafficService;
+    
+    private TrafficListeners.ErrorListener mErrorListener = new TrafficListeners.ErrorListener() {
+		@Override
+		public void done(final String error) {
+			runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSendButton.setEnabled(true);
+                    removeDialog(DIALOG_WAITING);
+                    if (!isCanceled) {
+                        Toast.makeText(ConsumerRecordsActivity.this, error, Toast.LENGTH_LONG).show();
+                    } else {
+                        isCanceled = false;
+                    }
+                    mRecordList.onRefreshComplete();
+                }
+            });
+		}
+	};
+	
+	private TrafficListeners.ConsumerRecordsListener mConsumerRecordsListener = new TrafficListeners.ConsumerRecordsListener() {
+		
+		@Override
+		public void onReceived(final ConsumptionInfo dataInfo) {
+			 runOnUiThread(new Runnable() {
+                 @Override
+                 public void run() {
+                     mSendButton.setEnabled(true);
+                     Utils.addCachedCards(ConsumerRecordsActivity.this, dataInfo.getCardId());
+                     String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
+                     String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+                     mResidualCountText.setText(resiaualCount);
+                     mResidualAmountText.setText(resiaualAmount);
+                     mListAdapter.updateRecords(dataInfo.getRecordList());
+                     mFragment.selectItemByCardId(dataInfo.getCardId());
+                     removeDialog(DIALOG_WAITING);
+                     refreshCardIDCache();
+                     mRecordList.onRefreshComplete();
+                 }
+             });
+		}
+	};
 
     private volatile boolean isCanceled = false;
 
@@ -52,7 +97,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.consumer_records);
 
-        mTrafficService = TrafficService.getTrafficService(null, getApplicationContext());
+        mTrafficService = TrafficManager.getTrafficManager(null, getApplicationContext()).getTrafficService();
 
         mEditText = (AutoCompleteTextView) findViewById(R.id.searchkey);
         mSendButton = (Button) findViewById(R.id.search);
@@ -60,10 +105,9 @@ public class ConsumerRecordsActivity extends FragmentActivity {
 
             @Override
             public void onClick(View v) {
-                mTrafficService.getBusStationLines();
-                String number = mEditText.getText().toString();
-                if (number.length() == 8) {
-                    mTrafficService.retrieveConsumerRecords(number, 30, new MyChargeRecordsListener());
+                String cardId = mEditText.getText().toString();
+                if (cardId.length() == 8) {
+                    mTrafficService.getConsumerRecords(cardId, 30);
                     mSendButton.setEnabled(false);
                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
                     showDialog(DIALOG_WAITING);
@@ -79,7 +123,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         mRecordList.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mTrafficService.retrieveConsumerRecords(mFragment.getSelectedCardId(), 30, new MyChargeRecordsListener());
+                mTrafficService.getConsumerRecords(mFragment.getSelectedCardId(), 30);
             }
         });
         mRecordList.setAdapter(mListAdapter);
@@ -103,20 +147,30 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mTrafficService.getTrafficMonitor().add(mErrorListener);
+        mTrafficService.getTrafficMonitor().add(mConsumerRecordsListener);
+        
     }
 
+    @Override
+    protected void onPause() {
+    	super.onPause();
+    	mTrafficService.getTrafficMonitor().remove(mErrorListener);
+    	mTrafficService.getTrafficMonitor().remove(mConsumerRecordsListener);
+    }
+    
     private void selectConsumptionRecordsByIndex(int index){
         selectConsumptionRecordsByCardId(mCardIdList.get(index));
     }
 
     private void selectConsumptionRecordsByCardId(String cardId){
         mEditText.setText(null);
-        ConsumptionInfo dataInfo = mTrafficService.getConsumptionStore().getConsumptionInfo(cardId);
-        String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
-        String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
-        mResidualCountText.setText(resiaualCount);
-        mResidualAmountText.setText(resiaualAmount);
-        mListAdapter.updateRecords(dataInfo.getRecordList());
+        //ConsumptionInfo dataInfo = mTrafficService.getConsumptionStore().getConsumptionInfo(cardId);
+//        String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
+//        String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+//        mResidualCountText.setText(resiaualCount);
+//        mResidualAmountText.setText(resiaualAmount);
+//        mListAdapter.updateRecords(dataInfo.getRecordList());
     }
 
     private void refreshCardIDCache(){
@@ -138,55 +192,13 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 @Override
                 public void onCancel(DialogInterface dialog) {
                     isCanceled = true;
-                    mTrafficService.cancelRetrieve();
+                  //  mTrafficService.cancelRetrieve();
                     mSendButton.setEnabled(true);
                 }
             });
             return prgDlg;
         }
         return null;
-    }
-
-    private class MyChargeRecordsListener implements ConsumerRecordsListener {
-
-        @Override
-        public void onSuccess(final ConsumptionInfo dataInfo) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSendButton.setEnabled(true);
-                    Utils.addCachedCards(ConsumerRecordsActivity.this, dataInfo.getCardId());
-                    String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
-                    String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
-                    mResidualCountText.setText(resiaualCount);
-                    mResidualAmountText.setText(resiaualAmount);
-                    mListAdapter.updateRecords(dataInfo.getRecordList());
-                    mFragment.selectItemByCardId(dataInfo.getCardId());
-                    removeDialog(DIALOG_WAITING);
-                    refreshCardIDCache();
-                    mRecordList.onRefreshComplete();
-                }
-            });
-
-        }
-
-        @Override
-        public void onError(final String errorMessage) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSendButton.setEnabled(true);
-                    removeDialog(DIALOG_WAITING);
-                    if (!isCanceled) {
-                        Toast.makeText(ConsumerRecordsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                    } else {
-                        isCanceled = false;
-                    }
-                    mRecordList.onRefreshComplete();
-                }
-            });
-
-        }
     }
 
     private static class RecordItemHolder {

@@ -4,33 +4,19 @@ import java.util.ArrayList;
 
 import org.ksoap2.serialization.SoapObject;
 
-import com.telepathic.finder.sdk.BusLineListener;
 import com.telepathic.finder.sdk.BusLineRoute;
 
-public class BusLineRouteRequest extends RPCRequest {
+public class BusLineRouteRequest extends RPCBaseRequest {
 
     private static final String METHOD_NAME = "getBusLineRoute";
 
-    private static final String RESPONSE_NAME = "getBusLineRouteResult";
-
-    private BusLineListener mListener;
-
-    public BusLineRouteRequest(String line, BusLineListener listener) {
+    public BusLineRouteRequest(String line) {
         super(METHOD_NAME);
         addParameter("busLine", line);
-        mListener = listener;
-    }
-
-    @Override
-    protected String getResponseName() {
-        return RESPONSE_NAME;
     }
 
     @Override
     protected void handleError(String errorMessage) {
-        if (mListener != null) {
-            mListener.onError(errorMessage);
-        }
     }
 
     /*
@@ -46,9 +32,6 @@ public class BusLineRouteRequest extends RPCRequest {
         for (int i = 0; i < newDataSet.getPropertyCount(); i++) {
             dataEntry = (SoapObject) newDataSet.getProperty(i);
             busLine.add(new BusLineRoute(dataEntry));
-        }
-        if (mListener != null) {
-            mListener.onSuccess(busLine);
         }
     }
 

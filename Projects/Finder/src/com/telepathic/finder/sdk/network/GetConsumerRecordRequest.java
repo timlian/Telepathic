@@ -1,28 +1,22 @@
 package com.telepathic.finder.sdk.network;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.ksoap2.serialization.SoapObject;
 
-import android.util.Log;
-
 import com.telepathic.finder.sdk.ConsumerRecord;
-import com.telepathic.finder.sdk.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ConsumptionInfo;
 import com.telepathic.finder.sdk.CountConsumerRecord;
 import com.telepathic.finder.sdk.EWalletConsumerRecord;
-import com.telepathic.finder.sdk.store.ConsumptionStore;
+import com.telepathic.finder.sdk.TrafficeMonitor;
 import com.telepathic.finder.util.Utils;
 
-public class BusConsumerRecordRequest extends RPCRequest {
+public class GetConsumerRecordRequest extends RPCBaseRequest {
     private static final String METHOD_NAME = "getConsumerRecords";
-    private static final String RESPONSE_NAME = "getConsumerRecordsResult";
-
-    private static final String KEY_CARD_ID = "cardID";
-    private static final String KEY_COUNT = "count";
 
     // consumer records constant keys
+    private static final String KEY_CARD_ID = "cardID";
+    private static final String KEY_COUNT   = "count";
     private static final String KEY_LINE_NUMBER    = "lineNumber";
     private static final String KEY_BUS_NUMBER     = "busNumber";
     private static final String KEY_CONSUMER_TIME  = "consumerTime";
@@ -31,27 +25,18 @@ public class BusConsumerRecordRequest extends RPCRequest {
     private static final String KEY_CONSUMER_AMOUNT = "consumerAmount";
     private static final String KEY_RESIDUAL_AMOUNT = "residualAmount";
 
-    private ConsumerRecordsListener mListener;
-    private ConsumptionStore mStore;
+    private TrafficeMonitor mTrafficeMonitor;
 
-    public BusConsumerRecordRequest(String cardId, int count, ConsumerRecordsListener listener, ConsumptionStore store) {
+    public GetConsumerRecordRequest(TrafficeMonitor monitor, String cardId, int count) {
         super(METHOD_NAME);
         addParameter(KEY_CARD_ID, cardId);
         addParameter(KEY_COUNT, String.valueOf(count + 1));
-        mStore = store;
-        mListener = listener;
-    }
-
-    @Override
-    protected String getResponseName() {
-        return RESPONSE_NAME;
+        mTrafficeMonitor = monitor;
     }
 
     @Override
     protected void handleError(String errorMessage) {
-        if (mListener != null) {
-            mListener.onError(errorMessage);
-        }
+
     }
 
     /*
@@ -73,7 +58,6 @@ public class BusConsumerRecordRequest extends RPCRequest {
         }
         for(int idx = 0; idx < count ; idx++) {
             dataEntry = (SoapObject) newDataSet.getProperty(idx);
-            Log.d("T", dataEntry.toString());
             try {
                 dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT);
                 record = new CountConsumerRecord();
@@ -109,22 +93,10 @@ public class BusConsumerRecordRequest extends RPCRequest {
             }
             consumerRecords.add(record);
         }
+        
         info.setRecordList(consumerRecords);
 
-        if (mListener != null) {
-            mListener.onSuccess(info);
-        }
-
-        for (ConsumerRecord consumerRecord : consumerRecords) {
-            mStore.insertRecord(consumerRecord);
-        }
-
-        try {
-            Utils.copyAppDatabaseFiles("com.telepathic.finder");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        mTrafficeMonitor.setUpdate(info);
     }
 
 }

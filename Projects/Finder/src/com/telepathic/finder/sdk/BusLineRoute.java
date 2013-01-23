@@ -40,11 +40,11 @@ public class BusLineRoute extends BusEntity implements BusLineRouteKeys {
         String[] stationAliases = object.getPrimitivePropertyAsString(KEY_STATIONS_ALIASES).split(",");
         ArrayList<BusStation> stations = new ArrayList<BusStation>();
         for(int i = 0; i < stationNames.length; i++) {
-            BusStation station = new BusStation();
-            station.setName(stationNames[i]);
-            station.setAlias(stationAliases[i]);
-            station.setIndex(i);
-            stations.add(station);
+//            BusStation station = new BusStation();
+//            station.setName(stationNames[i]);
+//            station.setAlias(stationAliases[i]);
+//            station.setIndex(i);
+//            stations.add(station);
         }
         setValue(KEY_STATIONS, stations);
     }

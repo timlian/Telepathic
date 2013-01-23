@@ -2,7 +2,7 @@ package com.telepathic.finder.sdk.network;
 
 import org.ksoap2.serialization.SoapObject;
 
-public class BusStationLinesRequest extends RPCRequest {
+public class BusStationLinesRequest extends RPCBaseRequest {
     private static final String METHOD_NAME = "getBusStationLines";
 
     private static final String KEY_BUS_STATION = "busStation";
@@ -14,12 +14,6 @@ public class BusStationLinesRequest extends RPCRequest {
         addParameter(KEY_BUS_STATION, busStation);
         addParameter(KEY_PAGE_INDEX, pageIndex);
         addParameter(KEY_PAGE_SIZE, pageSize);
-    }
-
-
-    @Override
-    protected String getResponseName() {
-        return null;
     }
 
     @Override

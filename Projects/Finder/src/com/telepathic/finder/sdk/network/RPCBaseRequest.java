@@ -4,32 +4,31 @@ import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 
-abstract class RPCRequest {
+abstract class RPCBaseRequest {
 
     private static final String NAMESPACE = "http://tempuri.org/";
 
     private static final String KEY_DIFF_GRAM = "diffgram";
     private static final String KEY_NEW_DATA_SET = "NewDataSet";
     private static final String KEY_DOCUMENT_ELEMENT = "DocumentElement";
+    private static final String KEY_ERROR_CODE = "code";
+    private static final String KEY_ERROR_MESSAGE = "msg";
 
-    protected static final String KEY_ERROR_CODE = "code";
-    protected static final String KEY_ERROR_MESSAGE = "msg";
-
-    protected static final int NO_ERROR = 200;
-
+    private static final int NO_ERROR = 200;
+    
+    private String mRpcMethodName;
     private SoapObject mRpc;
 
-    public RPCRequest(String name) {
-        mRpc = new SoapObject(NAMESPACE, name);
+    public RPCBaseRequest(String name) {
+    	mRpcMethodName = name;
+        mRpc = new SoapObject(NAMESPACE, mRpcMethodName);
     }
 
-    protected abstract String getResponseName();
+    abstract void handleError(String errorMessage);
 
-    protected abstract void handleError(String errorMessage);
+    abstract void handleResponse(SoapObject dataSet);
 
-    protected abstract void handleResponse(SoapObject dataSet);
-
-    protected void addParameter(String key, Object value) {
+    void addParameter(String key, Object value) {
         if (key == null) {
             throw new IllegalArgumentException("The parameter key is null.");
         }
@@ -81,7 +80,7 @@ abstract class RPCRequest {
     }
 
     private void process(SoapObject result) {
-        final SoapObject response = (SoapObject) result.getProperty(getResponseName());
+        final SoapObject response = (SoapObject) result.getProperty(getRpcResultTag());
         if (response != null) {
             final SoapObject diffGram = (SoapObject) response.getProperty(KEY_DIFF_GRAM);
             if (diffGram != null) {
@@ -109,6 +108,10 @@ abstract class RPCRequest {
         }
     }
 
+    private String getRpcResultTag() {
+    	return mRpcMethodName + "Result";
+    }
+    
     private static boolean isValidDataEntry(SoapObject dataEntry) {
         boolean isValid = false;
         if (dataEntry.getPropertyCount() <= 2) {
