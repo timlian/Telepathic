@@ -22,7 +22,7 @@ import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.network.GetBusLocationRequest;
 import com.telepathic.finder.sdk.traffic.network.GetConsumerRecordRequest;
 import com.telepathic.finder.sdk.traffic.network.NetworkManager;
-import com.telepathic.finder.sdk.traffic.store.ConsumptionStore;
+import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
 import com.telepathic.finder.util.Utils;
 
 public class TrafficManager {
@@ -33,14 +33,14 @@ public class TrafficManager {
     private MKSearch mMapSearch;
     
     private NetworkManager mNetWorkAdapter;
-    private ConsumptionStore mConsumptionStore;
+    private TrafficeStore mConsumptionStore;
     private TrafficeMonitor mTrafficeMonitor;
     private MyConsumerRecordsListener mConsumerRecordsListener;
 
     private TrafficManager(BMapManager manager, Context appContext) {
     	mAppContext = appContext;
         mNetWorkAdapter = new NetworkManager();
-        mConsumptionStore =  ConsumptionStore.getDefaultStore(mAppContext);
+        mConsumptionStore =  TrafficeStore.getDefaultStore(mAppContext);
         mMapSearch = new MKSearch();
         mMapSearch.init(manager, new MapSearchListener());
         mTrafficeMonitor = new TrafficeMonitor();
@@ -53,7 +53,7 @@ public class TrafficManager {
         return mInstance;
     }
     
-    public ConsumptionStore getConsumptionStore() {
+    public TrafficeStore getConsumptionStore() {
     	return mConsumptionStore;
     }
     

@@ -2,8 +2,6 @@ package com.telepathic.finder.app;
 
 import java.util.ArrayList;
 
-import javax.xml.transform.ErrorListener;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -26,9 +24,9 @@ import com.telepathic.finder.app.CardIdFragment.OnCardSelectedListener;
 import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
 import com.telepathic.finder.sdk.traffic.TrafficManager;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;

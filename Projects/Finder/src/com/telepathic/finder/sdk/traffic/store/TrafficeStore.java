@@ -14,23 +14,30 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
 import com.telepathic.finder.sdk.traffic.CountConsumerRecord;
 import com.telepathic.finder.sdk.traffic.EWalletConsumerRecord;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
-import com.telepathic.finder.sdk.traffic.store.Store.ConsumptionColumns;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteColumns;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteStationColumns;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusStationColumns;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.ConsumerRecordsColumns;
 import com.telepathic.finder.util.Utils;
 
 /**
  * @author Tim.Lian
  */
-public class ConsumptionStore {
+public class TrafficeStore {
 
-    private static final String TAG = ConsumptionStore.class.getSimpleName();
+    private static final String TAG = TrafficeStore.class.getSimpleName();
 
     private static final int DB_VERSION = 1;
     private static final String DB_NAME = "finder.db";
-    private static final String TABLE_NAME = "consumption";
+    
+    private static final String TABLE_CONSUMER_RECORD = "consumerRecord";
+    private static final String TABLE_BUS_ROUTE = "busRoute";
+    private static final String TABLE_BUS_STATION = "busStation";
+    private static final String TABLE_BUS_ROUTE_STATION = "busRouteStation";
 
     //conlumn index
     private static final int IDX_ROW_ID  = 0;
@@ -44,18 +51,18 @@ public class ConsumptionStore {
 
     private final DbHelper dbHelper;
 
-    private static ConsumptionStore defaultStore;
+    private static TrafficeStore defaultStore;
 
     private final Object mLock = new Object();
 
-    public static synchronized ConsumptionStore getDefaultStore(Context context) {
+    public static synchronized TrafficeStore getDefaultStore(Context context) {
         if (defaultStore == null) {
-            defaultStore = new ConsumptionStore(context);
+            defaultStore = new TrafficeStore(context);
         }
         return defaultStore;
     }
 
-    private ConsumptionStore(Context context) {
+    private TrafficeStore(Context context) {
         dbHelper = new DbHelper(context);
         Log.i(TAG, "Initialized data");
     }
@@ -65,13 +72,13 @@ public class ConsumptionStore {
             long result = -1;
             if (record != null) {
                 ContentValues values = new ContentValues();
-                values.put(ConsumptionColumns.CARD_ID, record.getCardId());
-                values.put(ConsumptionColumns.BUS_LINE_NUMBER, record.getLineNumber());
-                values.put(ConsumptionColumns.LICENSE_PLATE_NUMBER, record.getBusNumber());
-                values.put(ConsumptionColumns.CONSUMPTION_TIME, Utils.formatDate(record.getConsumerTime()));
-                values.put(ConsumptionColumns.CONSUMPTION, record.getConsumption());
-                values.put(ConsumptionColumns.RESIDUAL, record.getResidual());
-                values.put(ConsumptionColumns.CONSUMPTION_TYPE, record.getType().toString());
+                values.put(ConsumerRecordsColumns.CARD_NUMBER, record.getCardId());
+                values.put(ConsumerRecordsColumns.LINE_NUMBER, record.getLineNumber());
+                values.put(ConsumerRecordsColumns.BUS_NUMBER, record.getBusNumber());
+                values.put(ConsumerRecordsColumns.DATE, Utils.formatDate(record.getConsumerTime()));
+                values.put(ConsumerRecordsColumns.CONSUMPTION, record.getConsumption());
+                values.put(ConsumerRecordsColumns.RESIDUAL, record.getResidual());
+                values.put(ConsumerRecordsColumns.TYPE, record.getType().toString());
                 result = insertOrIgnore(values);
             }
             return result;
@@ -82,7 +89,7 @@ public class ConsumptionStore {
         synchronized (mLock) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             try {
-                db.delete(TABLE_NAME, null, null);
+                db.delete(TABLE_CONSUMER_RECORD, null, null);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -96,7 +103,7 @@ public class ConsumptionStore {
             long retID = -1;
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             try {
-                retID = db.insertWithOnConflict(TABLE_NAME, null, values,
+                retID = db.insertWithOnConflict(TABLE_CONSUMER_RECORD, null, values,
                         SQLiteDatabase.CONFLICT_IGNORE);
             } catch (Exception e) {
                 Log.e(TAG, "Insertion failed: " + e.getLocalizedMessage());
@@ -145,10 +152,10 @@ public class ConsumptionStore {
             ArrayList<ConsumerRecord> records = new ArrayList<ConsumerRecord>();
             SQLiteDatabase db = dbHelper.getReadableDatabase();
             try {
-                Cursor cursor = db.query(TABLE_NAME, null,
-                        ConsumptionColumns.CARD_ID + " like " + "\'%" + cardId
+                Cursor cursor = db.query(TABLE_CONSUMER_RECORD, null,
+                        ConsumerRecordsColumns.CARD_NUMBER + " like " + "\'%" + cardId
                         + "%\'", null, null, null,
-                        ConsumptionColumns.CONSUMPTION_TIME + " DESC");
+                        ConsumerRecordsColumns.DATE + " DESC");
                 //cursor.setNotificationUri(null, null);
                 if (cursor != null) {
                     try {
@@ -182,8 +189,6 @@ public class ConsumptionStore {
     }
 
     class DbHelper extends SQLiteOpenHelper {
-        static final String TAG = "DbHelper";
-
         Context context;
 
         public DbHelper(Context context) {
@@ -194,28 +199,58 @@ public class ConsumptionStore {
         // Called only once, first time the DB is created
         @Override
         public void onCreate(SQLiteDatabase db) {
-            String sql = "CREATE TABLE " + TABLE_NAME + " ("
-                    + ConsumptionColumns._ID + " integer primary key, "
-                    + ConsumptionColumns.CARD_ID + " text, "
-                    + ConsumptionColumns.BUS_LINE_NUMBER + " text, "
-                    + ConsumptionColumns.LICENSE_PLATE_NUMBER + " text, "
-                    + ConsumptionColumns.CONSUMPTION_TIME + " text, "
-                    + ConsumptionColumns.CONSUMPTION + " text, "
-                    + ConsumptionColumns.RESIDUAL + " text, "
-                    + ConsumptionColumns.CONSUMPTION_TYPE + " text, "
-                    + "UNIQUE (" + ConsumptionColumns.CARD_ID + ", "
-                    + ConsumptionColumns.CONSUMPTION_TIME + " )"+ " )";
-            db.execSQL(sql);
-            Log.d(TAG, "onCreated sql: " + sql);
+            String createTableSql1 = "CREATE TABLE " + TABLE_CONSUMER_RECORD + " ("
+                    + ConsumerRecordsColumns._ID + " integer primary key, "
+                    + ConsumerRecordsColumns.CARD_NUMBER + " text, "
+                    + ConsumerRecordsColumns.LINE_NUMBER + " text, "
+                    + ConsumerRecordsColumns.BUS_NUMBER + " text, "
+                    + ConsumerRecordsColumns.DATE + " text, "
+                    + ConsumerRecordsColumns.CONSUMPTION + " text, "
+                    + ConsumerRecordsColumns.RESIDUAL + " text, "
+                    + ConsumerRecordsColumns.TYPE + " text, "
+                    + "UNIQUE (" + ConsumerRecordsColumns.CARD_NUMBER + ", "
+                    + ConsumerRecordsColumns.DATE + " )"+ " )";
+            
+            String createTableSql2 = "CREATE TABLE " + TABLE_BUS_ROUTE + " ("
+                    + BusRouteColumns._ID + " integer primary key, "
+                    + BusRouteColumns.DIRECTION + " text, "
+                    + BusRouteColumns.LINE_NUMBER + " text, "
+                    + BusRouteColumns.DEPARTURE_TIME + " text, "
+                    + BusRouteColumns.CLOSE_OFF_TIME + " text)";
+            
+            String createTableSql3 = "CREATE TABLE " + TABLE_BUS_STATION + " ("
+                    + BusStationColumns._ID + " integer primary key, "
+                    + BusStationColumns.NAME + " text, "
+                    + BusStationColumns.GPS_NUMBER + " text, "
+                    + BusStationColumns.LONGITUDE + " text, "
+                    + BusStationColumns.LATITUDE + " text)";
+            
+            String createTableSql4 = "CREATE TABLE " + TABLE_BUS_ROUTE_STATION + " ("
+                    + BusRouteStationColumns.ROUTE_ID + " INTEGER, "
+                    + BusRouteStationColumns.STATION_ID + " INTEGER, "
+                    + BusRouteStationColumns.INDEX + " INTEGER)";
+            
+            Utils.debug(TAG, "onCreated sql: " + createTableSql1);
+            db.execSQL(createTableSql1);
+            Utils.debug(TAG, "onCreated sql: " + createTableSql2);
+            db.execSQL(createTableSql2);
+            Utils.debug(TAG, "onCreated sql: " + createTableSql3);
+            db.execSQL(createTableSql3);
+            Utils.debug(TAG, "onCreated sql: " + createTableSql4);
+            db.execSQL(createTableSql4);
         }
 
         // Called whenever newVersion != oldVersion
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("drop table if exists " + TABLE_NAME); // drops the old
-            // database
-            Log.d(TAG, "onUpgrade");
+        	Utils.debug(TAG, "onUpgrade");
+        	// drops the old tables
+            db.execSQL("drop table if exists " + TABLE_CONSUMER_RECORD); 
+            db.execSQL("drop table if exists " + TABLE_BUS_ROUTE); 
+            db.execSQL("drop table if exists " + TABLE_BUS_STATION); 
+            db.execSQL("drop table if exists " + TABLE_BUS_ROUTE_STATION); 
             onCreate(db);
         }
     }
+    
 }
