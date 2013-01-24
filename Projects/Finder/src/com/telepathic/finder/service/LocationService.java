@@ -4,7 +4,7 @@
 
 package com.telepathic.finder.service;
 
-import com.telepathic.finder.util.ClientLog;
+import com.telepathic.finder.util.Utils;
 
 import android.app.Service;
 import android.content.Context;
@@ -79,16 +79,16 @@ public class LocationService extends Service {
         Location lastGpsLocation = null;
         if (isGpsProviderEnabled ) {
             lastGpsLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (ClientLog.DEBUG && lastGpsLocation != null) {
-                ClientLog.debug(TAG, "last location from gps: " + lastGpsLocation.getLatitude() + ", " + lastGpsLocation.getLongitude());
+            if (lastGpsLocation != null) {
+            	Utils.debug(TAG, "last location from gps: " + lastGpsLocation.getLatitude() + ", " + lastGpsLocation.getLongitude());
             }
         }
 
         Location lastNetworkLocation = null;
         if (isNetworkProviderEnabled) {
             lastNetworkLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if (ClientLog.DEBUG && lastNetworkLocation != null) {
-                Log.d(TAG, "last location from network: " + lastNetworkLocation.getLatitude() + ", " + lastNetworkLocation.getLongitude());
+            if (lastNetworkLocation != null) {
+            	Utils.debug(TAG, "last location from network: " + lastNetworkLocation.getLatitude() + ", " + lastNetworkLocation.getLongitude());
             }
         }
 

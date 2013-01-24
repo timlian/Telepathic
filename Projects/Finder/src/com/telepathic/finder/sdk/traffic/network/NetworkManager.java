@@ -10,7 +10,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
-import com.telepathic.finder.util.ClientLog;
+import com.telepathic.finder.util.Utils;
 
 public class NetworkManager {
     private static final String TAG = "NetWorkAdapter";
@@ -59,9 +59,7 @@ public class NetworkManager {
             throw new IllegalArgumentException("Request is NULL!");
         }
         SoapObject rpcMessage = request.getSoapMessage();
-        if (ClientLog.DEBUG) {
-            Log.d(TAG, "Sent Request: " + rpcMessage.toString());
-        }
+        Utils.debug(TAG, "Sent Request: " + rpcMessage.toString());
         SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(110);
         soapEnvelope.bodyOut = rpcMessage;
         soapEnvelope.dotNet  = true;
@@ -70,8 +68,8 @@ public class NetworkManager {
         String errorMessage = null;
         try {
             localHttpTransportSE.call(request.getSoapAction(), soapEnvelope);
-            if (ClientLog.DEBUG && soapEnvelope.bodyIn != null) {
-                Log.d(TAG, "Received Response: " + soapEnvelope.bodyIn.toString());
+            if (soapEnvelope.bodyIn != null) {
+            	Utils.debug(TAG, "Received Response: " + soapEnvelope.bodyIn.toString());
             }
         } catch (Exception e) {
             errorMessage = e.getLocalizedMessage();
