@@ -58,10 +58,6 @@ public class TrafficManager {
         return mInstance;
     }
 
-    public ConsumptionStore getConsumptionStore() {
-        return mConsumptionStore;
-    }
-
     public ITrafficService getTrafficService() {
         return new TrafficeService();
     }
@@ -90,6 +86,10 @@ public class TrafficManager {
         // // TODO Auto-generated method stub
         //
         // }
+        @Override
+        public ConsumptionStore getConsumptionStore() {
+            return mConsumptionStore;
+        }
 
         @Override
         public void getBusLocation(String lineNumber, String anchorStation, String lastStation) {

@@ -2,8 +2,6 @@ package com.telepathic.finder.app;
 
 import java.util.ArrayList;
 
-import javax.xml.transform.ErrorListener;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -26,9 +24,9 @@ import com.telepathic.finder.app.CardIdFragment.OnCardSelectedListener;
 import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
 import com.telepathic.finder.sdk.traffic.TrafficManager;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
@@ -47,11 +45,11 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private ArrayList<String> mCardIdList;
 
     private ITrafficService mTrafficService;
-    
+
     private ITrafficListeners.ErrorListener mErrorListener = new ITrafficListeners.ErrorListener() {
-		@Override
-		public void done(final String error) {
-			runOnUiThread(new Runnable() {
+        @Override
+        public void done(final String error) {
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
@@ -64,31 +62,31 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                     mRecordList.onRefreshComplete();
                 }
             });
-		}
-	};
-	
-	private ITrafficListeners.ConsumerRecordsListener mConsumerRecordsListener = new ITrafficListeners.ConsumerRecordsListener() {
-		
-		@Override
-		public void onReceived(final ConsumptionInfo dataInfo) {
-			 runOnUiThread(new Runnable() {
-                 @Override
-                 public void run() {
-                     mSendButton.setEnabled(true);
-                     Utils.addCachedCards(ConsumerRecordsActivity.this, dataInfo.getCardId());
-                     String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
-                     String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
-                     mResidualCountText.setText(resiaualCount);
-                     mResidualAmountText.setText(resiaualAmount);
-                     mListAdapter.updateRecords(dataInfo.getRecordList());
-                     mFragment.selectItemByCardId(dataInfo.getCardId());
-                     removeDialog(DIALOG_WAITING);
-                     refreshCardIDCache();
-                     mRecordList.onRefreshComplete();
-                 }
-             });
-		}
-	};
+        }
+    };
+
+    private ITrafficListeners.ConsumerRecordsListener mConsumerRecordsListener = new ITrafficListeners.ConsumerRecordsListener() {
+
+        @Override
+        public void onReceived(final ConsumptionInfo dataInfo) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSendButton.setEnabled(true);
+                    Utils.addCachedCards(ConsumerRecordsActivity.this, dataInfo.getCardId());
+                    String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
+                    String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+                    mResidualCountText.setText(resiaualCount);
+                    mResidualAmountText.setText(resiaualAmount);
+                    mListAdapter.updateRecords(dataInfo.getRecordList());
+                    mFragment.selectItemByCardId(dataInfo.getCardId());
+                    removeDialog(DIALOG_WAITING);
+                    refreshCardIDCache();
+                    mRecordList.onRefreshComplete();
+                }
+            });
+        }
+    };
 
     private volatile boolean isCanceled = false;
 
@@ -149,28 +147,28 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         super.onResume();
         mTrafficService.getTrafficMonitor().add(mErrorListener);
         mTrafficService.getTrafficMonitor().add(mConsumerRecordsListener);
-        
+
     }
 
     @Override
     protected void onPause() {
-    	super.onPause();
-    	mTrafficService.getTrafficMonitor().remove(mErrorListener);
-    	mTrafficService.getTrafficMonitor().remove(mConsumerRecordsListener);
+        super.onPause();
+        mTrafficService.getTrafficMonitor().remove(mErrorListener);
+        mTrafficService.getTrafficMonitor().remove(mConsumerRecordsListener);
     }
-    
+
     private void selectConsumptionRecordsByIndex(int index){
         selectConsumptionRecordsByCardId(mCardIdList.get(index));
     }
 
     private void selectConsumptionRecordsByCardId(String cardId){
         mEditText.setText(null);
-        //ConsumptionInfo dataInfo = mTrafficService.getConsumptionStore().getConsumptionInfo(cardId);
-//        String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
-//        String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
-//        mResidualCountText.setText(resiaualCount);
-//        mResidualAmountText.setText(resiaualAmount);
-//        mListAdapter.updateRecords(dataInfo.getRecordList());
+        ConsumptionInfo dataInfo = mTrafficService.getConsumptionStore().getConsumptionInfo(cardId);
+        String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
+        String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+        mResidualCountText.setText(resiaualCount);
+        mResidualAmountText.setText(resiaualAmount);
+        mListAdapter.updateRecords(dataInfo.getRecordList());
     }
 
     private void refreshCardIDCache(){
@@ -192,7 +190,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 @Override
                 public void onCancel(DialogInterface dialog) {
                     isCanceled = true;
-                  //  mTrafficService.cancelRetrieve();
+                    //  mTrafficService.cancelRetrieve();
                     mSendButton.setEnabled(true);
                 }
             });
