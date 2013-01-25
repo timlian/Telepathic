@@ -80,9 +80,8 @@ public interface ITrafficService {
      */
     public ITrafficMonitor getTrafficMonitor();
     /**
-     * Get the consumption store
-     * @return ConsumptionStore
+     * 
+     * @return
      */
-    public TrafficeStore getConsumptionStore();
-
+    public TrafficeStore getTrafficeStore();
 }

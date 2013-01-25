@@ -30,6 +30,8 @@ public class Utils {
     private static final boolean DEBUG = true;
 
     private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([aAbBcCdD])?";
+    
+    private static final String BUS_CARD_NUM_EXPRESSION = "\\d{8}";
 
     private static final String START_WITH_ZERO_EXPRESSION = "^0+";
 
@@ -66,6 +68,16 @@ public class Utils {
         return ret;
     }
 
+    public static boolean isValidBusCardNumber(String number) {
+        boolean ret = false;
+        if (number != null) {
+            final String busCardNumber = number.trim();
+            if (number.length() != 0) {
+                ret = busCardNumber.matches(BUS_CARD_NUM_EXPRESSION);
+            }
+        }
+        return ret;
+    }
     public static ArrayList<String> parseBusLineNumber(String text) {
         Pattern p = Pattern.compile(BUS_LINE_NUM_EXPRESSION);
         Matcher m = p.matcher(text);

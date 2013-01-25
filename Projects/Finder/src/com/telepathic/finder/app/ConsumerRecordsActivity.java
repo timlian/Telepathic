@@ -22,8 +22,8 @@ import android.widget.Toast;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.CardIdFragment.OnCardSelectedListener;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
-import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
+import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
@@ -32,7 +32,7 @@ import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
 public class ConsumerRecordsActivity extends FragmentActivity {
-    private static final String TAG = "ConsumerRecordsActivity";
+    private static final String TAG = ConsumerRecordsActivity.class.getSimpleName();
 
     private Button mSendButton;
     private TextView mResidualCountText;
@@ -43,139 +43,107 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private CardIdFragment mFragment;
     private ArrayList<String> mCardIdList;
     private ProgressDialog mWaitingDialog;
-    
 	private MessageDispatcher mMessageDispatcher;
-
     private ITrafficService mTrafficService;
-
-    private ITrafficListeners.ErrorListener mErrorListener = new ITrafficListeners.ErrorListener() {
-        @Override
-        public void done(final String error) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSendButton.setEnabled(true);
-                    mWaitingDialog.dismiss();
-                    if (!isCanceled) {
-                        Toast.makeText(ConsumerRecordsActivity.this, error, Toast.LENGTH_LONG).show();
-                    } else {
-                        isCanceled = false;
-                    }
-                    mRecordList.onRefreshComplete();
-                }
-            });
-        }
-    };
-
-    private ITrafficListeners.ConsumerRecordsListener mConsumerRecordsListener = new ITrafficListeners.ConsumerRecordsListener() {
-
-        @Override
-        public void onReceived(final ConsumptionInfo dataInfo) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSendButton.setEnabled(true);
-                    Utils.addCachedCards(ConsumerRecordsActivity.this, dataInfo.getCardId());
-                    String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
-                    String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
-                    mResidualCountText.setText(resiaualCount);
-                    mResidualAmountText.setText(resiaualAmount);
-                    mListAdapter.updateRecords(dataInfo.getRecordList());
-                    mFragment.selectItemByCardId(dataInfo.getCardId());
-                    mWaitingDialog.dismiss();
-                    refreshCardIDCache();
-                    mRecordList.onRefreshComplete();
-                }
-            });
-        }
-    };
-
     private volatile boolean isCanceled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.consumer_records);
-
         FinderApplication app = (FinderApplication) getApplication();
-        
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
+		mMessageDispatcher.add(new IMessageHandler() {
+			@Override
+			public int what() {
+				return ITrafficeMessage.RECEIVED_CONSUMER_RECORDS;
+			}
 
-        mEditText = (AutoCompleteTextView) findViewById(R.id.searchkey);
-        mSendButton = (Button) findViewById(R.id.search);
-        mSendButton.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                String cardId = mEditText.getText().toString();
-                if (cardId.length() == 8) {
-                    mTrafficService.getConsumerRecords(cardId, 30);
-                    mMessageDispatcher.add(new IMessageHandler() {
-						@Override
-						public void handleMessage(Message msg) {
-							Utils.debug(TAG, "getConsumerRecords received: " + msg.obj.toString());
-						}
-					});
-                    mSendButton.setEnabled(false);
-                    Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
-                    mWaitingDialog.show();
-                } else {
-                    mEditText.setError(getResources().getString(R.string.card_id_error_notice));
-                }
-            }
-        });
-        refreshCardIDCache();
-
-        mListAdapter = new ConsumerRecordsAdapter();
-        mRecordList = (DropRefreshListView) findViewById(R.id.consumer_record_list);
-        mRecordList.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mTrafficService.getConsumerRecords(mFragment.getSelectedCardId(), 30);
-            }
-        });
-        mRecordList.setAdapter(mListAdapter);
-
-        mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
-        mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
-
-        mFragment = (CardIdFragment)getSupportFragmentManager().findFragmentById(R.id.card_id_list);
-        mFragment.setOnCardSelectedListener(new OnCardSelectedListener() {
-            @Override
-            public void onCardSelected(String cardId) {
-                selectConsumptionRecordsByCardId(cardId);
-            }
-        });
-
-        if (mCardIdList.size() > 0){
-            selectConsumptionRecordsByIndex(0);
-        }
-        mWaitingDialog = createWaitingDialog();
+			@Override
+			public void handleMessage(Message msg) {
+				mSendButton.setEnabled(true);
+				mWaitingDialog.dismiss();
+				final int errorCode = msg.arg2;
+				if (errorCode == 0) {
+					ConsumptionInfo dataInfo = (ConsumptionInfo) msg.obj;
+					onReceived(dataInfo);
+				} else {
+					showMessage("Get consumer records failed: " + errorCode);
+				}
+			}
+		});
+		
+        initView();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mTrafficService.getTrafficMonitor().add(mErrorListener);
-        mTrafficService.getTrafficMonitor().add(mConsumerRecordsListener);
-
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mTrafficService.getTrafficMonitor().remove(mErrorListener);
-        mTrafficService.getTrafficMonitor().remove(mConsumerRecordsListener);
+    private void initView() {
+    	 mEditText = (AutoCompleteTextView) findViewById(R.id.searchkey);
+         mSendButton = (Button) findViewById(R.id.search);
+         mSendButton.setOnClickListener(new OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 String cardId = mEditText.getText().toString();
+                 if (Utils.isValidBusCardNumber(cardId)) {
+                     mTrafficService.getConsumerRecords(cardId, 30);
+                     mSendButton.setEnabled(false);
+                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
+                     mWaitingDialog.show();
+                 } else {
+                     mEditText.setError(getResources().getString(R.string.card_id_error_notice));
+                 }
+             }
+         });
+         
+         refreshCardIDCache();
+         mListAdapter = new ConsumerRecordsAdapter();
+         mRecordList = (DropRefreshListView) findViewById(R.id.consumer_record_list);
+         mRecordList.setOnRefreshListener(new OnRefreshListener() {
+             @Override
+             public void onRefresh() {
+                 mTrafficService.getConsumerRecords(mFragment.getSelectedCardId(), 30);
+             }
+         });
+         mRecordList.setAdapter(mListAdapter);
+         mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
+         mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
+         mFragment = (CardIdFragment)getSupportFragmentManager().findFragmentById(R.id.card_id_list);
+         mFragment.setOnCardSelectedListener(new OnCardSelectedListener() {
+             @Override
+             public void onCardSelected(String cardId) {
+                 selectConsumptionRecordsByCardId(cardId);
+             }
+         });
+         if (mCardIdList.size() > 0){
+             selectConsumptionRecordsByIndex(0);
+         }
+         mWaitingDialog = createWaitingDialog();
     }
-
+    
+    private void onReceived(ConsumptionInfo dataInfo) {
+    	Utils.addCachedCards(ConsumerRecordsActivity.this,dataInfo.getCardId());
+		String resiaualCount = getString(R.string.residual_count, dataInfo.getResidualCount());
+		String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+		mResidualCountText.setText(resiaualCount);
+		mResidualAmountText.setText(resiaualAmount);
+		mListAdapter.updateRecords(dataInfo.getRecordList());
+		mFragment.selectItemByCardId(dataInfo.getCardId());
+		refreshCardIDCache();
+		mRecordList.onRefreshComplete();
+    }
+    
     private void selectConsumptionRecordsByIndex(int index){
         selectConsumptionRecordsByCardId(mCardIdList.get(index));
     }
 
     private void selectConsumptionRecordsByCardId(String cardId){
         mEditText.setText(null);
-        ConsumptionInfo dataInfo = mTrafficService.getConsumptionStore().getConsumptionInfo(cardId);
+        ConsumptionInfo dataInfo = mTrafficService.getTrafficeStore().getConsumptionInfo(cardId);
         String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
         String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
         mResidualCountText.setText(resiaualCount);
@@ -275,6 +243,10 @@ public class ConsumerRecordsActivity extends FragmentActivity {
             holder.consumerTime.setText(Utils.formatDate(record.getConsumerTime()));
         }
 
+    }
+    
+    private void showMessage(String msgText) {
+    	Toast.makeText(this, msgText, Toast.LENGTH_SHORT).show();
     }
     
 }

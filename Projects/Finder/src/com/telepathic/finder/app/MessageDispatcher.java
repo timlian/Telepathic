@@ -19,6 +19,8 @@ public class MessageDispatcher {
 	
 	public interface IMessageHandler {
 		
+		public int what();
+		
 		public void handleMessage(Message msg);
 	}
 	
@@ -45,9 +47,12 @@ public class MessageDispatcher {
 		public void handleMessage(Message msg) {
 			Utils.debug(TAG, "handleMessage received: " + msg);
 			for(IMessageHandler msgHandler : mMessageHandlers) {
-				msgHandler.handleMessage(msg);
+				if (msgHandler.what() == msg.arg1) {
+					msgHandler.handleMessage(msg);
+				}
 			}
 		}
+		
 	}
 
 }

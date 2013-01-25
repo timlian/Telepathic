@@ -3,7 +3,6 @@ package com.telepathic.finder.sdk.traffic;
 
 import java.util.ArrayList;
 
-import android.R.interpolator;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.Handler;
@@ -25,6 +24,7 @@ import com.baidu.mapapi.MKWalkingRouteResult;
 import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficMonitor;
 import com.telepathic.finder.sdk.ITrafficService;
+import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.network.GetBusLocationRequest;
 import com.telepathic.finder.sdk.traffic.network.GetConsumerRecordRequest;
 import com.telepathic.finder.sdk.traffic.network.NetworkManager;
@@ -71,10 +71,6 @@ public class TrafficManager {
         return mInstance;
     }
     
-    public TrafficeStore getConsumptionStore() {
-    	return mTrafficeStore;
-    }
-
     public ITrafficService getTrafficService() {
         return new TrafficeService();
     }
@@ -103,11 +99,7 @@ public class TrafficManager {
         // // TODO Auto-generated method stub
         //
         // }
-        @Override
-        public TrafficeStore getConsumptionStore() {
-            return mTrafficeStore;
-        }
-
+        
         @Override
         public void getBusLocation(String lineNumber, String anchorStation, String lastStation) {
 
@@ -140,7 +132,12 @@ public class TrafficManager {
         public ITrafficMonitor getTrafficMonitor() {
             return mTrafficeMonitor;
         }
-
+        
+        @Override
+        public TrafficeStore getTrafficeStore() {
+        	return mTrafficeStore;
+        }
+        
         @Override
         public void getBusLocation(BusRoute route) {
             GetBusLocationRequest request = new GetBusLocationRequest(mTrafficeMonitor, route);
@@ -153,6 +150,8 @@ public class TrafficManager {
         @Override
         public void onReceived(ConsumptionInfo info) {
         	Message msg = Message.obtain();
+        	msg.arg1 = ITrafficeMessage.RECEIVED_CONSUMER_RECORDS;
+        	msg.arg2 = 0;
         	msg.obj = info;
         	mMessageHandler.sendMessage(msg);
             for (ConsumerRecord consumerRecord : info.getRecordList()) {
