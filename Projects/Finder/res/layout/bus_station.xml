@@ -5,6 +5,7 @@
     tools:context=".BusStationActivity" >
 
     <RelativeLayout
+        android:id="@+id/station_id_input_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -16,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:onClick="onFindBusStationClicked"
             android:text="@string/find" />
 
         <EditText
@@ -28,8 +30,10 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:layout_below="@id/station_id_input_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:background="#F0F0F0" >
 
         <com.telepathic.finder.view.HorizontialListView
             android:id="@+id/bus_line_list"

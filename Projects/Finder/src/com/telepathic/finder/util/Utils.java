@@ -28,7 +28,7 @@ import android.widget.EditText;
 public class Utils {
 
     private static final boolean DEBUG = true;
-    
+
     private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([aAbBcCdD])?";
 
     private static final String START_WITH_ZERO_EXPRESSION = "^0+";
@@ -262,16 +262,16 @@ public class Utils {
         SharedPreferences preferences = c.getSharedPreferences(Utils.CARD_ID_CACHE, Context.MODE_PRIVATE);
         preferences.edit().putString(cardId, cardId).commit();
     }
-    
-	public static void debug(String tag, String info) {
-		if (DEBUG) {
-			Log.i(tag, info);
-		}
-	}
 
-	public static void error(String tag, String errorMsg) {
-		if (DEBUG) {
-			Log.e(tag, errorMsg);
-		}
-	}
+    public static void debug(String tag, String info) {
+        if (DEBUG) {
+            Log.i(tag, info);
+        }
+    }
+
+    public static void error(String tag, String errorMsg) {
+        if (DEBUG) {
+            Log.e(tag, errorMsg);
+        }
+    }
 }
