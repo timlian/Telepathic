@@ -2,13 +2,10 @@ package com.telepathic.finder.app;
 
 import java.util.ArrayList;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -30,14 +27,12 @@ import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
-import com.telepathic.finder.sdk.traffic.TrafficManager;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
 public class ConsumerRecordsActivity extends FragmentActivity {
     private static final String TAG = "ConsumerRecordsActivity";
-    private static final int DIALOG_WAITING = 2;
 
     private Button mSendButton;
     private TextView mResidualCountText;
@@ -47,6 +42,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private ConsumerRecordsAdapter mListAdapter;
     private CardIdFragment mFragment;
     private ArrayList<String> mCardIdList;
+    private ProgressDialog mWaitingDialog;
     
 	private MessageDispatcher mMessageDispatcher;
 
@@ -59,7 +55,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     mSendButton.setEnabled(true);
-                    removeDialog(DIALOG_WAITING);
+                    mWaitingDialog.dismiss();
                     if (!isCanceled) {
                         Toast.makeText(ConsumerRecordsActivity.this, error, Toast.LENGTH_LONG).show();
                     } else {
@@ -86,7 +82,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                     mResidualAmountText.setText(resiaualAmount);
                     mListAdapter.updateRecords(dataInfo.getRecordList());
                     mFragment.selectItemByCardId(dataInfo.getCardId());
-                    removeDialog(DIALOG_WAITING);
+                    mWaitingDialog.dismiss();
                     refreshCardIDCache();
                     mRecordList.onRefreshComplete();
                 }
@@ -123,7 +119,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
 					});
                     mSendButton.setEnabled(false);
                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
-                    showDialog(DIALOG_WAITING);
+                    mWaitingDialog.show();
                 } else {
                     mEditText.setError(getResources().getString(R.string.card_id_error_notice));
                 }
@@ -155,7 +151,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         if (mCardIdList.size() > 0){
             selectConsumptionRecordsByIndex(0);
         }
-        Utils.debug(TAG, String.valueOf(System.identityHashCode(getMainLooper())));
+        mWaitingDialog = createWaitingDialog();
     }
 
     @Override
@@ -195,24 +191,20 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         mEditText.setAdapter(adapter);
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        if (id == DIALOG_WAITING) {
-            ProgressDialog prgDlg = new ProgressDialog(this);
-            prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            prgDlg.setMessage(getResources().getString(R.string.find_ic_card_records));
-            prgDlg.setIndeterminate(true);
-            prgDlg.setOnCancelListener(new OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    isCanceled = true;
-                    //  mTrafficService.cancelRetrieve();
-                    mSendButton.setEnabled(true);
-                }
-            });
-            return prgDlg;
-        }
-        return null;
+    private ProgressDialog createWaitingDialog() {
+    	ProgressDialog prgDlg = new ProgressDialog(this);
+        prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prgDlg.setMessage(getResources().getString(R.string.find_ic_card_records));
+        prgDlg.setIndeterminate(true);
+        prgDlg.setOnCancelListener(new OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isCanceled = true;
+                //  mTrafficService.cancelRetrieve();
+                mSendButton.setEnabled(true);
+            }
+        });
+        return prgDlg;
     }
 
     private static class RecordItemHolder {
