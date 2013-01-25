@@ -85,7 +85,7 @@ public interface ITrafficeStore {
 		/**
 		 * The station index in the route.
 		 */
-		public static final String INDEX = "index";
+		public static final String INDEX = "idx";
 	}
 	
 }

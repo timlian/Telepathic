@@ -1,5 +1,6 @@
 package com.telepathic.finder.app;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
@@ -394,6 +395,11 @@ public class BusLocationActivity extends MapActivity {
             mMapView.getController().animateTo(route.getRoute().getStart());
             mBtnSearch.setEnabled(true);
             mTrafficService.getBusLocation(route);
+            try {
+				Utils.copyAppDatabaseFiles(getPackageName());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	};
 	

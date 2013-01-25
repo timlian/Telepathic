@@ -79,10 +79,22 @@ public class TrafficeStore {
                 values.put(ConsumerRecordsColumns.CONSUMPTION, record.getConsumption());
                 values.put(ConsumerRecordsColumns.RESIDUAL, record.getResidual());
                 values.put(ConsumerRecordsColumns.TYPE, record.getType().toString());
-                result = insertOrIgnore(values);
+                result = insertOrIgnore(values, TABLE_CONSUMER_RECORD);
             }
             return result;
         }
+    }
+    
+    public long insertBusRoute(ContentValues route) {
+    	return insertOrIgnore(route, TABLE_BUS_ROUTE);
+    }
+    
+    public long insertBusStation(ContentValues station) {
+    	return insertOrIgnore(station, TABLE_BUS_STATION);
+    }
+    
+    public long insertBusRouteStation(ContentValues routeStation) {
+    	return insertOrIgnore(routeStation, TABLE_BUS_ROUTE_STATION);
     }
 
     public void deleteAllRecords() {
@@ -98,24 +110,19 @@ public class TrafficeStore {
         }
     }
 
-    private long insertOrIgnore(ContentValues values) {
-        synchronized (mLock) {
-            long retID = -1;
+    private long insertOrIgnore(ContentValues values, String table) {
+    	long rowId = -1;
+    	synchronized (mLock) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             try {
-                retID = db.insertWithOnConflict(TABLE_CONSUMER_RECORD, null, values,
-                        SQLiteDatabase.CONFLICT_IGNORE);
+            	rowId = db.insertWithOnConflict(table, null, values, SQLiteDatabase.CONFLICT_IGNORE);
             } catch (Exception e) {
-                Log.e(TAG, "Insertion failed: " + e.getLocalizedMessage());
+            	Utils.debug(TAG, "insertOrIgnore failed: " + e.getLocalizedMessage());
             } finally {
-                if (retID == -1) {
-                    Log.e(TAG, "Insertion failed: " + values.toString());
-                }
                 db.close();
             }
-            return retID;
-        }
-
+    	}
+        return rowId;
     }
 
     public ConsumptionInfo getConsumptionInfo(String cardId) {
@@ -228,7 +235,11 @@ public class TrafficeStore {
             String createTableSql4 = "CREATE TABLE " + TABLE_BUS_ROUTE_STATION + " ("
                     + BusRouteStationColumns.ROUTE_ID + " INTEGER, "
                     + BusRouteStationColumns.STATION_ID + " INTEGER, "
-                    + BusRouteStationColumns.INDEX + " INTEGER)";
+                    + BusRouteStationColumns.INDEX + " INTEGER, "
+                    + "FOREIGN KEY" + " (" + BusRouteStationColumns.ROUTE_ID + ") " 
+                    + "REFERENCES " + TABLE_BUS_ROUTE + "(" + BusRouteColumns._ID + "), "
+                    + "FOREIGN KEY" + " (" + BusRouteStationColumns.STATION_ID + ") "
+                    + "REFERENCES " + TABLE_BUS_STATION + "(" + BusStationColumns._ID + ") )";
             
             Utils.debug(TAG, "onCreated sql: " + createTableSql1);
             db.execSQL(createTableSql1);

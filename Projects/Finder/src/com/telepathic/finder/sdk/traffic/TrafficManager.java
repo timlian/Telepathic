@@ -3,6 +3,8 @@ package com.telepathic.finder.sdk.traffic;
 
 import java.util.ArrayList;
 
+import android.R.interpolator;
+import android.content.ContentValues;
 import android.content.Context;
 
 import com.baidu.mapapi.BMapManager;
@@ -11,8 +13,10 @@ import com.baidu.mapapi.MKBusLineResult;
 import com.baidu.mapapi.MKDrivingRouteResult;
 import com.baidu.mapapi.MKPoiInfo;
 import com.baidu.mapapi.MKPoiResult;
+import com.baidu.mapapi.MKRoute;
 import com.baidu.mapapi.MKSearch;
 import com.baidu.mapapi.MKSearchListener;
+import com.baidu.mapapi.MKStep;
 import com.baidu.mapapi.MKSuggestionResult;
 import com.baidu.mapapi.MKTransitRouteResult;
 import com.baidu.mapapi.MKWalkingRouteResult;
@@ -22,6 +26,9 @@ import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.network.GetBusLocationRequest;
 import com.telepathic.finder.sdk.traffic.network.GetConsumerRecordRequest;
 import com.telepathic.finder.sdk.traffic.network.NetworkManager;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteColumns;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteStationColumns;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusStationColumns;
 import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
 import com.telepathic.finder.util.Utils;
 
@@ -156,8 +163,25 @@ public class TrafficManager {
         @Override
         public void onGetBusDetailResult(MKBusLineResult result, int error) {
             String busLine = Utils.parseBusLineNumber(result.getBusName()).get(0);
-            BusRoute route = new BusRoute(busLine, result.getBusRoute());
-            mTrafficeMonitor.setUpdate(route);
+            MKRoute route = result.getBusRoute();
+            ContentValues values = new ContentValues();
+            values.put(BusRouteColumns.LINE_NUMBER, busLine);
+            final long routeId = mTrafficeStore.insertBusRoute(values);
+            final int stepNumber = route.getNumSteps();
+            for(int index = 0; index < stepNumber; index++) {
+            	MKStep station = route.getStep(index);
+            	values.clear();
+            	values.put(BusStationColumns.NAME, station.getContent());
+            	values.put(BusStationColumns.LATITUDE, station.getPoint().getLatitudeE6());
+            	values.put(BusStationColumns.LONGITUDE, station.getPoint().getLongitudeE6());
+            	final long stationId = mTrafficeStore.insertBusStation(values);
+            	values.clear();
+            	values.put(BusRouteStationColumns.ROUTE_ID, routeId);
+            	values.put(BusRouteStationColumns.STATION_ID, stationId);
+            	values.put(BusRouteStationColumns.INDEX, index);
+            	mTrafficeStore.insertBusRouteStation(values);
+            }
+            mTrafficeMonitor.setUpdate(new BusRoute(busLine, route));
         }
 
         @Override
