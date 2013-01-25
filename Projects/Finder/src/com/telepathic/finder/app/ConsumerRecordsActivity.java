@@ -7,6 +7,9 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,6 +24,7 @@ import android.widget.Toast;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.CardIdFragment.OnCardSelectedListener;
+import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
@@ -43,6 +47,8 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     private ConsumerRecordsAdapter mListAdapter;
     private CardIdFragment mFragment;
     private ArrayList<String> mCardIdList;
+    
+	private MessageDispatcher mMessageDispatcher;
 
     private ITrafficService mTrafficService;
 
@@ -95,7 +101,10 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.consumer_records);
 
-        mTrafficService = TrafficManager.getTrafficManager(null, getApplicationContext()).getTrafficService();
+        FinderApplication app = (FinderApplication) getApplication();
+        
+        mTrafficService = app.getTrafficService();
+        mMessageDispatcher = app.getMessageDispatcher();
 
         mEditText = (AutoCompleteTextView) findViewById(R.id.searchkey);
         mSendButton = (Button) findViewById(R.id.search);
@@ -106,6 +115,12 @@ public class ConsumerRecordsActivity extends FragmentActivity {
                 String cardId = mEditText.getText().toString();
                 if (cardId.length() == 8) {
                     mTrafficService.getConsumerRecords(cardId, 30);
+                    mMessageDispatcher.add(new IMessageHandler() {
+						@Override
+						public void handleMessage(Message msg) {
+							Utils.debug(TAG, "getConsumerRecords received: " + msg.obj.toString());
+						}
+					});
                     mSendButton.setEnabled(false);
                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
                     showDialog(DIALOG_WAITING);
@@ -140,6 +155,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         if (mCardIdList.size() > 0){
             selectConsumptionRecordsByIndex(0);
         }
+        Utils.debug(TAG, String.valueOf(System.identityHashCode(getMainLooper())));
     }
 
     @Override
@@ -268,5 +284,5 @@ public class ConsumerRecordsActivity extends FragmentActivity {
         }
 
     }
-
+    
 }

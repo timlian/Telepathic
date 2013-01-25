@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import android.R.interpolator;
 import android.content.ContentValues;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.MKAddrInfo;
@@ -45,22 +47,26 @@ public class TrafficManager {
     private TrafficeStore mTrafficeStore;
 
     private TrafficeMonitor mTrafficeMonitor;
+    
+    private Handler mMessageHandler;
 
     private MyConsumerRecordsListener mConsumerRecordsListener;
 
-    private TrafficManager(BMapManager manager, Context appContext) {
+    private TrafficManager(BMapManager manager, Context appContext, Handler msgHandler) {
         mAppContext = appContext;
         mNetWorkAdapter = new NetworkManager();
         mTrafficeStore =  TrafficeStore.getDefaultStore(mAppContext);
         mMapSearch = new MKSearch();
         mMapSearch.init(manager, new MapSearchListener());
         mTrafficeMonitor = new TrafficeMonitor();
+        Utils.debug("TrafficManager", String.valueOf(System.identityHashCode(mAppContext.getMainLooper())));
+        mMessageHandler = msgHandler;
     }
 
     public static synchronized TrafficManager getTrafficManager(BMapManager manager,
-            Context appContext) {
+            Context appContext, Handler handler) {
         if (mInstance == null) {
-            mInstance = new TrafficManager(manager, appContext);
+            mInstance = new TrafficManager(manager, appContext, handler);
         }
         return mInstance;
     }
@@ -146,6 +152,9 @@ public class TrafficManager {
     private class MyConsumerRecordsListener implements ITrafficListeners.ConsumerRecordsListener {
         @Override
         public void onReceived(ConsumptionInfo info) {
+        	Message msg = Message.obtain();
+        	msg.obj = info;
+        	mMessageHandler.sendMessage(msg);
             for (ConsumerRecord consumerRecord : info.getRecordList()) {
             	mTrafficeStore.insertRecord(consumerRecord);
             }

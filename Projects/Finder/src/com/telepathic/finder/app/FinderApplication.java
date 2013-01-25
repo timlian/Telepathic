@@ -1,6 +1,7 @@
 package com.telepathic.finder.app;
 
 import android.app.Application;
+import android.os.Handler;
 import android.widget.Toast;
 
 import com.baidu.mapapi.BMapManager;
@@ -14,6 +15,7 @@ public class FinderApplication extends Application {
 
     private BMapManager mBMapManager = null;
     private TrafficManager mTrafficManager = null;
+    private MessageDispatcher mMessageDispatcher = new MessageDispatcher();
 
     // Authentication Key
     private String mStrKey = "A963422DFFFC8530BDDC5FF0063205F9E2D98461";
@@ -43,7 +45,8 @@ public class FinderApplication extends Application {
         mApp = this;
         mBMapManager = new BMapManager(this);
         boolean isSuccess = mBMapManager.init(this.mStrKey, new MyGeneralListener());
-        mTrafficManager = TrafficManager.getTrafficManager(mBMapManager, getApplicationContext());
+        Handler msgHandler = mMessageDispatcher.getMessageHandler(getMainLooper());
+        mTrafficManager = TrafficManager.getTrafficManager(mBMapManager, getApplicationContext(), msgHandler);
         // 初始化地图sdk成功，设置定位监听时间
         if (isSuccess) {
             mBMapManager.getLocationManager().setNotifyInternal(10, 5);
@@ -69,6 +72,10 @@ public class FinderApplication extends Application {
     
     public ITrafficService getTrafficService() {
     	return mTrafficManager.getTrafficService();
+    }
+    
+    public MessageDispatcher getMessageDispatcher() {
+    	return mMessageDispatcher;
     }
 
 }

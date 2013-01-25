@@ -13,6 +13,9 @@ abstract class RPCBaseRequest {
     private static final String KEY_DOCUMENT_ELEMENT = "DocumentElement";
     private static final String KEY_ERROR_CODE = "code";
     private static final String KEY_ERROR_MESSAGE = "msg";
+    
+    private static long COUNT = 0;
+    private static final long mRequestId = COUNT++;
 
     private static final int NO_ERROR = 200;
     
@@ -28,6 +31,10 @@ abstract class RPCBaseRequest {
 
     abstract void handleResponse(SoapObject dataSet);
 
+    public long getRequestId() {
+    	return mRequestId;
+    }
+    
     void addParameter(String key, Object value) {
         if (key == null) {
             throw new IllegalArgumentException("The parameter key is null.");
