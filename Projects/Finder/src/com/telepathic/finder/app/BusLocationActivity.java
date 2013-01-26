@@ -76,6 +76,8 @@ public class BusLocationActivity extends MapActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bus_location_view);
 
+        Utils.copyAppDatabaseFiles(getPackageName());
+        
         mBtnSearch = (ImageButton) findViewById(R.id.search);
 
         mTvSearchKey = (AutoCompleteTextView) findViewById(R.id.search_key);
@@ -395,11 +397,6 @@ public class BusLocationActivity extends MapActivity {
             mMapView.getController().animateTo(route.getRoute().getStart());
             mBtnSearch.setEnabled(true);
             mTrafficService.getBusLocation(route);
-            try {
-				Utils.copyAppDatabaseFiles(getPackageName());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	};
 	

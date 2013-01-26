@@ -6,11 +6,13 @@ package com.telepathic.finder.sdk.traffic.store;
 
 import java.util.ArrayList;
 
+import android.R.interpolator;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
@@ -90,7 +92,33 @@ public class TrafficeStore {
     }
     
     public long insertBusStation(ContentValues station) {
-    	return insertOrIgnore(station, TABLE_BUS_STATION);
+    	long rowId = insertOrIgnore(station, TABLE_BUS_STATION);
+    	if (rowId == -1) {
+    		synchronized (mLock) {
+    			SQLiteDatabase db = dbHelper.getWritableDatabase();
+    			try {
+    				String[] projection = new String[] { BusStationColumns._ID };
+    				String where = BusStationColumns.NAME + "=?";
+    				String[] whereArgs = new String[] {station.getAsString(BusStationColumns.NAME)};
+    				Cursor cursor = db.query(TABLE_BUS_STATION, projection, where, whereArgs, null, null, null);
+    				if (cursor != null) {
+    					try {
+    						cursor.moveToFirst();
+    						rowId = cursor.getLong(0);
+    					} catch (Exception e) {
+    						Utils.error(TAG, e.getLocalizedMessage());
+    					} finally {
+    						cursor.close();
+    					}
+    				}
+    			} catch (Exception e) {
+    				Utils.error(TAG, e.getLocalizedMessage());
+    			} finally {
+    				db.close();
+    			}
+			}
+    	}
+    	return rowId;
     }
     
     public long insertBusRouteStation(ContentValues routeStation) {
@@ -230,7 +258,8 @@ public class TrafficeStore {
                     + BusStationColumns.NAME + " text, "
                     + BusStationColumns.GPS_NUMBER + " text, "
                     + BusStationColumns.LONGITUDE + " text, "
-                    + BusStationColumns.LATITUDE + " text)";
+                    + BusStationColumns.LATITUDE + " text, "
+                    + "UNIQUE (" + BusStationColumns.NAME + ")"+ " )";
             
             String createTableSql4 = "CREATE TABLE " + TABLE_BUS_ROUTE_STATION + " ("
                     + BusRouteStationColumns.ROUTE_ID + " INTEGER, "
@@ -261,6 +290,15 @@ public class TrafficeStore {
             db.execSQL("drop table if exists " + TABLE_BUS_STATION); 
             db.execSQL("drop table if exists " + TABLE_BUS_ROUTE_STATION); 
             onCreate(db);
+        }
+        
+        @Override
+        public void onOpen(SQLiteDatabase db) {
+        	super.onOpen(db);
+        	if (!db.isReadOnly()) {
+                // Enable foreign key constraints
+                db.execSQL("PRAGMA foreign_keys=ON;");
+            }
         }
     }
     

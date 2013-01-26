@@ -26,7 +26,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 public class Utils {
-
+	private static final String TAG = Utils.class.getSimpleName();
+	
     private static final boolean DEBUG = true;
 
     private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([aAbBcCdD])?";
@@ -140,15 +141,19 @@ public class Utils {
     /**
      * Copy the application database files to external storage
      */
-    public static void copyAppDatabaseFiles(String packageName) throws IOException {
-        File dbDirectory = new File("/data/data/" + packageName + "/databases/");
-        if (dbDirectory.exists()) {
-            File[] dbFiles = dbDirectory.listFiles();
-            for(int i = 0; i < dbFiles.length; i++) {
-                copyFileToExternalStorage(dbFiles[i]);
-            }
-        }
-    }
+	public static void copyAppDatabaseFiles(String packageName) {
+		try {
+			File dbDirectory = new File("/data/data/" + packageName + "/databases/");
+			if (dbDirectory.exists()) {
+				File[] dbFiles = dbDirectory.listFiles();
+				for (int i = 0; i < dbFiles.length; i++) {
+					copyFileToExternalStorage(dbFiles[i]);
+				}
+			}
+		} catch (IOException e) {
+			Utils.error(TAG, e.getLocalizedMessage());
+		}
+	}
 
     /**
      * Copy the application normal files to external storage

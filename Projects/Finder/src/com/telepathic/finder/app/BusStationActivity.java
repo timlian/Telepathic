@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.telepathic.finder.R;
+import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.HorizontialListView;
 
 public class BusStationActivity extends Activity {
@@ -26,6 +27,7 @@ public class BusStationActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bus_station);
+        Utils.copyAppDatabaseFiles(getPackageName());
         setupView();
     }
 

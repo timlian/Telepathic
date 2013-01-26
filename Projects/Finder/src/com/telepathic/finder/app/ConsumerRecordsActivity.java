@@ -51,6 +51,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.consumer_records);
+        Utils.copyAppDatabaseFiles(getPackageName());
         FinderApplication app = (FinderApplication) getApplication();
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
