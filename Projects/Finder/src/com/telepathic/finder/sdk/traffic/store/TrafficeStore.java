@@ -8,7 +8,6 @@ package com.telepathic.finder.sdk.traffic.store;
 
 import java.util.ArrayList;
 
-import android.R.interpolator;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -16,9 +15,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.telepathic.finder.sdk.traffic.BusCard;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
-import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
 import com.telepathic.finder.sdk.traffic.CountConsumerRecord;
 import com.telepathic.finder.sdk.traffic.EWalletConsumerRecord;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusCardColumns;
@@ -146,36 +145,53 @@ public class TrafficeStore {
         return rowId;
     }
 
-    public ConsumptionInfo getConsumptionInfo(String cardId) {
-        ArrayList<ConsumerRecord> consumerRecords = getConsumptionRecords(cardId);
-        ConsumptionInfo info = new ConsumptionInfo();
-        if (consumerRecords.size() > 0) {
-            info.setCardId(cardId);
-        }
-        for (ConsumerRecord record : consumerRecords) {
-            switch(record.getType()){
-                case COUNT:
-                    if (info.getResidualCount() == null) {
-                        info.setResidualCount(record.getResidual());
-                    }
-                    break;
-                case EWALLET:
-                    if (info.getResidualAmount() == null) {
-                        info.setResidualAmount(record.getResidual());
-                    }
-                    break;
-                default:
-                    throw new RuntimeException("Unknown consumer type !!!");
-            }
-            if (info.getResidualAmount() != null && info.getResidualCount() != null) {
-                break;
-            }
-        }
-        info.setRecordList(consumerRecords);
-        return info;
+    public BusCard getConsumptionInfo(String cardNumber) {
+        ArrayList<ConsumerRecord> consumerRecords = getConsumerRecords(cardNumber);
+        BusCard busCard = getBusCard(cardNumber);
+        busCard.setConsumerRecords(consumerRecords);
+        return busCard;
     }
 
-    public ArrayList<ConsumerRecord> getConsumptionRecords(String cardId) {
+	public BusCard getBusCard(String cardNumber) {
+		BusCard busCard = new BusCard();
+		synchronized (mLock) {
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+			try {
+				String[] projection = new String[] {
+						BusCardColumns.CARD_NUMBER,
+						BusCardColumns.RESIDUAL_COUNT,
+						BusCardColumns.RESIDUAL_AMOUNT,
+						BusCardColumns.LAST_DATE };
+				String where = BusCardColumns.CARD_NUMBER + "=?";
+				String[] whereArgs = new String[] { cardNumber };
+				Cursor cursor = db.query(TABLE_BUS_CARD, projection, where, whereArgs, null, null, null);
+				if (cursor != null) {
+					try {
+						cursor.moveToFirst();
+						final int idxCardNumber = cursor.getColumnIndex(BusCardColumns.CARD_NUMBER);
+						final int idxResidualCount = cursor.getColumnIndex(BusCardColumns.RESIDUAL_COUNT);
+						final int idxResidualAmount = cursor.getColumnIndex(BusCardColumns.RESIDUAL_AMOUNT);
+						final int idxLastDate = cursor.getColumnIndex(BusCardColumns.LAST_DATE);
+						busCard.setCardNumber(cursor.getString(idxCardNumber));
+						busCard.setResidualCount(cursor.getString(idxResidualCount));
+						busCard.setResidualAmount(cursor.getString(idxResidualAmount));
+						busCard.setLastDate(Utils.parseDate(cursor.getString(idxLastDate)));
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
+						cursor.close();
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				db.close();
+			}
+		}
+		return busCard;
+	}
+    
+    public ArrayList<ConsumerRecord> getConsumerRecords(String cardId) {
         synchronized (mLock) {
             ArrayList<ConsumerRecord> records = new ArrayList<ConsumerRecord>();
             SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -215,7 +231,6 @@ public class TrafficeStore {
                     } finally {
                         cursor.close();
                     }
-
                 }
             } finally {
                 db.close();

@@ -150,22 +150,22 @@ public class TrafficManager {
 
     private class MyConsumerRecordsListener implements ConsumerRecordsListener {
         @Override
-        public void onReceived(ConsumptionInfo info) {
+        public void onReceived(BusCard busCard) {
         	Message msg = Message.obtain();
         	msg.arg1 = ITrafficeMessage.RECEIVED_CONSUMER_RECORDS;
         	msg.arg2 = 0;
-        	msg.obj = info;
+        	msg.obj = busCard;
         	mMessageHandler.sendMessage(msg);
-        	saveConsumerRecords(info);
+        	saveConsumerRecords(busCard);
         }
         
-        private void saveConsumerRecords(ConsumptionInfo info) {
+        private void saveConsumerRecords(BusCard busCard) {
         	ContentValues values = new ContentValues();
-        	values.put(BusCardColumns.CARD_NUMBER, info.getCardId());
-        	values.put(BusCardColumns.RESIDUAL_COUNT, info.getResidualCount());
-        	values.put(BusCardColumns.RESIDUAL_AMOUNT, info.getResidualAmount());
+        	values.put(BusCardColumns.CARD_NUMBER, busCard.getCardNumber());
+        	values.put(BusCardColumns.RESIDUAL_COUNT, busCard.getResidualCount());
+        	values.put(BusCardColumns.RESIDUAL_AMOUNT, busCard.getResidualAmount());
         	long cardId = mTrafficeStore.insertBusCard(values);
-        	for (ConsumerRecord record : info.getRecordList()) {
+        	for (ConsumerRecord record : busCard.getConsumerRecords()) {
         		values.clear();
         		values.put(ConsumerRecordColumns.CARD_ID, cardId);
         		values.put(ConsumerRecordColumns.LINE_NUMBER, record.getLineNumber());

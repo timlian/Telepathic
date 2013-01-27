@@ -3,8 +3,10 @@ package com.telepathic.finder.app;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
@@ -15,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,15 +27,15 @@ import com.telepathic.finder.app.CardIdFragment.OnCardSelectedListener;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
+import com.telepathic.finder.sdk.traffic.BusCard;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
-import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
-public class ConsumerRecordsActivity extends FragmentActivity {
-    private static final String TAG = ConsumerRecordsActivity.class.getSimpleName();
+public class BusCardRecordActivity extends FragmentActivity {
+    private static final String TAG = BusCardRecordActivity.class.getSimpleName();
 
     private Button mSendButton;
     private TextView mResidualCountText;
@@ -67,7 +70,7 @@ public class ConsumerRecordsActivity extends FragmentActivity {
 				mWaitingDialog.dismiss();
 				final int errorCode = msg.arg2;
 				if (errorCode == 0) {
-					ConsumptionInfo dataInfo = (ConsumptionInfo) msg.obj;
+					BusCard dataInfo = (BusCard) msg.obj;
 					onReceived(dataInfo);
 				} else {
 					showMessage("Get consumer records failed: " + errorCode);
@@ -126,14 +129,14 @@ public class ConsumerRecordsActivity extends FragmentActivity {
          mWaitingDialog = createWaitingDialog();
     }
     
-    private void onReceived(ConsumptionInfo dataInfo) {
-    	Utils.addCachedCards(ConsumerRecordsActivity.this,dataInfo.getCardId());
-		String resiaualCount = getString(R.string.residual_count, dataInfo.getResidualCount());
-		String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+    private void onReceived(BusCard busCard) {
+    	Utils.addCachedCards(BusCardRecordActivity.this,busCard.getCardNumber());
+		String resiaualCount = getString(R.string.residual_count, busCard.getResidualCount());
+		String resiaualAmount = getString(R.string.residual_amount, busCard.getResidualAmount());
 		mResidualCountText.setText(resiaualCount);
 		mResidualAmountText.setText(resiaualAmount);
-		mListAdapter.updateRecords(dataInfo.getRecordList());
-		mFragment.selectItemByCardId(dataInfo.getCardId());
+		mListAdapter.updateRecords(busCard.getConsumerRecords());
+		mFragment.selectItemByCardId(busCard.getCardNumber());
 		refreshCardIDCache();
 		mRecordList.onRefreshComplete();
     }
@@ -144,18 +147,18 @@ public class ConsumerRecordsActivity extends FragmentActivity {
 
     private void selectConsumptionRecordsByCardId(String cardId){
         mEditText.setText(null);
-        ConsumptionInfo dataInfo = mTrafficService.getTrafficeStore().getConsumptionInfo(cardId);
-        String resiaualCount  = getString(R.string.residual_count, dataInfo.getResidualCount());
-        String resiaualAmount = getString(R.string.residual_amount, dataInfo.getResidualAmount());
+        BusCard busCard = mTrafficService.getTrafficeStore().getConsumptionInfo(cardId);
+        String resiaualCount  = getString(R.string.residual_count, busCard.getResidualCount());
+        String resiaualAmount = getString(R.string.residual_amount, busCard.getResidualAmount());
         mResidualCountText.setText(resiaualCount);
         mResidualAmountText.setText(resiaualAmount);
-        mListAdapter.updateRecords(dataInfo.getRecordList());
+        mListAdapter.updateRecords(busCard.getConsumerRecords());
     }
 
     private void refreshCardIDCache(){
         mCardIdList = Utils.getCachedCards(this);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(ConsumerRecordsActivity.this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(BusCardRecordActivity.this,
                 android.R.layout.simple_dropdown_item_1line, mCardIdList);
         mEditText.setAdapter(adapter);
     }

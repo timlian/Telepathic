@@ -1,6 +1,7 @@
 package com.telepathic.finder.sdk.traffic;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class BusCard {
 	/**
@@ -18,7 +19,7 @@ public class BusCard {
 	/**
 	 * The last consumption time
 	 */
-	private String mLastDate;
+	private Date mLastDate;
 	/**
 	 * The consumer records
 	 */
@@ -26,6 +27,42 @@ public class BusCard {
 	
 	public String getCardNumber() {
 		return mCardNumber;
+	}
+	
+	public void setCardNumber(String cardNumber) {
+		mCardNumber = cardNumber;
+	}
+	
+	public String getResidualCount() {
+		return mResidualCount;
+	}
+	
+	public void setResidualCount(String residualCount) {
+		mResidualCount = residualCount;
+	}
+	
+	public String getResidualAmount() {
+		return mResidualAmount;
+	}
+	
+	public void setResidualAmount(String residualAmount) {
+		mResidualAmount = residualAmount;
+	}
+	
+	public Date getLastDate() {
+		return mLastDate;
+	}
+	
+	public void setLastDate(Date date) {
+		mLastDate = date;
+	}
+	
+	public ArrayList<ConsumerRecord> getConsumerRecords() {
+		return mConsumerRecords;
+	}
+	
+	public void setConsumerRecords(ArrayList<ConsumerRecord> consumerRecords) {
+		mConsumerRecords = consumerRecords;
 	}
 
 }

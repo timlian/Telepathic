@@ -53,7 +53,7 @@
             android:screenOrientation="sensor" >
         </activity>
         <activity
-            android:name="com.telepathic.finder.app.ConsumerRecordsActivity"
+            android:name="com.telepathic.finder.app.BusCardRecordActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/test_activity"
             android:screenOrientation="portrait" >

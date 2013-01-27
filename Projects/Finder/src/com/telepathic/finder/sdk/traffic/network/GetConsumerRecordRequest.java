@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import org.ksoap2.serialization.SoapObject;
 
+import com.telepathic.finder.sdk.traffic.BusCard;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
-import com.telepathic.finder.sdk.traffic.ConsumptionInfo;
 import com.telepathic.finder.sdk.traffic.CountConsumerRecord;
 import com.telepathic.finder.sdk.traffic.EWalletConsumerRecord;
 import com.telepathic.finder.sdk.traffic.TrafficeMonitor;
@@ -50,11 +50,11 @@ public class GetConsumerRecordRequest extends RPCBaseRequest {
         SoapObject dataEntry = null;
         ArrayList<ConsumerRecord> consumerRecords = new ArrayList<ConsumerRecord>();
         ConsumerRecord record = null;
-        ConsumptionInfo info = new ConsumptionInfo();
+        BusCard busCard = new BusCard();
         int count = newDataSet.getPropertyCount();
         if (count > 0) {
             String cardId = ((SoapObject)newDataSet.getProperty(0)).getPropertyAsString(KEY_CARD_ID);
-            info.setCardId(cardId.substring(4));
+            busCard.setCardNumber(cardId.substring(4));
         }
         for(int idx = 0; idx < count ; idx++) {
             dataEntry = (SoapObject) newDataSet.getProperty(idx);
@@ -77,15 +77,15 @@ public class GetConsumerRecordRequest extends RPCBaseRequest {
                 case COUNT:
                     record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
                     record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
-                    if (info.getResidualCount() == null) {
-                        info.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+                    if (busCard.getResidualCount() == null) {
+                    	busCard.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
                     }
                     break;
                 case EWALLET:
                     record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_AMOUNT));
                     record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
-                    if (info.getResidualAmount() == null) {
-                        info.setResidualAmount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
+                    if (busCard.getResidualAmount() == null) {
+                    	busCard.setResidualAmount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_AMOUNT));
                     }
                     break;
                 default:
@@ -93,10 +93,8 @@ public class GetConsumerRecordRequest extends RPCBaseRequest {
             }
             consumerRecords.add(record);
         }
-        
-        info.setRecordList(consumerRecords);
-
-        mTrafficeMonitor.setUpdate(info);
+        busCard.setConsumerRecords(consumerRecords);
+        mTrafficeMonitor.setUpdate(busCard);
     }
 
 }

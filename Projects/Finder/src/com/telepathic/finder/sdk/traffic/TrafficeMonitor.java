@@ -39,9 +39,9 @@ public class TrafficeMonitor implements ITrafficMonitor {
 		mConsumerRecordsListeners.remove(listener);
 	}
 	
-	public void setUpdate(ConsumptionInfo infoData) {
+	public void setUpdate(BusCard busCard) {
 		for(ConsumerRecordsListener listener : mConsumerRecordsListeners) {
-			listener.onReceived(infoData);
+			listener.onReceived(busCard);
 		}
 	}
 	
