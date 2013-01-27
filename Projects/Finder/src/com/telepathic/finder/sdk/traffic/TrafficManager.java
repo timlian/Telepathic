@@ -21,16 +21,18 @@ import com.baidu.mapapi.MKStep;
 import com.baidu.mapapi.MKSuggestionResult;
 import com.baidu.mapapi.MKTransitRouteResult;
 import com.baidu.mapapi.MKWalkingRouteResult;
-import com.telepathic.finder.sdk.ITrafficListeners;
+import com.telepathic.finder.sdk.ITrafficListeners.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ITrafficMonitor;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.network.GetBusLocationRequest;
 import com.telepathic.finder.sdk.traffic.network.GetConsumerRecordRequest;
 import com.telepathic.finder.sdk.traffic.network.NetworkManager;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusCardColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteStationColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusStationColumns;
+import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.ConsumerRecordColumns;
 import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
 import com.telepathic.finder.util.Utils;
 
@@ -146,7 +148,7 @@ public class TrafficManager {
 
     }
 
-    private class MyConsumerRecordsListener implements ITrafficListeners.ConsumerRecordsListener {
+    private class MyConsumerRecordsListener implements ConsumerRecordsListener {
         @Override
         public void onReceived(ConsumptionInfo info) {
         	Message msg = Message.obtain();
@@ -154,8 +156,25 @@ public class TrafficManager {
         	msg.arg2 = 0;
         	msg.obj = info;
         	mMessageHandler.sendMessage(msg);
-            for (ConsumerRecord consumerRecord : info.getRecordList()) {
-            	mTrafficeStore.insertRecord(consumerRecord);
+        	saveConsumerRecords(info);
+        }
+        
+        private void saveConsumerRecords(ConsumptionInfo info) {
+        	ContentValues values = new ContentValues();
+        	values.put(BusCardColumns.CARD_NUMBER, info.getCardId());
+        	values.put(BusCardColumns.RESIDUAL_COUNT, info.getResidualCount());
+        	values.put(BusCardColumns.RESIDUAL_AMOUNT, info.getResidualAmount());
+        	long cardId = mTrafficeStore.insertBusCard(values);
+        	for (ConsumerRecord record : info.getRecordList()) {
+        		values.clear();
+        		values.put(ConsumerRecordColumns.CARD_ID, cardId);
+        		values.put(ConsumerRecordColumns.LINE_NUMBER, record.getLineNumber());
+        		values.put(ConsumerRecordColumns.BUS_NUMBER, record.getBusNumber());
+        		values.put(ConsumerRecordColumns.DATE, Utils.formatDate(record.getConsumerTime()));
+        		values.put(ConsumerRecordColumns.CONSUMPTION, record.getConsumption());
+        		values.put(ConsumerRecordColumns.RESIDUAL, record.getResidual());
+        		values.put(ConsumerRecordColumns.TYPE, record.getType().toString());
+            	mTrafficeStore.insertConsumerRecord(values);
             }
         }
     }

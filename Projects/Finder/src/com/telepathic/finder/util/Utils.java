@@ -188,7 +188,7 @@ public class Utils {
      * @param cursor, The cursor, which content needs to be printed
      * @param logTag, The log tag
      */
-    public static void printCursorContent(Cursor cursor, String logTag) {
+    public static void printCursorContent(String logTag, Cursor cursor) {
         if (cursor == null) {
             Log.d(logTag, "Cursor is NULL!");
             return ;

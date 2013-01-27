@@ -1,14 +1,39 @@
+/**
+ * Copyright (C) 2012 Telepathic LTD. All Rights Reserved.
+ * 
+ * * Author: Tim Lian
+ */
+
 package com.telepathic.finder.sdk.traffic.store;
 
 import android.provider.BaseColumns;
 
 public interface ITrafficeStore {
 	
-	public interface ConsumerRecordsColumns extends BaseColumns {
+	public interface BusCardColumns extends BaseColumns {
 		/**
 		 * The card number.
 		 */
 		public static final String CARD_NUMBER = "card_number";
+		/**
+		 * The residual count
+		 */
+		public static final String RESIDUAL_COUNT = "residual_count";
+		/**
+		 * The residual amount
+		 */
+		public static final String RESIDUAL_AMOUNT = "residual_amount";
+		/**
+		 * The last consumption date
+		 */
+		public static final String LAST_DATE = "last_date";
+	}
+	
+	public interface ConsumerRecordColumns extends BaseColumns {
+		/**
+		 * The card identification.
+		 */
+		public static final String CARD_ID = "card_id";
 		/**
 		 * The line number.
 		 */
