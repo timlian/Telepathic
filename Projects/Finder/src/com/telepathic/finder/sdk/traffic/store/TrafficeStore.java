@@ -145,13 +145,33 @@ public class TrafficeStore {
         return rowId;
     }
 
-    public BusCard getConsumptionInfo(String cardNumber) {
-        ArrayList<ConsumerRecord> consumerRecords = getConsumerRecords(cardNumber);
-        BusCard busCard = getBusCard(cardNumber);
-        busCard.setConsumerRecords(consumerRecords);
-        return busCard;
-    }
+//    public BusCard getConsumptionInfo(String cardNumber) {
+//        ArrayList<ConsumerRecord> consumerRecords = getConsumerRecords(cardNumber);
+//        BusCard busCard = getBusCard(cardNumber);
+//        busCard.setConsumerRecords(consumerRecords);
+//        return busCard;
+//    }
 
+    public Cursor getBusCards() {
+		synchronized (mLock) {
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+			try {
+				String[] projection = new String[] {
+						BusCardColumns.CARD_NUMBER,
+						BusCardColumns.RESIDUAL_COUNT,
+						BusCardColumns.RESIDUAL_AMOUNT,
+						BusCardColumns.LAST_DATE 
+				};
+				return db.query(TABLE_BUS_CARD, null, null, null, null, null, null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				//db.close();
+			}
+		}
+		return null;
+    }
+    
 	public BusCard getBusCard(String cardNumber) {
 		BusCard busCard = new BusCard();
 		synchronized (mLock) {
@@ -171,11 +191,11 @@ public class TrafficeStore {
 						final int idxCardNumber = cursor.getColumnIndex(BusCardColumns.CARD_NUMBER);
 						final int idxResidualCount = cursor.getColumnIndex(BusCardColumns.RESIDUAL_COUNT);
 						final int idxResidualAmount = cursor.getColumnIndex(BusCardColumns.RESIDUAL_AMOUNT);
-						final int idxLastDate = cursor.getColumnIndex(BusCardColumns.LAST_DATE);
+						//final int idxLastDate = cursor.getColumnIndex(BusCardColumns.LAST_DATE);
 						busCard.setCardNumber(cursor.getString(idxCardNumber));
 						busCard.setResidualCount(cursor.getString(idxResidualCount));
 						busCard.setResidualAmount(cursor.getString(idxResidualAmount));
-						busCard.setLastDate(Utils.parseDate(cursor.getString(idxLastDate)));
+						//busCard.setLastDate(Utils.parseDate(cursor.getString(idxLastDate)));
 					} catch (Exception e) {
 						e.printStackTrace();
 					} finally {

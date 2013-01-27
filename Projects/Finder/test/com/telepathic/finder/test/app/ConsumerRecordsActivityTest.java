@@ -4,13 +4,11 @@ package com.telepathic.finder.test.app;
 import android.content.SharedPreferences;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.BusCardRecordActivity;
-import com.telepathic.finder.util.Utils;
 
 public class ConsumerRecordsActivityTest extends
 ActivityInstrumentationTestCase2<BusCardRecordActivity> {
@@ -46,21 +44,6 @@ ActivityInstrumentationTestCase2<BusCardRecordActivity> {
     public void testViewText() {
         assertEquals(mActivity.getResources().getString(R.string.ic_card_hint), mEditText.getHint());
         assertEquals(mActivity.getResources().getString(R.string.find), mSendButton.getText());
-    }
-
-    @UiThreadTest
-    public void testSaveCardID() {
-        Utils.addCachedCards(mActivity, "10802436");
-        Utils.addCachedCards(mActivity, "10808691");
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mActivity,
-                android.R.layout.simple_dropdown_item_1line, Utils.getCachedCards(mActivity));
-        mEditText.setAdapter(adapter);
-        assertEquals(2, mEditText.getAdapter().getCount());
-        String item1 = (String)mEditText.getAdapter().getItem(0);
-        String item2 = (String)mEditText.getAdapter().getItem(1);
-        assertEquals(true,
-                ((item1.equals("10802436") && item2.equals("10808691")) ||
-                        (item2.equals("10802436") && item1.equals("10808691"))));
     }
 
     @UiThreadTest

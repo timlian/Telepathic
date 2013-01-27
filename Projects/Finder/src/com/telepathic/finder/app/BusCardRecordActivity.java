@@ -3,21 +3,19 @@ package com.telepathic.finder.app;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +28,7 @@ import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.BusCard;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
+import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
@@ -44,11 +43,12 @@ public class BusCardRecordActivity extends FragmentActivity {
     private DropRefreshListView mRecordList;
     private ConsumerRecordsAdapter mListAdapter;
     private CardIdFragment mFragment;
-    private ArrayList<String> mCardIdList;
+    private ArrayList<String> mCardNumberList = new ArrayList<String>();
     private ProgressDialog mWaitingDialog;
 	private MessageDispatcher mMessageDispatcher;
     private ITrafficService mTrafficService;
     private volatile boolean isCanceled = false;
+    private Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,27 +58,8 @@ public class BusCardRecordActivity extends FragmentActivity {
         FinderApplication app = (FinderApplication) getApplication();
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
-		mMessageDispatcher.add(new IMessageHandler() {
-			@Override
-			public int what() {
-				return ITrafficeMessage.RECEIVED_CONSUMER_RECORDS;
-			}
-
-			@Override
-			public void handleMessage(Message msg) {
-				mSendButton.setEnabled(true);
-				mWaitingDialog.dismiss();
-				final int errorCode = msg.arg2;
-				if (errorCode == 0) {
-					BusCard dataInfo = (BusCard) msg.obj;
-					onReceived(dataInfo);
-				} else {
-					showMessage("Get consumer records failed: " + errorCode);
-				}
-			}
-		});
-		
         initView();
+        new BusCardLoader().loadAll();
     }
 
     @Override
@@ -92,20 +73,38 @@ public class BusCardRecordActivity extends FragmentActivity {
          mSendButton.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View v) {
-                 String cardId = mEditText.getText().toString();
-                 if (Utils.isValidBusCardNumber(cardId)) {
-                     mTrafficService.getConsumerRecords(cardId, 30);
+                 final String cardNumber = mEditText.getText().toString();
+                 if (Utils.isValidBusCardNumber(cardNumber)) {
+                     mTrafficService.getConsumerRecords(cardNumber, 30);
                      mSendButton.setEnabled(false);
                      Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
                      mWaitingDialog.show();
+                     mMessageDispatcher.add(new IMessageHandler() {
+             			@Override
+             			public int what() {
+             				return ITrafficeMessage.CONSUMER_RECORD_UPDATED;
+             			}
+
+             			@Override
+             			public void handleMessage(Message msg) {
+             				mSendButton.setEnabled(true);
+             				mWaitingDialog.dismiss();
+             				final int errorCode = msg.arg2;
+             				if (errorCode == 0) {
+             					new BusCardLoader().load(cardNumber);
+             				} else {
+             					showMessage("Get consumer records failed: " + errorCode);
+             				}
+             				mMessageDispatcher.remove(this);
+             			}
+             		});
                  } else {
                      mEditText.setError(getResources().getString(R.string.card_id_error_notice));
                  }
              }
          });
          
-         refreshCardIDCache();
-         mListAdapter = new ConsumerRecordsAdapter();
+         mListAdapter = new ConsumerRecordsAdapter();//new ConsumerRecordsAdapter();
          mRecordList = (DropRefreshListView) findViewById(R.id.consumer_record_list);
          mRecordList.setOnRefreshListener(new OnRefreshListener() {
              @Override
@@ -123,46 +122,29 @@ public class BusCardRecordActivity extends FragmentActivity {
                  selectConsumptionRecordsByCardId(cardId);
              }
          });
-         if (mCardIdList.size() > 0){
+         if (mCardNumberList.size() > 0){
              selectConsumptionRecordsByIndex(0);
          }
          mWaitingDialog = createWaitingDialog();
     }
     
     private void onReceived(BusCard busCard) {
-    	Utils.addCachedCards(BusCardRecordActivity.this,busCard.getCardNumber());
-		String resiaualCount = getString(R.string.residual_count, busCard.getResidualCount());
-		String resiaualAmount = getString(R.string.residual_amount, busCard.getResidualAmount());
-		mResidualCountText.setText(resiaualCount);
-		mResidualAmountText.setText(resiaualAmount);
-		mListAdapter.updateRecords(busCard.getConsumerRecords());
-		mFragment.selectItemByCardId(busCard.getCardNumber());
-		refreshCardIDCache();
-		mRecordList.onRefreshComplete();
+    	
     }
     
     private void selectConsumptionRecordsByIndex(int index){
-        selectConsumptionRecordsByCardId(mCardIdList.get(index));
+        selectConsumptionRecordsByCardId(mCardNumberList.get(index));
     }
 
     private void selectConsumptionRecordsByCardId(String cardId){
         mEditText.setText(null);
-        BusCard busCard = mTrafficService.getTrafficeStore().getConsumptionInfo(cardId);
-        String resiaualCount  = getString(R.string.residual_count, busCard.getResidualCount());
-        String resiaualAmount = getString(R.string.residual_amount, busCard.getResidualAmount());
-        mResidualCountText.setText(resiaualCount);
-        mResidualAmountText.setText(resiaualAmount);
-        mListAdapter.updateRecords(busCard.getConsumerRecords());
+        new BusCardLoader().load(cardId);
     }
 
-    private void refreshCardIDCache(){
-        mCardIdList = Utils.getCachedCards(this);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(BusCardRecordActivity.this,
-                android.R.layout.simple_dropdown_item_1line, mCardIdList);
-        mEditText.setAdapter(adapter);
+    public ArrayList<String> getBusCardNumbers() {
+    	return mCardNumberList;
     }
-
+    
     private ProgressDialog createWaitingDialog() {
     	ProgressDialog prgDlg = new ProgressDialog(this);
         prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -253,4 +235,53 @@ public class BusCardRecordActivity extends FragmentActivity {
     	Toast.makeText(this, msgText, Toast.LENGTH_SHORT).show();
     }
     
+	private class BusCardLoader {
+		
+		void loadAll() {
+			new LoadBusCardTask().execute();
+		}
+		
+		void load(String cardNumber) {
+			new LoadBusCardTask().execute(cardNumber);
+		}
+
+		private class LoadBusCardTask extends AsyncTask<String, Integer, ArrayList<BusCard>> {
+			@Override
+			protected ArrayList<BusCard> doInBackground(String... params) {
+				TrafficeStore trafficeStore = mTrafficService.getTrafficeStore();
+				ArrayList<BusCard> busCards = new ArrayList<BusCard>();
+				if (params.length == 0) {
+
+				} else {
+					final String cardNumber = params[0];
+					BusCard busCard = trafficeStore.getBusCard(cardNumber);
+					ArrayList<ConsumerRecord> consumerRecords = trafficeStore.getConsumerRecords(cardNumber);
+					busCard.setConsumerRecords(consumerRecords);
+					busCards.add(busCard);
+				}
+				return busCards;
+			}
+
+			@Override
+			protected void onProgressUpdate(Integer... values) {
+				super.onProgressUpdate(values);
+			}
+
+			@Override
+			protected void onPostExecute(ArrayList<BusCard> busCards) {
+				BusCard busCard = busCards.get(0);
+				String resiaualCount = getString(R.string.residual_count,busCard.getResidualCount());
+				String resiaualAmount = getString(R.string.residual_amount,busCard.getResidualAmount());
+				mResidualCountText.setText(resiaualCount);
+				mResidualAmountText.setText(resiaualAmount);
+				mListAdapter.updateRecords(busCard.getConsumerRecords());
+				mFragment.selectItemByCardId(busCard.getCardNumber());
+				mRecordList.onRefreshComplete();
+				if (!mCardNumberList.contains(busCard.getCardNumber())) {
+					mCardNumberList.add(busCard.getCardNumber());
+				}
+			}
+		}
+	}
+
 }

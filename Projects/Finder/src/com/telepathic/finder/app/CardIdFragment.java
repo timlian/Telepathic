@@ -18,7 +18,7 @@ import com.telepathic.finder.util.Utils;
 
 
 public class CardIdFragment extends android.support.v4.app.Fragment {
-    private Activity mHostActivity;
+    private BusCardRecordActivity mHostActivity;
     private ListView mCardListView;
     private MyAdapter mAdapter;
 
@@ -33,7 +33,7 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHostActivity = getActivity();
+        mHostActivity = (BusCardRecordActivity)getActivity();
     }
 
     public void setOnCardSelectedListener(OnCardSelectedListener listener) {
@@ -93,7 +93,7 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
         private int mSelectedItem = 0;
 
         MyAdapter() {
-            ArrayList<String> list = Utils.getCachedCards(getActivity());
+            ArrayList<String> list = mHostActivity.getBusCardNumbers();
             if (list.size() <= 0) {
                 list.add(getResources().getString(R.string.no_item_in_db));
             }
@@ -151,7 +151,7 @@ public class CardIdFragment extends android.support.v4.app.Fragment {
 
         @Override
         public void notifyDataSetChanged() {
-            ArrayList<String> list = Utils.getCachedCards(getActivity());
+            ArrayList<String> list = mHostActivity.getBusCardNumbers();
             if (list.size() <= 0) {
                 list.add("no item");
             }

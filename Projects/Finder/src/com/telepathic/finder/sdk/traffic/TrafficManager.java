@@ -151,12 +151,15 @@ public class TrafficManager {
     private class MyConsumerRecordsListener implements ConsumerRecordsListener {
         @Override
         public void onReceived(BusCard busCard) {
-        	Message msg = Message.obtain();
-        	msg.arg1 = ITrafficeMessage.RECEIVED_CONSUMER_RECORDS;
-        	msg.arg2 = 0;
-        	msg.obj = busCard;
-        	mMessageHandler.sendMessage(msg);
         	saveConsumerRecords(busCard);
+        	notifyDataChanged();
+        }
+        
+        private void notifyDataChanged() {
+        	Message msg = Message.obtain();
+        	msg.arg1 = ITrafficeMessage.CONSUMER_RECORD_UPDATED;
+        	msg.arg2 = 0;
+        	mMessageHandler.sendMessage(msg);
         }
         
         private void saveConsumerRecords(BusCard busCard) {

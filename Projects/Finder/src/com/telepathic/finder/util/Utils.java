@@ -12,12 +12,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -262,22 +260,6 @@ public class Utils {
             builder.append(" ");
         }
         return builder.toString();
-    }
-
-    public static ArrayList<String> getCachedCards(Context c) {
-        SharedPreferences sharedPreferences = c.getSharedPreferences(CARD_ID_CACHE, Context.MODE_PRIVATE);
-
-        Map<String, ?> map = sharedPreferences.getAll();
-        ArrayList<String> list = new ArrayList<String>();
-        if (map.keySet() != null) {
-            list.addAll(map.keySet());
-        }
-        return list;
-    }
-
-    public static void addCachedCards(Context c, String cardId){
-        SharedPreferences preferences = c.getSharedPreferences(Utils.CARD_ID_CACHE, Context.MODE_PRIVATE);
-        preferences.edit().putString(cardId, cardId).commit();
     }
 
     public static void debug(String tag, String info) {
