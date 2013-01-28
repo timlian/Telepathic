@@ -66,6 +66,11 @@
             android:name="com.telepathic.finder.app.BusStationActivity"
             android:label="@string/title_activity_bus_station" >
         </activity>
+        <provider android:name="com.telepathic.finder.sdk.traffic.provider.TrafficDataProvider"
+            android:authorities="com.telepathic.finder.provider" 
+            android:multiprocess="false"
+            android:grantUriPermissions="true">
+        </provider>
     </application>
 
 </manifest>

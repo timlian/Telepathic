@@ -3,8 +3,10 @@ package com.telepathic.finder.sdk.traffic;
 
 import java.util.ArrayList;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 
@@ -28,6 +30,7 @@ import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.network.GetBusLocationRequest;
 import com.telepathic.finder.sdk.traffic.network.GetConsumerRecordRequest;
 import com.telepathic.finder.sdk.traffic.network.NetworkManager;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusCardColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteStationColumns;
@@ -40,7 +43,7 @@ public class TrafficManager {
 
     private static TrafficManager mInstance;
 
-    private Context mAppContext;
+    private Context mContext;
 
     private MKSearch mMapSearch;
 
@@ -55,13 +58,12 @@ public class TrafficManager {
     private MyConsumerRecordsListener mConsumerRecordsListener;
 
     private TrafficManager(BMapManager manager, Context appContext, Handler msgHandler) {
-        mAppContext = appContext;
+    	mContext = appContext;
         mNetWorkAdapter = new NetworkManager();
-        mTrafficeStore =  TrafficeStore.getDefaultStore(mAppContext);
+        mTrafficeStore =  TrafficeStore.getDefaultStore(mContext);
         mMapSearch = new MKSearch();
         mMapSearch.init(manager, new MapSearchListener());
         mTrafficeMonitor = new TrafficeMonitor();
-        Utils.debug("TrafficManager", String.valueOf(System.identityHashCode(mAppContext.getMainLooper())));
         mMessageHandler = msgHandler;
     }
 
@@ -153,6 +155,7 @@ public class TrafficManager {
         public void onReceived(BusCard busCard) {
         	saveConsumerRecords(busCard);
         	notifyDataChanged();
+        	Utils.copyAppDatabaseFiles(mContext.getPackageName());
         }
         
         private void notifyDataChanged() {
@@ -163,11 +166,13 @@ public class TrafficManager {
         }
         
         private void saveConsumerRecords(BusCard busCard) {
+        	ContentResolver resolver = mContext.getContentResolver();
         	ContentValues values = new ContentValues();
         	values.put(BusCardColumns.CARD_NUMBER, busCard.getCardNumber());
         	values.put(BusCardColumns.RESIDUAL_COUNT, busCard.getResidualCount());
         	values.put(BusCardColumns.RESIDUAL_AMOUNT, busCard.getResidualAmount());
-        	long cardId = mTrafficeStore.insertBusCard(values);
+        	Uri uri = resolver.insert(ITrafficData.BusCard.CONTENT_URI, values);
+        	long cardId = Long.parseLong(uri.getLastPathSegment());
         	for (ConsumerRecord record : busCard.getConsumerRecords()) {
         		values.clear();
         		values.put(ConsumerRecordColumns.CARD_ID, cardId);
@@ -178,6 +183,7 @@ public class TrafficManager {
         		values.put(ConsumerRecordColumns.RESIDUAL, record.getResidual());
         		values.put(ConsumerRecordColumns.TYPE, record.getType().toString());
             	mTrafficeStore.insertConsumerRecord(values);
+            	resolver.insert(ITrafficData.ConsumerRecord.CONTENT_URI, values);
             }
         }
     }
