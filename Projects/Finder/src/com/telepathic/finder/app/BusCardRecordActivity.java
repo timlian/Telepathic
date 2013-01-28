@@ -45,7 +45,7 @@ public class BusCardRecordActivity extends FragmentActivity {
     private CardIdFragment mFragment;
     private ArrayList<String> mCardNumberList = new ArrayList<String>();
     private ProgressDialog mWaitingDialog;
-	private MessageDispatcher mMessageDispatcher;
+    private MessageDispatcher mMessageDispatcher;
     private ITrafficService mTrafficService;
     private volatile boolean isCanceled = false;
     private Cursor mCursor;
@@ -68,70 +68,70 @@ public class BusCardRecordActivity extends FragmentActivity {
     }
 
     private void initView() {
-    	 mEditText = (AutoCompleteTextView) findViewById(R.id.searchkey);
-         mSendButton = (Button) findViewById(R.id.search);
-         mSendButton.setOnClickListener(new OnClickListener() {
-             @Override
-             public void onClick(View v) {
-                 final String cardNumber = mEditText.getText().toString();
-                 if (Utils.isValidBusCardNumber(cardNumber)) {
-                     mTrafficService.getConsumerRecords(cardNumber, 30);
-                     mSendButton.setEnabled(false);
-                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
-                     mWaitingDialog.show();
-                     mMessageDispatcher.add(new IMessageHandler() {
-             			@Override
-             			public int what() {
-             				return ITrafficeMessage.CONSUMER_RECORD_UPDATED;
-             			}
+        mEditText = (AutoCompleteTextView) findViewById(R.id.searchkey);
+        mSendButton = (Button) findViewById(R.id.search);
+        mSendButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String cardNumber = mEditText.getText().toString();
+                if (Utils.isValidBusCardNumber(cardNumber)) {
+                    mTrafficService.getConsumerRecords(cardNumber, 30);
+                    mSendButton.setEnabled(false);
+                    Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
+                    mWaitingDialog.show();
+                    mMessageDispatcher.add(new IMessageHandler() {
+                        @Override
+                        public int what() {
+                            return ITrafficeMessage.CONSUMER_RECORD_UPDATED;
+                        }
 
-             			@Override
-             			public void handleMessage(Message msg) {
-             				mSendButton.setEnabled(true);
-             				mWaitingDialog.dismiss();
-             				final int errorCode = msg.arg2;
-             				if (errorCode == 0) {
-             					new BusCardLoader().load(cardNumber);
-             				} else {
-             					showMessage("Get consumer records failed: " + errorCode);
-             				}
-             				mMessageDispatcher.remove(this);
-             			}
-             		});
-                 } else {
-                     mEditText.setError(getResources().getString(R.string.card_id_error_notice));
-                 }
-             }
-         });
-         
-         mListAdapter = new ConsumerRecordsAdapter();//new ConsumerRecordsAdapter();
-         mRecordList = (DropRefreshListView) findViewById(R.id.consumer_record_list);
-         mRecordList.setOnRefreshListener(new OnRefreshListener() {
-             @Override
-             public void onRefresh() {
-                 mTrafficService.getConsumerRecords(mFragment.getSelectedCardId(), 30);
-             }
-         });
-         mRecordList.setAdapter(mListAdapter);
-         mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
-         mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
-         mFragment = (CardIdFragment)getSupportFragmentManager().findFragmentById(R.id.card_id_list);
-         mFragment.setOnCardSelectedListener(new OnCardSelectedListener() {
-             @Override
-             public void onCardSelected(String cardId) {
-                 selectConsumptionRecordsByCardId(cardId);
-             }
-         });
-         if (mCardNumberList.size() > 0){
-             selectConsumptionRecordsByIndex(0);
-         }
-         mWaitingDialog = createWaitingDialog();
+                        @Override
+                        public void handleMessage(Message msg) {
+                            mSendButton.setEnabled(true);
+                            mWaitingDialog.dismiss();
+                            final int errorCode = msg.arg2;
+                            if (errorCode == 0) {
+                                new BusCardLoader().load(cardNumber);
+                            } else {
+                                showMessage("Get consumer records failed: " + errorCode);
+                            }
+                            mMessageDispatcher.remove(this);
+                        }
+                    });
+                } else {
+                    mEditText.setError(getResources().getString(R.string.card_id_error_notice));
+                }
+            }
+        });
+
+        mListAdapter = new ConsumerRecordsAdapter();//new ConsumerRecordsAdapter();
+        mRecordList = (DropRefreshListView) findViewById(R.id.consumer_record_list);
+        mRecordList.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mTrafficService.getConsumerRecords(mFragment.getSelectedCardId(), 30);
+            }
+        });
+        mRecordList.setAdapter(mListAdapter);
+        mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
+        mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
+        mFragment = (CardIdFragment)getSupportFragmentManager().findFragmentById(R.id.card_id_list);
+        mFragment.setOnCardSelectedListener(new OnCardSelectedListener() {
+            @Override
+            public void onCardSelected(String cardId) {
+                selectConsumptionRecordsByCardId(cardId);
+            }
+        });
+        if (mCardNumberList.size() > 0){
+            selectConsumptionRecordsByIndex(0);
+        }
+        mWaitingDialog = createWaitingDialog();
     }
-    
+
     private void onReceived(BusCard busCard) {
-    	
+
     }
-    
+
     private void selectConsumptionRecordsByIndex(int index){
         selectConsumptionRecordsByCardId(mCardNumberList.get(index));
     }
@@ -142,11 +142,11 @@ public class BusCardRecordActivity extends FragmentActivity {
     }
 
     public ArrayList<String> getBusCardNumbers() {
-    	return mCardNumberList;
+        return mCardNumberList;
     }
-    
+
     private ProgressDialog createWaitingDialog() {
-    	ProgressDialog prgDlg = new ProgressDialog(this);
+        ProgressDialog prgDlg = new ProgressDialog(this);
         prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         prgDlg.setMessage(getResources().getString(R.string.find_ic_card_records));
         prgDlg.setIndeterminate(true);
@@ -230,58 +230,62 @@ public class BusCardRecordActivity extends FragmentActivity {
         }
 
     }
-    
+
     private void showMessage(String msgText) {
-    	Toast.makeText(this, msgText, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, msgText, Toast.LENGTH_SHORT).show();
     }
-    
-	private class BusCardLoader {
-		
-		void loadAll() {
-			new LoadBusCardTask().execute();
-		}
-		
-		void load(String cardNumber) {
-			new LoadBusCardTask().execute(cardNumber);
-		}
 
-		private class LoadBusCardTask extends AsyncTask<String, Integer, ArrayList<BusCard>> {
-			@Override
-			protected ArrayList<BusCard> doInBackground(String... params) {
-				TrafficeStore trafficeStore = mTrafficService.getTrafficeStore();
-				ArrayList<BusCard> busCards = new ArrayList<BusCard>();
-				if (params.length == 0) {
+    private class BusCardLoader {
 
-				} else {
-					final String cardNumber = params[0];
-					BusCard busCard = trafficeStore.getBusCard(cardNumber);
-					ArrayList<ConsumerRecord> consumerRecords = trafficeStore.getConsumerRecords(cardNumber);
-					busCard.setConsumerRecords(consumerRecords);
-					busCards.add(busCard);
-				}
-				return busCards;
-			}
+        void loadAll() {
+            new LoadBusCardTask().execute();
+        }
 
-			@Override
-			protected void onProgressUpdate(Integer... values) {
-				super.onProgressUpdate(values);
-			}
+        void load(String cardNumber) {
+            new LoadBusCardTask().execute(cardNumber);
+        }
 
-			@Override
-			protected void onPostExecute(ArrayList<BusCard> busCards) {
-				BusCard busCard = busCards.get(0);
-				String resiaualCount = getString(R.string.residual_count,busCard.getResidualCount());
-				String resiaualAmount = getString(R.string.residual_amount,busCard.getResidualAmount());
-				mResidualCountText.setText(resiaualCount);
-				mResidualAmountText.setText(resiaualAmount);
-				mListAdapter.updateRecords(busCard.getConsumerRecords());
-				mFragment.selectItemByCardId(busCard.getCardNumber());
-				mRecordList.onRefreshComplete();
-				if (!mCardNumberList.contains(busCard.getCardNumber())) {
-					mCardNumberList.add(busCard.getCardNumber());
-				}
-			}
-		}
-	}
+        private class LoadBusCardTask extends AsyncTask<String, Integer, ArrayList<BusCard>> {
+            @Override
+            protected ArrayList<BusCard> doInBackground(String... params) {
+                TrafficeStore trafficeStore = mTrafficService.getTrafficeStore();
+                ArrayList<BusCard> busCards = new ArrayList<BusCard>();
+                if (params.length == 0) {
+
+                } else {
+                    final String cardNumber = params[0];
+                    BusCard busCard = trafficeStore.getBusCard(cardNumber);
+                    ArrayList<ConsumerRecord> consumerRecords = trafficeStore.getConsumerRecords(cardNumber);
+                    busCard.setConsumerRecords(consumerRecords);
+                    busCards.add(busCard);
+                }
+                return busCards;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<BusCard> busCards) {
+                if(busCards.size() == 0) {
+
+                }else {
+                    BusCard busCard = busCards.get(0);
+                    String resiaualCount = getString(R.string.residual_count,busCard.getResidualCount());
+                    String resiaualAmount = getString(R.string.residual_amount,busCard.getResidualAmount());
+                    mResidualCountText.setText(resiaualCount);
+                    mResidualAmountText.setText(resiaualAmount);
+                    mListAdapter.updateRecords(busCard.getConsumerRecords());
+                    mFragment.selectItemByCardId(busCard.getCardNumber());
+                    mRecordList.onRefreshComplete();
+                    if (!mCardNumberList.contains(busCard.getCardNumber())) {
+                        mCardNumberList.add(busCard.getCardNumber());
+                    }
+                }
+            }
+        }
+    }
 
 }
