@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -58,8 +61,34 @@ public class BusCardRecordActivity extends FragmentActivity {
         FinderApplication app = (FinderApplication) getApplication();
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
+        mCursor = mTrafficService.getTrafficeStore().getBusCards();
+        Utils.debug(TAG, mCursor.getClass().getName());
+		mCursor.registerContentObserver(new ContentObserver(new Handler()) {
+			@Override
+			public boolean deliverSelfNotifications() {
+				Utils.debug(TAG, "ContentObserver - deliverSelfNotifications()");
+				return true;
+			}
+
+			@Override
+			public void onChange(boolean selfChange) {
+				Utils.debug(TAG, "ContentObserver - deliverSelfNotifications()");
+				onContentChanged();
+			}
+		});
+		mCursor.registerDataSetObserver(new DataSetObserver() {
+			@Override
+			public void onChanged() {
+				Utils.debug(TAG, "ContentObserver - onChanged()");
+			}
+
+			@Override
+			public void onInvalidated() {
+				Utils.debug(TAG, "ContentObserver - onInvalidated()");
+			}
+		});
         initView();
-        new BusCardLoader().loadAll();
+        //new BusCardLoader().loadAll();
     }
 
     @Override
