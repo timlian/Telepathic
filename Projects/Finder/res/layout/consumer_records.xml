@@ -38,11 +38,6 @@
             android:layout_alignParentLeft="true"
             android:background="#80808080">
 
-            <fragment
-                android:id="@+id/card_id_list"
-                android:name="com.telepathic.finder.app.CardIdFragment"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <LinearLayout

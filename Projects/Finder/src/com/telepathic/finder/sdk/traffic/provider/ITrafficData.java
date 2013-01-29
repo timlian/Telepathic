@@ -26,7 +26,7 @@ public interface ITrafficData {
 		String LAST_DATE = "last_date";
 	}
 	
-	static class BusCard implements BaseColumns {
+	static class BusCard implements BusCardColumns {
 		/**
 		 * The content uri of this table
 		 */

@@ -46,6 +46,11 @@ public class TrafficDataProvider extends ContentProvider {
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "busRouteStation", MATCH_BUS_ROUTE_STATION);
 	}
 	
+	private static final String BUS_CARD_JOIN_CONSUMER_RECORD = 
+			TABLE_BUS_CARD + " LEFT OUTER JOIN " + TABLE_CONSUMER_RECORD + " ON "
+			+ "(" + TABLE_BUS_CARD + "." + BusCardColumns._ID + "=" + ConsumerRecordColumns.CARD_ID + ")";
+	
+	
 	private DbHelper mDBHelper;
 	
 	@Override
@@ -65,6 +70,9 @@ public class TrafficDataProvider extends ContentProvider {
 		case MATCH_BUS_CARD_BY_ID:
 			tableName = TABLE_CONSUMER_RECORD;
 			break;
+		case MATCH_CONSUMER_RECORD:
+			tableName = BUS_CARD_JOIN_CONSUMER_RECORD;
+			break;
 		case MATCH_BUS_ROUTE:
 			tableName = TABLE_BUS_ROUTE;
 			break;
@@ -79,8 +87,8 @@ public class TrafficDataProvider extends ContentProvider {
 		}
 		SQLiteDatabase db = mDBHelper.getReadableDatabase();
 		Cursor cursor = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
-		cursor.setNotificationUri(getContext().getContentResolver(), uri);
-		Utils.debug(TAG, "query cursor: " + cursor.getClass().getName());
+		Utils.printCursorContent(TAG, cursor);
+		//cursor.setNotificationUri(getContext().getContentResolver(), uri);
 		return cursor;
 	}
 
