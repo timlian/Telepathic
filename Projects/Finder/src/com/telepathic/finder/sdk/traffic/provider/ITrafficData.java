@@ -1,5 +1,6 @@
 package com.telepathic.finder.sdk.traffic.provider;
 
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -85,6 +86,18 @@ public interface ITrafficData {
 		 * The MIME type
 		 */
 		public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.consumerRecord";
+		
+		/**
+		 * Get the consumer records uri according to the specified card numer.
+		 * 
+		 * @param cardNumber The card number
+		 * @return
+		 */
+		public static final Uri getConsumerRecordUriByCardNumber(long cardNumber) {
+            Uri.Builder builder = CONTENT_URI.buildUpon();
+            ContentUris.appendId(builder, cardNumber);
+            return builder.build();
+        }
 	}
 	
 	interface BusRouteColumns extends BaseColumns {

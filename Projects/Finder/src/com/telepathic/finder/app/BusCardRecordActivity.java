@@ -1,5 +1,6 @@
 package com.telepathic.finder.app;
 
+import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,7 +12,6 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,7 +31,7 @@ import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
-public class BusCardRecordActivity extends FragmentActivity {
+public class BusCardRecordActivity extends Activity {
     private static final String TAG = BusCardRecordActivity.class.getSimpleName();
 
     private static final int BUS_CARD_LOADER_ID = 100;
@@ -85,9 +85,9 @@ public class BusCardRecordActivity extends FragmentActivity {
 				loader = new CursorLoader(getContext(), ITrafficData.BusCard.CONTENT_URI, null, null, null, null);
 				break;
 			case CONSUMER_RECORD_LOADER_ID:
-				String cardNumber = args.getString(CARD_NUMBER);
-				String selection = ITrafficData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber + "\'";
-				loader = new CursorLoader(getContext(), ITrafficData.ConsumerRecord.CONTENT_URI, null, selection, null, null);
+				//String cardNumber = args.getString(CARD_NUMBER);
+				//String selection = ITrafficData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber + "\'";
+				loader = new CursorLoader(getContext(), ITrafficData.ConsumerRecord.CONTENT_URI, null, null, null, null);
 				break;
 			default:
 				break;
@@ -104,16 +104,18 @@ public class BusCardRecordActivity extends FragmentActivity {
 				}
 				mListAdapter.swapCursor(data);
 			} else {
-				final int idxCardNumber = data.getColumnIndex(ITrafficData.BusCard.CARD_NUMBER);
-				final int idxResidualCount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_COUNT);
-				final int idxResidualAmount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_AMOUNT);
-				String resiaualCount = getString(R.string.residual_count, data.getString(idxResidualCount));
-                String resiaualAmount = getString(R.string.residual_amount, data.getString(idxResidualAmount));
-				mResidualCountText.setText(resiaualCount);
-				mResidualAmountText.setText(resiaualAmount);
-				Bundle args = new Bundle();
-				args.putString(CARD_NUMBER, data.getString(idxCardNumber));
-				getLoaderManager().initLoader(CONSUMER_RECORD_LOADER_ID, args, this);
+				if (data.getCount() > 0) {
+					final int idxCardNumber = data.getColumnIndex(ITrafficData.BusCard.CARD_NUMBER);
+					final int idxResidualCount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_COUNT);
+					final int idxResidualAmount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_AMOUNT);
+					String resiaualCount = getString(R.string.residual_count, data.getString(idxResidualCount));
+	                String resiaualAmount = getString(R.string.residual_amount, data.getString(idxResidualAmount));
+					mResidualCountText.setText(resiaualCount);
+					mResidualAmountText.setText(resiaualAmount);
+					Bundle args = new Bundle();
+					args.putString(CARD_NUMBER, data.getString(idxCardNumber));
+					getLoaderManager().initLoader(CONSUMER_RECORD_LOADER_ID, args, this);
+				}
 			}
 		}
 
