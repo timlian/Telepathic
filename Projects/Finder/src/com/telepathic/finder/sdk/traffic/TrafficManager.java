@@ -159,10 +159,10 @@ public class TrafficManager {
         }
         
         private void notifyDataChanged() {
-        	Message msg = Message.obtain();
-        	msg.arg1 = ITrafficeMessage.CONSUMER_RECORD_UPDATED;
-        	msg.arg2 = 0;
-        	mMessageHandler.sendMessage(msg);
+//        	Message msg = Message.obtain();
+//        	msg.arg1 = ITrafficeMessage.CONSUMER_RECORD_UPDATED;
+//        	msg.arg2 = 0;
+//        	mMessageHandler.sendMessage(msg);
         }
         
         private void saveConsumerRecords(BusCard busCard) {
@@ -185,6 +185,8 @@ public class TrafficManager {
             	mTrafficeStore.insertConsumerRecord(values);
             	resolver.insert(ITrafficData.ConsumerRecord.CONTENT_URI, values);
             }
+        	resolver.notifyChange(ITrafficData.BusCard.CONTENT_URI, null);
+        	resolver.notifyChange(ITrafficData.ConsumerRecord.CONTENT_URI, null);
         }
     }
 

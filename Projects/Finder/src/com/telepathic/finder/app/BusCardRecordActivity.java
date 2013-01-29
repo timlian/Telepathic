@@ -2,9 +2,13 @@ package com.telepathic.finder.app;
 
 import java.util.ArrayList;
 
+import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.Loader;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -19,7 +23,9 @@ import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +37,7 @@ import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.BusCard;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
@@ -51,6 +58,8 @@ public class BusCardRecordActivity extends FragmentActivity {
     private MessageDispatcher mMessageDispatcher;
     private ITrafficService mTrafficService;
     private volatile boolean isCanceled = false;
+    private SimpleCursorAdapter mCursorAdapter;
+    private TestAdapter mAdapter;
     private Cursor mCursor;
 
     @Override
@@ -61,8 +70,8 @@ public class BusCardRecordActivity extends FragmentActivity {
         FinderApplication app = (FinderApplication) getApplication();
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
-        mCursor = mTrafficService.getTrafficeStore().getBusCards();
-        Utils.debug(TAG, mCursor.getClass().getName());
+        mCursor = getContentResolver().query(ITrafficData.BusCard.CONTENT_URI, null, null, null, null);
+        Utils.debug(TAG, "cursor class: " + mCursor.getClass().getName());
 		mCursor.registerContentObserver(new ContentObserver(new Handler()) {
 			@Override
 			public boolean deliverSelfNotifications() {
@@ -72,7 +81,7 @@ public class BusCardRecordActivity extends FragmentActivity {
 
 			@Override
 			public void onChange(boolean selfChange) {
-				Utils.debug(TAG, "ContentObserver - deliverSelfNotifications()");
+				Utils.debug(TAG, "ContentObserver - onChange()");
 				onContentChanged();
 			}
 		});
@@ -87,10 +96,45 @@ public class BusCardRecordActivity extends FragmentActivity {
 				Utils.debug(TAG, "ContentObserver - onInvalidated()");
 			}
 		});
+		getContentResolver().registerContentObserver(ITrafficData.BusCard.CONTENT_URI , true, new ContentObserver(new Handler()) {
+			@Override
+			public boolean deliverSelfNotifications() {
+				Utils.debug(TAG, "getContentResolver.ContentObserver - deliverSelfNotifications()");
+				return true;
+			}
+
+			@Override
+			public void onChange(boolean selfChange) {
+				Utils.debug(TAG, "getContentResolver.ContentObserver - onChange()");
+				onContentChanged();
+			}
+		});
+		mAdapter= new TestAdapter(mCursor);
         initView();
-        //new BusCardLoader().loadAll();
+       // getLoaderManager().initLoader(0, null, (LoaderCallbacks<D>) this);
     }
 
+    private class MyLoaderCallback implements LoaderCallbacks<Cursor> {
+
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			CursorLoader loader = new CursorLoader(BusCardRecordActivity.this, ITrafficData.BusCard.CONTENT_URI, null, null, null, null);
+			return loader;
+		}
+
+		@Override
+		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+			// TODO Auto-generated method stub
+			mCursorAdapter.swapCursor(data);
+		}
+
+		@Override
+		public void onLoaderReset(Loader<Cursor> loader) {
+			// TODO Auto-generated method stub
+			mCursorAdapter.swapCursor(null);
+		}
+    }
+    
     @Override
     protected void onResume() {
         super.onResume();
@@ -141,7 +185,7 @@ public class BusCardRecordActivity extends FragmentActivity {
                 mTrafficService.getConsumerRecords(mFragment.getSelectedCardId(), 30);
             }
         });
-        mRecordList.setAdapter(mListAdapter);
+        mRecordList.setAdapter(mAdapter);
         mResidualCountText = (TextView) findViewById(R.id.residual_count_text);
         mResidualAmountText = (TextView) findViewById(R.id.residual_amount_text);
         mFragment = (CardIdFragment)getSupportFragmentManager().findFragmentById(R.id.card_id_list);
@@ -198,6 +242,24 @@ public class BusCardRecordActivity extends FragmentActivity {
         ImageView consumeType;
     }
 
+    private class TestAdapter extends CursorAdapter {
+
+		public TestAdapter(Cursor c) {
+			super(BusCardRecordActivity.this, c, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+		}
+
+		@Override
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			Utils.printCursorContent(TAG, cursor);
+			return null;
+		}
+
+		@Override
+		public void bindView(View view, Context context, Cursor cursor) {
+			Utils.printCursorContent(TAG, cursor);
+		}
+    }
+    
     private class ConsumerRecordsAdapter extends BaseAdapter {
         private ArrayList<ConsumerRecord> mRecords;
 

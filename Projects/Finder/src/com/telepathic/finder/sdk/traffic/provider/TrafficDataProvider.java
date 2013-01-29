@@ -57,17 +57,31 @@ public class TrafficDataProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
-		Utils.debug(TAG, "query()");
-		
+		String tableName = null;
 		switch (sUriMatcher.match(uri)) {
 		case MATCH_BUS_CARD:
-
+			tableName = TABLE_BUS_CARD;
 			break;
-
+		case MATCH_BUS_CARD_BY_ID:
+			tableName = TABLE_CONSUMER_RECORD;
+			break;
+		case MATCH_BUS_ROUTE:
+			tableName = TABLE_BUS_ROUTE;
+			break;
+		case MATCH_BUS_STATION:
+			tableName = TABLE_BUS_STATION;
+			break;
+		case MATCH_BUS_ROUTE_STATION:
+			tableName = TABLE_BUS_ROUTE_STATION;
+			break;
 		default:
-			break;
+			throw new IllegalArgumentException("query() - Unknown uri: " + uri);
 		}
-		return null;
+		SQLiteDatabase db = mDBHelper.getReadableDatabase();
+		Cursor cursor = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
+		cursor.setNotificationUri(getContext().getContentResolver(), uri);
+		Utils.debug(TAG, "query cursor: " + cursor.getClass().getName());
+		return cursor;
 	}
 
 	@Override
@@ -93,7 +107,7 @@ public class TrafficDataProvider extends ContentProvider {
 			mimeType = ITrafficData.BusRouteStation.CONTENT_TYPE;
 			break;
 		default:
-			throw new IllegalArgumentException("Unknown uri: " + uri);
+			throw new IllegalArgumentException("getType() - Unknown uri: " + uri);
 		}
 		return mimeType;
 	}
@@ -119,7 +133,7 @@ public class TrafficDataProvider extends ContentProvider {
 			tableName = TABLE_BUS_ROUTE_STATION;
 			break;
 		default:
-			throw new UnsupportedOperationException("Can't inser into uri: " + uri);
+			throw new UnsupportedOperationException("Can't insert into uri: " + uri);
 		}
 		Uri retUri = null;
 		long rowId = db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_REPLACE);
