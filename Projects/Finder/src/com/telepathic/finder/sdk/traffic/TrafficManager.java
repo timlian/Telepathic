@@ -186,7 +186,7 @@ public class TrafficManager {
             	resolver.insert(ITrafficData.ConsumerRecord.CONTENT_URI, values);
             }
         	resolver.notifyChange(ITrafficData.BusCard.CONTENT_URI, null);
-        	resolver.notifyChange(ITrafficData.ConsumerRecord.CONTENT_URI, null);
+        	//resolver.notifyChange(ITrafficData.ConsumerRecord.CONTENT_URI, null);
         }
     }
 

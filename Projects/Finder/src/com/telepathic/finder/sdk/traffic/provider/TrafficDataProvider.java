@@ -88,7 +88,7 @@ public class TrafficDataProvider extends ContentProvider {
 		SQLiteDatabase db = mDBHelper.getReadableDatabase();
 		Cursor cursor = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
 		Utils.printCursorContent(TAG, cursor);
-		//cursor.setNotificationUri(getContext().getContentResolver(), uri);
+		cursor.setNotificationUri(getContext().getContentResolver(), uri);
 		return cursor;
 	}
 
@@ -147,7 +147,6 @@ public class TrafficDataProvider extends ContentProvider {
 		long rowId = db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 		if (rowId > 0) {
 			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
-			getContext().getContentResolver().notifyChange(uri, null);
 		}
 		return retUri;
 	}

@@ -55,19 +55,31 @@ public class BusCardRecordActivity extends Activity {
         FinderApplication app = (FinderApplication) getApplication();
         mTrafficService = app.getTrafficService();
         getLoaderManager().initLoader(BUS_CARD_LOADER_ID, null, new BusCardLoaderCallback());
-        
-		getContentResolver().registerContentObserver(ITrafficData.ConsumerRecord.CONTENT_URI , true, new ContentObserver(new Handler()) {
-			@Override
-			public boolean deliverSelfNotifications() {
-				Utils.debug(TAG, "getContentResolver.ContentObserver - deliverSelfNotifications()");
-				return false;
-			}
-
-			@Override
-			public void onChange(boolean selfChange) {
-				Utils.debug(TAG, "getContentResolver.ContentObserver - onChange()");
-				getLoaderManager().initLoader(CONSUMER_RECORD_LOADER_ID, null, new BusCardLoaderCallback());
-			}
+        getContentResolver().registerContentObserver(ITrafficData.BusCard.CONTENT_URI, true, new ContentObserver(new Handler()) {
+        	@Override
+        	public boolean deliverSelfNotifications() {
+        		Utils.debug(TAG, "ContentObserver - deliverSelfNotifications()");
+        		return super.deliverSelfNotifications();
+        	}
+        	
+        	@Override
+        	public void onChange(boolean selfChange) {
+        		Utils.debug(TAG, "ContentObserver - ITrafficData.BusCard onChange()");
+        		super.onChange(selfChange);
+        	}
+		});
+        getContentResolver().registerContentObserver(ITrafficData.ConsumerRecord.CONTENT_URI, true, new ContentObserver(new Handler()) {
+        	@Override
+        	public boolean deliverSelfNotifications() {
+        		Utils.debug(TAG, "ContentObserver - deliverSelfNotifications()");
+        		return super.deliverSelfNotifications();
+        	}
+        	
+        	@Override
+        	public void onChange(boolean selfChange) {
+        		Utils.debug(TAG, "ContentObserver - ITrafficData.ConsumerRecord onChange()");
+        		super.onChange(selfChange);
+        	}
 		});
         initView();
     }
@@ -184,7 +196,7 @@ public class BusCardRecordActivity extends Activity {
 
     private class ConsumerRecordAdapter extends CursorAdapter {
     	private LayoutInflater mInflater;
-    	
+
 		public ConsumerRecordAdapter(Cursor c) {
 			super(BusCardRecordActivity.this, c, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 			mInflater = getLayoutInflater();
@@ -233,5 +245,5 @@ public class BusCardRecordActivity extends Activity {
     private void showMessage(String msgText) {
         Toast.makeText(this, msgText, Toast.LENGTH_SHORT).show();
     }
-
+    
 }
