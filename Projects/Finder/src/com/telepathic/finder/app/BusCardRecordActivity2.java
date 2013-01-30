@@ -17,14 +17,13 @@ import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.telepathic.finder.R;
-import com.telepathic.finder.adapter.GalleryAdapter;
+import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.BusCard;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
@@ -36,19 +35,20 @@ public class BusCardRecordActivity2 extends BaseActivity {
     private Button mSendButton;
     private AutoCompleteTextView mEditText;
     private ViewPager mViewPager;
-    private Gallery mGallery;
     private BusCardPageAdapter mViewPagerAdapter;
-    private GalleryAdapter mGalleryAdapter;
     private LinearLayout mNoItemTips;
     private RelativeLayout mConsumptionDetail;
     private final int mBusCardLoaderId = getLoaderId();
     private ArrayList<BusCard> mBusCards;
-
+    private ITrafficService mTrafficService;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bus_card_record);
         initView();
+        FinderApplication app = (FinderApplication) getApplication();
+        mTrafficService = app.getTrafficService();
         startLoadBusCards();
     }
 
@@ -104,7 +104,6 @@ public class BusCardRecordActivity2 extends BaseActivity {
         mEditText = (AutoCompleteTextView)findViewById(R.id.key_card_id);
         mNoItemTips = (LinearLayout)findViewById(R.id.no_item_tips);
         mConsumptionDetail = (RelativeLayout)findViewById(R.id.consumption_detail);
-        mGallery = (Gallery)findViewById(R.id.viewpager_tab);
         mViewPager = (ViewPager)findViewById(R.id.viewpager);
         mNoItemTips.setVisibility(View.GONE);
         mConsumptionDetail.setVisibility(View.VISIBLE);
@@ -114,7 +113,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
         if(mSendButton.equals(v)) {
             String cardNumber = mEditText.getText().toString();
             if (Utils.isValidBusCardNumber(cardNumber)) {
-                //TODO: Get the consumer record
+            	mTrafficService.getConsumerRecords(cardNumber, 30);
             } else {
                 mEditText.setError(getResources().getString(R.string.card_id_error_notice));
             }
