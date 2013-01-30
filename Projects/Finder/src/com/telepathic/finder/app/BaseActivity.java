@@ -1,11 +1,11 @@
 package com.telepathic.finder.app;
 
-import android.app.Activity;
 import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 
-public class BaseActivity extends Activity{
+public class BaseActivity extends FragmentActivity{
 
-	Context getContext() {
-		return this;
-	}
+    Context getContext() {
+        return this;
+    }
 }
