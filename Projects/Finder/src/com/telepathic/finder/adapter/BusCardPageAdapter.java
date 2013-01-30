@@ -12,10 +12,11 @@ import android.widget.TextView;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.traffic.BusCard;
+import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 
 public class BusCardPageAdapter extends PagerAdapter {
-
+	private static final String TAG  = "BusCardPageAdapter";
     private Context mContext;
     private ArrayList<BusCardPageInfo> mBusCardPageInfoList;
 
@@ -52,10 +53,11 @@ public class BusCardPageAdapter extends PagerAdapter {
      */
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+    	Utils.debug(TAG, "instantiateItem - : " + position);
         View containView = mBusCardPageInfoList.get(position).view;
         if (containView == null) {
             ViewHolder holder = new ViewHolder();
-            containView = ((Activity)mContext).getLayoutInflater().inflate(R.layout.bus_card_consume_records, container);
+            containView = ((Activity)mContext).getLayoutInflater().inflate(R.layout.bus_card_consume_records, null);
             holder.tvResidualCount = (TextView)containView.findViewById(R.id.residual_count_text);
             holder.tvResidualAmount = (TextView)containView.findViewById(R.id.residual_amount_text);
             holder.lvRecordsList = (DropRefreshListView)containView.findViewById(R.id.consumer_record_list);
