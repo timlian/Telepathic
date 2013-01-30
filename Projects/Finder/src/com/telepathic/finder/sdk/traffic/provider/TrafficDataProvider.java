@@ -13,6 +13,7 @@ import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusCardColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusRouteColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusRouteStationColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusStationColumns;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.ConsumerRecordColumns;
 import com.telepathic.finder.util.Utils;
 

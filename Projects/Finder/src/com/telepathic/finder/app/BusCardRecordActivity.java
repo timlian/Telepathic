@@ -1,6 +1,8 @@
 package com.telepathic.finder.app;
 
+import android.R.interpolator;
 import android.app.Activity;
+import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -27,17 +29,16 @@ import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData.ConsumerRecord;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
 public class BusCardRecordActivity extends Activity {
     private static final String TAG = BusCardRecordActivity.class.getSimpleName();
-
     private static final int BUS_CARD_LOADER_ID = 100;
     private static final int CONSUMER_RECORD_LOADER_ID = 200;
     private static final String CARD_NUMBER = "card_number";
-    
     private Button mSendButton;
     private TextView mResidualCountText;
     private TextView mResidualAmountText;
@@ -55,6 +56,7 @@ public class BusCardRecordActivity extends Activity {
         FinderApplication app = (FinderApplication) getApplication();
         mTrafficService = app.getTrafficService();
         getLoaderManager().initLoader(BUS_CARD_LOADER_ID, null, new BusCardLoaderCallback());
+        
         getContentResolver().registerContentObserver(ITrafficData.BusCard.CONTENT_URI, true, new ContentObserver(new Handler()) {
         	@Override
         	public boolean deliverSelfNotifications() {
@@ -91,15 +93,17 @@ public class BusCardRecordActivity extends Activity {
     private class BusCardLoaderCallback implements LoaderCallbacks<Cursor> {
 		@Override
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			Utils.debug(TAG, "BusCardLoaderCallback - onCreateLoader: " + id);
 			CursorLoader loader = null;
 			switch(id) {
 			case BUS_CARD_LOADER_ID:
 				loader = new CursorLoader(getContext(), ITrafficData.BusCard.CONTENT_URI, null, null, null, null);
 				break;
 			case CONSUMER_RECORD_LOADER_ID:
-				//String cardNumber = args.getString(CARD_NUMBER);
-				//String selection = ITrafficData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber + "\'";
-				loader = new CursorLoader(getContext(), ITrafficData.ConsumerRecord.CONTENT_URI, null, null, null, null);
+				String cardNumber = args.getString(CARD_NUMBER);
+				String selection = ITrafficData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber + "\'";
+				String sortOrder = ITrafficData.ConsumerRecord.DATE + " DESC";
+				loader = new CursorLoader(getContext(), ITrafficData.ConsumerRecord.CONTENT_URI, null, selection, null, sortOrder);
 				break;
 			default:
 				break;
@@ -109,14 +113,17 @@ public class BusCardRecordActivity extends Activity {
 
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-			if (loader.getId() == CONSUMER_RECORD_LOADER_ID) {
+			Utils.debug(TAG, "BusCardLoaderCallback - onLoadFinished: " + loader.getId());
+			switch (loader.getId()) {
+			case CONSUMER_RECORD_LOADER_ID:
 				if (mListAdapter == null) {
 					mListAdapter = new ConsumerRecordAdapter(data);
 					mRecordList.setAdapter(mListAdapter);
 				}
 				mListAdapter.swapCursor(data);
-			} else {
-				if (data.getCount() > 0) {
+				break;
+			case BUS_CARD_LOADER_ID:
+				do {
 					final int idxCardNumber = data.getColumnIndex(ITrafficData.BusCard.CARD_NUMBER);
 					final int idxResidualCount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_COUNT);
 					final int idxResidualAmount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_AMOUNT);
@@ -126,13 +133,18 @@ public class BusCardRecordActivity extends Activity {
 					mResidualAmountText.setText(resiaualAmount);
 					Bundle args = new Bundle();
 					args.putString(CARD_NUMBER, data.getString(idxCardNumber));
-					getLoaderManager().initLoader(CONSUMER_RECORD_LOADER_ID, args, this);
-				}
+					Loader<Cursor> loader2 = getLoaderManager().restartLoader(CONSUMER_RECORD_LOADER_ID, args, this);
+					Utils.debug(TAG, "loader return: " + loader2);
+				} while(data.moveToNext());
+				break;
+			default:
+				break;
 			}
 		}
 
 		@Override
 		public void onLoaderReset(Loader<Cursor> loader) {
+			Utils.debug(TAG, "BusCardLoaderCallback - onLoaderReset: " + loader.getId());
 			mListAdapter.swapCursor(null);
 		}
     }
@@ -156,6 +168,7 @@ public class BusCardRecordActivity extends Activity {
                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
                 } else {
                     mEditText.setError(getResources().getString(R.string.card_id_error_notice));
+                    getLoaderManager().restartLoader(BUS_CARD_LOADER_ID, null, new BusCardLoaderCallback());
                 }
             }
         });
@@ -246,4 +259,82 @@ public class BusCardRecordActivity extends Activity {
         Toast.makeText(this, msgText, Toast.LENGTH_SHORT).show();
     }
     
+//    private class BusCardLoader {
+//        private static final int BUS_CARD_LOADER = 100;
+//        private static final int CONSUMER_RECORD_LOADER = 200;
+//        private static final String CARD_NUMBER = "card_number";
+//        
+//    	void loadAllBusCard() {
+//    		LoaderManager manager = getLoaderManager();
+//    		if (manager.getLoader(BUS_CARD_LOADER) == null) {
+//    			manager.initLoader(BUS_CARD_LOADER, null, new LoaderCallback());
+//    		} else {
+//    			manager.restartLoader(BUS_CARD_LOADER, null, new LoaderCallback());
+//    		}
+//    	}
+//    	
+//    	void loadConsumerRecords(String cardNumber) {
+//    		LoaderManager manager = getLoaderManager();
+//    		Bundle args = new Bundle();
+//			args.putString(CARD_NUMBER, cardNumber);
+//    		if (manager.getLoader(CONSUMER_RECORD_LOADER) == null) {
+//    			manager.initLoader(CONSUMER_RECORD_LOADER, args, new LoaderCallback());
+//    		} else {
+//    			manager.restartLoader(CONSUMER_RECORD_LOADER, args, new LoaderCallback());
+//    		}
+//    	}
+//    	
+//    	private class LoaderCallback implements LoaderCallbacks<Cursor>{
+//    		@Override
+//    		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+//    			Utils.debug(TAG, "BusCardLoaderCallback - onCreateLoader: " + id);
+//    			CursorLoader loader = null;
+//    			switch(id) {
+//    			case BUS_CARD_LOADER:
+//    				loader = new CursorLoader(getContext(), ITrafficData.BusCard.CONTENT_URI, null, null, null, null);
+//    				break;
+//    			case CONSUMER_RECORD_LOADER:
+//    				//String cardNumber = args.getString(CARD_NUMBER);
+//    				//String selection = ITrafficData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber + "\'";
+//    				loader = new CursorLoader(getContext(), ITrafficData.ConsumerRecord.CONTENT_URI, null, null, null, null);
+//    				break;
+//    			default:
+//    				break;
+//    			}
+//    			return loader;
+//    		}
+//
+//    		@Override
+//    		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+//    			Utils.debug(TAG, "BusCardLoaderCallback - onLoadFinished: " + loader.getId());
+//    			if (loader.getId() == CONSUMER_RECORD_LOADER_ID) {
+//    				if (mListAdapter == null) {
+//    					mListAdapter = new ConsumerRecordAdapter(data);
+//    					mRecordList.setAdapter(mListAdapter);
+//    				}
+//    				mListAdapter.swapCursor(data);
+//    			} else {
+//    				if (data.getCount() > 0) {
+//    					final int idxCardNumber = data.getColumnIndex(ITrafficData.BusCard.CARD_NUMBER);
+//    					final int idxResidualCount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_COUNT);
+//    					final int idxResidualAmount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_AMOUNT);
+//    					String resiaualCount = getString(R.string.residual_count, data.getString(idxResidualCount));
+//    	                String resiaualAmount = getString(R.string.residual_amount, data.getString(idxResidualAmount));
+//    					mResidualCountText.setText(resiaualCount);
+//    					mResidualAmountText.setText(resiaualAmount);
+//    					Bundle args = new Bundle();
+//    					args.putString(CARD_NUMBER, data.getString(idxCardNumber));
+//    					//getLoaderManager().initLoader(CONSUMER_RECORD_LOADER_ID, args, this);
+//    				}
+//    			}
+//    		}
+//
+//    		@Override
+//    		public void onLoaderReset(Loader<Cursor> loader) {
+//    			Utils.debug(TAG, "BusCardLoaderCallback - onLoaderReset: " + loader.getId());
+//    			mListAdapter.swapCursor(null);
+//    		}
+//    	}
+//    }
+//    
 }
