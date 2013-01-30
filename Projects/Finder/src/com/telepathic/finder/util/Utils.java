@@ -273,4 +273,8 @@ public class Utils {
             Log.e(tag, errorMsg);
         }
     }
+    
+    public static boolean isValid(Cursor cursor) {
+    	return (cursor != null && cursor.getCount() > 0) ? true : false;
+    }
 }
