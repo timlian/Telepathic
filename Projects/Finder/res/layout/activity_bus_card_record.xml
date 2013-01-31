@@ -20,16 +20,16 @@
 
         <Button
             android:id="@+id/search"
-            android:onClick="onSearchCardIdClicked"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="onSearchCardIdClicked"
             android:text="@string/find" />
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/no_item_tips"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/no_item_tips"
         android:gravity="center"
         android:visibility="visible" >
 
@@ -45,11 +45,23 @@
         android:layout_height="fill_parent"
         android:visibility="gone" >
 
-        <Gallery
+        <HorizontalScrollView
             android:id="@+id/viewpager_tab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true"
+            android:background="@android:color/darker_gray"
+            android:fadingEdge="none"
+            android:scrollbars="none" >
+
+            <LinearLayout
+                android:id="@+id/tabcontent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/darker_gray"
+                android:orientation="horizontal" >
+            </LinearLayout>
+        </HorizontalScrollView>
 
         <android.support.v4.view.ViewPager
             android:id="@+id/viewpager"

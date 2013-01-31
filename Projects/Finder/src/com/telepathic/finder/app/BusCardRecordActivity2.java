@@ -5,18 +5,25 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.CursorAdapter;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -32,15 +39,21 @@ import com.telepathic.finder.view.DropRefreshListView;
 
 public class BusCardRecordActivity2 extends BaseActivity {
     private static int LOADER_ID = 1000;
+    private static final int TAB_COUNT = 3;
     private Button mSendButton;
     private AutoCompleteTextView mEditText;
     private ViewPager mViewPager;
+    private HorizontalScrollView mViewPagerTab;
     private BusCardPageAdapter mViewPagerAdapter;
     private LinearLayout mNoItemTips;
     private RelativeLayout mConsumptionDetail;
     private final int mBusCardLoaderId = getLoaderId();
     private ArrayList<BusCard> mBusCards;
     private ITrafficService mTrafficService;
+    private LinearLayout mTabContent;
+    private ArrayList<TextView> mViewPagerTabTextView = new ArrayList<TextView>();
+    private int mScreenWidth;
+    private volatile boolean isClicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +83,8 @@ public class BusCardRecordActivity2 extends BaseActivity {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if (mBusCardLoaderId == loader.getId() && Utils.isValid(data)) {
+                mNoItemTips.setVisibility(View.GONE);
+                mConsumptionDetail.setVisibility(View.VISIBLE);
                 mBusCards = new ArrayList<BusCard>();
                 int idxCardNumber = data.getColumnIndex(ITrafficData.BusCard.CARD_NUMBER);
                 int idxResidualCount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_COUNT);
@@ -77,8 +92,8 @@ public class BusCardRecordActivity2 extends BaseActivity {
                 do {
                     BusCard card = new BusCard();
                     card.setCardNumber(data.getString(idxCardNumber));
-                    String resiaualCount = getString(R.string.residual_count, data.getString(idxResidualCount));
-                    String resiaualAmount = getString(R.string.residual_amount, data.getString(idxResidualAmount));
+                    String resiaualCount = data.getString(idxResidualCount);
+                    String resiaualAmount = data.getString(idxResidualAmount);
                     card.setResidualCount(resiaualCount);
                     card.setResidualAmount(resiaualAmount);
                     mBusCards.add(card);
@@ -88,6 +103,10 @@ public class BusCardRecordActivity2 extends BaseActivity {
                     mViewPagerAdapter = new BusCardPageAdapter();
                     mViewPager.setAdapter(mViewPagerAdapter);
                 }
+                initTab(mBusCards);
+            } else {
+                mNoItemTips.setVisibility(View.VISIBLE);
+                mConsumptionDetail.setVisibility(View.GONE);
             }
         }
 
@@ -99,14 +118,80 @@ public class BusCardRecordActivity2 extends BaseActivity {
         }
     }
 
+    private void initTab(ArrayList<BusCard> busCards) {
+        final DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        final int screenWidth = dm.widthPixels;
+        mViewPagerTabTextView.clear();
+        mTabContent.removeAllViews();
+        for (int i = 0; i < busCards.size(); i++) {
+            TextView tv = new TextView(this);
+            tv.setId(i);
+            tv.setGravity(Gravity.CENTER);
+            tv.setPadding(0, Utils.dip2px(this, 10), 0, Utils.dip2px(this, 10));
+            tv.setLayoutParams(new LinearLayout.LayoutParams(screenWidth/TAB_COUNT, LayoutParams.WRAP_CONTENT));
+            tv.setText(busCards.get(i).getCardNumber());
+            tv.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isClicked = true;
+                    int id = v.getId();
+                    for (int i = 0; i < mViewPagerTabTextView.size(); i++) {
+                        if (id == i) {
+                            mViewPager.setCurrentItem(i, true);
+                        }
+                    }
+                }
+            });
+            mViewPagerTabTextView.add(tv);
+            mTabContent.addView(tv);
+        }
+        if (mViewPagerTabTextView.size() > 0) {
+            mViewPagerTabTextView.get(mViewPager.getCurrentItem()).setBackgroundColor(Color.WHITE);
+        }
+    }
+
     private void initView(){
+        final DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        mScreenWidth = metrics.widthPixels;
         mSendButton = (Button)findViewById(R.id.search);
         mEditText = (AutoCompleteTextView)findViewById(R.id.key_card_id);
         mNoItemTips = (LinearLayout)findViewById(R.id.no_item_tips);
         mConsumptionDetail = (RelativeLayout)findViewById(R.id.consumption_detail);
         mViewPager = (ViewPager)findViewById(R.id.viewpager);
-        mNoItemTips.setVisibility(View.GONE);
-        mConsumptionDetail.setVisibility(View.VISIBLE);
+        mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                if (!isClicked) {
+                    final float curLeftDistance = mScreenWidth * position / TAB_COUNT;
+                    mViewPagerTab.smoothScrollTo((int)curLeftDistance, 0);
+                } else {
+                    isClicked = false;
+                }
+                for (int i = 0; i < mViewPagerTabTextView.size(); i++) {
+                    if (i != position) {
+                        mViewPagerTabTextView.get(i).setBackgroundColor(Color.TRANSPARENT);
+                    } else {
+                        mViewPagerTabTextView.get(i).setBackgroundColor(Color.WHITE);
+                    }
+                }
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        mViewPagerTab = (HorizontalScrollView)findViewById(R.id.viewpager_tab);
+        mTabContent = (LinearLayout)findViewById(R.id.tabcontent);
     }
 
     public void onSearchCardIdClicked(View v){
@@ -195,8 +280,8 @@ public class BusCardRecordActivity2 extends BaseActivity {
             mResidualCount = (TextView) mRootView.findViewById(R.id.residual_count_text);
             mResidualAmount = (TextView) mRootView.findViewById(R.id.residual_amount_text);
             mRecordList = (DropRefreshListView) mRootView.findViewById(R.id.consumer_record_list);
-            mResidualCount.setText(mCard.getResidualCount());
-            mResidualAmount.setText(mCard.getResidualAmount());
+            mResidualCount.setText(getString(R.string.residual_count, mCard.getResidualCount()));
+            mResidualAmount.setText(getString(R.string.residual_count, mCard.getResidualAmount()));
             mLoaderId = getLoaderId();
             startLoadRecords();
         }
@@ -263,11 +348,14 @@ public class BusCardRecordActivity2 extends BaseActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            //BusCardPageView pageView = mPageViews.get(position);
-            //if (pageView == null) {
-            BusCardPageView pageView = new BusCardPageView(mBusCards.get(position));
-            mPageViews.add(pageView);
-            //}
+            BusCardPageView pageView = null;
+            if (mPageViews.size() > position){
+                pageView = mPageViews.get(position);
+            }
+            if (pageView == null) {
+                pageView = new BusCardPageView(mBusCards.get(position));
+                mPageViews.add(pageView);
+            }
             ((ViewPager)container).addView(pageView.getView());
             return pageView.getView();
         }

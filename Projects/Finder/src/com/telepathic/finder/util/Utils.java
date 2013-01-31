@@ -24,12 +24,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 public class Utils {
-	private static final String TAG = Utils.class.getSimpleName();
-	
+    private static final String TAG = Utils.class.getSimpleName();
+
     private static final boolean DEBUG = true;
 
     private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([aAbBcCdD])?";
-    
+
     private static final String BUS_CARD_NUM_EXPRESSION = "\\d{8}";
 
     private static final String START_WITH_ZERO_EXPRESSION = "^0+";
@@ -139,19 +139,19 @@ public class Utils {
     /**
      * Copy the application database files to external storage
      */
-	public static void copyAppDatabaseFiles(String packageName) {
-		try {
-			File dbDirectory = new File("/data/data/" + packageName + "/databases/");
-			if (dbDirectory.exists()) {
-				File[] dbFiles = dbDirectory.listFiles();
-				for (int i = 0; i < dbFiles.length; i++) {
-					copyFileToExternalStorage(dbFiles[i]);
-				}
-			}
-		} catch (IOException e) {
-			Utils.error(TAG, e.getLocalizedMessage());
-		}
-	}
+    public static void copyAppDatabaseFiles(String packageName) {
+        try {
+            File dbDirectory = new File("/data/data/" + packageName + "/databases/");
+            if (dbDirectory.exists()) {
+                File[] dbFiles = dbDirectory.listFiles();
+                for (int i = 0; i < dbFiles.length; i++) {
+                    copyFileToExternalStorage(dbFiles[i]);
+                }
+            }
+        } catch (IOException e) {
+            Utils.error(TAG, e.getLocalizedMessage());
+        }
+    }
 
     /**
      * Copy the application normal files to external storage
@@ -273,8 +273,26 @@ public class Utils {
             Log.e(tag, errorMsg);
         }
     }
-    
+
     public static boolean isValid(Cursor cursor) {
-    	return (cursor != null && cursor.getCount() > 0) ? true : false;
+        return (cursor != null && cursor.getCount() > 0) ? true : false;
+    }
+
+    /**
+     * Translate the dp(density-independent pixels) to px(pixels),
+     * according to the resolution of device;
+     */
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    /**
+     * Translate the px(pixels) to dp(density-independent pixels),
+     * according to the resolution of device;
+     */
+    public static int px2dip(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
     }
 }
