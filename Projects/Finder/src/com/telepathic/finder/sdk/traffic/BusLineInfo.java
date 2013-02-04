@@ -27,30 +27,30 @@ public class BusLineInfo {
     /**
      * The bus start time
      */
-    private String mStartTime;
+    private String mStartingTime;
 
     /**
      * The bus end time
      */
-    private String mEndTime;
+    private String mEndingTime;
 
     public BusLineInfo(String busNumber, String startTime, String endTime, HashMap<Direction,ArrayList<String>> busStations){
         mBusNumber = busNumber;
-        mStartTime = startTime;
-        mEndTime = endTime;
+        mStartingTime = startTime;
+        mEndingTime = endTime;
         mBusStations = busStations;
     }
 
-    public String getmBusNumber() {
+    public String getBusNumber() {
         return mBusNumber;
     }
 
-    public String getmStartTime() {
-        return mStartTime;
+    public String getStartingTime() {
+        return mStartingTime;
     }
 
-    public String getmEndTime() {
-        return mEndTime;
+    public String getEndingTime() {
+        return mEndingTime;
     }
 
     /**

@@ -26,8 +26,8 @@
     <string name="default_city">成都</string>
     <string name="invalid_input_hint">请输入正确的公交车路线号码</string>
     <string name="no_item_in_db">no  item</string>
-    <string name="start_time">Start time: </string>
-    <string name="end_time">End time: </string>
+    <string name="starting_time">Starting time: <xliff:g id="starting_time" example="6:00">%1$s</xliff:g></string>
+    <string name="ending_time">Ending time: <xliff:g id="ending_time" example="21:00">%1$s</xliff:g></string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">Please enter the correct parameter</string>

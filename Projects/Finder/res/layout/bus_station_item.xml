@@ -29,7 +29,7 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/start_time"
+                android:id="@+id/starting_time"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -37,7 +37,7 @@
                 android:text="Start time: 06:00" />
 
             <TextView
-                android:id="@+id/end_time"
+                android:id="@+id/ending_time"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
