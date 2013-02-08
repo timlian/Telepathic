@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk.traffic;
+package com.telepathic.finder.sdk.traffic.entity;
 
 
 import com.baidu.mapapi.MKRoute;
@@ -7,6 +7,7 @@ import com.baidu.mapapi.MKStep;
 public class BusRoute {
     private MKRoute mRoute;
     private String mLineNumber;
+    private String mDirection;
 
     public BusRoute(String number, MKRoute route) {
         mRoute = route;

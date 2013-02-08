@@ -10,6 +10,8 @@ import com.telepathic.finder.sdk.ITrafficListeners.BusLocationListener;
 import com.telepathic.finder.sdk.ITrafficListeners.BusRouteListener;
 import com.telepathic.finder.sdk.ITrafficListeners.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ITrafficListeners.ErrorListener;
+import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.BusRoute;
 
 public class TrafficeMonitor implements ITrafficMonitor {
 

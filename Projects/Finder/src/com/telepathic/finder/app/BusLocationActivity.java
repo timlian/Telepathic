@@ -39,7 +39,7 @@ import com.baidu.mapapi.RouteOverlay;
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
-import com.telepathic.finder.sdk.traffic.BusRoute;
+import com.telepathic.finder.sdk.traffic.entity.BusRoute;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {

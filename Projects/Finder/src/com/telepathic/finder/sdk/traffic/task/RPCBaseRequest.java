@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk.traffic.network;
+package com.telepathic.finder.sdk.traffic.task;
 
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
@@ -72,11 +72,7 @@ abstract class RPCBaseRequest {
         return true;
     }
 
-    public void onResponse(Object result, String errorMessage) {
-        if (errorMessage != null) {
-            handleError(errorMessage);
-            return ;
-        }
+    public void onResponse(Object result) {
         if (result instanceof SoapObject) {
             process((SoapObject)result);
         } else if (result instanceof SoapFault) {

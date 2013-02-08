@@ -1,14 +1,14 @@
-package com.telepathic.finder.sdk.traffic.network;
+package com.telepathic.finder.sdk.traffic.task;
 
 import java.util.ArrayList;
 
 import org.ksoap2.serialization.SoapObject;
 
-import com.telepathic.finder.sdk.traffic.BusCard;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord;
-import com.telepathic.finder.sdk.traffic.CountConsumerRecord;
-import com.telepathic.finder.sdk.traffic.EWalletConsumerRecord;
 import com.telepathic.finder.sdk.traffic.TrafficeMonitor;
+import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.CountConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.EWalletConsumerRecord;
 import com.telepathic.finder.util.Utils;
 
 public class GetConsumerRecordRequest extends RPCBaseRequest {

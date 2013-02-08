@@ -1,8 +1,6 @@
 package com.telepathic.finder.app;
 
-import android.R.interpolator;
 import android.app.Activity;
-import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -27,9 +25,8 @@ import android.widget.Toast;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ITrafficService;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
+import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData.ConsumerRecord;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;

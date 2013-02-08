@@ -1,6 +1,6 @@
 package com.telepathic.finder.sdk;
 
-import com.telepathic.finder.sdk.traffic.BusRoute;
+import com.telepathic.finder.sdk.traffic.entity.BusRoute;
 import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
 
 public interface ITrafficService {

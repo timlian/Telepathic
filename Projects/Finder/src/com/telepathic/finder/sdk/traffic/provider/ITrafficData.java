@@ -117,6 +117,18 @@ public interface ITrafficData {
 		 * Close off time
 		 */
 		String CLOSE_OFF_TIME = "close_off_time";
+		/**
+		 * The first station name
+		 */
+		String FIRST_STATION = "first_station";
+		/**
+		 * The last station name
+		 */
+		String LAST_STATION = "last_station";
+		/**
+		 * The station names
+		 */
+		String STATIONS = "stations";
 	}
 	
 	static class BusRoute implements BusRouteColumns {

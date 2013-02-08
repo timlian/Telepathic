@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk.traffic;
+package com.telepathic.finder.sdk.traffic.entity;
 
 public class EWalletConsumerRecord extends ConsumerRecord {
 	 /**

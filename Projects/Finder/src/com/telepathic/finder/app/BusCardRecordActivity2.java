@@ -29,8 +29,8 @@ import android.widget.TextView;
 
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ITrafficService;
-import com.telepathic.finder.sdk.traffic.BusCard;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
+import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;

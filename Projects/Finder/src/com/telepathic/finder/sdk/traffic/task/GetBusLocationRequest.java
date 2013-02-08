@@ -1,9 +1,9 @@
-package com.telepathic.finder.sdk.traffic.network;
+package com.telepathic.finder.sdk.traffic.task;
 
 import org.ksoap2.serialization.SoapObject;
 
-import com.telepathic.finder.sdk.traffic.BusRoute;
 import com.telepathic.finder.sdk.traffic.TrafficeMonitor;
+import com.telepathic.finder.sdk.traffic.entity.BusRoute;
 
 public class GetBusLocationRequest extends RPCBaseRequest {
     private static final String METHOD_NAME = "getBusLocation";

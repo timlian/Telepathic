@@ -2,7 +2,6 @@
 package com.telepathic.finder.app;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -19,8 +18,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.telepathic.finder.R;
-import com.telepathic.finder.sdk.traffic.BusLineInfo;
-import com.telepathic.finder.sdk.traffic.BusLineInfo.Direction;
+import com.telepathic.finder.sdk.ITrafficService;
+import com.telepathic.finder.sdk.traffic.entity.BusLine;
+import com.telepathic.finder.sdk.traffic.entity.BusStation;
+import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.util.Utils;
 
 public class BusStationActivity extends Activity {
@@ -31,6 +32,8 @@ public class BusStationActivity extends Activity {
     private LinearLayout mLlNoItem;
     private LinearLayout mLlStationInfo;
     private BusAndStationInfo mBusAndStationInfo;
+    private ITrafficService mTrafficService;
+    private MessageDispatcher mMessageDispatcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,10 @@ public class BusStationActivity extends Activity {
         setContentView(R.layout.bus_station);
         Utils.copyAppDatabaseFiles(getPackageName());
         setupView();
+        FinderApplication app = (FinderApplication)getApplication();
+        mTrafficService = app.getTrafficService();
+        mMessageDispatcher = app.getMessageDispatcher();
+        mMessageDispatcher.add(null);
     }
 
     private void setupView(){
@@ -53,9 +60,21 @@ public class BusStationActivity extends Activity {
         if (mBtnFindStation.equals(v)) {
             initBusLines(mEtStationId.getText().toString());
             Utils.hideSoftKeyboard(getApplicationContext(), mEtStationId);
+            if (mEtStationId.getText().toString().equals("111")) {
+            	Utils.copyAppDatabaseFiles(getPackageName());
+            } else if (mEtStationId.getText().toString().equals("222")){
+            	mTrafficService.translateToStation("");
+            }
+            else {
+            	test();
+            }
         }
     }
 
+    private void test() {
+    	//mTrafficService.getBusStationLines("50022");
+    }
+    
     private void initBusLines(String GPSNumber) {
         ArrayList<String> busLines = getBusLines(GPSNumber);
         String stationName = getStationName(GPSNumber);
@@ -70,7 +89,6 @@ public class BusStationActivity extends Activity {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dm.widthPixels / 2 - (2*dip5), LayoutParams.MATCH_PARENT);
             lp.setMargins(dip5, dip5, dip5, dip5);
             for (int index = 0; index < mBusAndStationInfo.getBusLines().size(); index++) {
-                mLlBusLines.addView(getView(index, mBusAndStationInfo), lp);
                 mLlBusLines.addView(getView(index, mBusAndStationInfo), lp);
             }
             mLlNoItem.setVisibility(View.GONE);
@@ -127,37 +145,39 @@ public class BusStationActivity extends Activity {
         return stationName;
     }
 
-    private BusLineInfo getBusLineInfo(String busNumber) {
-        BusLineInfo busLineInfo = null;
-        //TODO: Get the bus line info by bus number
-        // Test data start
+    private BusLine getBusLineInfo(String busNumber) {
+        BusLine busLine = null;
         if (busNumber.equals("504")) {
-            HashMap<Direction,ArrayList<String>> busStations = new HashMap<Direction, ArrayList<String>>();
-            ArrayList<String> stations = new ArrayList<String>();
+            ArrayList<BusStation> route = new ArrayList<BusStation>();
             for(String station : testBus504Down) {
-                stations.add(station);
+                route.add(new BusStation(station));
             }
-            busStations.put(Direction.DOWN, stations);
-            busLineInfo = new BusLineInfo(busNumber, testBus504Time[0], testBus504Time[1], busStations);
+            busLine = new BusLine();
+            busLine.setLineNumber(busNumber);
+            busLine.setStartTime(testBus504Time[0]);
+            busLine.setEndTime(testBus504Time[1]);
+            busLine.addRoute(Direction.DOWN, route);
         } else if (busNumber.equals("501")) {
-            HashMap<Direction,ArrayList<String>> busStations = new HashMap<Direction, ArrayList<String>>();
-            ArrayList<String> stations = new ArrayList<String>();
+        	ArrayList<BusStation> route = new ArrayList<BusStation>();
             for(String station : testBus501Up) {
-                stations.add(station);
+                route.add(new BusStation(station));
             }
-            busStations.put(Direction.UP, stations);
-            busLineInfo = new BusLineInfo(busNumber, testBus501Time[0], testBus501Time[1], busStations);
+            busLine = new BusLine();
+            busLine.setLineNumber(busNumber);
+            busLine.setStartTime(testBus501Time[0]);
+            busLine.setEndTime(testBus501Time[1]);
+            busLine.addRoute(Direction.UP, route);
         }
         // Test data end
-        return busLineInfo;
+        return busLine;
     }
 
-    private Direction getDirection(String gpsNumber, String busNumber) {
+    private Direction getDirection(String gpsNumber) {
         //TODO: Get the bus direction on this station
         // Test data start
-        if (gpsNumber.equals("50020") && busNumber.equals("504")) {
+        if (gpsNumber.equals("50020")) {
             return Direction.DOWN;
-        } else if (gpsNumber.equals("50020") && busNumber.equals("501")) {
+        } else if (gpsNumber.equals("50020")) {
             return Direction.UP;
         }
         return null;
@@ -173,23 +193,29 @@ public class BusStationActivity extends Activity {
         holder.tvEndingTime = (TextView)convertView.findViewById(R.id.ending_time);
         holder.lvStationNameList = (ListView)convertView.findViewById(R.id.station_name_list);
         convertView.setTag(holder);
-        BusLineInfo busLineInfo = getBusLineInfo(busNumber);
+        BusLine busLineInfo = getBusLineInfo(busNumber);
         bindView(busLineInfo, convertView, info);
         return convertView;
     }
 
-    private void bindView(BusLineInfo busLineInfo, View view, BusAndStationInfo busAndStationInfo) {
+    private void bindView(BusLine busLine, View view, BusAndStationInfo busAndStationInfo) {
         BusInfoHolder holder = (BusInfoHolder)view.getTag();
-        holder.tvBusNumber.setText(busLineInfo.getBusNumber());
-        holder.tvStartingTime.setText(getString(R.string.starting_time, busLineInfo.getStartingTime()));
-        holder.tvEndingTime.setText(getString(R.string.ending_time, busLineInfo.getEndingTime()));
-        holder.lvStationNameList.setAdapter(new StationsAdapter(busLineInfo.getBusStationsByDirection(getDirection(busAndStationInfo.stationGpsNumber,busLineInfo.getBusNumber()))));
+        holder.tvBusNumber.setText(busLine.getLineNumber());
+        holder.tvStartingTime.setText(getString(R.string.starting_time, busLine.getStartTime()));
+        holder.tvEndingTime.setText(getString(R.string.ending_time, busLine.getEndTime()));
+        ArrayList<BusStation> route = busLine.getRoute(Direction.UP);
+        if (route == null) {
+        	route = busLine.getRoute(Direction.DOWN);
+        }
+        if (route != null) {
+        	holder.lvStationNameList.setAdapter(new StationsAdapter(route));
+        }
     }
 
     private class StationsAdapter extends BaseAdapter {
-        private ArrayList<String> mBusStations;
+        private ArrayList<BusStation> mBusStations;
 
-        public StationsAdapter(ArrayList<String> busStations) {
+        public StationsAdapter(ArrayList<BusStation> busStations) {
             this.mBusStations = busStations;
         }
 
@@ -210,7 +236,7 @@ public class BusStationActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            String busStation = mBusStations.get(position);
+            String busStation = mBusStations.get(position).getName();
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.bus_station_list_item, null);
                 StationNameHolder holder = new StationNameHolder();

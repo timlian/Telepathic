@@ -1,5 +1,6 @@
 package com.telepathic.finder.sdk.traffic.provider;
 
+import android.R.interpolator;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,12 +9,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.provider.BaseColumns;
 
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusCardColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusRouteColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusRouteStationColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusStationColumns;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.ConsumerRecordColumns;
 import com.telepathic.finder.util.Utils;
 
@@ -61,7 +62,7 @@ public class TrafficDataProvider extends ContentProvider {
 	}
 
 	@Override
-	public Cursor query(Uri uri, String[] projection, String selection,
+	public synchronized Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
 		String tableName = null;
 		switch (sUriMatcher.match(uri)) {
@@ -94,7 +95,7 @@ public class TrafficDataProvider extends ContentProvider {
 	}
 
 	@Override
-	public String getType(Uri uri) {
+	public synchronized String getType(Uri uri) {
 		String mimeType = "";
 		switch (sUriMatcher.match(uri)) {
 		case MATCH_BUS_CARD:
@@ -122,8 +123,84 @@ public class TrafficDataProvider extends ContentProvider {
 	}
 
 	@Override
-	public Uri insert(Uri uri, ContentValues values) {
+	public synchronized Uri insert(Uri uri, ContentValues values) {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
+		String tableName = null;
+		StringBuilder selection = new StringBuilder();
+		String[] selectionArgs = null;
+		switch (sUriMatcher.match(uri)) {
+		case MATCH_BUS_CARD:
+			tableName = TABLE_BUS_CARD;
+			break;
+		case MATCH_CONSUMER_RECORD:
+			tableName = TABLE_CONSUMER_RECORD;
+			break;
+		case MATCH_BUS_ROUTE:
+			tableName = TABLE_BUS_ROUTE;
+			selection.append(ITrafficData.BusRoute.LINE_NUMBER)
+			         .append("=?")
+			         .append(" AND ")
+			         .append(ITrafficData.BusRoute.DIRECTION)
+			         .append("=?");
+			selectionArgs = new String[] {
+					values.getAsString(ITrafficData.BusRoute.LINE_NUMBER),
+					values.getAsString(ITrafficData.BusRoute.DIRECTION)
+			};
+			break;
+		case MATCH_BUS_STATION:
+			tableName = TABLE_BUS_STATION;
+			selection.append(ITrafficData.BusStation.NAME)
+					 .append("=?")
+					 .append(" AND ")
+					 .append(ITrafficData.BusStation.GPS_NUMBER)
+					 .append("=?");
+			selectionArgs = new String[] {
+					values.getAsString(ITrafficData.BusStation.NAME),
+					values.getAsString(ITrafficData.BusStation.GPS_NUMBER)
+			};
+			break;
+		case MATCH_BUS_ROUTE_STATION:
+			tableName = TABLE_BUS_ROUTE_STATION;
+			selection.append(ITrafficData.BusRouteStation.ROUTE_ID)
+					 .append("=?")
+					 .append(" AND ")
+					 .append(ITrafficData.BusRouteStation.STATION_ID)
+					 .append("=?");
+			selectionArgs = new String[] {
+					values.getAsString(ITrafficData.BusRouteStation.ROUTE_ID),
+					values.getAsString(ITrafficData.BusRouteStation.STATION_ID)
+			};
+			break;
+		default:
+			throw new UnsupportedOperationException("Can't insert into uri: " + uri);
+		}
+		Uri retUri = null;
+		long rowId = db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+		if (rowId == -1) {
+			Cursor cursor = query(uri, new String[]{BaseColumns._ID}, selection.toString(), selectionArgs, null);
+			long existRowId = cursor.getLong(0);
+			int rows = update(uri, values, BaseColumns._ID + "=?", new String[]{String.valueOf(existRowId)});
+			if (rows == 1) {
+				rowId = existRowId;
+			}
+		}
+		if (rowId > 0) {
+			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
+		} else {
+			Utils.debug(TAG, "insert: " + values.toString() + ", return: " + rowId);
+		}
+		return retUri;
+	}
+	
+
+	@Override
+	public synchronized int delete(Uri uri, String selection, String[] selectionArgs) {
+		return 0;
+	}
+
+	@Override
+	public synchronized int update(Uri uri, ContentValues values, String selection,
+			String[] selectionArgs) {
 		String tableName = null;
 		switch (sUriMatcher.match(uri)) {
 		case MATCH_BUS_CARD:
@@ -142,25 +219,10 @@ public class TrafficDataProvider extends ContentProvider {
 			tableName = TABLE_BUS_ROUTE_STATION;
 			break;
 		default:
-			throw new UnsupportedOperationException("Can't insert into uri: " + uri);
+			throw new UnsupportedOperationException("Can't update uri: " + uri);
 		}
-		Uri retUri = null;
-		long rowId = db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-		if (rowId > 0) {
-			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
-		}
-		return retUri;
-	}
-
-	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		return 0;
-	}
-
-	@Override
-	public int update(Uri uri, ContentValues values, String selection,
-			String[] selectionArgs) {
-		return 0;
+		SQLiteDatabase db = mDBHelper.getWritableDatabase();
+		return db.updateWithOnConflict(tableName, values, selection, selectionArgs, SQLiteDatabase.CONFLICT_IGNORE);
 	}
 	
 	class DbHelper extends SQLiteOpenHelper {
@@ -198,10 +260,13 @@ public class TrafficDataProvider extends ContentProvider {
         	
         	db.execSQL("CREATE TABLE " + TABLE_BUS_ROUTE + " ("
                     + BusRouteColumns._ID + " INTEGER PRIMARY KEY, "
-                    + BusRouteColumns.DIRECTION + " TEXT, "
                     + BusRouteColumns.LINE_NUMBER + " TEXT, "
+                    + BusRouteColumns.DIRECTION + " TEXT, "
                     + BusRouteColumns.DEPARTURE_TIME + " TEXT, "
                     + BusRouteColumns.CLOSE_OFF_TIME + " TEXT, "
+                    + BusRouteColumns.FIRST_STATION + " TEXT, "
+                    + BusRouteColumns.LAST_STATION + " TEXT, "
+                    + BusRouteColumns.STATIONS + " TEXT, "
                     + "UNIQUE (" + BusRouteColumns.LINE_NUMBER + ", "
                     + BusRouteColumns.DIRECTION + " )"+ " )");
         	
@@ -211,7 +276,8 @@ public class TrafficDataProvider extends ContentProvider {
                     + BusStationColumns.GPS_NUMBER + " TEXT, "
                     + BusStationColumns.LONGITUDE + " TEXT, "
                     + BusStationColumns.LATITUDE + " TEXT, "
-                    + "UNIQUE (" + BusStationColumns.GPS_NUMBER + ")"+ " )");
+                    + "UNIQUE (" + BusStationColumns.NAME + ", "
+                    + BusStationColumns.GPS_NUMBER + " )"+ " )");
             
         	db.execSQL("CREATE TABLE " + TABLE_BUS_ROUTE_STATION + " ("
                     + BusRouteStationColumns.ROUTE_ID + " INTEGER, "

@@ -15,11 +15,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.telepathic.finder.sdk.traffic.BusCard;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
-import com.telepathic.finder.sdk.traffic.CountConsumerRecord;
-import com.telepathic.finder.sdk.traffic.EWalletConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.CountConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.EWalletConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusCardColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteStationColumns;

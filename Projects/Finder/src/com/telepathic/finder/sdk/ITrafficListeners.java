@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import com.baidu.mapapi.MKPoiInfo;
 import com.baidu.mapapi.MKStep;
-import com.telepathic.finder.sdk.traffic.BusCard;
-import com.telepathic.finder.sdk.traffic.BusRoute;
+import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.BusRoute;
 
 public interface ITrafficListeners {
 

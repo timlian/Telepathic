@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.telepathic.finder.R;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord;
-import com.telepathic.finder.sdk.traffic.ConsumerRecord.ConsumerType;
+import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord.ConsumerType;
 
 public class ConsumerRecordsAdapter extends BaseAdapter {
 

@@ -1,7 +1,12 @@
 
 package com.telepathic.finder.sdk.traffic;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -11,36 +16,30 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.baidu.mapapi.BMapManager;
-import com.baidu.mapapi.MKAddrInfo;
-import com.baidu.mapapi.MKBusLineResult;
-import com.baidu.mapapi.MKDrivingRouteResult;
-import com.baidu.mapapi.MKPoiInfo;
-import com.baidu.mapapi.MKPoiResult;
-import com.baidu.mapapi.MKRoute;
 import com.baidu.mapapi.MKSearch;
-import com.baidu.mapapi.MKSearchListener;
-import com.baidu.mapapi.MKStep;
-import com.baidu.mapapi.MKSuggestionResult;
-import com.baidu.mapapi.MKTransitRouteResult;
-import com.baidu.mapapi.MKWalkingRouteResult;
 import com.telepathic.finder.sdk.ITrafficListeners.ConsumerRecordsListener;
 import com.telepathic.finder.sdk.ITrafficMonitor;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
-import com.telepathic.finder.sdk.traffic.network.GetBusLocationRequest;
-import com.telepathic.finder.sdk.traffic.network.GetConsumerRecordRequest;
-import com.telepathic.finder.sdk.traffic.network.NetworkManager;
+import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.BusRoute;
+import com.telepathic.finder.sdk.traffic.entity.BusStation;
+import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusCardColumns;
-import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteColumns;
-import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusRouteStationColumns;
-import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusStationColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.ConsumerRecordColumns;
 import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
+import com.telepathic.finder.sdk.traffic.task.BusStationLinesRequest;
+import com.telepathic.finder.sdk.traffic.task.GetBusLineTask;
+import com.telepathic.finder.sdk.traffic.task.GetBusLocationRequest;
+import com.telepathic.finder.sdk.traffic.task.GetBusStationRequest;
+import com.telepathic.finder.sdk.traffic.task.GetConsumerRecordRequest;
+import com.telepathic.finder.sdk.traffic.task.NetworkManager;
 import com.telepathic.finder.util.Utils;
 
 public class TrafficManager {
-
+	private static final String TAG = TrafficManager.class.getSimpleName();
+	
     private static TrafficManager mInstance;
 
     private Context mContext;
@@ -56,15 +55,17 @@ public class TrafficManager {
     private Handler mMessageHandler;
 
     private MyConsumerRecordsListener mConsumerRecordsListener;
+    
+    private ExecutorService mExecutorService;
 
     private TrafficManager(BMapManager manager, Context appContext, Handler msgHandler) {
     	mContext = appContext;
         mNetWorkAdapter = new NetworkManager();
         mTrafficeStore =  TrafficeStore.getDefaultStore(mContext);
         mMapSearch = new MKSearch();
-        mMapSearch.init(manager, new MapSearchListener());
         mTrafficeMonitor = new TrafficeMonitor();
         mMessageHandler = msgHandler;
+        mExecutorService = Executors.newCachedThreadPool();
     }
 
     public static synchronized TrafficManager getTrafficManager(BMapManager manager,
@@ -92,9 +93,46 @@ public class TrafficManager {
         }
 
         @Override
-        public void getBusStationLines(String stationName) {
-            // TODO Auto-generated method stub
-
+        public void getBusStationLines(final String gpsNumber) {
+        	mExecutorService.execute(new Runnable() {
+        		private String[] mLineNames;
+				@Override
+				public void run() {
+					Future<BusStation> result = mExecutorService.submit(new GetBusStationRequest("", gpsNumber));
+		        	try {
+		        		BusStation station = result.get();
+						Utils.debug(TAG, "station name: " + station.getName());
+						Future<String[]> lineNames= mExecutorService.submit(new BusStationLinesRequest(station.getName(), gpsNumber));
+						String[] lines = lineNames.get();
+						List<Future<BusStation>> results = new CopyOnWriteArrayList<Future<BusStation>>();
+						for(String lineNumber: lines) {
+							results.add(mExecutorService.submit(new GetBusStationRequest(lineNumber, gpsNumber)));
+							mExecutorService.submit(new GetBusLineTask(mContext,lineNumber));
+						}
+						while (results.size() > 0) {
+							for (Future<BusStation> f : results)
+								if (f.isDone()) {
+									results.remove(f);
+									Thread.yield();
+								}
+						}
+						notifyDone();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				private void notifyDone() {
+		        	Message msg = Message.obtain();
+		        	msg.arg1 = ITrafficeMessage.GET_BUS_STATION_LINES_DONE;
+		        	msg.arg2 = 0;
+		        	mMessageHandler.sendMessage(msg);
+	        	}
+				
+			});
+        	
         }
 
         // @Override
@@ -128,7 +166,42 @@ public class TrafficManager {
 
         @Override
         public void translateToStation(String gpsNumber) {
-            // TODO Auto-generated method stub
+//            mExecutorService.execute(new Runnable() {
+//				@Override
+//				public void run() {
+//					for(int i = 10000; i < 20000; i++) {
+//						Future<BusStation> result = mExecutorService.submit(new GetBusStationRequest("", String.format("%1$05d", i)));
+//			        	try {
+//			        		BusStation station = result.get();
+//			        	} catch (Exception e) {
+//			        		
+//			        	}
+//					}					
+//				}
+//			});
+        	mExecutorService.submit(new GetBusLineTask(mContext,"102"));
+//        	mExecutorService.execute(new Runnable() {
+//				@Override
+//				public void run() {
+//					String[] gpsNumbers = {"50022", "50023", "50016", "50019", "50014", "50015",
+//											"50012", "50013", "50010", "50011", "50403", "50404",
+//											"41498", "41499", "41496", "41497", "40370", "40999",
+//											"40236", "40237", "40234", "40235", "30339", "30340",
+//											"30335", "30336", "30322", "30323", "20226", "20224",
+//											"20225", "20222", "20223", "10523", "10486", "10487"
+//							              };
+//					for(String gpsNumber : gpsNumbers) {
+//						GetBusStationRequest request = new GetBusStationRequest("102", gpsNumber);
+//						try {
+//							request.call();
+//						} catch (Exception e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//					}
+//					
+//				}
+//			});
 
         }
 
@@ -190,95 +263,5 @@ public class TrafficManager {
         }
     }
 
-    private class MapSearchListener implements MKSearchListener {
-
-        @Override
-        public void onGetAddrResult(MKAddrInfo arg0, int arg1) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onGetBusDetailResult(MKBusLineResult result, int error) {
-            String busLine = Utils.parseBusLineNumber(result.getBusName()).get(0);
-            MKRoute route = result.getBusRoute();
-            ContentValues values = new ContentValues();
-            values.put(BusRouteColumns.LINE_NUMBER, busLine);
-            final long routeId = mTrafficeStore.insertBusRoute(values);
-            final int stepNumber = route.getNumSteps();
-            for(int index = 0; index < stepNumber; index++) {
-            	MKStep station = route.getStep(index);
-            	values.clear();
-            	values.put(BusStationColumns.NAME, station.getContent());
-            	values.put(BusStationColumns.LATITUDE, station.getPoint().getLatitudeE6());
-            	values.put(BusStationColumns.LONGITUDE, station.getPoint().getLongitudeE6());
-            	final long stationId = mTrafficeStore.insertBusStation(values);
-            	values.clear();
-            	values.put(BusRouteStationColumns.ROUTE_ID, routeId);
-            	values.put(BusRouteStationColumns.STATION_ID, stationId);
-            	values.put(BusRouteStationColumns.INDEX, index);
-            	mTrafficeStore.insertBusRouteStation(values);
-            }
-            mTrafficeMonitor.setUpdate(new BusRoute(busLine, route));
-        }
-
-        @Override
-        public void onGetDrivingRouteResult(MKDrivingRouteResult arg0, int arg1) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onGetPoiDetailSearchResult(int arg0, int arg1) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onGetPoiResult(MKPoiResult res, int type, int error) {
-            ArrayList<MKPoiInfo> busPois = null;
-            String busLineNumber = null;
-            if (error == 0 || res != null) {
-                ArrayList<MKPoiInfo> allPois = res.getAllPoi();
-                if (allPois != null && allPois.size() > 0) {
-                    busPois = new ArrayList<MKPoiInfo>();
-                    for (MKPoiInfo poiInfo : allPois) {
-                        // poi类型，0：普通点，1：公交站，2：公交线路，3：地铁站，4：地铁线路
-                        if (poiInfo.ePoiType == 2) {
-                            if (busLineNumber == null) {
-                                busLineNumber = Utils.parseBusLineNumber(poiInfo.name).get(0);
-                            }
-                            busPois.add(poiInfo);
-                        }
-                    }
-                }
-            }
-            mTrafficeMonitor.setUpdate(busLineNumber, busPois);
-        }
-
-        @Override
-        public void onGetRGCShareUrlResult(String arg0, int arg1) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onGetSuggestionResult(MKSuggestionResult arg0, int arg1) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onGetTransitRouteResult(MKTransitRouteResult arg0, int arg1) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onGetWalkingRouteResult(MKWalkingRouteResult arg0, int arg1) {
-            // TODO Auto-generated method stub
-
-        }
-    }
-
+    
 }
