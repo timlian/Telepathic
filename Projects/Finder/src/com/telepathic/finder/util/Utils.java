@@ -31,6 +31,8 @@ public class Utils {
     private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([aAbBcCdD])?";
 
     private static final String BUS_CARD_NUM_EXPRESSION = "\\d{8}";
+    
+    private static final String BUS_STATION_GPS_NUMBER = "\\d{5}";
 
     private static final String START_WITH_ZERO_EXPRESSION = "^0+";
 
@@ -77,6 +79,18 @@ public class Utils {
         }
         return ret;
     }
+    
+    public static boolean isValidGpsNumber(String number) {
+        boolean ret = false;
+        if (number != null) {
+            final String gpsNumber = number.trim();
+            if (number.length() != 0) {
+                ret = gpsNumber.matches(BUS_STATION_GPS_NUMBER);
+            }
+        }
+        return ret;
+    }
+    
     public static ArrayList<String> parseBusLineNumber(String text) {
         Pattern p = Pattern.compile(BUS_LINE_NUM_EXPRESSION);
         Matcher m = p.matcher(text);

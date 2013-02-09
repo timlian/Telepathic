@@ -3,6 +3,7 @@ package com.telepathic.finder.sdk.traffic;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +15,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.MKSearch;
@@ -22,17 +24,21 @@ import com.telepathic.finder.sdk.ITrafficMonitor;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.BusLine;
 import com.telepathic.finder.sdk.traffic.entity.BusRoute;
 import com.telepathic.finder.sdk.traffic.entity.BusStation;
+import com.telepathic.finder.sdk.traffic.entity.BusStationLines;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusCardColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.ConsumerRecordColumns;
+import com.telepathic.finder.sdk.traffic.store.BusLineStation;
 import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
-import com.telepathic.finder.sdk.traffic.task.BusStationLinesRequest;
+import com.telepathic.finder.sdk.traffic.task.GetBusStationLinesTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLineTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLocationRequest;
-import com.telepathic.finder.sdk.traffic.task.GetBusStationRequest;
+import com.telepathic.finder.sdk.traffic.task.TranslateToStationTask;
 import com.telepathic.finder.sdk.traffic.task.GetConsumerRecordRequest;
 import com.telepathic.finder.sdk.traffic.task.NetworkManager;
 import com.telepathic.finder.util.Utils;
@@ -95,44 +101,125 @@ public class TrafficManager {
         @Override
         public void getBusStationLines(final String gpsNumber) {
         	mExecutorService.execute(new Runnable() {
-        		private String[] mLineNames;
 				@Override
 				public void run() {
-					Future<BusStation> result = mExecutorService.submit(new GetBusStationRequest("", gpsNumber));
-		        	try {
-		        		BusStation station = result.get();
-						Utils.debug(TAG, "station name: " + station.getName());
-						Future<String[]> lineNames= mExecutorService.submit(new BusStationLinesRequest(station.getName(), gpsNumber));
-						String[] lines = lineNames.get();
-						List<Future<BusStation>> results = new CopyOnWriteArrayList<Future<BusStation>>();
-						for(String lineNumber: lines) {
-							results.add(mExecutorService.submit(new GetBusStationRequest(lineNumber, gpsNumber)));
-							mExecutorService.submit(new GetBusLineTask(mContext,lineNumber));
+					final BusStationLines stationLines = new BusStationLines();
+					synchronized (stationLines) {
+						stationLines.setGpsNumber(gpsNumber);
+					}
+					// Translate the specified gps number to corresponding station name.
+					Future<String> result1 = mExecutorService.submit(new TranslateToStationTask("", gpsNumber));
+					String stationName = null;
+					try {
+						stationName = result1.get();
+						synchronized (stationLines) {
+							stationLines.setStationName(stationName);
 						}
-						while (results.size() > 0) {
-							for (Future<BusStation> f : results)
-								if (f.isDone()) {
-									results.remove(f);
-									Thread.yield();
-								}
-						}
-						notifyDone();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
+						return ;
 					} catch (ExecutionException e) {
 						e.printStackTrace();
+						return ;
 					}
+					// Get the bus line numbers according to the gps number and station name.
+					Future<String[]> result2 = mExecutorService.submit(new GetBusStationLinesTask(stationName, gpsNumber));
+					String[] lineNumbers = null;
+					try {
+						lineNumbers = result2.get();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						return ;
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+						return ;
+					}
+					// Get the bus line details according to the line numbers.
+					final List<Future<String>>  result3 = new CopyOnWriteArrayList<Future<String>>();
+					final List<Future<BusLine>> result4 = new CopyOnWriteArrayList<Future<BusLine>>();
+					final CountDownLatch latch = new CountDownLatch(2 * lineNumbers.length);
+					
+					// Post the bus station lines result.
+					mExecutorService.execute(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								latch.await();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+								return ;
+							}
+							// Notify the get bus station lines operation finished.
+							Message msg = Message.obtain();
+				        	msg.arg1 = ITrafficeMessage.GET_BUS_STATION_LINES_DONE;
+				        	msg.arg2 = 0;
+				        	msg.obj = stationLines;
+				        	mMessageHandler.sendMessage(msg);
+						}
+					});
+					
+					for(String lineNumber: lineNumbers) {
+						result3.add(mExecutorService.submit(new TranslateToStationTask(lineNumber, gpsNumber)));
+						result4.add(mExecutorService.submit(new GetBusLineTask(mContext,lineNumber)));
+					}
+					// wait to process the result3
+					mExecutorService.execute(new Runnable() {
+						@Override
+						public void run() {
+							while (result3.size() > 0) {
+								for (Future<String> result : result3)
+									if (result.isDone()) {
+										try {
+											String[] stationLine  = result.get().split(",");
+											String lineNumber = stationLine[0];
+											String stationName = stationLine[1];
+											String direction = stationLine[2];
+											synchronized (stationLines) {
+												stationLines.setLineRoute(lineNumber, Direction.fromString(direction));
+											}
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+											return ;
+										} catch (ExecutionException e) {
+											e.printStackTrace();
+											return ;
+										}
+										result3.remove(result);
+										latch.countDown();
+										Thread.yield();
+									}
+							}
+						}
+					});
+					
+					// wait to process the result4
+					mExecutorService.execute(new Runnable() {
+						@Override
+						public void run() {
+							while (result4.size() > 0) {
+								for (Future<BusLine> result : result4)
+									if (result.isDone()) {
+										try {
+											BusLine line = result.get();
+											synchronized (stationLines) {
+												stationLines.setBusLine(line);
+											}
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+											return ;
+										} catch (ExecutionException e) {
+											e.printStackTrace();
+											return ;
+										}
+										result4.remove(result);
+										latch.countDown();
+										Thread.yield();
+									}
+							}
+						}
+					});
 				}
-				
-				private void notifyDone() {
-		        	Message msg = Message.obtain();
-		        	msg.arg1 = ITrafficeMessage.GET_BUS_STATION_LINES_DONE;
-		        	msg.arg2 = 0;
-		        	mMessageHandler.sendMessage(msg);
-	        	}
-				
 			});
-        	
         }
 
         // @Override
@@ -179,7 +266,25 @@ public class TrafficManager {
 //					}					
 //				}
 //			});
-        	mExecutorService.submit(new GetBusLineTask(mContext,"102"));
+        	//mExecutorService.submit(new GetBusLineTask(mContext,"102"));
+        	mExecutorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					Future<String> result = mExecutorService.submit(new TranslateToStationTask("", "50022"));
+					try {
+						Utils.debug(TAG, "Result: " + result.get());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					result = mExecutorService.submit(new TranslateToStationTask("102", "50022"));
+					try {
+						Utils.debug(TAG, "Result: " + result.get());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+        	
 //        	mExecutorService.execute(new Runnable() {
 //				@Override
 //				public void run() {
@@ -262,6 +367,6 @@ public class TrafficManager {
         	//resolver.notifyChange(ITrafficData.ConsumerRecord.CONTENT_URI, null);
         }
     }
-
+    
     
 }
