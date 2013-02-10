@@ -3,10 +3,14 @@ package com.telepathic.finder.app;
 
 import java.util.ArrayList;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -28,8 +32,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.telepathic.finder.R;
+import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ITrafficService;
+import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.BusStationLines;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.util.Utils;
@@ -67,7 +74,23 @@ public class BusCardRecordActivity2 extends BaseActivity {
     private int mScreenWidth;
 
     private volatile boolean isClicked;
+    
+    private ProgressDialog mWaitingDialog;
+    private MessageDispatcher mMessageDispatcher;
 
+    private IMessageHandler mMessageHandler = new IMessageHandler() {
+		@Override
+		public int what() {
+			return ITrafficeMessage.GET_BUS_CARD_DONE;
+		}
+		
+		@Override
+		public void handleMessage(Message msg) {
+			mWaitingDialog.cancel();
+			mSendButton.setEnabled(true);
+		}
+	};
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +98,8 @@ public class BusCardRecordActivity2 extends BaseActivity {
         initView();
         FinderApplication app = (FinderApplication)getApplication();
         mTrafficService = app.getTrafficService();
+        mMessageDispatcher = app.getMessageDispatcher();
+        mMessageDispatcher.add(mMessageHandler);
         startLoadBusCards();
     }
 
@@ -165,6 +190,20 @@ public class BusCardRecordActivity2 extends BaseActivity {
                     R.drawable.tab_selected);
         }
     }
+    
+    private ProgressDialog createWaitingDialog() {
+        ProgressDialog prgDlg = new ProgressDialog(this);
+        prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prgDlg.setMessage(getResources().getString(R.string.find_ic_card_records));
+        prgDlg.setIndeterminate(true);
+        prgDlg.setOnCancelListener(new OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                mSendButton.setEnabled(true);
+            }
+        });
+        return prgDlg;
+    }
 
     private void initView() {
         final DisplayMetrics metrics = new DisplayMetrics();
@@ -207,16 +246,22 @@ public class BusCardRecordActivity2 extends BaseActivity {
         });
         mViewPagerTab = (HorizontalScrollView)findViewById(R.id.viewpager_tab);
         mTabContent = (LinearLayout)findViewById(R.id.tabcontent);
+        mWaitingDialog = createWaitingDialog();
     }
 
     public void onSearchCardIdClicked(View v) {
-        if (mSendButton.equals(v)) {
-            String cardNumber = mEditText.getText().toString();
-            if (Utils.isValidBusCardNumber(cardNumber)) {
-                mTrafficService.getConsumerRecords(cardNumber, 30);
-            } else {
-                mEditText.setError(getResources().getString(R.string.card_id_error_notice));
-            }
+        if (!mSendButton.equals(v)) {
+           return ;
+        }
+        String cardNumber = mEditText.getText().toString();
+        if (Utils.isValidBusCardNumber(cardNumber)) {
+        	 mSendButton.setEnabled(false);
+             mWaitingDialog.show();
+             Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
+            mTrafficService.getConsumerRecords(cardNumber, 30);
+        } else {
+        	mSendButton.setEnabled(true);
+            mEditText.setError(getResources().getString(R.string.card_id_error_notice));
         }
     }
 

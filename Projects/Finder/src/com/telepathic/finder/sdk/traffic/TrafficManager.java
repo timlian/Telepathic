@@ -15,7 +15,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.MKSearch;
@@ -25,22 +24,20 @@ import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.BusLine;
+import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.BusRoute;
-import com.telepathic.finder.sdk.traffic.entity.BusStation;
 import com.telepathic.finder.sdk.traffic.entity.BusStationLines;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
-import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.BusCardColumns;
 import com.telepathic.finder.sdk.traffic.store.ITrafficeStore.ConsumerRecordColumns;
-import com.telepathic.finder.sdk.traffic.store.BusLineStation;
 import com.telepathic.finder.sdk.traffic.store.TrafficeStore;
-import com.telepathic.finder.sdk.traffic.task.GetBusStationLinesTask;
+import com.telepathic.finder.sdk.traffic.task.GetBusCardTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLineTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLocationRequest;
-import com.telepathic.finder.sdk.traffic.task.TranslateToStationTask;
-import com.telepathic.finder.sdk.traffic.task.GetConsumerRecordRequest;
+import com.telepathic.finder.sdk.traffic.task.GetBusStationLinesTask;
 import com.telepathic.finder.sdk.traffic.task.NetworkManager;
+import com.telepathic.finder.sdk.traffic.task.TranslateToStationTask;
 import com.telepathic.finder.util.Utils;
 
 public class TrafficManager {
@@ -235,14 +232,46 @@ public class TrafficManager {
         }
 
         @Override
-        public void getConsumerRecords(String cardId, int count) {
-            if (mConsumerRecordsListener == null) {
-                mConsumerRecordsListener = new MyConsumerRecordsListener();
-                mTrafficeMonitor.add(mConsumerRecordsListener);
-            }
-            GetConsumerRecordRequest request = new GetConsumerRecordRequest(mTrafficeMonitor,
-                    cardId, count);
-            mNetWorkAdapter.execute(request);
+        public void getConsumerRecords(final String cardId, final int count) {
+            mExecutorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					 BusCard busCard = null;
+					 Future<BusCard> result = mExecutorService.submit(new GetBusCardTask(cardId, count));
+					 try {
+						busCard = result.get();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						return ;
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+						return ;
+					}
+					ContentResolver resolver = mContext.getContentResolver();
+					ContentValues values = new ContentValues();
+					values.put(BusCardColumns.CARD_NUMBER, busCard.getCardNumber());
+					values.put(BusCardColumns.RESIDUAL_COUNT, busCard.getResidualCount());
+					values.put(BusCardColumns.RESIDUAL_AMOUNT, busCard.getResidualAmount());
+					Uri uri = resolver.insert(ITrafficData.BusCard.CONTENT_URI, values);
+					long cardId = Long.parseLong(uri.getLastPathSegment());
+					for (ConsumerRecord record : busCard.getConsumerRecords()) {
+						values.clear();
+						values.put(ConsumerRecordColumns.CARD_ID, cardId);
+						values.put(ConsumerRecordColumns.LINE_NUMBER, record.getLineNumber());
+						values.put(ConsumerRecordColumns.BUS_NUMBER, record.getBusNumber());
+						values.put(ConsumerRecordColumns.DATE, Utils.formatDate(record.getConsumerTime()));
+						values.put(ConsumerRecordColumns.CONSUMPTION, record.getConsumption());
+						values.put(ConsumerRecordColumns.RESIDUAL, record.getResidual());
+						values.put(ConsumerRecordColumns.TYPE, record.getType().toString());
+						resolver.insert(ITrafficData.ConsumerRecord.CONTENT_URI, values);
+					}
+					resolver.notifyChange(ITrafficData.BusCard.CONTENT_URI, null);
+					Message msg = Message.obtain();
+		        	msg.arg1 = ITrafficeMessage.GET_BUS_CARD_DONE;
+		        	msg.arg2 = 0;
+		        	mMessageHandler.sendMessage(msg);
+				 } 
+			});
         }
 
         @Override
