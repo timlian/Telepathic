@@ -159,7 +159,7 @@ public class BusCardRecordActivity extends Activity {
             public void onClick(View v) {
                 final String cardNumber = mEditText.getText().toString();
                 if (Utils.isValidBusCardNumber(cardNumber)) {
-                    mTrafficService.getConsumerRecords(cardNumber, 30);
+                    mTrafficService.getBusCardRecords(cardNumber, 30);
                     mSendButton.setEnabled(false);
                     mWaitingDialog.show();
                     Utils.hideSoftKeyboard(getApplicationContext(), mEditText);

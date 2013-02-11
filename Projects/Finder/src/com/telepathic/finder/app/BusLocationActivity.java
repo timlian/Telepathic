@@ -17,6 +17,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Message;
 import android.speech.RecognizerIntent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -29,6 +30,7 @@ import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.GeoPoint;
 import com.baidu.mapapi.LocationListener;
 import com.baidu.mapapi.MKPoiInfo;
+import com.baidu.mapapi.MKRoute;
 import com.baidu.mapapi.MKStep;
 import com.baidu.mapapi.MapActivity;
 import com.baidu.mapapi.MapView;
@@ -37,12 +39,15 @@ import com.baidu.mapapi.Overlay;
 import com.baidu.mapapi.OverlayItem;
 import com.baidu.mapapi.RouteOverlay;
 import com.telepathic.finder.R;
+import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
+import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusRoute;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
+	private static final String TAG = BusLocationActivity.class.getSimpleName();
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
 
@@ -70,6 +75,7 @@ public class BusLocationActivity extends MapActivity {
     private MyLocationOverlay mLocationOverlay;  //定位图层
     private LocationListener mLocationListener; //onResume时注册此listener，onPause时需要Remove
     private ITrafficService mTrafficService;
+    private MessageDispatcher mMessageDispatcher;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +98,8 @@ public class BusLocationActivity extends MapActivity {
 
         // init traffic service
         mTrafficService = app.getTrafficService();
+        mMessageDispatcher = app.getMessageDispatcher();
+        initMessageHandlers();
 
         mMapView = (MapView) findViewById(R.id.bmapView);
         mMapView.setBuiltInZoomControls(true);
@@ -116,19 +124,75 @@ public class BusLocationActivity extends MapActivity {
         };
     }
 
-    public void onSearchClicked(View v) {
-        if (mBtnSearch.equals(v)) {
-            String busNumber = mTvSearchKey.getText().toString();
-            if (Utils.isValidBusLineNumber(busNumber)) {
-                String city = getResources().getString(R.string.default_city);
-                Utils.hideSoftKeyboard(this, mTvSearchKey);
-                mBtnSearch.setEnabled(false);
-                showDialog(BUS_LINE_SEARCH_DLG);
-                mTrafficService.searchBusLine(city, busNumber);
-            } else {
-                Toast.makeText(this, R.string.invalid_input_hint,
-                        Toast.LENGTH_LONG).show();
+    private void initMessageHandlers() {
+    	mMessageDispatcher.add(new IMessageHandler() {
+			@Override
+			public int what() {
+				return ITrafficeMessage.SEARCH_BUS_LINE_DONE;
+			}
+			
+			@Override
+			public void handleMessage(Message msg) {
+				ArrayList<MKPoiInfo> busPois = (ArrayList<MKPoiInfo>)msg.obj;
+				if (busPois != null && busPois.size() > 0) {
+					removeDialog(BUS_LINE_SEARCH_DLG);
+					showBusRoutesDlg("102", busPois);
+				}
+			}
+		});
+    	
+    	mMessageDispatcher.add(new IMessageHandler() {
+			@Override
+			public int what() {
+				return ITrafficeMessage.SEARCH_BUS_ROUTE_DONE;
+			}
+			
+			@Override
+			public void handleMessage(Message msg) {
+				MKRoute route = (MKRoute) msg.obj;
+				RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
+	            routeOverlay.setData(route);
+	            mMapView.getOverlays().clear();
+	            mMapView.getOverlays().add(routeOverlay);
+	            mMapView.getOverlays().add(mLocationOverlay);
+	            mMapView.invalidate();
+	            mMapView.getController().animateTo(route.getStart());
+	            mBtnSearch.setEnabled(true);
+	            //mTrafficService.getBusLocation(getRouteStationNames(route));
+			}
+		});
+    }
+    
+    private static ArrayList<String> getRouteStationNames(MKRoute route) {
+    	ArrayList<String> result = new ArrayList<String>();
+    	final int totalNum = route.getNumSteps();
+    	for(int idx = 0; idx < totalNum; idx++) {
+    		MKStep station = route.getStep(idx);
+    		String stationName = station.getContent();
+            if (stationName != null && stationName.length() != 0) {
+                if (stationName.charAt(stationName.length() - 1) != '\u7AD9') {
+                    stationName += '\u7AD9';
+                }
             }
+           result.add(stationName);
+    	}
+    	return result;
+    }
+    
+    public void onSearchClicked(View v) {
+        if (!mBtnSearch.equals(v)) {
+        	return ;
+        }
+        String lineNumber = mTvSearchKey.getText().toString();
+        if (Utils.isValidBusLineNumber(lineNumber)) {
+            String city = getResources().getString(R.string.default_city);
+            Utils.hideSoftKeyboard(this, mTvSearchKey);
+            mBtnSearch.setEnabled(false);
+            showDialog(BUS_LINE_SEARCH_DLG);
+            mTrafficService.searchBusLine(city, lineNumber);
+            Utils.debug(TAG, "UI Thread: " + Thread.currentThread().toString());
+        } else {
+            Toast.makeText(this, R.string.invalid_input_hint,Toast.LENGTH_LONG).show();
         }
     }
 
@@ -170,9 +234,6 @@ public class BusLocationActivity extends MapActivity {
         mMapManager.getLocationManager().removeUpdates(mLocationListener);
         mLocationOverlay.disableMyLocation();
         mMapManager.stop();
-        mTrafficService.getTrafficMonitor().remove(mBusLineListener);
-        mTrafficService.getTrafficMonitor().remove(mBusRouteListener);
-        mTrafficService.getTrafficMonitor().remove(mBusLocationListener);
         super.onPause();
     }
 
@@ -181,9 +242,6 @@ public class BusLocationActivity extends MapActivity {
         mMapManager.getLocationManager().requestLocationUpdates(mLocationListener);
         mLocationOverlay.enableMyLocation();
         mMapManager.start();
-        mTrafficService.getTrafficMonitor().add(mBusLineListener);
-        mTrafficService.getTrafficMonitor().add(mBusRouteListener);
-        mTrafficService.getTrafficMonitor().add(mBusLocationListener);
         super.onResume();
     }
 
@@ -373,33 +431,6 @@ public class BusLocationActivity extends MapActivity {
         }
     }
     
-	private ITrafficListeners.BusLineListener mBusLineListener = new ITrafficListeners.BusLineListener() {
-		@Override
-		public void onReceived(String busLineNumber,
-				ArrayList<MKPoiInfo> busPois) {
-			if (busPois != null && busPois.size() > 0) {
-				removeDialog(BUS_LINE_SEARCH_DLG);
-				showBusRoutesDlg(busLineNumber, busPois);
-			}
-
-		}
-	};
-	
-	private ITrafficListeners.BusRouteListener mBusRouteListener = new ITrafficListeners.BusRouteListener() {
-		@Override
-		public void onReceived(BusRoute route) {
-			RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
-            routeOverlay.setData(route.getRoute());
-            mMapView.getOverlays().clear();
-            mMapView.getOverlays().add(routeOverlay);
-            mMapView.getOverlays().add(mLocationOverlay);
-            mMapView.invalidate();
-            mMapView.getController().animateTo(route.getRoute().getStart());
-            mBtnSearch.setEnabled(true);
-            mTrafficService.getBusLocation(route);
-		}
-	};
-	
 	private ITrafficListeners.BusLocationListener mBusLocationListener = new ITrafficListeners.BusLocationListener() {
 		@Override
 		public void onReceived(final MKStep station) {

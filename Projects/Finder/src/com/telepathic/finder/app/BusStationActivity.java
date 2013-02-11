@@ -89,10 +89,6 @@ public class BusStationActivity extends Activity {
 			if (mEtStationId.getText().toString().equals("111")) {
 				Utils.copyAppDatabaseFiles(getPackageName());
 			}
-			// debug
-			if (mEtStationId.getText().toString().equals("222")) {
-				mTrafficService.translateToStation("");
-			}
 		}
     }
 

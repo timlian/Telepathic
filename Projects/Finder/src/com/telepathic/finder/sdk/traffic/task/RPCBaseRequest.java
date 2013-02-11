@@ -27,7 +27,7 @@ abstract class RPCBaseRequest {
         mRpc = new SoapObject(NAMESPACE, mRpcMethodName);
     }
 
-    abstract void handleError(String errorMessage);
+    abstract void handleError(int errorCode, String errorMessage);
 
     abstract void handleResponse(SoapObject dataSet);
 
@@ -95,16 +95,14 @@ abstract class RPCBaseRequest {
                 }
                 if (dataSet != null) {
                     final SoapObject firstDataEntry = (SoapObject) dataSet.getProperty(0);
-                    final String errorCode = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE);
+                    final int errorCode = Integer.parseInt(firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_CODE));
                     final String errorMessage = firstDataEntry.getPrimitivePropertyAsString(KEY_ERROR_MESSAGE);
-                    if (NO_ERROR == Integer.parseInt(errorCode)) {
+                    if (NO_ERROR == errorCode) {
                         if (isValidDataEntry(firstDataEntry)) {
                             handleResponse(dataSet);
-                        } else {
-                            handleError("No data.");
-                        }
+                        } 
                     } else {
-                        handleError(errorMessage);
+                        handleError(errorCode, errorMessage);
                     }
                 }
             }

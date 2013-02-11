@@ -4,6 +4,8 @@ import java.util.concurrent.Callable;
 
 import org.ksoap2.serialization.SoapObject;
 
+import android.R.interpolator;
+
 
 public class GetBusStationLinesTask  implements Callable<String[]> {
 	private final String mStationName;
@@ -40,7 +42,7 @@ public class GetBusStationLinesTask  implements Callable<String[]> {
 	    }
 	    
 	    @Override
-	    void handleError(String errorMessage) {
+	    void handleError(int errorCode, String errorMessage) {
 
 	    }
 

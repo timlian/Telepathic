@@ -43,7 +43,7 @@ public class TranslateToStationTask implements Callable<String> {
 		}
 		
 		@Override
-		protected void handleError(String errorMessage) {
+		protected void handleError(int errorCode, String errorMessage) {
 			// TODO Auto-generated method stub
 		}
 

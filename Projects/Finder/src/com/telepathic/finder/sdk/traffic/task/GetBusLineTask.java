@@ -63,7 +63,7 @@ public class GetBusLineTask  implements Callable<BusLine> {
 		}
 
 		@Override
-		void handleError(String errorMessage) {
+		void handleError(int errorCode, String errorMessage) {
 			// TODO Auto-generated method stub
 		}
 

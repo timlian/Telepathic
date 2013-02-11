@@ -81,7 +81,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
     private IMessageHandler mMessageHandler = new IMessageHandler() {
 		@Override
 		public int what() {
-			return ITrafficeMessage.GET_BUS_CARD_DONE;
+			return ITrafficeMessage.GET_BUS_CARD_RECORDS_DONE;
 		}
 		
 		@Override
@@ -258,7 +258,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
         	 mSendButton.setEnabled(false);
              mWaitingDialog.show();
              Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
-            mTrafficService.getConsumerRecords(cardNumber, 30);
+            mTrafficService.getBusCardRecords(cardNumber, 30);
         } else {
         	mSendButton.setEnabled(true);
             mEditText.setError(getResources().getString(R.string.card_id_error_notice));

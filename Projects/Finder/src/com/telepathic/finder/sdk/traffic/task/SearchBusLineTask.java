@@ -1,0 +1,55 @@
+package com.telepathic.finder.sdk.traffic.task;
+
+import java.util.ArrayList;
+
+import com.baidu.mapapi.BMapManager;
+import com.baidu.mapapi.MKPoiInfo;
+import com.baidu.mapapi.MKPoiResult;
+import com.baidu.mapapi.MKSearch;
+import com.telepathic.finder.util.Utils;
+
+public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
+    private MKSearch mMapSearch;
+    private final String mCity;
+    private final String mLineNumber;
+    
+	public SearchBusLineTask(BMapManager manager, String city, String lineNumber) {
+		mCity = city;
+		mLineNumber = lineNumber;
+		mMapSearch = new MKSearch();
+		mMapSearch.init(manager, new PoiSearchListener());
+	}
+
+	@Override
+	protected void doWork() {
+		mMapSearch.poiSearchInCity(mCity, mLineNumber);
+	}
+	
+    private class PoiSearchListener extends MKSearchListenerImpl {
+        @Override
+        public void onGetPoiResult(MKPoiResult res, int type, int error) {
+            ArrayList<MKPoiInfo> busPois = null;
+            String busLineNumber = null;
+            if (error == 0 || res != null) {
+                ArrayList<MKPoiInfo> allPois = res.getAllPoi();
+                if (allPois != null && allPois.size() > 0) {
+                    busPois = new ArrayList<MKPoiInfo>();
+                    for (MKPoiInfo poiInfo : allPois) {
+                        // poi类型，0：普通点，1：公交站，2：公交线路，3：地铁站，4：地铁线路
+                        if (poiInfo.ePoiType == 2) {
+                            if (busLineNumber == null) {
+                                busLineNumber = Utils.parseBusLineNumber(poiInfo.name).get(0);
+                            }
+                            busPois.add(poiInfo);
+                        }
+                    }
+                }
+            }
+            TaskResult<ArrayList<MKPoiInfo>> taskResult = new TaskResult<ArrayList<MKPoiInfo>>();
+            taskResult.setErrorCode(error);
+            taskResult.setResult(busPois);
+            setTaskResult(taskResult);
+        }
+
+    }
+}
