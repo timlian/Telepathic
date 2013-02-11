@@ -1,6 +1,5 @@
 package com.telepathic.finder.app;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
@@ -40,10 +39,8 @@ import com.baidu.mapapi.OverlayItem;
 import com.baidu.mapapi.RouteOverlay;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
-import com.telepathic.finder.sdk.ITrafficListeners;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
-import com.telepathic.finder.sdk.traffic.entity.BusRoute;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
@@ -458,19 +455,5 @@ public class BusLocationActivity extends MapActivity {
             super.onPostExecute(result);
         }
     }
-    
-	private ITrafficListeners.BusLocationListener mBusLocationListener = new ITrafficListeners.BusLocationListener() {
-		@Override
-		public void onReceived(final MKStep station) {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					if (station != null) {
-						updateBusLocation(station);
-					}
-				}
-			});
-		}
-	};
 
 }

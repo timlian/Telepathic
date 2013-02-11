@@ -33,7 +33,6 @@ import com.telepathic.finder.sdk.traffic.task.SearchBusLineTask;
 import com.telepathic.finder.sdk.traffic.task.SearchBusRouteTask;
 import com.telepathic.finder.sdk.traffic.task.TaskResult;
 import com.telepathic.finder.sdk.traffic.task.TranslateToStationTask;
-import com.telepathic.finder.util.Utils;
 
 public class TrafficManager {
 	private static final String TAG = TrafficManager.class.getSimpleName();
@@ -290,22 +289,8 @@ public class TrafficManager {
 					}
 				}
 			});
-			
 		}
 
-
-//        	mExecutorService.execute(new Runnable() {
-//				@Override
-//				public void run() {
-//					String[] gpsNumbers = {"50022", "50023", "50016", "50019", "50014", "50015",
-//											"50012", "50013", "50010", "50011", "50403", "50404",
-//											"41498", "41499", "41496", "41497", "40370", "40999",
-//											"40236", "40237", "40234", "40235", "30339", "30340",
-//											"30335", "30336", "30322", "30323", "20226", "20224",
-//											"20225", "20222", "20223", "10523", "10486", "10487"
-//							              };
-
-        }
-
-
     }
+
+}
