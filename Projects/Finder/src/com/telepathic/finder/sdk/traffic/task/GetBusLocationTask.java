@@ -14,7 +14,7 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 	private String mErrorMessage;
 	private int mStationIndex;
 
-	public GetBusLocationTask(String lineNumber, ArrayList<String> route, BlockingQueue<Integer> queue) {
+	public GetBusLocationTask(String lineNumber, ArrayList<String> route, BlockingQueue<TaskResult<Integer>> queue) {
 		super(queue);
 		mLineNumber = lineNumber;
 		mRoute = route;
@@ -24,7 +24,7 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 
 	@Override
 	protected void doWork() {
-		while (isDone()) {
+		while (!isDone()) {
 			NetworkManager.execute(new GetBusLocationRequest());
 		}
 	}
@@ -63,6 +63,12 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 		protected void handleError(int errorCode, String errorMessage) {
 			mErrorCode = errorCode;
 			mErrorMessage = errorMessage;
+			TaskResult<Integer> taskResult = new TaskResult<Integer>();
+			taskResult.setResult(-1);
+			taskResult.setErrorCode(errorCode);
+			taskResult.setErrorMessage(errorMessage);
+			setProgress(taskResult);
+			setTaskDone();
 		}
 
 		/*
@@ -76,14 +82,15 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 			final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
 			final int distance = Integer.parseInt(firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE));
 			updateStationIndex(distance);
-			if (distance >= 0) {
+			if (distance >= 0 && mStationIndex >=0) {
 				TaskResult<Integer> taskResult = new TaskResult<Integer>();
 				taskResult.setResult(mStationIndex);
-				if (mStationIndex >= 0) {
-					setProgress(mStationIndex);
-				} else {
-					setTaskDone();
-				}
+				TaskResult<Integer> location = new TaskResult<Integer>();
+				location.setResult(mStationIndex);
+				setProgress(location);
+			} 
+			if (mStationIndex < 0) {
+				setTaskDone();
 			}
 		}
 	}

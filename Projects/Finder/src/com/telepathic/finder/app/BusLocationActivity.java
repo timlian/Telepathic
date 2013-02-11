@@ -76,6 +76,8 @@ public class BusLocationActivity extends MapActivity {
     private LocationListener mLocationListener; //onResume时注册此listener，onPause时需要Remove
     private ITrafficService mTrafficService;
     private MessageDispatcher mMessageDispatcher;
+    private MKRoute mBusRoute;
+    private String mLineNumber;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +138,7 @@ public class BusLocationActivity extends MapActivity {
 				ArrayList<MKPoiInfo> busPois = (ArrayList<MKPoiInfo>)msg.obj;
 				if (busPois != null && busPois.size() > 0) {
 					removeDialog(BUS_LINE_SEARCH_DLG);
-					showBusRoutesDlg("102", busPois);
+					showBusRoutesDlg(mLineNumber, busPois);
 				}
 			}
 		});
@@ -158,9 +160,34 @@ public class BusLocationActivity extends MapActivity {
 	            mMapView.invalidate();
 	            mMapView.getController().animateTo(route.getStart());
 	            mBtnSearch.setEnabled(true);
-	            //mTrafficService.getBusLocation(getRouteStationNames(route));
+	            mTrafficService.getBusLocation(mLineNumber, getRouteStationNames(route));
 			}
 		});
+    	
+    	mMessageDispatcher.add(new IMessageHandler() {
+			@Override
+			public int what() {
+				return ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
+			}
+			
+			@Override
+			public void handleMessage(Message msg) {
+				if (msg.arg2 == 0) {
+					Integer index = (Integer) msg.obj;
+					if (mBusRoute != null) {
+						MKStep station = mBusRoute.getStep(index);
+						updateBusLocation(station);
+					}
+				} else {
+					String errorMessage = (String) msg.obj;
+					showErrorMessage(errorMessage);
+				}
+			}
+		});
+    }
+    
+    private void showErrorMessage(String errorMessage) {
+    	Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
     
     private static ArrayList<String> getRouteStationNames(MKRoute route) {
@@ -189,7 +216,8 @@ public class BusLocationActivity extends MapActivity {
             Utils.hideSoftKeyboard(this, mTvSearchKey);
             mBtnSearch.setEnabled(false);
             showDialog(BUS_LINE_SEARCH_DLG);
-            mTrafficService.searchBusLine(city, lineNumber);
+            mLineNumber = lineNumber;
+            mTrafficService.searchBusLine(city, mLineNumber);
             Utils.debug(TAG, "UI Thread: " + Thread.currentThread().toString());
         } else {
             Toast.makeText(this, R.string.invalid_input_hint,Toast.LENGTH_LONG).show();

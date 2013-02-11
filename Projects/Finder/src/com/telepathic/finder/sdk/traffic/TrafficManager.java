@@ -3,12 +3,14 @@ package com.telepathic.finder.sdk.traffic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.content.Context;
 import android.os.Handler;
@@ -269,12 +271,21 @@ public class TrafficManager {
 			mExecutorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					GetBusLocationTask task = new GetBusLocationTask(lineNumber, route);
+					final BlockingQueue<TaskResult<Integer>> queue = new LinkedBlockingQueue<TaskResult<Integer>>();
+					GetBusLocationTask task = new GetBusLocationTask(lineNumber, route, queue);
+					task.startTask();
 					while (!task.isDone()) {
+						TaskResult<Integer> taskResult = null;
 						try {
-							task.waitTaskDone();
+							taskResult = queue.take();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
+						} finally {
+							Message msg = Message.obtain();
+				        	msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
+				        	msg.arg2 = taskResult.getErrorCode();
+				        	msg.obj  = taskResult.getResult();
+				        	mMessageHandler.sendMessage(msg);
 						}
 					}
 				}
