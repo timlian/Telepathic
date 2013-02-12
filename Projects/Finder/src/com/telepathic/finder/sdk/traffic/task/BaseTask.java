@@ -39,10 +39,6 @@ public abstract class BaseTask<Result> {
     
     public synchronized void setTaskResult(TaskResult<Result> taskResult) {
     	mTaskResult = taskResult;
-    	setTaskDone();
-    }
-    
-    public synchronized void setTaskDone() {
     	mIsDone = true;
     	notifyAll();
     }

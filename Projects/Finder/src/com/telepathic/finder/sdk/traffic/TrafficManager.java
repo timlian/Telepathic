@@ -33,6 +33,7 @@ import com.telepathic.finder.sdk.traffic.task.SearchBusLineTask;
 import com.telepathic.finder.sdk.traffic.task.SearchBusRouteTask;
 import com.telepathic.finder.sdk.traffic.task.TaskResult;
 import com.telepathic.finder.sdk.traffic.task.TranslateToStationTask;
+import com.telepathic.finder.util.Utils;
 
 public class TrafficManager {
 	private static final String TAG = TrafficManager.class.getSimpleName();
@@ -270,27 +271,43 @@ public class TrafficManager {
 			mExecutorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					final BlockingQueue<TaskResult<Integer>> queue = new LinkedBlockingQueue<TaskResult<Integer>>();
-					GetBusLocationTask task = new GetBusLocationTask(lineNumber, route, queue);
-					task.startTask();
-					while (!task.isDone()) {
-						TaskResult<Integer> taskResult = null;
-						try {
-							taskResult = queue.take();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} finally {
-							Message msg = Message.obtain();
-				        	msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
-				        	msg.arg2 = taskResult.getErrorCode();
-				        	msg.obj  = taskResult.getResult();
-				        	mMessageHandler.sendMessage(msg);
+					try {
+						final BlockingQueue<Integer> queue = new LinkedBlockingQueue<Integer>();
+						GetBusLocationTask task = new GetBusLocationTask(lineNumber, route, queue);
+						final Integer lastLocation = -1;
+						task.startTask();
+						task.setLastLocation(lastLocation);
+						while (!Thread.interrupted()) {
+							Integer location = null;
+							Utils.debug(TAG, "wait location...");
+							location = queue.take();
+							Utils.debug(TAG, "get location: " + location);
+							if (location != lastLocation) {
+								Message msg = Message.obtain();
+								msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
+								msg.arg2 = 0;
+								msg.obj = location;
+								mMessageHandler.sendMessage(msg);
+							} else {
+								TaskResult<Integer> taskResult = task.getTaskResult();
+								if (taskResult != null) {
+									Message msg = Message.obtain();
+									msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_DONE;
+									msg.arg2 = taskResult.getErrorCode();
+									msg.obj = taskResult.getErrorMessage();
+									mMessageHandler.sendMessage(msg);
+								}
+								Thread.currentThread().interrupt();
+							}
 						}
+					} catch (InterruptedException ex) {
+						Utils.debug(TAG, "getBusLocation is interrupted.");
 					}
+					Utils.debug(TAG, "getBusLocation finished.");
 				}
 			});
 		}
 
-    }
+	}
 
 }

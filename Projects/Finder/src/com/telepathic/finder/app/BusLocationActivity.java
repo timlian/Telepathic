@@ -157,6 +157,7 @@ public class BusLocationActivity extends MapActivity {
 	            mMapView.invalidate();
 	            mMapView.getController().animateTo(route.getStart());
 	            mBtnSearch.setEnabled(true);
+	            mBusRoute = route;
 	            mTrafficService.getBusLocation(mLineNumber, getRouteStationNames(route));
 			}
 		});
@@ -169,13 +170,23 @@ public class BusLocationActivity extends MapActivity {
 			
 			@Override
 			public void handleMessage(Message msg) {
-				if (msg.arg2 == 0) {
-					Integer index = (Integer) msg.obj;
-					if (mBusRoute != null) {
-						MKStep station = mBusRoute.getStep(index);
-						updateBusLocation(station);
-					}
-				} else {
+				Integer index = (Integer) msg.obj;
+				if (mBusRoute != null) {
+					MKStep station = mBusRoute.getStep(index);
+					updateBusLocation(station);
+				}
+			}
+		});
+    	
+    	mMessageDispatcher.add(new IMessageHandler() {
+			@Override
+			public int what() {
+				return ITrafficeMessage.GET_BUS_LOCATION_DONE;
+			}
+			
+			@Override
+			public void handleMessage(Message msg) {
+				if (msg.arg2 != 0) {
 					String errorMessage = (String) msg.obj;
 					showErrorMessage(errorMessage);
 				}

@@ -5,20 +5,21 @@ import java.util.concurrent.BlockingQueue;
 
 import org.ksoap2.serialization.SoapObject;
 
+import com.telepathic.finder.util.Utils;
+
 public class GetBusLocationTask extends ProgressiveTask<Integer> {
 	private static final String TAG = GetBusLocationTask.class.getSimpleName();
 	private final String mLineNumber;
 	private final ArrayList<String> mRoute;
 	private final String mLastStation;
-	private int mErrorCode;
-	private String mErrorMessage;
-	private int mStationIndex;
+	
+	private int mLocation;
 
-	public GetBusLocationTask(String lineNumber, ArrayList<String> route, BlockingQueue<TaskResult<Integer>> queue) {
+	public GetBusLocationTask(String lineNumber, ArrayList<String> route, BlockingQueue<Integer> queue) {
 		super(queue);
 		mLineNumber = lineNumber;
 		mRoute = route;
-		mStationIndex = route.size() - 1;
+		mLocation = route.size() - 1;
 		mLastStation = route.get(route.size() - 1);
 	}
 
@@ -29,20 +30,16 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 		}
 	}
 
+	public void setLastLocation(Integer lastLocation) {
+		setTaskEndFlag(lastLocation);
+	}
+	
 	public String getStationName() {
 		String result = null;
-		if (mStationIndex >= 0 && mStationIndex < mRoute.size()) {
-			result = mRoute.get(mStationIndex);
+		if (mLocation >= 0 && mLocation < mRoute.size()) {
+			result = mRoute.get(mLocation);
 		}
 		return result;
-	}
-
-	private void updateStationIndex(int distance) {
-		if (distance > 0) {
-			mStationIndex -= distance;
-		} else {
-			mStationIndex--;
-		}
 	}
 
 	private class GetBusLocationRequest extends RPCBaseRequest {
@@ -61,14 +58,11 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 
 		@Override
 		protected void handleError(int errorCode, String errorMessage) {
-			mErrorCode = errorCode;
-			mErrorMessage = errorMessage;
 			TaskResult<Integer> taskResult = new TaskResult<Integer>();
 			taskResult.setResult(-1);
 			taskResult.setErrorCode(errorCode);
 			taskResult.setErrorMessage(errorMessage);
-			setProgress(taskResult);
-			setTaskDone();
+			setTaskResult(taskResult);
 		}
 
 		/*
@@ -81,16 +75,21 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 			final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
 			final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
 			final int distance = Integer.parseInt(firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE));
-			updateStationIndex(distance);
-			if (distance >= 0 && mStationIndex >=0) {
-				TaskResult<Integer> taskResult = new TaskResult<Integer>();
-				taskResult.setResult(mStationIndex);
-				TaskResult<Integer> location = new TaskResult<Integer>();
-				location.setResult(mStationIndex);
-				setProgress(location);
-			} 
-			if (mStationIndex < 0) {
-				setTaskDone();
+			if (distance >= 0) {
+				mLocation -= distance;
+				if (mLocation >= 0) {
+					setProgress(mLocation);
+					Utils.debug(TAG, "location: " + mLocation);
+				} else {
+					Utils.debug(TAG, "end: " + mLocation);
+					setTaskResult(null);
+				}
+			} else {
+				mLocation -= 1;
+				if (mLocation < 0) {
+					Utils.debug(TAG, "end: " + mLocation);
+					setTaskResult(null);
+				}
 			}
 		}
 	}

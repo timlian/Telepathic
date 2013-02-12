@@ -15,4 +15,6 @@ public interface ITrafficeMessage {
 	
 	int GET_BUS_LOCATION_UPDATED = 6;
 	
+	int GET_BUS_LOCATION_DONE = 7;
+	
 }

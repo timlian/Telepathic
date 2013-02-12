@@ -3,15 +3,27 @@ package com.telepathic.finder.sdk.traffic.task;
 import java.util.concurrent.BlockingQueue;
 
 public abstract class ProgressiveTask<Progress> extends BaseTask<Progress> {
-	private BlockingQueue<TaskResult<Progress>> mProgresseQueue;
+	private BlockingQueue<Progress> mProgresseQueue;
+	private Progress mEndFlag;
 	
-	ProgressiveTask(BlockingQueue<TaskResult<Progress>> progresseQueue) {
+	ProgressiveTask(BlockingQueue<Progress> progresseQueue) {
 		mProgresseQueue = progresseQueue;
 	}
 	
-	
-	public void setProgress(TaskResult<Progress> progress) {
+	public void setProgress(Progress progress) {
 		mProgresseQueue.add(progress);
+	}
+	
+	public void setTaskEndFlag(Progress endFlag) {
+		mEndFlag = endFlag;
+	}
+	
+	@Override
+	public synchronized void setTaskResult(TaskResult<Progress> result) {
+		if (mEndFlag != null) {
+			mProgresseQueue.add(mEndFlag);
+		}
+		super.setTaskResult(result);
 	}
 
 }
