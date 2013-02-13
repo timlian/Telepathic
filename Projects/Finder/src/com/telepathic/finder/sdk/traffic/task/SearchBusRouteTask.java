@@ -12,6 +12,7 @@ public class SearchBusRouteTask extends BaseTask<MKRoute>{
 	private String mRouteUid;
 	
 	public SearchBusRouteTask(BMapManager manager, String city, String routeUid) {
+		super("SearchBusRouteTask");
 		mCity = city;
 		mRouteUid = routeUid;
 		mMapSearch = new MKSearch();

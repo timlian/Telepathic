@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
 
@@ -25,7 +26,8 @@ import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.BusLine;
 import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.BusStationLines;
-import com.telepathic.finder.sdk.traffic.task.GetBusCardTask;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
+import com.telepathic.finder.sdk.traffic.task.GetBusCardRecordsTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLineTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLocationTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusStationLinesTask;
@@ -43,6 +45,7 @@ public class TrafficManager {
     private Handler mMessageHandler;
     private ExecutorService mExecutorService;
     private BMapManager mMapManager;
+    private TrafficConfig mTrafficConfig;
 
     private TrafficManager(BMapManager manager, Context appContext, Handler msgHandler) {
     	mContext = appContext;
@@ -50,6 +53,7 @@ public class TrafficManager {
         mMessageHandler = msgHandler;
         mExecutorService = Executors.newCachedThreadPool();
         mTrafficStore =  new TrafficStore(mContext, mExecutorService);
+        mTrafficConfig = new TrafficConfig();
     }
 
     public static synchronized TrafficManager getTrafficManager(BMapManager manager,
@@ -68,52 +72,57 @@ public class TrafficManager {
 
     	@Override
 		public void searchBusLine(final String city, final String lineNumber) {
-    		 mExecutorService.execute(new Runnable() {
- 				@Override
- 				public void run() {
- 					SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
- 					searchTask.startTask();
- 					try {
- 						searchTask.waitTaskDone();
- 					} catch (InterruptedException e) {
- 						e.printStackTrace();
- 					} finally {
- 						// Notify the search bus line operation finished.
-	 					TaskResult<ArrayList<MKPoiInfo>> taskResult = searchTask.getTaskResult();
+			mExecutorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
+						searchTask.startTask();
+						searchTask.waitTaskDone();
+						// Notify the search bus line operation finished.
+						TaskResult<ArrayList<MKPoiInfo>> taskResult = searchTask.getTaskResult();
 						Message msg = Message.obtain();
-			        	msg.arg1 = ITrafficeMessage.SEARCH_BUS_LINE_DONE;
-			        	msg.arg2 = taskResult.getErrorCode();
-			        	msg.obj  = taskResult.getResult();
-			        	mMessageHandler.sendMessage(msg);
- 					}
- 				}
- 			});
+						msg.arg1 = ITrafficeMessage.SEARCH_BUS_LINE_DONE;
+						msg.arg2 = taskResult.getErrorCode();
+						msg.obj = taskResult.getResult();
+						mMessageHandler.sendMessage(msg);
+						// store bus line info.
+					    mTrafficStore.store(lineNumber, taskResult.getResult());
+					} catch (InterruptedException e) {
+						Utils.debug(TAG, "searchBusLine is interrupted.");
+					}
+					Utils.debug(TAG, "searchBusLine(" + city + ", " + lineNumber + ") finished.");
+					Utils.copyAppDatabaseFiles(mContext.getPackageName());
+				}
+			});
 		}
     	
         @Override
-        public void searchBusRoute(final String city, final String routeUid) {
-            mExecutorService.execute(new Runnable() {
-            	@Override
-            	public void run() {
-            		SearchBusRouteTask searchTask = new SearchBusRouteTask(mMapManager, city, routeUid);
- 					searchTask.startTask();
- 					try {
- 						searchTask.waitTaskDone();
- 					} catch (InterruptedException e) {
- 						e.printStackTrace();
- 					} finally {
- 						// Notify the search bus route operation finished.
-	 					TaskResult<MKRoute> taskResult = searchTask.getTaskResult();
+		public void searchBusRoute(final String city, final String routeUid) {
+			mExecutorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						SearchBusRouteTask searchTask = new SearchBusRouteTask(mMapManager, city, routeUid);
+						searchTask.startTask();
+						searchTask.waitTaskDone();
+						// Notify the search bus route operation finished.
+						TaskResult<MKRoute> taskResult = searchTask.getTaskResult();
 						Message msg = Message.obtain();
-			        	msg.arg1 = ITrafficeMessage.SEARCH_BUS_ROUTE_DONE;
-			        	msg.arg2 = taskResult.getErrorCode();
-			        	msg.obj  = taskResult.getResult();
-			        	mMessageHandler.sendMessage(msg);
- 					}
-            	}
+						msg.arg1 = ITrafficeMessage.SEARCH_BUS_ROUTE_DONE;
+						msg.arg2 = taskResult.getErrorCode();
+						msg.obj = taskResult.getResult();
+						mMessageHandler.sendMessage(msg);
+						// store the bus route info.
+						mTrafficStore.store(routeUid, taskResult.getResult());
+					} catch (InterruptedException e) {
+						Utils.debug(TAG, "searchBusRoute is interrupted.");
+					}
+					Utils.debug(TAG, "searchBusRoute(" + city + ", " + routeUid + ") finished.");
+					Utils.copyAppDatabaseFiles(mContext.getPackageName());
+				}
 			});
-            
-        }
+		}
 
         @Override
         public void getBusStationLines(final String gpsNumber) {
@@ -240,29 +249,48 @@ public class TrafficManager {
         }
 
         @Override
-        public void getBusCardRecords(final String cardId, final int count) {
-            mExecutorService.execute(new Runnable() {
+        public void getBusCardRecords(final String cardNumber, final int count) {
+			mExecutorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					TaskResult<BusCard> result = null;
-					Future<TaskResult<BusCard>> taskResult = mExecutorService.submit(new GetBusCardTask(cardId, count));
-					 try {
-						result = taskResult.get();
+					try {
+						boolean needUpdate = true;
+						String[] projection = new String[]{ITrafficData.BusCard.LAST_UPDATE_TIME};
+						String selection = ITrafficData.BusCard.CARD_NUMBER + "=?";
+						String[] selectionArgs = new String[]{cardNumber};
+						Cursor cursor = mContext.getContentResolver().query(ITrafficData.BusCard.CONTENT_URI, projection, selection, selectionArgs, null);
+						if (cursor != null && cursor.moveToFirst()) {
+							long lastUpdateTime = cursor.getLong(0);
+							long interval = System.currentTimeMillis() - lastUpdateTime;
+							if (interval <= mTrafficConfig.getBusCardUpdateInterval()) {
+								needUpdate = false;
+							}
+						}
+						if (needUpdate) {
+							GetBusCardRecordsTask task = new GetBusCardRecordsTask(cardNumber, count);
+							task.startTask();
+							task.waitTaskDone();
+							TaskResult<BusCard> result = task.getTaskResult();
+							Message msg = Message.obtain();
+							msg.arg1 = ITrafficeMessage.GET_BUS_CARD_RECORDS_DONE;
+							msg.arg2 = result.getErrorCode();
+							msg.obj  = result.getErrorMessage();
+							mMessageHandler.sendMessage(msg);
+							BusCard busCard = result.getResult();
+							if (busCard != null) {
+								mTrafficStore.store(busCard, true);
+							}
+						} else {
+							Message msg = Message.obtain();
+							msg.arg1 = ITrafficeMessage.GET_BUS_CARD_RECORDS_DONE;
+							mMessageHandler.sendMessage(msg);
+						}
 					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-					} finally {
-						Message msg = Message.obtain();
-			        	msg.arg1 = ITrafficeMessage.GET_BUS_CARD_RECORDS_DONE;
-			        	msg.arg2 = result.getErrorCode();
-			        	msg.obj  = result.getErrorMessage();
-			        	mMessageHandler.sendMessage(msg);
-					}
-					if (result.getErrorCode() == 0) {
-						mTrafficStore.store(result.getResult(), true);
-					}
-				 } 
+						Utils.debug(TAG, "getBusCardRecords is interrupted.");
+					} 
+					Utils.debug(TAG, "getBusCardRecords(" + cardNumber + ", " + count + ") finished.");
+					Utils.copyAppDatabaseFiles(mContext.getPackageName());
+				}
 			});
         }
 

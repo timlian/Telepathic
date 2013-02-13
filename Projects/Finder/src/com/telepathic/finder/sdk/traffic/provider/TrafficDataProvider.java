@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -89,7 +90,6 @@ public class TrafficDataProvider extends ContentProvider {
 		}
 		SQLiteDatabase db = mDBHelper.getReadableDatabase();
 		Cursor cursor = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
-		Utils.printCursorContent(TAG, cursor);
 		cursor.setNotificationUri(getContext().getContentResolver(), uri);
 		return cursor;
 	}
@@ -121,73 +121,55 @@ public class TrafficDataProvider extends ContentProvider {
 		}
 		return mimeType;
 	}
-
+	
 	@Override
 	public synchronized Uri insert(Uri uri, ContentValues values) {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		String tableName = null;
-		StringBuilder selection = new StringBuilder();
-		String[] selectionArgs = null;
+		Uri retUri = null;
+		long rowId = -1;
 		switch (sUriMatcher.match(uri)) {
 		case MATCH_BUS_CARD:
-			tableName = TABLE_BUS_CARD;
+			rowId = db.insertWithOnConflict(TABLE_BUS_CARD, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
 			break;
 		case MATCH_CONSUMER_RECORD:
-			tableName = TABLE_CONSUMER_RECORD;
+			rowId = db.insertWithOnConflict(TABLE_CONSUMER_RECORD, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
 			break;
 		case MATCH_BUS_ROUTE:
-			tableName = TABLE_BUS_ROUTE;
+			StringBuilder selection = new StringBuilder();
 			selection.append(ITrafficData.BusRoute.LINE_NUMBER)
 			         .append("=?")
 			         .append(" AND ")
 			         .append(ITrafficData.BusRoute.DIRECTION)
 			         .append("=?");
-			selectionArgs = new String[] {
+			String[] selectionArgs = new String[] {
 					values.getAsString(ITrafficData.BusRoute.LINE_NUMBER),
 					values.getAsString(ITrafficData.BusRoute.DIRECTION)
 			};
+			rowId = db.insertWithOnConflict(TABLE_BUS_ROUTE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+			if (rowId == -1) {
+				Cursor cursor = query(uri, new String[]{BaseColumns._ID}, selection.toString(), selectionArgs, null);
+				long existRowId = cursor.getLong(0);
+				int rows = update(uri, values, BaseColumns._ID + "=?", new String[]{String.valueOf(existRowId)});
+				if (rows == 1) {
+					rowId = existRowId;
+				}
+			}
+			if (rowId > 0) {
+				retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
+			} else {
+				Utils.debug(TAG, "insert: " + values.toString() + ", return: " + rowId);
+			}
 			break;
 		case MATCH_BUS_STATION:
-			tableName = TABLE_BUS_STATION;
-			selection.append(ITrafficData.BusStation.NAME)
-					 .append("=?")
-					 .append(" AND ")
-					 .append(ITrafficData.BusStation.GPS_NUMBER)
-					 .append("=?");
-			selectionArgs = new String[] {
-					values.getAsString(ITrafficData.BusStation.NAME),
-					values.getAsString(ITrafficData.BusStation.GPS_NUMBER)
-			};
+			rowId = db.insertWithOnConflict(TABLE_BUS_STATION, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 			break;
 		case MATCH_BUS_ROUTE_STATION:
-			tableName = TABLE_BUS_ROUTE_STATION;
-			selection.append(ITrafficData.BusRouteStation.ROUTE_ID)
-					 .append("=?")
-					 .append(" AND ")
-					 .append(ITrafficData.BusRouteStation.STATION_ID)
-					 .append("=?");
-			selectionArgs = new String[] {
-					values.getAsString(ITrafficData.BusRouteStation.ROUTE_ID),
-					values.getAsString(ITrafficData.BusRouteStation.STATION_ID)
-			};
+			rowId = db.insertWithOnConflict(TABLE_BUS_ROUTE_STATION, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 			break;
 		default:
 			throw new UnsupportedOperationException("Can't insert into uri: " + uri);
-		}
-		Uri retUri = null;
-		long rowId = db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-		if (rowId == -1) {
-			Cursor cursor = query(uri, new String[]{BaseColumns._ID}, selection.toString(), selectionArgs, null);
-			long existRowId = cursor.getLong(0);
-			int rows = update(uri, values, BaseColumns._ID + "=?", new String[]{String.valueOf(existRowId)});
-			if (rows == 1) {
-				rowId = existRowId;
-			}
-		}
-		if (rowId > 0) {
-			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
-		} else {
-			Utils.debug(TAG, "insert: " + values.toString() + ", return: " + rowId);
 		}
 		return retUri;
 	}
@@ -241,7 +223,7 @@ public class TrafficDataProvider extends ContentProvider {
                     + BusCardColumns.CARD_NUMBER + " TEXT, "
                     + BusCardColumns.RESIDUAL_COUNT + " TEXT, "
                     + BusCardColumns.RESIDUAL_AMOUNT + " TEXT, "
-                    + BusCardColumns.LAST_DATE + " TEXT, "
+                    + BusCardColumns.LAST_UPDATE_TIME + " INTEGER, "
                     + "UNIQUE (" + BusCardColumns.CARD_NUMBER + ")"+ " )");
         	
         	db.execSQL("CREATE TABLE " + TABLE_CONSUMER_RECORD + " ("
@@ -261,14 +243,16 @@ public class TrafficDataProvider extends ContentProvider {
         	db.execSQL("CREATE TABLE " + TABLE_BUS_ROUTE + " ("
                     + BusRouteColumns._ID + " INTEGER PRIMARY KEY, "
                     + BusRouteColumns.LINE_NUMBER + " TEXT, "
+                    + BusRouteColumns.ROUTE_UID + " TEXT, "
                     + BusRouteColumns.DIRECTION + " TEXT, "
-                    + BusRouteColumns.DEPARTURE_TIME + " TEXT, "
-                    + BusRouteColumns.CLOSE_OFF_TIME + " TEXT, "
+                    + BusRouteColumns.START_TIME + " TEXT, "
+                    + BusRouteColumns.END_TIME + " TEXT, "
                     + BusRouteColumns.FIRST_STATION + " TEXT, "
                     + BusRouteColumns.LAST_STATION + " TEXT, "
                     + BusRouteColumns.STATIONS + " TEXT, "
+                    + BusRouteColumns.LAST_UPDATE_TIME + " INTEGER, "
                     + "UNIQUE (" + BusRouteColumns.LINE_NUMBER + ", "
-                    + BusRouteColumns.DIRECTION + " )"+ " )");
+                    + BusRouteColumns.FIRST_STATION + " )"+ " )");
         	
         	db.execSQL("CREATE TABLE " + TABLE_BUS_STATION + " ("
                     + BusStationColumns._ID + " INTEGER PRIMARY KEY, "
@@ -294,7 +278,6 @@ public class TrafficDataProvider extends ContentProvider {
         // Called whenever newVersion != oldVersion
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        	Utils.debug(TAG, "onUpgrade");
         	// drops the old tables
         	db.execSQL("drop table if exists " + TABLE_BUS_CARD);
             db.execSQL("drop table if exists " + TABLE_CONSUMER_RECORD); 

@@ -24,7 +24,7 @@ public interface ITrafficData {
 		/**
 		 * The last consumption date
 		 */
-		String LAST_DATE = "last_date";
+		String LAST_UPDATE_TIME = "last_update_time";
 	}
 	
 	static class BusCard implements BusCardColumns {
@@ -110,13 +110,17 @@ public interface ITrafficData {
 		 */
 		String LINE_NUMBER = "line_number";
 		/**
-		 *  Departure time
+		 *  Bus line number
 		 */
-		String DEPARTURE_TIME = "departure_time";
+		String ROUTE_UID = "route_uid";
 		/**
-		 * Close off time
+		 *  Start time
 		 */
-		String CLOSE_OFF_TIME = "close_off_time";
+		String START_TIME = "start_time";
+		/**
+		 * End time
+		 */
+		String END_TIME = "end_time";
 		/**
 		 * The first station name
 		 */
@@ -129,6 +133,11 @@ public interface ITrafficData {
 		 * The station names
 		 */
 		String STATIONS = "stations";
+		
+		/**
+		 * The station names
+		 */
+		String LAST_UPDATE_TIME = "last_update_time";
 	}
 	
 	static class BusRoute implements BusRouteColumns {

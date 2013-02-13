@@ -36,7 +36,6 @@ import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
-import com.telepathic.finder.sdk.traffic.entity.BusStationLines;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.util.Utils;
@@ -129,6 +128,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
                 int idxResidualCount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_COUNT);
                 int idxResidualAmount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_AMOUNT);
                 do {
+                	Utils.printCursorContent("BusCardRecords", data);
                     BusCard card = new BusCard();
                     card.setCardNumber(data.getString(idxCardNumber));
                     String resiaualCount = data.getString(idxResidualCount);

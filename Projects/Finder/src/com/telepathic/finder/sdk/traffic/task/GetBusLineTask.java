@@ -37,8 +37,8 @@ public class GetBusLineTask  implements Callable<BusLine> {
     		ContentValues values = new ContentValues();
     		values.put(ITrafficData.BusRoute.LINE_NUMBER, busLine.getLineNumber());
     		values.put(ITrafficData.BusRoute.DIRECTION, direction.toString());
-    		values.put(ITrafficData.BusRoute.DEPARTURE_TIME, busLine.getStartTime());
-    		values.put(ITrafficData.BusRoute.CLOSE_OFF_TIME, busLine.getEndTime());
+    		values.put(ITrafficData.BusRoute.START_TIME, busLine.getStartTime());
+    		values.put(ITrafficData.BusRoute.END_TIME, busLine.getEndTime());
     		values.put(ITrafficData.BusRoute.FIRST_STATION, busLine.getFirstStation(direction));
     		values.put(ITrafficData.BusRoute.LAST_STATION, busLine.getLastStation(direction));
     		values.put(ITrafficData.BusRoute.STATIONS, busLine.getRouteStations(direction));

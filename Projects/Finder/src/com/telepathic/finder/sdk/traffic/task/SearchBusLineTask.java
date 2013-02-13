@@ -14,6 +14,7 @@ public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
     private final String mLineNumber;
     
 	public SearchBusLineTask(BMapManager manager, String city, String lineNumber) {
+		super("SearchBusLineTask");
 		mCity = city;
 		mLineNumber = lineNumber;
 		mMapSearch = new MKSearch();

@@ -7,6 +7,7 @@ public abstract class ProgressiveTask<Progress> extends BaseTask<Progress> {
 	private Progress mEndFlag;
 	
 	ProgressiveTask(BlockingQueue<Progress> progresseQueue) {
+		super("ProgressiveTask");
 		mProgresseQueue = progresseQueue;
 	}
 	

@@ -1,7 +1,6 @@
 package com.telepathic.finder.sdk.traffic.task;
 
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
 
 import org.ksoap2.serialization.SoapObject;
 
@@ -11,31 +10,29 @@ import com.telepathic.finder.sdk.traffic.entity.CountConsumerRecord;
 import com.telepathic.finder.sdk.traffic.entity.EWalletConsumerRecord;
 import com.telepathic.finder.util.Utils;
 
-public class GetBusCardTask implements Callable<TaskResult<BusCard>> {
+public class GetBusCardRecordsTask extends BaseTask<BusCard> {
 	private final String mCardNumber;
 	private final int mCount;
 	private BusCard mBusCard;
 	private int mErrorCode;
 	private String mErrorMessage;
-
-	public GetBusCardTask(String cardId, int count) {
-		mCardNumber = cardId;
+	
+	public GetBusCardRecordsTask(String cardNumber, int count) {
+		super("GetBusCardRecordsTask");
+		mCardNumber = cardNumber;
 		mCount = count;
 	}
 
 	@Override
-	public TaskResult<BusCard> call() throws Exception {
+	protected void doWork() {
 		NetworkManager.execute(new GetConsumerRecordsRequest());
 		TaskResult<BusCard> result = new TaskResult<BusCard>();
-		if (mErrorCode == 0) {
-			result.setResult(mBusCard);
-		} else {
-			result.setErrorCode(mErrorCode);
-			result.setErrorMessage(mErrorMessage);
-		}
-		return result;
+		result.setErrorCode(mErrorCode);
+		result.setErrorMessage(mErrorMessage);
+		result.setResult(mBusCard);
+		setTaskResult(result);
 	}
-    
+	
     private class GetConsumerRecordsRequest extends RPCBaseRequest {
 		private static final String METHOD_NAME = "getConsumerRecords";
 		// consumer records constant keys
