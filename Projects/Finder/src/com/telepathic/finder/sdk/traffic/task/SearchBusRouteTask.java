@@ -7,9 +7,11 @@ import com.baidu.mapapi.MKSearch;
 import com.telepathic.finder.util.Utils;
 
 public class SearchBusRouteTask extends BaseTask<MKRoute>{
+	private static final String TAG = SearchBusRouteTask.class.getSimpleName();
 	private MKSearch mMapSearch;
 	private String mCity;
 	private String mRouteUid;
+	private final Object mLock;
 	
 	public SearchBusRouteTask(BMapManager manager, String city, String routeUid) {
 		super("SearchBusRouteTask");
@@ -17,11 +19,19 @@ public class SearchBusRouteTask extends BaseTask<MKRoute>{
 		mRouteUid = routeUid;
 		mMapSearch = new MKSearch();
 		mMapSearch.init(manager, new BusLineSearchListener());
+		mLock = new Object();
 	}
 	
 	@Override
 	public void doWork() {
 		mMapSearch.busLineSearch(mCity, mRouteUid);
+		synchronized (mLock) {
+			try {
+				mLock.wait();
+			} catch (InterruptedException e) {
+				Utils.debug(TAG, "doWork is interrupted.");
+			}
+		}
 	}
 	
 	public void searchBusRoute(String city, String routeUid) {
@@ -37,6 +47,9 @@ public class SearchBusRouteTask extends BaseTask<MKRoute>{
             taskResult.setErrorCode(error);
             taskResult.setResult(route);
             setTaskResult(taskResult);
+            synchronized (mLock) {
+            	mLock.notifyAll();
+			}
         }
     }
 	

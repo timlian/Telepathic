@@ -113,7 +113,7 @@ public class TrafficStore {
 		String[] selectionArgs = new String[] { routeUid };
 		Cursor cursor = mContentResolver.query(ITrafficData.BusRoute.CONTENT_URI, projection, selection, selectionArgs, null);
 		long routeId = -1;
-		if (cursor != null) {
+		if (cursor != null && cursor.moveToFirst()) {
 			routeId = cursor.getLong(0);
 		}
 		if (routeId > 0) {

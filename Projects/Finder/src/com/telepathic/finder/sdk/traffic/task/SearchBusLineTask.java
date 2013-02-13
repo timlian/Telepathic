@@ -9,9 +9,11 @@ import com.baidu.mapapi.MKSearch;
 import com.telepathic.finder.util.Utils;
 
 public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
+	private static final String TAG = SearchBusLineTask.class.getSimpleName();
     private MKSearch mMapSearch;
     private final String mCity;
     private final String mLineNumber;
+    private final Object mLock;
     
 	public SearchBusLineTask(BMapManager manager, String city, String lineNumber) {
 		super("SearchBusLineTask");
@@ -19,11 +21,19 @@ public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
 		mLineNumber = lineNumber;
 		mMapSearch = new MKSearch();
 		mMapSearch.init(manager, new PoiSearchListener());
+		mLock = new Object();
 	}
 
 	@Override
 	protected void doWork() {
 		mMapSearch.poiSearchInCity(mCity, mLineNumber);
+		synchronized (mLock) {
+			try {
+				mLock.wait();
+			} catch (InterruptedException e) {
+				Utils.debug(TAG, "doWork is interrupted.");
+			}
+		}
 	}
 	
     private class PoiSearchListener extends MKSearchListenerImpl {
@@ -50,6 +60,9 @@ public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
             taskResult.setErrorCode(error);
             taskResult.setResult(busPois);
             setTaskResult(taskResult);
+            synchronized (mLock) {
+            	mLock.notifyAll();
+			}
         }
 
     }

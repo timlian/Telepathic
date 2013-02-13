@@ -25,7 +25,7 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 
 	@Override
 	protected void doWork() {
-		while (!isDone()) {
+		while (mLocation >= 0) {
 			NetworkManager.execute(new GetBusLocationRequest());
 		}
 	}

@@ -1,6 +1,9 @@
 
 package com.telepathic.finder.sdk.traffic;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -307,9 +310,7 @@ public class TrafficManager {
 						task.setLastLocation(lastLocation);
 						while (!Thread.interrupted()) {
 							Integer location = null;
-							Utils.debug(TAG, "wait location...");
 							location = queue.take();
-							Utils.debug(TAG, "get location: " + location);
 							if (location != lastLocation) {
 								Message msg = Message.obtain();
 								msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_UPDATED;

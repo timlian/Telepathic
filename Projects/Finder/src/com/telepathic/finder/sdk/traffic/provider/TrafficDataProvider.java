@@ -1,12 +1,10 @@
 package com.telepathic.finder.sdk.traffic.provider;
 
-import android.R.interpolator;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -17,7 +15,6 @@ import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusRouteColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusRouteStationColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusStationColumns;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.ConsumerRecordColumns;
-import com.telepathic.finder.util.Utils;
 
 public class TrafficDataProvider extends ContentProvider {
 	private static final String TAG = TrafficDataProvider.class.getSimpleName();
@@ -28,6 +25,7 @@ public class TrafficDataProvider extends ContentProvider {
     private static final String TABLE_BUS_CARD = "busCard";
     private static final String TABLE_CONSUMER_RECORD = "consumerRecord";
     private static final String TABLE_BUS_ROUTE = "busRoute";
+    private static final String TABLE_BUS_ROUTE2 = "busRoute2";
     private static final String TABLE_BUS_STATION = "busStation";
     private static final String TABLE_BUS_ROUTE_STATION = "busRouteStation";
     
@@ -141,32 +139,32 @@ public class TrafficDataProvider extends ContentProvider {
 			selection.append(ITrafficData.BusRoute.LINE_NUMBER)
 			         .append("=?")
 			         .append(" AND ")
-			         .append(ITrafficData.BusRoute.DIRECTION)
+			         .append(ITrafficData.BusRoute.FIRST_STATION)
 			         .append("=?");
 			String[] selectionArgs = new String[] {
 					values.getAsString(ITrafficData.BusRoute.LINE_NUMBER),
-					values.getAsString(ITrafficData.BusRoute.DIRECTION)
+					values.getAsString(ITrafficData.BusRoute.FIRST_STATION)
 			};
 			rowId = db.insertWithOnConflict(TABLE_BUS_ROUTE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 			if (rowId == -1) {
 				Cursor cursor = query(uri, new String[]{BaseColumns._ID}, selection.toString(), selectionArgs, null);
-				long existRowId = cursor.getLong(0);
-				int rows = update(uri, values, BaseColumns._ID + "=?", new String[]{String.valueOf(existRowId)});
-				if (rows == 1) {
-					rowId = existRowId;
+				if (cursor != null && cursor.moveToFirst()) {
+					long existRowId = cursor.getLong(0);
+					int rows = update(uri, values, BaseColumns._ID + "=?", new String[]{String.valueOf(existRowId)});
+					if (rows == 1) {
+						rowId = existRowId;
+					}
 				}
 			}
-			if (rowId > 0) {
-				retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
-			} else {
-				Utils.debug(TAG, "insert: " + values.toString() + ", return: " + rowId);
-			}
+			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
 			break;
 		case MATCH_BUS_STATION:
-			rowId = db.insertWithOnConflict(TABLE_BUS_STATION, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+			rowId = db.insertWithOnConflict(TABLE_BUS_STATION, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
 			break;
 		case MATCH_BUS_ROUTE_STATION:
 			rowId = db.insertWithOnConflict(TABLE_BUS_ROUTE_STATION, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
 			break;
 		default:
 			throw new UnsupportedOperationException("Can't insert into uri: " + uri);
@@ -257,11 +255,10 @@ public class TrafficDataProvider extends ContentProvider {
         	db.execSQL("CREATE TABLE " + TABLE_BUS_STATION + " ("
                     + BusStationColumns._ID + " INTEGER PRIMARY KEY, "
                     + BusStationColumns.NAME + " TEXT, "
-                    + BusStationColumns.GPS_NUMBER + " TEXT, "
                     + BusStationColumns.LONGITUDE + " TEXT, "
                     + BusStationColumns.LATITUDE + " TEXT, "
-                    + "UNIQUE (" + BusStationColumns.NAME + ", "
-                    + BusStationColumns.GPS_NUMBER + " )"+ " )");
+                    + "UNIQUE (" + BusStationColumns.LONGITUDE + ", "
+                    + BusStationColumns.LATITUDE + " )"+ " )");
             
         	db.execSQL("CREATE TABLE " + TABLE_BUS_ROUTE_STATION + " ("
                     + BusRouteStationColumns.ROUTE_ID + " INTEGER, "
