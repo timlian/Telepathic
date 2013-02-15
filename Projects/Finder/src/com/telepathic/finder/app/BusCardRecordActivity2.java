@@ -120,7 +120,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if (mBusCardLoaderId == loader.getId() && Utils.isValid(data)) {
+            if (mBusCardLoaderId == loader.getId() && data != null && data.moveToFirst()) {
                 mNoItemTips.setVisibility(View.GONE);
                 mConsumptionDetail.setVisibility(View.VISIBLE);
                 mBusCards = new ArrayList<BusCard>();
