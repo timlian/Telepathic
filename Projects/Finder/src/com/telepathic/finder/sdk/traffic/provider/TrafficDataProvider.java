@@ -8,13 +8,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.provider.BaseColumns;
 
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusCardColumns;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusRouteColumns;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusRouteStationColumns;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BusStationColumns;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData.ConsumerRecordColumns;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BaiDuData;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
 
 public class TrafficDataProvider extends ContentProvider {
 	private static final String TAG = TrafficDataProvider.class.getSimpleName();
@@ -22,34 +18,44 @@ public class TrafficDataProvider extends ContentProvider {
 	private static final int DB_VERSION = 1;
     private static final String DB_NAME = "finder.db";
     
-    private static final String TABLE_BUS_CARD = "busCard";
-    private static final String TABLE_CONSUMER_RECORD = "consumerRecord";
-    private static final String TABLE_BUS_ROUTE = "busRoute";
-    private static final String TABLE_BUS_ROUTE2 = "busRoute2";
-    private static final String TABLE_BUS_STATION = "busStation";
-    private static final String TABLE_BUS_ROUTE_STATION = "busRouteStation";
+    private static final String TABLE_KUAI_XIN_BUS_CARD = "kuaiXinBusCard";
+    private static final String TABLE_KUAI_XIN_CONSUMER_RECORD = "kuaiXinConsumerRecord";
     
-	private static final int MATCH_BUS_CARD = 1;
-	private static final int MATCH_BUS_CARD_BY_ID = 2;
-	private static final int MATCH_CONSUMER_RECORD = 3;
-	private static final int MATCH_BUS_ROUTE = 4;
-	private static final int MATCH_BUS_STATION = 5;
-	private static final int MATCH_BUS_ROUTE_STATION = 6;
+    private static final String TABLE_KUAI_XIN_BUS_ROUTE = "kuaiXinBusRoute";
+    private static final String TABLE_KUAI_XIN_BUS_STATION = "kuaiXinBusStation";
+    private static final String TABLE_KUAI_XIN_BUS_ROUTE_STATION = "kuaiXinBusRouteStation";
+    
+    private static final String TABLE_BAI_DU_BUS_ROUTE = "baiDuBusRoute";
+    private static final String TABLE_BAI_DU_BUS_STATION = "baiDuBusStation";
+    private static final String TABLE_BAI_DU_BUS_ROUTE_STATION = "baiDuBusRouteStation";
+    
+	private static final int MATCH_KUAI_XIN_BUS_CARD = 1;
+	private static final int MATCH_KUAI_XIN_BUS_CARD_BY_ID = 2;
+	private static final int MATCH_KUAI_XIN_CONSUMER_RECORD = 3;
+	private static final int MATCH_KUAI_XIN_BUS_ROUTE = 4;
+	private static final int MATCH_KUAI_XIN_BUS_STATION = 5;
+	private static final int MATCH_KUAI_XIN_BUS_ROUTE_STATION = 6;
+	private static final int MATCH_BAI_DU_BUS_ROUTE = 7;
+	private static final int MATCH_BAI_DU_BUS_STATION = 8;
+	private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 9;
 	
 	private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 	
 	static {
-		sUriMatcher.addURI(ITrafficData.AUTHORITY, "busCard", MATCH_BUS_CARD);
-		sUriMatcher.addURI(ITrafficData.AUTHORITY, "busCard/#", MATCH_BUS_CARD_BY_ID);
-		sUriMatcher.addURI(ITrafficData.AUTHORITY, "consumerRecord", MATCH_CONSUMER_RECORD);
-		sUriMatcher.addURI(ITrafficData.AUTHORITY, "busRoute", MATCH_BUS_ROUTE);
-		sUriMatcher.addURI(ITrafficData.AUTHORITY, "busStation", MATCH_BUS_STATION);
-		sUriMatcher.addURI(ITrafficData.AUTHORITY, "busRouteStation", MATCH_BUS_ROUTE_STATION);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusCard", MATCH_KUAI_XIN_BUS_CARD);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusCard/#", MATCH_KUAI_XIN_BUS_CARD_BY_ID);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinConsumerRecord", MATCH_KUAI_XIN_CONSUMER_RECORD);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusRoute", MATCH_KUAI_XIN_BUS_ROUTE);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusStation", MATCH_KUAI_XIN_BUS_STATION);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusRouteStation", MATCH_KUAI_XIN_BUS_ROUTE_STATION);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRoute", MATCH_BAI_DU_BUS_ROUTE);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusStation", MATCH_BAI_DU_BUS_STATION);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRouteStation", MATCH_BAI_DU_BUS_ROUTE_STATION);
 	}
 	
 	private static final String BUS_CARD_JOIN_CONSUMER_RECORD = 
-			TABLE_BUS_CARD + " LEFT OUTER JOIN " + TABLE_CONSUMER_RECORD + " ON "
-			+ "(" + TABLE_BUS_CARD + "." + BusCardColumns._ID + "=" + ConsumerRecordColumns.CARD_ID + ")";
+			TABLE_KUAI_XIN_BUS_CARD + " LEFT OUTER JOIN " + TABLE_KUAI_XIN_CONSUMER_RECORD + " ON "
+			+ "(" + TABLE_KUAI_XIN_BUS_CARD + "." + KuaiXinData.BusCardColumns._ID + "=" + KuaiXinData.ConsumerRecordColumns.CARD_ID + ")";
 	
 	
 	private DbHelper mDBHelper;
@@ -65,24 +71,33 @@ public class TrafficDataProvider extends ContentProvider {
 			String[] selectionArgs, String sortOrder) {
 		String tableName = null;
 		switch (sUriMatcher.match(uri)) {
-		case MATCH_BUS_CARD:
-			tableName = TABLE_BUS_CARD;
+		case MATCH_KUAI_XIN_BUS_CARD:
+			tableName = TABLE_KUAI_XIN_BUS_CARD;
 			break;
-		case MATCH_BUS_CARD_BY_ID:
-			tableName = TABLE_CONSUMER_RECORD;
+		case MATCH_KUAI_XIN_BUS_CARD_BY_ID:
+			tableName = TABLE_KUAI_XIN_BUS_CARD;
 			break;
-		case MATCH_CONSUMER_RECORD:
+		case MATCH_KUAI_XIN_CONSUMER_RECORD:
 			tableName = BUS_CARD_JOIN_CONSUMER_RECORD;
 			break;
-		case MATCH_BUS_ROUTE:
-			tableName = TABLE_BUS_ROUTE;
+		case MATCH_KUAI_XIN_BUS_ROUTE:
+			tableName = TABLE_KUAI_XIN_BUS_ROUTE;
 			break;
-		case MATCH_BUS_STATION:
-			tableName = TABLE_BUS_STATION;
+		case MATCH_KUAI_XIN_BUS_STATION:
+			tableName = TABLE_KUAI_XIN_BUS_STATION;
 			break;
-		case MATCH_BUS_ROUTE_STATION:
-			tableName = TABLE_BUS_ROUTE_STATION;
+		case MATCH_KUAI_XIN_BUS_ROUTE_STATION:
+			tableName = TABLE_KUAI_XIN_BUS_ROUTE_STATION;
 			break;
+		case MATCH_BAI_DU_BUS_ROUTE:
+			tableName = TABLE_BAI_DU_BUS_ROUTE;
+			break;
+		case MATCH_BAI_DU_BUS_STATION:
+			tableName = TABLE_BAI_DU_BUS_STATION;
+			break;
+		case MATCH_BAI_DU_BUS_ROUTE_STATION:
+			tableName = TABLE_BAI_DU_BUS_ROUTE_STATION;
+			break;	
 		default:
 			throw new IllegalArgumentException("query() - Unknown uri: " + uri);
 		}
@@ -96,23 +111,32 @@ public class TrafficDataProvider extends ContentProvider {
 	public synchronized String getType(Uri uri) {
 		String mimeType = "";
 		switch (sUriMatcher.match(uri)) {
-		case MATCH_BUS_CARD:
-			mimeType = ITrafficData.BusCard.CONTENT_TYPE;
+		case MATCH_KUAI_XIN_BUS_CARD:
+			mimeType = ITrafficData.KuaiXinData.BusCard.CONTENT_TYPE;
 			break;
-		case MATCH_BUS_CARD_BY_ID:
-			mimeType = ITrafficData.BusCard.CONTENT_ITEM_TYPE;
+		case MATCH_KUAI_XIN_BUS_CARD_BY_ID:
+			mimeType = ITrafficData.KuaiXinData.BusCard.CONTENT_ITEM_TYPE;
 			break;
-		case MATCH_CONSUMER_RECORD:
-			mimeType = ITrafficData.ConsumerRecord.CONTENT_TYPE;
+		case MATCH_KUAI_XIN_CONSUMER_RECORD:
+			mimeType = ITrafficData.KuaiXinData.ConsumerRecord.CONTENT_TYPE;
 			break;
-		case MATCH_BUS_ROUTE:
-			mimeType = ITrafficData.BusRoute.CONTENT_TYPE;
+		case MATCH_KUAI_XIN_BUS_ROUTE:
+			mimeType = ITrafficData.KuaiXinData.BusRoute.CONTENT_TYPE;
 			break;
-		case MATCH_BUS_STATION:
-			mimeType = ITrafficData.BusStation.CONTENT_TYPE;
+		case MATCH_KUAI_XIN_BUS_STATION:
+			mimeType = ITrafficData.KuaiXinData.BusStation.CONTENT_TYPE;
 			break;
-		case MATCH_BUS_ROUTE_STATION:
-			mimeType = ITrafficData.BusRouteStation.CONTENT_TYPE;
+		case MATCH_KUAI_XIN_BUS_ROUTE_STATION:
+			mimeType = ITrafficData.KuaiXinData.BusRouteStation.CONTENT_TYPE;
+			break;
+		case MATCH_BAI_DU_BUS_ROUTE:
+			mimeType = ITrafficData.BaiDuData.BusRoute.CONTENT_TYPE;
+			break;
+		case MATCH_BAI_DU_BUS_STATION:
+			mimeType = ITrafficData.BaiDuData.BusStation.CONTENT_TYPE;
+			break;
+		case MATCH_BAI_DU_BUS_ROUTE_STATION:
+			mimeType = ITrafficData.BaiDuData.BusRouteStation.CONTENT_TYPE;
 			break;
 		default:
 			throw new IllegalArgumentException("getType() - Unknown uri: " + uri);
@@ -123,53 +147,37 @@ public class TrafficDataProvider extends ContentProvider {
 	@Override
 	public synchronized Uri insert(Uri uri, ContentValues values) {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		Uri retUri = null;
-		long rowId = -1;
+		String tableName = null;
 		switch (sUriMatcher.match(uri)) {
-		case MATCH_BUS_CARD:
-			rowId = db.insertWithOnConflict(TABLE_BUS_CARD, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
+		case MATCH_KUAI_XIN_BUS_CARD:
+			tableName = TABLE_KUAI_XIN_BUS_CARD;
 			break;
-		case MATCH_CONSUMER_RECORD:
-			rowId = db.insertWithOnConflict(TABLE_CONSUMER_RECORD, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
+		case MATCH_KUAI_XIN_CONSUMER_RECORD:
+			tableName = TABLE_KUAI_XIN_CONSUMER_RECORD;
 			break;
-		case MATCH_BUS_ROUTE:
-			StringBuilder selection = new StringBuilder();
-			selection.append(ITrafficData.BusRoute.LINE_NUMBER)
-			         .append("=?")
-			         .append(" AND ")
-			         .append(ITrafficData.BusRoute.FIRST_STATION)
-			         .append("=?");
-			String[] selectionArgs = new String[] {
-					values.getAsString(ITrafficData.BusRoute.LINE_NUMBER),
-					values.getAsString(ITrafficData.BusRoute.FIRST_STATION)
-			};
-			rowId = db.insertWithOnConflict(TABLE_BUS_ROUTE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-			if (rowId == -1) {
-				Cursor cursor = query(uri, new String[]{BaseColumns._ID}, selection.toString(), selectionArgs, null);
-				if (cursor != null && cursor.moveToFirst()) {
-					long existRowId = cursor.getLong(0);
-					int rows = update(uri, values, BaseColumns._ID + "=?", new String[]{String.valueOf(existRowId)});
-					if (rows == 1) {
-						rowId = existRowId;
-					}
-				}
-			}
-			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
+		case MATCH_KUAI_XIN_BUS_ROUTE:
+			tableName = TABLE_KUAI_XIN_BUS_ROUTE;
 			break;
-		case MATCH_BUS_STATION:
-			rowId = db.insertWithOnConflict(TABLE_BUS_STATION, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
+		case MATCH_KUAI_XIN_BUS_STATION:
+			tableName = TABLE_KUAI_XIN_BUS_STATION;
 			break;
-		case MATCH_BUS_ROUTE_STATION:
-			rowId = db.insertWithOnConflict(TABLE_BUS_ROUTE_STATION, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-			retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
+		case MATCH_KUAI_XIN_BUS_ROUTE_STATION:
+			tableName = TABLE_KUAI_XIN_BUS_ROUTE_STATION;
+			break;
+		case MATCH_BAI_DU_BUS_ROUTE:
+			tableName = TABLE_BAI_DU_BUS_ROUTE;
+			break;
+		case MATCH_BAI_DU_BUS_STATION:
+			tableName = TABLE_BAI_DU_BUS_STATION;
+			break;
+		case MATCH_BAI_DU_BUS_ROUTE_STATION:
+			tableName = TABLE_BAI_DU_BUS_ROUTE_STATION;
 			break;
 		default:
 			throw new UnsupportedOperationException("Can't insert into uri: " + uri);
 		}
-		return retUri;
+		long rowId = db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+		return Uri.withAppendedPath(uri, String.valueOf(rowId));
 	}
 	
 
@@ -183,20 +191,29 @@ public class TrafficDataProvider extends ContentProvider {
 			String[] selectionArgs) {
 		String tableName = null;
 		switch (sUriMatcher.match(uri)) {
-		case MATCH_BUS_CARD:
-			tableName = TABLE_BUS_CARD;
+		case MATCH_KUAI_XIN_BUS_CARD:
+			tableName = TABLE_KUAI_XIN_BUS_CARD;
 			break;
-		case MATCH_CONSUMER_RECORD:
-			tableName = TABLE_CONSUMER_RECORD;
+		case MATCH_KUAI_XIN_CONSUMER_RECORD:
+			tableName = TABLE_KUAI_XIN_CONSUMER_RECORD;
 			break;
-		case MATCH_BUS_ROUTE:
-			tableName = TABLE_BUS_ROUTE;
+		case MATCH_KUAI_XIN_BUS_ROUTE:
+			tableName = TABLE_KUAI_XIN_BUS_ROUTE;
 			break;
-		case MATCH_BUS_STATION:
-			tableName = TABLE_BUS_STATION;
+		case MATCH_KUAI_XIN_BUS_STATION:
+			tableName = TABLE_KUAI_XIN_BUS_STATION;
 			break;
-		case MATCH_BUS_ROUTE_STATION:
-			tableName = TABLE_BUS_ROUTE_STATION;
+		case MATCH_KUAI_XIN_BUS_ROUTE_STATION:
+			tableName = TABLE_KUAI_XIN_BUS_ROUTE_STATION;
+			break;
+		case MATCH_BAI_DU_BUS_ROUTE:
+			tableName = TABLE_BAI_DU_BUS_ROUTE;
+			break;
+		case MATCH_BAI_DU_BUS_STATION:
+			tableName = TABLE_BAI_DU_BUS_STATION;
+			break;
+		case MATCH_BAI_DU_BUS_ROUTE_STATION:
+			tableName = TABLE_BAI_DU_BUS_ROUTE_STATION;
 			break;
 		default:
 			throw new UnsupportedOperationException("Can't update uri: " + uri);
@@ -216,71 +233,96 @@ public class TrafficDataProvider extends ContentProvider {
         // Called only once, first time the DB is created
         @Override
         public void onCreate(SQLiteDatabase db) {
-        	db.execSQL("CREATE TABLE " + TABLE_BUS_CARD + " ("
-                    + BusCardColumns._ID + " INTEGER PRIMARY KEY, "
-                    + BusCardColumns.CARD_NUMBER + " TEXT, "
-                    + BusCardColumns.RESIDUAL_COUNT + " TEXT, "
-                    + BusCardColumns.RESIDUAL_AMOUNT + " TEXT, "
-                    + BusCardColumns.LAST_UPDATE_TIME + " INTEGER, "
-                    + "UNIQUE (" + BusCardColumns.CARD_NUMBER + ")"+ " )");
+        	db.execSQL("CREATE TABLE " + TABLE_KUAI_XIN_BUS_CARD + " ("
+                    + KuaiXinData.BusCardColumns._ID + " INTEGER PRIMARY KEY, "
+                    + KuaiXinData.BusCardColumns.CARD_NUMBER + " TEXT, "
+                    + KuaiXinData.BusCardColumns.RESIDUAL_COUNT + " TEXT, "
+                    + KuaiXinData.BusCardColumns.RESIDUAL_AMOUNT + " TEXT, "
+                    + KuaiXinData.BusCardColumns.LAST_UPDATE_TIME + " INTEGER, "
+                    + "UNIQUE (" + KuaiXinData.BusCardColumns.CARD_NUMBER + ")"+ " )");
         	
-        	db.execSQL("CREATE TABLE " + TABLE_CONSUMER_RECORD + " ("
-                    + ConsumerRecordColumns._ID + " INTEGER PRIMARY KEY, "
-                    + ConsumerRecordColumns.CARD_ID + " INTEGER, "
-                    + ConsumerRecordColumns.LINE_NUMBER + " TEXT, "
-                    + ConsumerRecordColumns.BUS_NUMBER + " TEXT, "
-                    + ConsumerRecordColumns.DATE + " TEXT, "
-                    + ConsumerRecordColumns.CONSUMPTION + " TEXT, "
-                    + ConsumerRecordColumns.RESIDUAL + " TEXT, "
-                    + ConsumerRecordColumns.TYPE + " TEXT, "
-                    + "FOREIGN KEY" + " (" + ConsumerRecordColumns.CARD_ID + ") "
-                    + "REFERENCES " + TABLE_BUS_CARD + "(" + BusCardColumns._ID + ") ON DELETE CASCADE, "
-                    + "UNIQUE (" + ConsumerRecordColumns.CARD_ID + ", "
-                    + ConsumerRecordColumns.DATE + " )"+ " )");
+        	db.execSQL("CREATE TABLE " + TABLE_KUAI_XIN_CONSUMER_RECORD + " ("
+                    + KuaiXinData.ConsumerRecordColumns._ID + " INTEGER PRIMARY KEY, "
+                    + KuaiXinData.ConsumerRecordColumns.CARD_ID + " INTEGER, "
+                    + KuaiXinData.ConsumerRecordColumns.LINE_NUMBER + " TEXT, "
+                    + KuaiXinData.ConsumerRecordColumns.BUS_NUMBER + " TEXT, "
+                    + KuaiXinData.ConsumerRecordColumns.DATE + " TEXT, "
+                    + KuaiXinData.ConsumerRecordColumns.CONSUMPTION + " TEXT, "
+                    + KuaiXinData.ConsumerRecordColumns.RESIDUAL + " TEXT, "
+                    + KuaiXinData.ConsumerRecordColumns.TYPE + " TEXT, "
+                    + "FOREIGN KEY" + " (" + KuaiXinData.ConsumerRecordColumns.CARD_ID + ") "
+                    + "REFERENCES " + TABLE_KUAI_XIN_BUS_CARD + "(" + KuaiXinData.BusCardColumns._ID + ") ON DELETE CASCADE, "
+                    + "UNIQUE (" + KuaiXinData.ConsumerRecordColumns.CARD_ID + ", "
+                    + KuaiXinData.ConsumerRecordColumns.DATE + " )"+ " )");
         	
-        	db.execSQL("CREATE TABLE " + TABLE_BUS_ROUTE + " ("
-                    + BusRouteColumns._ID + " INTEGER PRIMARY KEY, "
-                    + BusRouteColumns.LINE_NUMBER + " TEXT, "
-                    + BusRouteColumns.ROUTE_UID + " TEXT, "
-                    + BusRouteColumns.DIRECTION + " TEXT, "
-                    + BusRouteColumns.START_TIME + " TEXT, "
-                    + BusRouteColumns.END_TIME + " TEXT, "
-                    + BusRouteColumns.FIRST_STATION + " TEXT, "
-                    + BusRouteColumns.LAST_STATION + " TEXT, "
-                    + BusRouteColumns.STATIONS + " TEXT, "
-                    + BusRouteColumns.LAST_UPDATE_TIME + " INTEGER, "
-                    + "UNIQUE (" + BusRouteColumns.LINE_NUMBER + ", "
-                    + BusRouteColumns.FIRST_STATION + " )"+ " )");
+        	db.execSQL("CREATE TABLE " + TABLE_KUAI_XIN_BUS_ROUTE + " ("
+                    + KuaiXinData.BusRouteColumns._ID + " INTEGER PRIMARY KEY, "
+                    + KuaiXinData.BusRouteColumns.LINE_NUMBER + " TEXT, "
+                    + KuaiXinData.BusRouteColumns.DIRECTION + " TEXT, "
+                    + KuaiXinData.BusRouteColumns.START_TIME + " TEXT, "
+                    + KuaiXinData.BusRouteColumns.END_TIME + " TEXT, "
+                    + KuaiXinData.BusRouteColumns.STATIONS + " TEXT, "
+                    + KuaiXinData.BusRouteColumns.LAST_UPDATE_TIME + " INTEGER, "
+                    + "UNIQUE (" + KuaiXinData.BusRouteColumns.LINE_NUMBER + ", " 
+                    + KuaiXinData.BusRouteColumns.DIRECTION + ")"+ " )");
         	
-        	db.execSQL("CREATE TABLE " + TABLE_BUS_STATION + " ("
-                    + BusStationColumns._ID + " INTEGER PRIMARY KEY, "
-                    + BusStationColumns.NAME + " TEXT, "
-                    + BusStationColumns.LONGITUDE + " TEXT, "
-                    + BusStationColumns.LATITUDE + " TEXT, "
-                    + "UNIQUE (" + BusStationColumns.LONGITUDE + ", "
-                    + BusStationColumns.LATITUDE + " )"+ " )");
+        	db.execSQL("CREATE TABLE " + TABLE_KUAI_XIN_BUS_STATION + " ("
+                    + KuaiXinData.BusStationColumns._ID + " INTEGER PRIMARY KEY, "
+                    + KuaiXinData.BusStationColumns.NAME + " TEXT, "
+                    + KuaiXinData.BusStationColumns.GPS_NUMBER + " TEXT, "
+                    + "UNIQUE (" + KuaiXinData.BusStationColumns.GPS_NUMBER + ")"+ " )");
             
-        	db.execSQL("CREATE TABLE " + TABLE_BUS_ROUTE_STATION + " ("
-                    + BusRouteStationColumns.ROUTE_ID + " INTEGER, "
-                    + BusRouteStationColumns.STATION_ID + " INTEGER, "
-                    + BusRouteStationColumns.INDEX + " INTEGER, "
-                    + "FOREIGN KEY" + " (" + BusRouteStationColumns.ROUTE_ID + ") " 
-                    + "REFERENCES " + TABLE_BUS_ROUTE + "(" + BusRouteColumns._ID + ") ON DELETE CASCADE, "
-                    + "FOREIGN KEY" + " (" + BusRouteStationColumns.STATION_ID + ") "
-                    + "REFERENCES " + TABLE_BUS_STATION + "(" + BusStationColumns._ID + ") ON DELETE CASCADE, "
-                    + "UNIQUE (" + BusRouteStationColumns.ROUTE_ID + ", "
-                    + BusRouteStationColumns.STATION_ID + " )"+ " )");
+        	db.execSQL("CREATE TABLE " + TABLE_KUAI_XIN_BUS_ROUTE_STATION + " ("
+                    + KuaiXinData.BusRouteStationColumns.ROUTE_ID + " INTEGER, "
+                    + KuaiXinData.BusRouteStationColumns.STATION_ID + " INTEGER, "
+                    + KuaiXinData.BusRouteStationColumns.INDEX + " INTEGER, "
+                    + "FOREIGN KEY" + " (" + KuaiXinData.BusRouteStationColumns.ROUTE_ID + ") " 
+                    + "REFERENCES " + TABLE_KUAI_XIN_BUS_ROUTE + "(" + KuaiXinData.BusRouteColumns._ID + ") ON DELETE CASCADE, "
+                    + "FOREIGN KEY" + " (" + KuaiXinData.BusRouteStationColumns.STATION_ID + ") "
+                    + "REFERENCES " + TABLE_KUAI_XIN_BUS_STATION + "(" + KuaiXinData.BusStationColumns._ID + ") ON DELETE CASCADE, "
+                    + "UNIQUE (" + KuaiXinData.BusRouteStationColumns.ROUTE_ID + ", "
+                    + KuaiXinData.BusRouteStationColumns.STATION_ID + " )"+ " )");
+        	
+        	db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_ROUTE + " ("
+                    + BaiDuData.BusRouteColumns._ID + " INTEGER PRIMARY KEY, "
+                    + BaiDuData.BusRouteColumns.LINE_NUMBER + " TEXT, "
+                    + BaiDuData.BusRouteColumns.UID + " TEXT, "
+                    + BaiDuData.BusRouteColumns.NAME + " TEXT, "
+                    + BaiDuData.BusRouteColumns.LAST_UPDATE_TIME + " INTEGER, "
+                    + "UNIQUE (" + BaiDuData.BusRouteColumns.UID + ")"+ " )");
+        	
+        	db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_STATION + " ("
+                    + BaiDuData.BusStationColumns._ID + " INTEGER PRIMARY KEY, "
+                    + BaiDuData.BusStationColumns.NAME + " TEXT, "
+                    + BaiDuData.BusStationColumns.LATITUDE + " TEXT, "
+                    + BaiDuData.BusStationColumns.LONGITUDE + " TEXT, "
+                    + "UNIQUE (" + BaiDuData.BusStationColumns.LATITUDE + ", "
+                    + BaiDuData.BusStationColumns.LONGITUDE + ")"+ " )");
+            
+        	db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_ROUTE_STATION + " ("
+                    + BaiDuData.BusRouteStationColumns.ROUTE_ID + " INTEGER, "
+                    + BaiDuData.BusRouteStationColumns.STATION_ID + " INTEGER, "
+                    + BaiDuData.BusRouteStationColumns.INDEX + " INTEGER, "
+                    + "FOREIGN KEY" + " (" + BaiDuData.BusRouteStationColumns.ROUTE_ID + ") " 
+                    + "REFERENCES " + TABLE_BAI_DU_BUS_ROUTE + "(" + BaiDuData.BusRouteColumns._ID + ") ON DELETE CASCADE, "
+                    + "FOREIGN KEY" + " (" + BaiDuData.BusRouteStationColumns.STATION_ID + ") "
+                    + "REFERENCES " + TABLE_BAI_DU_BUS_STATION + "(" + BaiDuData.BusStationColumns._ID + ") ON DELETE CASCADE, "
+                    + "UNIQUE (" + BaiDuData.BusRouteStationColumns.ROUTE_ID + ", "
+                    + BaiDuData.BusRouteStationColumns.STATION_ID + " )"+ " )");
         }
 
         // Called whenever newVersion != oldVersion
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         	// drops the old tables
-        	db.execSQL("drop table if exists " + TABLE_BUS_CARD);
-            db.execSQL("drop table if exists " + TABLE_CONSUMER_RECORD); 
-            db.execSQL("drop table if exists " + TABLE_BUS_ROUTE); 
-            db.execSQL("drop table if exists " + TABLE_BUS_STATION); 
-            db.execSQL("drop table if exists " + TABLE_BUS_ROUTE_STATION); 
+        	db.execSQL("drop table if exists " + TABLE_KUAI_XIN_BUS_CARD);
+            db.execSQL("drop table if exists " + TABLE_KUAI_XIN_CONSUMER_RECORD); 
+            db.execSQL("drop table if exists " + TABLE_KUAI_XIN_BUS_ROUTE); 
+            db.execSQL("drop table if exists " + TABLE_KUAI_XIN_BUS_STATION); 
+            db.execSQL("drop table if exists " + TABLE_KUAI_XIN_BUS_ROUTE_STATION); 
+            db.execSQL("drop table if exists " + TABLE_BAI_DU_BUS_ROUTE); 
+            db.execSQL("drop table if exists " + TABLE_BAI_DU_BUS_STATION); 
+            db.execSQL("drop table if exists " + TABLE_BAI_DU_BUS_ROUTE_STATION); 
             onCreate(db);
         }
         

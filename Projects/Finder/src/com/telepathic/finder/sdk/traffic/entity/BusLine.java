@@ -3,6 +3,8 @@ package com.telepathic.finder.sdk.traffic.entity;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.R.interpolator;
+
 public class BusLine {
     /**
      * The bus number
@@ -112,5 +114,21 @@ public class BusLine {
     
     public HashMap<Direction, ArrayList<BusStation>> getRouteMap() {
     	return mRouteMap;
+    }
+    
+    public int getStationIndex(Direction direction, String stationName) {
+    	int index = -1;
+    	ArrayList<BusStation> route = mRouteMap.get(direction);
+    	if (route != null && route.size() > 0) {
+    		BusStation station = null;
+    		for(int idx = 0; idx < route.size(); idx++) {
+    			station = route.get(idx);
+    			if (station.getName().equals(stationName)) {
+    				index = idx;
+    				break;
+    			}
+    		}
+    	} 
+    	return index;
     }
 }

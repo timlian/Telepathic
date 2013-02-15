@@ -54,7 +54,7 @@ public class BusCardRecordActivity extends Activity {
         mTrafficService = app.getTrafficService();
         getLoaderManager().initLoader(BUS_CARD_LOADER_ID, null, new BusCardLoaderCallback());
         
-        getContentResolver().registerContentObserver(ITrafficData.BusCard.CONTENT_URI, true, new ContentObserver(new Handler()) {
+        getContentResolver().registerContentObserver(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, true, new ContentObserver(new Handler()) {
         	@Override
         	public boolean deliverSelfNotifications() {
         		Utils.debug(TAG, "ContentObserver - deliverSelfNotifications()");
@@ -67,7 +67,7 @@ public class BusCardRecordActivity extends Activity {
         		super.onChange(selfChange);
         	}
 		});
-        getContentResolver().registerContentObserver(ITrafficData.ConsumerRecord.CONTENT_URI, true, new ContentObserver(new Handler()) {
+        getContentResolver().registerContentObserver(ITrafficData.KuaiXinData.ConsumerRecord.CONTENT_URI, true, new ContentObserver(new Handler()) {
         	@Override
         	public boolean deliverSelfNotifications() {
         		Utils.debug(TAG, "ContentObserver - deliverSelfNotifications()");
@@ -94,13 +94,13 @@ public class BusCardRecordActivity extends Activity {
 			CursorLoader loader = null;
 			switch(id) {
 			case BUS_CARD_LOADER_ID:
-				loader = new CursorLoader(getContext(), ITrafficData.BusCard.CONTENT_URI, null, null, null, null);
+				loader = new CursorLoader(getContext(), ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null, null, null, null);
 				break;
 			case CONSUMER_RECORD_LOADER_ID:
 				String cardNumber = args.getString(CARD_NUMBER);
-				String selection = ITrafficData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber + "\'";
-				String sortOrder = ITrafficData.ConsumerRecord.DATE + " DESC";
-				loader = new CursorLoader(getContext(), ITrafficData.ConsumerRecord.CONTENT_URI, null, selection, null, sortOrder);
+				String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber + "\'";
+				String sortOrder = ITrafficData.KuaiXinData.ConsumerRecord.DATE + " DESC";
+				loader = new CursorLoader(getContext(), ITrafficData.KuaiXinData.ConsumerRecord.CONTENT_URI, null, selection, null, sortOrder);
 				break;
 			default:
 				break;
@@ -121,9 +121,9 @@ public class BusCardRecordActivity extends Activity {
 				break;
 			case BUS_CARD_LOADER_ID:
 				do {
-					final int idxCardNumber = data.getColumnIndex(ITrafficData.BusCard.CARD_NUMBER);
-					final int idxResidualCount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_COUNT);
-					final int idxResidualAmount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_AMOUNT);
+					final int idxCardNumber = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.CARD_NUMBER);
+					final int idxResidualCount = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_COUNT);
+					final int idxResidualAmount = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_AMOUNT);
 					String resiaualCount = getString(R.string.residual_count, data.getString(idxResidualCount));
 	                String resiaualAmount = getString(R.string.residual_amount, data.getString(idxResidualAmount));
 					mResidualCountText.setText(resiaualCount);
@@ -229,11 +229,11 @@ public class BusCardRecordActivity extends Activity {
 		public void bindView(View view, Context context, Cursor cursor) {
 			if (cursor != null) {
 				RecordItemHolder holder = (RecordItemHolder) view.getTag();
-				final int idxLineNumber = cursor.getColumnIndex(ITrafficData.ConsumerRecord.LINE_NUMBER);
-				final int idxBusNumber = cursor.getColumnIndex(ITrafficData.ConsumerRecord.BUS_NUMBER);
-				final int idxConsumption = cursor.getColumnIndex(ITrafficData.ConsumerRecord.CONSUMPTION);
-				final int idxDate = cursor.getColumnIndex(ITrafficData.ConsumerRecord.DATE);
-				final int idxType = cursor.getColumnIndex(ITrafficData.ConsumerRecord.TYPE);
+				final int idxLineNumber = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.LINE_NUMBER);
+				final int idxBusNumber = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.BUS_NUMBER);
+				final int idxConsumption = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.CONSUMPTION);
+				final int idxDate = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.DATE);
+				final int idxType = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.TYPE);
 				holder.lineNumber.setText(getResources().getString(R.string.line_number)+ cursor.getString(idxLineNumber));
 				holder.busNumber.setText(getResources().getString(R.string.bus_number) + cursor.getString(idxBusNumber));
 				String comsumption = "";

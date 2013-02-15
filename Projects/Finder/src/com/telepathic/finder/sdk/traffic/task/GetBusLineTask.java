@@ -5,47 +5,26 @@ import java.util.concurrent.Callable;
 
 import org.ksoap2.serialization.SoapObject;
 
-import android.content.ContentValues;
-import android.content.Context;
-
 import com.telepathic.finder.sdk.traffic.entity.BusLine;
 import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.BusStation;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 
 public class GetBusLineTask  implements Callable<BusLine> {
 	private static final String TAG = GetBusLineTask.class.getSimpleName();
 	
     private BusLine mResult;
-    private Context mContext;
     private String mLineNumber;
     
-    public GetBusLineTask(Context context, String lineNumber) {
-        mContext = context;
+    public GetBusLineTask(String lineNumber) {
         mLineNumber = lineNumber;
     }
     
     @Override
 	public BusLine call() throws Exception {
 		NetworkManager.execute(new GetBusLineRequest());
-		store(mResult);
 		return mResult;
 	}
   
-    private void store(BusLine busLine) {
-    	for(Direction direction : busLine.getRouteMap().keySet()) {
-    		ContentValues values = new ContentValues();
-    		values.put(ITrafficData.BusRoute.LINE_NUMBER, busLine.getLineNumber());
-    		values.put(ITrafficData.BusRoute.DIRECTION, direction.toString());
-    		values.put(ITrafficData.BusRoute.START_TIME, busLine.getStartTime());
-    		values.put(ITrafficData.BusRoute.END_TIME, busLine.getEndTime());
-    		values.put(ITrafficData.BusRoute.FIRST_STATION, busLine.getFirstStation(direction));
-    		values.put(ITrafficData.BusRoute.LAST_STATION, busLine.getLastStation(direction));
-    		values.put(ITrafficData.BusRoute.STATIONS, busLine.getRouteStations(direction));
-    		mContext.getContentResolver().insert(ITrafficData.BusRoute.CONTENT_URI, values);
-    	}
-    }
-    
     private class GetBusLineRequest extends RPCBaseRequest {
     	private static final String METHOD_NAME = "getBusLineRoute";
         // parameter keys

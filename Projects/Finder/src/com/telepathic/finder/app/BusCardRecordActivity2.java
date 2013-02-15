@@ -112,7 +112,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             CursorLoader loader = null;
             if (mBusCardLoaderId == id) {
-                loader = new CursorLoader(getContext(), ITrafficData.BusCard.CONTENT_URI, null,
+                loader = new CursorLoader(getContext(), ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null,
                         null, null, null);
             }
             return loader;
@@ -124,9 +124,9 @@ public class BusCardRecordActivity2 extends BaseActivity {
                 mNoItemTips.setVisibility(View.GONE);
                 mConsumptionDetail.setVisibility(View.VISIBLE);
                 mBusCards = new ArrayList<BusCard>();
-                int idxCardNumber = data.getColumnIndex(ITrafficData.BusCard.CARD_NUMBER);
-                int idxResidualCount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_COUNT);
-                int idxResidualAmount = data.getColumnIndex(ITrafficData.BusCard.RESIDUAL_AMOUNT);
+                int idxCardNumber = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.CARD_NUMBER);
+                int idxResidualCount = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_COUNT);
+                int idxResidualAmount = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_AMOUNT);
                 do {
                 	Utils.printCursorContent("BusCardRecords", data);
                     BusCard card = new BusCard();
@@ -307,13 +307,13 @@ public class BusCardRecordActivity2 extends BaseActivity {
             if (cursor != null) {
                 RecordItemHolder holder = (RecordItemHolder)view.getTag();
                 final int idxLineNumber = cursor
-                        .getColumnIndex(ITrafficData.ConsumerRecord.LINE_NUMBER);
+                        .getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.LINE_NUMBER);
                 final int idxBusNumber = cursor
-                        .getColumnIndex(ITrafficData.ConsumerRecord.BUS_NUMBER);
+                        .getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.BUS_NUMBER);
                 final int idxConsumption = cursor
-                        .getColumnIndex(ITrafficData.ConsumerRecord.CONSUMPTION);
-                final int idxDate = cursor.getColumnIndex(ITrafficData.ConsumerRecord.DATE);
-                final int idxType = cursor.getColumnIndex(ITrafficData.ConsumerRecord.TYPE);
+                        .getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.CONSUMPTION);
+                final int idxDate = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.DATE);
+                final int idxType = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.TYPE);
                 holder.lineNumber.setText(getResources().getString(R.string.line_number)
                         + cursor.getString(idxLineNumber));
                 holder.busNumber.setText(getResources().getString(R.string.bus_number)
@@ -377,11 +377,11 @@ public class BusCardRecordActivity2 extends BaseActivity {
                 CursorLoader loader = null;
                 if (mLoaderId == id) {
                     String cardNumber = mCard.getCardNumber();
-                    String selection = ITrafficData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber
+                    String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber
                             + "\'";
-                    String sortOrder = ITrafficData.ConsumerRecord.DATE + " DESC";
+                    String sortOrder = ITrafficData.KuaiXinData.ConsumerRecord.DATE + " DESC";
                     loader = new CursorLoader(getContext(),
-                            ITrafficData.ConsumerRecord.CONTENT_URI, null, selection, null,
+                            ITrafficData.KuaiXinData.ConsumerRecord.CONTENT_URI, null, selection, null,
                             sortOrder);
                 }
                 return loader;

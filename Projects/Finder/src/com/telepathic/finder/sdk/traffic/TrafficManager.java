@@ -1,9 +1,6 @@
 
 package com.telepathic.finder.sdk.traffic;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -189,7 +186,7 @@ public class TrafficManager {
 					
 					for(String lineNumber: lineNumbers) {
 						result3.add(mExecutorService.submit(new TranslateToStationTask(lineNumber, gpsNumber)));
-						result4.add(mExecutorService.submit(new GetBusLineTask(mContext,lineNumber)));
+						result4.add(mExecutorService.submit(new GetBusLineTask(lineNumber)));
 					}
 					// wait to process the result3
 					mExecutorService.execute(new Runnable() {
@@ -247,8 +244,12 @@ public class TrafficManager {
 							}
 						}
 					});
+					// store the data
+					mTrafficStore.store(stationLines);
+					Utils.copyAppDatabaseFiles(mContext.getPackageName());
 				}
 			});
+        	
         }
 
         @Override
@@ -258,10 +259,10 @@ public class TrafficManager {
 				public void run() {
 					try {
 						boolean needUpdate = true;
-						String[] projection = new String[]{ITrafficData.BusCard.LAST_UPDATE_TIME};
-						String selection = ITrafficData.BusCard.CARD_NUMBER + "=?";
+						String[] projection = new String[]{ITrafficData.KuaiXinData.BusCard.LAST_UPDATE_TIME};
+						String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=?";
 						String[] selectionArgs = new String[]{cardNumber};
-						Cursor cursor = mContext.getContentResolver().query(ITrafficData.BusCard.CONTENT_URI, projection, selection, selectionArgs, null);
+						Cursor cursor = mContext.getContentResolver().query(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, projection, selection, selectionArgs, null);
 						if (cursor != null && cursor.moveToFirst()) {
 							long lastUpdateTime = cursor.getLong(0);
 							long interval = System.currentTimeMillis() - lastUpdateTime;
