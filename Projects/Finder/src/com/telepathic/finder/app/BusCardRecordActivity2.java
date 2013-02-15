@@ -128,7 +128,6 @@ public class BusCardRecordActivity2 extends BaseActivity {
                 int idxResidualCount = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_COUNT);
                 int idxResidualAmount = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_AMOUNT);
                 do {
-                	Utils.printCursorContent("BusCardRecords", data);
                     BusCard card = new BusCard();
                     card.setCardNumber(data.getString(idxCardNumber));
                     String resiaualCount = data.getString(idxResidualCount);
