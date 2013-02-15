@@ -159,6 +159,10 @@ public interface ITrafficData {
 			 * The gps number of the bus station.
 			 */
 			String GPS_NUMBER = "gps_number";
+			/**
+			 * The last update time
+			 */
+			String LAST_UPDATE_TIME = "last_update_time";
 		}
 		
 		class BusStation implements BusStationColumns {
@@ -204,6 +208,21 @@ public interface ITrafficData {
 			 * The MIME type
 			 */
 			public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.kuaiXinBusRouteStation";
+		}
+		
+		class BusStationLines {
+			/**
+			 * The content uri of this table
+			 */
+			public static final Uri CONTENT_URI = Uri.parse("content://com.telepathic.finder.provider/kuaiXinBusStationLines");
+			/**
+			 * The MIME type
+			 */
+			public static final String CONTENT_TYPE = "vnd.android.cursor.dir/com.telepathic.finder.provider.kuaiXinBusStationLines";
+			/**
+			 * The MIME type
+			 */
+			public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.kuaiXinBusStationLines";
 		}
 		
 	}

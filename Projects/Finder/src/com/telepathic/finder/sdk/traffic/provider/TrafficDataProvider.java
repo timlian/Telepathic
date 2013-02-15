@@ -35,9 +35,10 @@ public class TrafficDataProvider extends ContentProvider {
 	private static final int MATCH_KUAI_XIN_BUS_ROUTE = 4;
 	private static final int MATCH_KUAI_XIN_BUS_STATION = 5;
 	private static final int MATCH_KUAI_XIN_BUS_ROUTE_STATION = 6;
-	private static final int MATCH_BAI_DU_BUS_ROUTE = 7;
-	private static final int MATCH_BAI_DU_BUS_STATION = 8;
-	private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 9;
+	private static final int MATCH_KUAI_XIN_BUS_STATION_LINES = 7;
+	private static final int MATCH_BAI_DU_BUS_ROUTE = 8;
+	private static final int MATCH_BAI_DU_BUS_STATION = 9;
+	private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 10;
 	
 	private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 	
@@ -48,14 +49,23 @@ public class TrafficDataProvider extends ContentProvider {
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusRoute", MATCH_KUAI_XIN_BUS_ROUTE);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusStation", MATCH_KUAI_XIN_BUS_STATION);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusRouteStation", MATCH_KUAI_XIN_BUS_ROUTE_STATION);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusStationLines", MATCH_KUAI_XIN_BUS_STATION_LINES);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRoute", MATCH_BAI_DU_BUS_ROUTE);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusStation", MATCH_BAI_DU_BUS_STATION);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRouteStation", MATCH_BAI_DU_BUS_ROUTE_STATION);
 	}
 	
-	private static final String BUS_CARD_JOIN_CONSUMER_RECORD = 
+	private static final String KUAI_XIN_BUS_CARD_JOIN_CONSUMER_RECORD = 
 			TABLE_KUAI_XIN_BUS_CARD + " LEFT OUTER JOIN " + TABLE_KUAI_XIN_CONSUMER_RECORD + " ON "
 			+ "(" + TABLE_KUAI_XIN_BUS_CARD + "." + KuaiXinData.BusCardColumns._ID + "=" + KuaiXinData.ConsumerRecordColumns.CARD_ID + ")";
+	
+	private static final String KUAI_XIN_STATION_JOIN_ROUTE_STATION_JOIN__ROUTE =
+			TABLE_KUAI_XIN_BUS_STATION + " LEFT OUTER JOIN " + TABLE_KUAI_XIN_BUS_ROUTE_STATION + " ON "
+			+ "(" + TABLE_KUAI_XIN_BUS_STATION + "." + KuaiXinData.BusStation._ID + "="
+			+ TABLE_KUAI_XIN_BUS_ROUTE_STATION + "." + KuaiXinData.BusRouteStation.STATION_ID + ")"
+			+ " LEFT OUTER JOIN " + TABLE_KUAI_XIN_BUS_ROUTE + " ON "
+			+ "(" + TABLE_KUAI_XIN_BUS_ROUTE_STATION + "." + KuaiXinData.BusRouteStation.ROUTE_ID + "=" 
+			+ TABLE_KUAI_XIN_BUS_ROUTE + "." + KuaiXinData.BusRoute._ID + ")";
 	
 	
 	private DbHelper mDBHelper;
@@ -78,7 +88,7 @@ public class TrafficDataProvider extends ContentProvider {
 			tableName = TABLE_KUAI_XIN_BUS_CARD;
 			break;
 		case MATCH_KUAI_XIN_CONSUMER_RECORD:
-			tableName = BUS_CARD_JOIN_CONSUMER_RECORD;
+			tableName = KUAI_XIN_BUS_CARD_JOIN_CONSUMER_RECORD;
 			break;
 		case MATCH_KUAI_XIN_BUS_ROUTE:
 			tableName = TABLE_KUAI_XIN_BUS_ROUTE;
@@ -88,6 +98,9 @@ public class TrafficDataProvider extends ContentProvider {
 			break;
 		case MATCH_KUAI_XIN_BUS_ROUTE_STATION:
 			tableName = TABLE_KUAI_XIN_BUS_ROUTE_STATION;
+			break;
+		case MATCH_KUAI_XIN_BUS_STATION_LINES:
+			tableName = KUAI_XIN_STATION_JOIN_ROUTE_STATION_JOIN__ROUTE;
 			break;
 		case MATCH_BAI_DU_BUS_ROUTE:
 			tableName = TABLE_BAI_DU_BUS_ROUTE;
@@ -148,6 +161,8 @@ public class TrafficDataProvider extends ContentProvider {
 	public synchronized Uri insert(Uri uri, ContentValues values) {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
 		String tableName = null;
+		boolean inserted = false;
+		long rowId = -1;
 		switch (sUriMatcher.match(uri)) {
 		case MATCH_KUAI_XIN_BUS_CARD:
 			tableName = TABLE_KUAI_XIN_BUS_CARD;
@@ -156,10 +171,56 @@ public class TrafficDataProvider extends ContentProvider {
 			tableName = TABLE_KUAI_XIN_CONSUMER_RECORD;
 			break;
 		case MATCH_KUAI_XIN_BUS_ROUTE:
-			tableName = TABLE_KUAI_XIN_BUS_ROUTE;
+			rowId = db.insertWithOnConflict(TABLE_KUAI_XIN_BUS_ROUTE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+			if (rowId == -1) {
+				long conflictRowId = -1;
+				String[] projection = new String[]{KuaiXinData.BusRoute._ID};
+				StringBuilder selection = new StringBuilder();
+				selection.append(KuaiXinData.BusRoute.LINE_NUMBER)
+						 .append("=?")
+						 .append(" AND ")
+						 .append(KuaiXinData.BusRoute.DIRECTION)
+						 .append("=?");
+				String[] selectionArgs = new String[]{
+						values.getAsString(KuaiXinData.BusRoute.LINE_NUMBER),
+						values.getAsString(KuaiXinData.BusRoute.DIRECTION)
+						};
+				Cursor cursor = query(KuaiXinData.BusRoute.CONTENT_URI, projection, selection.toString(), selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+					conflictRowId = cursor.getLong(0);
+				}
+				if (conflictRowId == -1) {
+					throw new RuntimeException("insert kuai xin bus route failed and there is no conflict row.");
+				}
+				int updateRows = update(KuaiXinData.BusRoute.CONTENT_URI, values, KuaiXinData.BusRoute._ID + "=?", new String[]{String.valueOf(conflictRowId)});
+				if (updateRows != 1) {
+					throw new RuntimeException("update the conflict row caused " + updateRows + " rows updated");
+				}
+				rowId = conflictRowId;
+			}
+			inserted = true;
 			break;
 		case MATCH_KUAI_XIN_BUS_STATION:
-			tableName = TABLE_KUAI_XIN_BUS_STATION;
+			rowId = db.insertWithOnConflict(TABLE_KUAI_XIN_BUS_STATION, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+			if (rowId == -1) {
+				long conflictRowId = -1;
+				String[] projection = new String[]{KuaiXinData.BusStation._ID};
+				String selection = KuaiXinData.BusStation.GPS_NUMBER + "=?";
+				String[] selectionArgs = new String[]{values.getAsString(KuaiXinData.BusStation.GPS_NUMBER)};
+				Cursor cursor = query(KuaiXinData.BusStation.CONTENT_URI, projection, selection, selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+					conflictRowId = cursor.getLong(0);
+				}
+				if (conflictRowId == -1) {
+					throw new RuntimeException("insert kuai xin bus station failed and there is no conflict row.");
+				}
+				int updateRows = update(KuaiXinData.BusStation.CONTENT_URI, values, KuaiXinData.BusStation._ID + "=?", new String[]{String.valueOf(conflictRowId)});
+				if (updateRows != 1) {
+					throw new RuntimeException("update the conflict row caused " + updateRows + " rows updated");
+				}
+				rowId = conflictRowId;
+			}
+			inserted = true;
 			break;
 		case MATCH_KUAI_XIN_BUS_ROUTE_STATION:
 			tableName = TABLE_KUAI_XIN_BUS_ROUTE_STATION;
@@ -176,7 +237,9 @@ public class TrafficDataProvider extends ContentProvider {
 		default:
 			throw new UnsupportedOperationException("Can't insert into uri: " + uri);
 		}
-		long rowId = db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+		if (!inserted) {
+			rowId = db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+		}
 		return Uri.withAppendedPath(uri, String.valueOf(rowId));
 	}
 	
@@ -219,7 +282,7 @@ public class TrafficDataProvider extends ContentProvider {
 			throw new UnsupportedOperationException("Can't update uri: " + uri);
 		}
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		return db.updateWithOnConflict(tableName, values, selection, selectionArgs, SQLiteDatabase.CONFLICT_IGNORE);
+		return db.updateWithOnConflict(tableName, values, selection, selectionArgs, SQLiteDatabase.CONFLICT_NONE);
 	}
 	
 	class DbHelper extends SQLiteOpenHelper {
@@ -270,6 +333,7 @@ public class TrafficDataProvider extends ContentProvider {
                     + KuaiXinData.BusStationColumns._ID + " INTEGER PRIMARY KEY, "
                     + KuaiXinData.BusStationColumns.NAME + " TEXT, "
                     + KuaiXinData.BusStationColumns.GPS_NUMBER + " TEXT, "
+                    + KuaiXinData.BusStationColumns.LAST_UPDATE_TIME + " TEXT, "
                     + "UNIQUE (" + KuaiXinData.BusStationColumns.GPS_NUMBER + ")"+ " )");
             
         	db.execSQL("CREATE TABLE " + TABLE_KUAI_XIN_BUS_ROUTE_STATION + " ("

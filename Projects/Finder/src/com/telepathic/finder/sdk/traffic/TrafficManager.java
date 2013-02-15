@@ -181,6 +181,13 @@ public class TrafficManager {
 				        	msg.arg2 = 0;
 				        	msg.obj = stationLines;
 				        	mMessageHandler.sendMessage(msg);
+				        	// store the data
+				        	long startTime = System.currentTimeMillis();
+							mTrafficStore.store(stationLines);
+							long endTime = System.currentTimeMillis();
+							Utils.debug(TAG, "store consume time: " + String.valueOf(endTime - startTime) + " in ms");
+							Utils.copyAppDatabaseFiles(mContext.getPackageName());
+							Utils.debug(TAG, "getBusStationLines(" + gpsNumber + ") finished");
 						}
 					});
 					
@@ -244,9 +251,6 @@ public class TrafficManager {
 							}
 						}
 					});
-					// store the data
-					mTrafficStore.store(stationLines);
-					Utils.copyAppDatabaseFiles(mContext.getPackageName());
 				}
 			});
         	

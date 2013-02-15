@@ -19,6 +19,7 @@ import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.BusStationLines;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
 import com.telepathic.finder.util.Utils;
 
 public class TrafficStore {
@@ -124,27 +125,30 @@ public class TrafficStore {
 	
 	public void store(BusStationLines stationLines) {
 		ContentValues station = new ContentValues();
-		station.put(ITrafficData.KuaiXinData.BusStation.NAME, stationLines.getStationName());
-		station.put(ITrafficData.KuaiXinData.BusStation.GPS_NUMBER, stationLines.getGpsNumber());
-		Uri uri = mContentResolver.insert(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, station);
+		station.put(KuaiXinData.BusStation.NAME, stationLines.getStationName());
+		station.put(KuaiXinData.BusStation.GPS_NUMBER, stationLines.getGpsNumber());
+		station.put(KuaiXinData.BusStation.LAST_UPDATE_TIME, System.currentTimeMillis());
+		Uri uri = mContentResolver.insert(KuaiXinData.BusStation.CONTENT_URI, station);
 		long stationId = Long.parseLong(uri.getLastPathSegment());
 		for(BusLine line : stationLines.getBusLines()) {
 			for(Direction direction : line.getRouteMap().keySet()) {
 	    		ContentValues route = new ContentValues();
-	    		route.put(ITrafficData.KuaiXinData.BusRoute.LINE_NUMBER, line.getLineNumber());
-	    		route.put(ITrafficData.KuaiXinData.BusRoute.DIRECTION, direction.toString());
-	    		route.put(ITrafficData.KuaiXinData.BusRoute.START_TIME, line.getStartTime());
-	    		route.put(ITrafficData.KuaiXinData.BusRoute.END_TIME, line.getEndTime());
-	    		route.put(ITrafficData.KuaiXinData.BusRoute.STATIONS, line.getRouteStations(direction));
-	    		route.put(ITrafficData.KuaiXinData.BusRoute.LAST_UPDATE_TIME, System.currentTimeMillis());
-	    		uri = mContentResolver.insert(ITrafficData.KuaiXinData.BusRoute.CONTENT_URI, route);
-	    		long routeId = Long.parseLong(uri.getLastPathSegment());
-	    		ContentValues routeStation = new ContentValues();
-	    		routeStation.put(ITrafficData.KuaiXinData.BusRouteStation.ROUTE_ID, routeId);
-	    		routeStation.put(ITrafficData.KuaiXinData.BusRouteStation.STATION_ID, stationId);
-	    		int index = line.getStationIndex(direction, stationLines.getStationName());
-	    		routeStation.put(ITrafficData.KuaiXinData.BusRouteStation.INDEX, index);
-	    		mContentResolver.insert(ITrafficData.KuaiXinData.BusRouteStation.CONTENT_URI, routeStation);
+	    		route.put(KuaiXinData.BusRoute.LINE_NUMBER, line.getLineNumber());
+	    		route.put(KuaiXinData.BusRoute.DIRECTION, direction.toString());
+	    		route.put(KuaiXinData.BusRoute.START_TIME, line.getStartTime());
+	    		route.put(KuaiXinData.BusRoute.END_TIME, line.getEndTime());
+	    		route.put(KuaiXinData.BusRoute.STATIONS, line.getRouteStations(direction));
+	    		route.put(KuaiXinData.BusRoute.LAST_UPDATE_TIME, System.currentTimeMillis());
+	    		uri = mContentResolver.insert(KuaiXinData.BusRoute.CONTENT_URI, route);
+	    		if (direction == stationLines.getRouteDirection(line.getLineNumber())) {
+		    		long routeId = Long.parseLong(uri.getLastPathSegment());
+		    		ContentValues routeStation = new ContentValues();
+		    		routeStation.put(KuaiXinData.BusRouteStation.ROUTE_ID, routeId);
+		    		routeStation.put(KuaiXinData.BusRouteStation.STATION_ID, stationId);
+		    		int index = line.getStationIndex(direction, stationLines.getStationName());
+		    		routeStation.put(KuaiXinData.BusRouteStation.INDEX, index);
+		    		mContentResolver.insert(KuaiXinData.BusRouteStation.CONTENT_URI, routeStation);
+	    		}
 	    	}
 		}
 	}

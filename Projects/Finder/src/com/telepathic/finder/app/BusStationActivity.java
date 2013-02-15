@@ -2,8 +2,12 @@
 package com.telepathic.finder.app;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
+import android.R.interpolator;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
@@ -27,9 +31,12 @@ import com.telepathic.finder.sdk.traffic.entity.BusLine;
 import com.telepathic.finder.sdk.traffic.entity.BusStation;
 import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.BusStationLines;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
 import com.telepathic.finder.util.Utils;
 
 public class BusStationActivity extends Activity {
+	private static final String TAG = "BusStationActivity";
     private EditText mEtStationId;
     private Button mBtnFindStation;
     private LinearLayout mLlBusLines;
@@ -64,8 +71,66 @@ public class BusStationActivity extends Activity {
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
         mMessageDispatcher.add(mMessageHandler);
+        queryData();
     }
 
+    private void queryData() {
+    	BusStationLines stationLines = new BusStationLines();
+    	ContentResolver resolver = getContentResolver();
+    	StringBuilder sortOrder = new StringBuilder();
+    	sortOrder.append(KuaiXinData.BusStation.LAST_UPDATE_TIME)
+    			 .append(" DESC ")
+    			 .append("LIMIT 0,1");
+        Cursor cursor = resolver.query(KuaiXinData.BusStation.CONTENT_URI, null, null, null, sortOrder.toString());
+        if (cursor != null && cursor.moveToFirst()) {
+        	int idxName = cursor.getColumnIndex(KuaiXinData.BusStation.NAME);
+        	int idxGpsNumber = cursor.getColumnIndex(KuaiXinData.BusStation.GPS_NUMBER);
+        	String name = cursor.getString(idxName);
+        	String gpsNumber = cursor.getString(idxGpsNumber);
+        	stationLines.setStationName(name);
+        	stationLines.setGpsNumber(gpsNumber);
+        	cursor.close();
+        	String[] projection = new String[] {
+        			KuaiXinData.BusRoute.LINE_NUMBER,
+        			KuaiXinData.BusRoute.DIRECTION,
+        			KuaiXinData.BusRoute.START_TIME,
+        			KuaiXinData.BusRoute.END_TIME,
+        			KuaiXinData.BusRoute.STATIONS
+        	};
+        	String selection = KuaiXinData.BusStation.GPS_NUMBER + "=?";
+        	String[] selectionArgs = new String[] { gpsNumber };
+        	cursor = resolver.query(KuaiXinData.BusStationLines.CONTENT_URI, projection, selection, selectionArgs, null);
+        	if (cursor != null && cursor.moveToFirst()) {
+        		int idxLineNumber = cursor.getColumnIndex(KuaiXinData.BusRoute.LINE_NUMBER);
+        		int idxDirection = cursor.getColumnIndex(KuaiXinData.BusRoute.DIRECTION);
+        		int idxStartTime = cursor.getColumnIndex(KuaiXinData.BusRoute.START_TIME);
+        		int idxEndTime = cursor.getColumnIndex(KuaiXinData.BusRoute.END_TIME);
+        		int idxStations = cursor.getColumnIndex(KuaiXinData.BusRoute.STATIONS);
+        		do {
+        			String lineNumber = cursor.getString(idxLineNumber);
+        			Direction direction = Direction.fromString(cursor.getString(idxDirection));
+        			String startTime = cursor.getString(idxStartTime);
+        			String endTime = cursor.getString(idxEndTime);
+        			String[] stationNames = cursor.getString(idxStations).split(",");
+        			BusLine line = new BusLine();
+        			line.setLineNumber(cursor.getString(idxLineNumber));
+        			line.setStartTime(startTime);
+        			line.setEndTime(endTime);
+        			ArrayList<BusStation> route = new ArrayList<BusStation>();
+    				for(String station : stationNames) {
+    					route.add(new BusStation(station));
+    				}
+    				line.addRoute(direction, route);
+        			stationLines.setBusLine(line);
+        			stationLines.setLineRoute(lineNumber, direction);
+        		} while(cursor.moveToNext());
+        		mStationLines = stationLines;
+        		initBusLines(stationLines);
+        	}
+        	Utils.printCursorContent(TAG, cursor);
+        }
+    }
+    
     private void setupView(){
         mLlBusLines = (LinearLayout)findViewById(R.id.bus_line_list);
         mTvStationName = (TextView)findViewById(R.id.bus_station_name);
@@ -85,10 +150,6 @@ public class BusStationActivity extends Activity {
 			mTrafficService.getBusStationLines(gpsNumber);
 		} else {
 			Toast.makeText(this, "invalid gps number: " + gpsNumber, Toast.LENGTH_SHORT).show();
-			// dump the database files.
-			if (mEtStationId.getText().toString().equals("111")) {
-				Utils.copyAppDatabaseFiles(getPackageName());
-			}
 		}
     }
 
