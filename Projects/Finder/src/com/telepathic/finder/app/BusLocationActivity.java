@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -44,7 +46,7 @@ import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationActivity extends MapActivity {
-	private static final String TAG = BusLocationActivity.class.getSimpleName();
+    private static final String TAG = BusLocationActivity.class.getSimpleName();
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
 
@@ -53,6 +55,8 @@ public class BusLocationActivity extends MapActivity {
     private static final int DOWN_VOICE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 2;
 
     private static final int DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG = CUSTOM_DIALOG_ID_START + 3;
+
+    private static final int EXIT_CONFIRM_DIALOG = CUSTOM_DIALOG_ID_START + 4;
 
     private static final int CUSTOM_INTENT_REQUEST_CODE_START = 0x1000;
 
@@ -75,14 +79,14 @@ public class BusLocationActivity extends MapActivity {
     private MessageDispatcher mMessageDispatcher;
     private MKRoute mBusRoute;
     private String mLineNumber;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bus_location_view);
 
         Utils.copyAppDatabaseFiles(getPackageName());
-        
+
         mBtnSearch = (ImageButton) findViewById(R.id.search);
 
         mTvSearchKey = (AutoCompleteTextView) findViewById(R.id.search_key);
@@ -124,99 +128,99 @@ public class BusLocationActivity extends MapActivity {
     }
 
     private void initMessageHandlers() {
-    	mMessageDispatcher.add(new IMessageHandler() {
-			@Override
-			public int what() {
-				return ITrafficeMessage.SEARCH_BUS_LINE_DONE;
-			}
-			
-			@Override
-			public void handleMessage(Message msg) {
-				ArrayList<MKPoiInfo> busPois = (ArrayList<MKPoiInfo>)msg.obj;
-				if (busPois != null && busPois.size() > 0) {
-					removeDialog(BUS_LINE_SEARCH_DLG);
-					showBusRoutesDlg(mLineNumber, busPois);
-				}
-			}
-		});
-    	
-    	mMessageDispatcher.add(new IMessageHandler() {
-			@Override
-			public int what() {
-				return ITrafficeMessage.SEARCH_BUS_ROUTE_DONE;
-			}
-			
-			@Override
-			public void handleMessage(Message msg) {
-				MKRoute route = (MKRoute) msg.obj;
-				RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
-	            routeOverlay.setData(route);
-	            mMapView.getOverlays().clear();
-	            mMapView.getOverlays().add(routeOverlay);
-	            mMapView.getOverlays().add(mLocationOverlay);
-	            mMapView.invalidate();
-	            mMapView.getController().animateTo(route.getStart());
-	            mBtnSearch.setEnabled(true);
-	            mBusRoute = route;
-	            mTrafficService.getBusLocation(mLineNumber, getRouteStationNames(route));
-			}
-		});
-    	
-    	mMessageDispatcher.add(new IMessageHandler() {
-			@Override
-			public int what() {
-				return ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
-			}
-			
-			@Override
-			public void handleMessage(Message msg) {
-				Integer index = (Integer) msg.obj;
-				if (mBusRoute != null) {
-					MKStep station = mBusRoute.getStep(index);
-					updateBusLocation(station);
-				}
-			}
-		});
-    	
-    	mMessageDispatcher.add(new IMessageHandler() {
-			@Override
-			public int what() {
-				return ITrafficeMessage.GET_BUS_LOCATION_DONE;
-			}
-			
-			@Override
-			public void handleMessage(Message msg) {
-				if (msg.arg2 != 0) {
-					String errorMessage = (String) msg.obj;
-					showErrorMessage(errorMessage);
-				}
-			}
-		});
+        mMessageDispatcher.add(new IMessageHandler() {
+            @Override
+            public int what() {
+                return ITrafficeMessage.SEARCH_BUS_LINE_DONE;
+            }
+
+            @Override
+            public void handleMessage(Message msg) {
+                ArrayList<MKPoiInfo> busPois = (ArrayList<MKPoiInfo>)msg.obj;
+                if (busPois != null && busPois.size() > 0) {
+                    removeDialog(BUS_LINE_SEARCH_DLG);
+                    showBusRoutesDlg(mLineNumber, busPois);
+                }
+            }
+        });
+
+        mMessageDispatcher.add(new IMessageHandler() {
+            @Override
+            public int what() {
+                return ITrafficeMessage.SEARCH_BUS_ROUTE_DONE;
+            }
+
+            @Override
+            public void handleMessage(Message msg) {
+                MKRoute route = (MKRoute) msg.obj;
+                RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
+                routeOverlay.setData(route);
+                mMapView.getOverlays().clear();
+                mMapView.getOverlays().add(routeOverlay);
+                mMapView.getOverlays().add(mLocationOverlay);
+                mMapView.invalidate();
+                mMapView.getController().animateTo(route.getStart());
+                mBtnSearch.setEnabled(true);
+                mBusRoute = route;
+                mTrafficService.getBusLocation(mLineNumber, getRouteStationNames(route));
+            }
+        });
+
+        mMessageDispatcher.add(new IMessageHandler() {
+            @Override
+            public int what() {
+                return ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
+            }
+
+            @Override
+            public void handleMessage(Message msg) {
+                Integer index = (Integer) msg.obj;
+                if (mBusRoute != null) {
+                    MKStep station = mBusRoute.getStep(index);
+                    updateBusLocation(station);
+                }
+            }
+        });
+
+        mMessageDispatcher.add(new IMessageHandler() {
+            @Override
+            public int what() {
+                return ITrafficeMessage.GET_BUS_LOCATION_DONE;
+            }
+
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.arg2 != 0) {
+                    String errorMessage = (String) msg.obj;
+                    showErrorMessage(errorMessage);
+                }
+            }
+        });
     }
-    
+
     private void showErrorMessage(String errorMessage) {
-    	Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
-    
+
     private static ArrayList<String> getRouteStationNames(MKRoute route) {
-    	ArrayList<String> result = new ArrayList<String>();
-    	final int totalNum = route.getNumSteps();
-    	for(int idx = 0; idx < totalNum; idx++) {
-    		MKStep station = route.getStep(idx);
-    		String stationName = station.getContent();
+        ArrayList<String> result = new ArrayList<String>();
+        final int totalNum = route.getNumSteps();
+        for(int idx = 0; idx < totalNum; idx++) {
+            MKStep station = route.getStep(idx);
+            String stationName = station.getContent();
             if (stationName != null && stationName.length() != 0) {
                 if (stationName.charAt(stationName.length() - 1) != '\u7AD9') {
                     stationName += '\u7AD9';
                 }
             }
-           result.add(stationName);
-    	}
-    	return result;
+            result.add(stationName);
+        }
+        return result;
     }
-    
+
     public void onSearchClicked(View v) {
         if (!mBtnSearch.equals(v)) {
-        	return ;
+            return ;
         }
         String lineNumber = mTvSearchKey.getText().toString();
         if (Utils.isValidBusLineNumber(lineNumber)) {
@@ -362,6 +366,19 @@ public class BusLocationActivity extends MapActivity {
                 });
                 retDialog = vsBrowserDlg.create();
                 break;
+            case EXIT_CONFIRM_DIALOG:
+                Builder exitDlgBuilder = new Builder(BusLocationActivity.this)
+                .setTitle(R.string.confirm_exit_title)
+                .setMessage(R.string.confirm_exit_message)
+                .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        BusLocationActivity.this.finish();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null);
+                retDialog = exitDlgBuilder.create();
+                break;
             default:
                 break;
         }
@@ -465,6 +482,11 @@ public class BusLocationActivity extends MapActivity {
             }
             super.onPostExecute(result);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        showDialog(EXIT_CONFIRM_DIALOG);
     }
 
 }

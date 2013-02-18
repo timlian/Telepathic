@@ -28,6 +28,8 @@
     <string name="no_item_in_db">no  item</string>
     <string name="starting_time">Starting time: <xliff:g id="starting_time" example="6:00">%1$s</xliff:g></string>
     <string name="ending_time">Ending time: <xliff:g id="ending_time" example="21:00">%1$s</xliff:g></string>
+    <string name="confirm_exit_title">Exit</string>
+    <string name="confirm_exit_message">Do you want to exit?</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">Please enter the correct parameter</string>
