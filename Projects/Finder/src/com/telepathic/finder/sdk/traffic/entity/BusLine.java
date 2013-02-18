@@ -3,8 +3,6 @@ package com.telepathic.finder.sdk.traffic.entity;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.R.interpolator;
-
 public class BusLine {
     /**
      * The bus number

@@ -3,11 +3,15 @@ package com.telepathic.finder.sdk.traffic.task;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
+import org.kobjects.util.Util;
 import org.ksoap2.serialization.SoapObject;
+
+import android.R.integer;
 
 import com.telepathic.finder.sdk.traffic.entity.BusLine;
 import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.BusStation;
+import com.telepathic.finder.util.Utils;
 
 public class GetBusLineTask  implements Callable<BusLine> {
 	private static final String TAG = GetBusLineTask.class.getSimpleName();
@@ -62,13 +66,16 @@ public class GetBusLineTask  implements Callable<BusLine> {
 				mResult.setLineNumber(dataEntry.getPrimitivePropertyAsString(KEY_LINE_NAME));
 				mResult.setStartTime(dataEntry.getPrimitivePropertyAsString(KEY_DEPARTURE_TIME));
 				mResult.setEndTime(dataEntry.getPrimitivePropertyAsString(KEY_CLOSE_OFF_TIME));
-				String[] stationNames = dataEntry.getPrimitivePropertyAsString(KEY_STATIONS).split(",");
-				ArrayList<BusStation> route = new ArrayList<BusStation>();
-				for(String name : stationNames) {
-					route.add(new BusStation(name));
+				String stations = dataEntry.getPrimitivePropertyAsString(KEY_STATIONS);
+				if (stations != null && !stations.equals("")) {
+    				ArrayList<BusStation> route = new ArrayList<BusStation>();
+    				String[] stationNames = stations.split(",");
+    				for(String name : stationNames) {
+    					route.add(new BusStation(name));
+    				}
+    				String direction = dataEntry.getPrimitivePropertyAsString(KEY_DIRECTION);
+    				mResult.addRoute(Direction.fromString(direction), route);
 				}
-				String direction = dataEntry.getPrimitivePropertyAsString(KEY_DIRECTION);
-				mResult.addRoute(Direction.fromString(direction), route);
 			}
 	    }
     }
