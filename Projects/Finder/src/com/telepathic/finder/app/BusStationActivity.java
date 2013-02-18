@@ -70,6 +70,12 @@ public class BusStationActivity extends BaseActivity {
         queryData();
     }
 
+    @Override
+    protected void onDestroy() {
+        mMessageDispatcher.remove(mMessageHandler);
+        super.onDestroy();
+    }
+
     private void queryData() {
         BusStationLines stationLines = new BusStationLines();
         ContentResolver resolver = getContentResolver();

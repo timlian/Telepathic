@@ -80,6 +80,11 @@ public class BusLocationActivity extends MapActivity {
     private MKRoute mBusRoute;
     private String mLineNumber;
 
+    private IMessageHandler mSearchBusLineDoneHandler;
+    private IMessageHandler mSearchBusRouteDoneHandler;
+    private IMessageHandler mGetBusLocationUpdateHandler;
+    private IMessageHandler mGetBusLocationDoneHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,7 +133,7 @@ public class BusLocationActivity extends MapActivity {
     }
 
     private void initMessageHandlers() {
-        mMessageDispatcher.add(new IMessageHandler() {
+        mSearchBusLineDoneHandler = new IMessageHandler() {
             @Override
             public int what() {
                 return ITrafficeMessage.SEARCH_BUS_LINE_DONE;
@@ -142,9 +147,8 @@ public class BusLocationActivity extends MapActivity {
                     showBusRoutesDlg(mLineNumber, busPois);
                 }
             }
-        });
-
-        mMessageDispatcher.add(new IMessageHandler() {
+        };
+        mSearchBusRouteDoneHandler = new IMessageHandler() {
             @Override
             public int what() {
                 return ITrafficeMessage.SEARCH_BUS_ROUTE_DONE;
@@ -164,9 +168,8 @@ public class BusLocationActivity extends MapActivity {
                 mBusRoute = route;
                 mTrafficService.getBusLocation(mLineNumber, getRouteStationNames(route));
             }
-        });
-
-        mMessageDispatcher.add(new IMessageHandler() {
+        };
+        mGetBusLocationUpdateHandler = new IMessageHandler() {
             @Override
             public int what() {
                 return ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
@@ -180,9 +183,8 @@ public class BusLocationActivity extends MapActivity {
                     updateBusLocation(station);
                 }
             }
-        });
-
-        mMessageDispatcher.add(new IMessageHandler() {
+        };
+        mGetBusLocationDoneHandler = new IMessageHandler() {
             @Override
             public int what() {
                 return ITrafficeMessage.GET_BUS_LOCATION_DONE;
@@ -195,7 +197,25 @@ public class BusLocationActivity extends MapActivity {
                     showErrorMessage(errorMessage);
                 }
             }
-        });
+        };
+
+        mMessageDispatcher.add(mSearchBusLineDoneHandler);
+        mMessageDispatcher.add(mSearchBusRouteDoneHandler);
+        mMessageDispatcher.add(mGetBusLocationUpdateHandler);
+        mMessageDispatcher.add(mGetBusLocationDoneHandler);
+    }
+
+    private void clearMessageHandlers() {
+        mMessageDispatcher.remove(mSearchBusLineDoneHandler);
+        mMessageDispatcher.remove(mSearchBusRouteDoneHandler);
+        mMessageDispatcher.remove(mGetBusLocationUpdateHandler);
+        mMessageDispatcher.remove(mGetBusLocationDoneHandler);
+    }
+
+    @Override
+    protected void onDestroy() {
+        clearMessageHandlers();
+        super.onDestroy();
     }
 
     private void showErrorMessage(String errorMessage) {

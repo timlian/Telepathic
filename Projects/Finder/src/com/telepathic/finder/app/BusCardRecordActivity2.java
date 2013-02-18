@@ -73,23 +73,23 @@ public class BusCardRecordActivity2 extends BaseActivity {
     private int mScreenWidth;
 
     private volatile boolean isClicked;
-    
+
     private ProgressDialog mWaitingDialog;
     private MessageDispatcher mMessageDispatcher;
 
     private IMessageHandler mMessageHandler = new IMessageHandler() {
-		@Override
-		public int what() {
-			return ITrafficeMessage.GET_BUS_CARD_RECORDS_DONE;
-		}
-		
-		@Override
-		public void handleMessage(Message msg) {
-			mWaitingDialog.cancel();
-			mSendButton.setEnabled(true);
-		}
-	};
-	
+        @Override
+        public int what() {
+            return ITrafficeMessage.GET_BUS_CARD_RECORDS_DONE;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            mWaitingDialog.cancel();
+            mSendButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +100,12 @@ public class BusCardRecordActivity2 extends BaseActivity {
         mMessageDispatcher = app.getMessageDispatcher();
         mMessageDispatcher.add(mMessageHandler);
         startLoadBusCards();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mMessageDispatcher.remove(mMessageHandler);
+        super.onDestroy();
     }
 
     private void startLoadBusCards() {
@@ -189,7 +195,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
                     R.drawable.tab_selected);
         }
     }
-    
+
     private ProgressDialog createWaitingDialog() {
         ProgressDialog prgDlg = new ProgressDialog(this);
         prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -250,16 +256,16 @@ public class BusCardRecordActivity2 extends BaseActivity {
 
     public void onSearchCardIdClicked(View v) {
         if (!mSendButton.equals(v)) {
-           return ;
+            return ;
         }
         String cardNumber = mEditText.getText().toString();
         if (Utils.isValidBusCardNumber(cardNumber)) {
-        	 mSendButton.setEnabled(false);
-             mWaitingDialog.show();
-             Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
+            mSendButton.setEnabled(false);
+            mWaitingDialog.show();
+            Utils.hideSoftKeyboard(getApplicationContext(), mEditText);
             mTrafficService.getBusCardRecords(cardNumber, 30);
         } else {
-        	mSendButton.setEnabled(true);
+            mSendButton.setEnabled(true);
             mEditText.setError(getResources().getString(R.string.card_id_error_notice));
         }
     }
