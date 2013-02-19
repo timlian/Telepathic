@@ -2,6 +2,8 @@
 package com.telepathic.finder.app;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -40,6 +42,7 @@ import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
+import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
 public class BusCardRecordActivity2 extends BaseActivity {
     private static int LOADER_ID = 1000;
@@ -70,6 +73,8 @@ public class BusCardRecordActivity2 extends BaseActivity {
 
     private ArrayList<View> mViewPagerTabView = new ArrayList<View>();
 
+    private ArrayList<BusCardPageView> mPageViews = new ArrayList<BusCardPageView>();
+
     private int mScreenWidth;
 
     private volatile boolean isClicked;
@@ -87,6 +92,9 @@ public class BusCardRecordActivity2 extends BaseActivity {
         public void handleMessage(Message msg) {
             mWaitingDialog.cancel();
             mSendButton.setEnabled(true);
+            for (BusCardPageView page : mPageViews) {
+                page.mRecordList.onRefreshComplete();
+            }
         }
     };
 
@@ -143,6 +151,15 @@ public class BusCardRecordActivity2 extends BaseActivity {
                     mBusCards.add(card);
                 } while (data.moveToNext());
 
+                Comparator cp = new Comparator() {
+                    @Override
+                    public int compare(Object lhs, Object rhs) {
+                        BusCard left = (BusCard)lhs;
+                        BusCard right = (BusCard)rhs;
+                        return left.getCardNumber().compareTo(right.getCardNumber());
+                    }
+                };
+                Collections.sort(mBusCards, cp);
                 if (mViewPagerAdapter == null) {
                     mViewPagerAdapter = new BusCardPageAdapter();
                     mViewPager.setAdapter(mViewPagerAdapter);
@@ -398,6 +415,17 @@ public class BusCardRecordActivity2 extends BaseActivity {
                     if (mAdapter == null) {
                         mAdapter = new ConsumerRecordAdapter(data);
                         mRecordList.setAdapter(mAdapter);
+                        mRecordList.setOnRefreshListener(new OnRefreshListener() {
+                            @Override
+                            public void onRefresh() {
+                                String cardNumber = mCard.getCardNumber();
+                                if (Utils.isValidBusCardNumber(cardNumber)) {
+                                    mTrafficService.getBusCardRecords(cardNumber, 30);
+                                } else {
+                                    mEditText.setError(getResources().getString(R.string.card_id_error_notice));
+                                }
+                            }
+                        });
                     }
                     mAdapter.swapCursor(data);
                 }
@@ -414,7 +442,6 @@ public class BusCardRecordActivity2 extends BaseActivity {
     }
 
     private class BusCardPageAdapter extends PagerAdapter {
-        private ArrayList<BusCardPageView> mPageViews = new ArrayList<BusCardPageView>();
 
         @Override
         public int getCount() {
