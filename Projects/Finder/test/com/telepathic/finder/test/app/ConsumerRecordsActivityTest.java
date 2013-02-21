@@ -8,20 +8,20 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.telepathic.finder.R;
-import com.telepathic.finder.app.BusCardRecordActivity;
+import com.telepathic.finder.app.BusCardRecordActivity2;
 
 public class ConsumerRecordsActivityTest extends
-ActivityInstrumentationTestCase2<BusCardRecordActivity> {
+ActivityInstrumentationTestCase2<BusCardRecordActivity2> {
     private static final String CARD_ID_CACHE = "card_id_cache";
 
-    private BusCardRecordActivity mActivity;
+    private BusCardRecordActivity2 mActivity;
 
     private AutoCompleteTextView mEditText;
 
     private Button mSendButton;
 
     public ConsumerRecordsActivityTest() {
-        super("com.telepathic.finder", BusCardRecordActivity.class);
+        super("com.telepathic.finder", BusCardRecordActivity2.class);
     }
 
     @Override
