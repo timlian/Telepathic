@@ -47,26 +47,26 @@ public class CustomItemizedOverlay extends ItemizedOverlay<OverlayItem> {
     @Override
     public void draw(Canvas canvas, MapView mapView, boolean shadow) {
         super.draw(canvas, mapView, shadow);
-        // Projection½Ó¿ÚÓÃÓÚÆÁÄ»ÏñËØµã×ø±êÏµÍ³ºÍµØÇò±íÃæ¾­Î³¶Èµã×ø±êÏµÍ³Ö®¼äµÄ±ä»»
+        // Projectionæ¥å£ç”¨äºå±å¹•åƒç´ ç‚¹åæ ‡ç³»ç»Ÿå’Œåœ°çƒè¡¨é¢ç»çº¬åº¦ç‚¹åæ ‡ç³»ç»Ÿä¹‹é—´çš„å˜æ¢
         Projection projection = mapView.getProjection();
-        // ±éÀúËùÓĞµÄOverlayItem
+        // éå†æ‰€æœ‰çš„OverlayItem
         for (int index = this.size() - 1; index >= 0; index--) {
-            // µÃµ½¸ø¶¨Ë÷ÒıµÄitem
+            // å¾—åˆ°ç»™å®šç´¢å¼•çš„item
             OverlayItem overLayItem = getItem(index);
 
-            // °Ñ¾­Î³¶È±ä»»µ½Ïà¶ÔÓÚMapView×óÉÏ½ÇµÄÆÁÄ»ÏñËØ×ø±ê
+            // æŠŠç»çº¬åº¦å˜æ¢åˆ°ç›¸å¯¹äºMapViewå·¦ä¸Šè§’çš„å±å¹•åƒç´ åæ ‡
             Point point = projection.toPixels(overLayItem.getPoint(), null);
 
             Paint paintText = new Paint();
             paintText.setColor(Color.RED);
             paintText.setTextSize(13);
-            // »æÖÆÎÄ±¾
+            // ç»˜åˆ¶æ–‡æœ¬
             canvas.drawText(overLayItem.getTitle(), point.x + 10, point.y - 15, paintText);
         }
     }
 
     @Override
-    // ´¦Àíµã»÷ÊÂ¼ş
+    // å¤„ç†ç‚¹å‡»äº‹ä»¶
     protected boolean onTap(int i) {
         setFocus(overlayItemList.get(i));
         Toast.makeText(this.context, overlayItemList.get(i).getSnippet(), Toast.LENGTH_SHORT).show();
