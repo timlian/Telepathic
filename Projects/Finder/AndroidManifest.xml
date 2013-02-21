@@ -49,12 +49,12 @@
         <activity
             android:name="com.telepathic.finder.app.BusLocationActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:label="@string/bus_location"
-            android:screenOrientation="sensor" >
+            android:label="@string/bus_location" >
         </activity>
         <activity
             android:name="com.telepathic.finder.app.TabHomeActivity"
-            android:label="@string/title_activity_tab_home" >
+            android:label="@string/title_activity_tab_home"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.telepathic.finder.app.BusStationActivity"
