@@ -45,7 +45,7 @@ import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
-public class BusCardRecordActivity2 extends BaseActivity {
+public class BusCardRecordActivity extends BaseActivity {
     private static int LOADER_ID = 1000;
 
     private static final int TAB_COUNT = 3;

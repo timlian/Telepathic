@@ -61,7 +61,7 @@
             android:label="@string/title_activity_bus_station" >
         </activity>
         <activity
-            android:name="com.telepathic.finder.app.BusCardRecordActivity2" >
+            android:name="com.telepathic.finder.app.BusCardRecordActivity" >
         </activity>
         <provider android:name="com.telepathic.finder.sdk.traffic.provider.TrafficDataProvider"
             android:authorities="com.telepathic.finder.provider" 
