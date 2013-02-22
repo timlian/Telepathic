@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.telepathic.finder.R;
@@ -51,6 +52,8 @@ public class BusCardRecordActivity2 extends BaseActivity {
 
     private Button mSendButton;
 
+    private LinearLayout mInputBar;
+
     private AutoCompleteTextView mEditText;
 
     private ViewPager mViewPager;
@@ -61,7 +64,9 @@ public class BusCardRecordActivity2 extends BaseActivity {
 
     private LinearLayout mNoItemTips;
 
-    private LinearLayout mConsumptionDetail;
+    private RelativeLayout mConsumptionDetail;
+
+    private ImageView mShowHideInputBar;
 
     private final int mBusCardLoaderId = getLoaderId();
 
@@ -135,6 +140,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if (mBusCardLoaderId == loader.getId() && data != null && data.moveToFirst()) {
+                mInputBar.setVisibility(View.GONE);
                 mNoItemTips.setVisibility(View.GONE);
                 mConsumptionDetail.setVisibility(View.VISIBLE);
                 mBusCards = new ArrayList<BusCard>();
@@ -231,10 +237,11 @@ public class BusCardRecordActivity2 extends BaseActivity {
         final DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mScreenWidth = metrics.widthPixels;
+        mInputBar = (LinearLayout)findViewById(R.id.card_number_input_bar);
         mSendButton = (Button)findViewById(R.id.search);
         mEditText = (AutoCompleteTextView)findViewById(R.id.key_card_id);
         mNoItemTips = (LinearLayout)findViewById(R.id.no_item_tips);
-        mConsumptionDetail = (LinearLayout)findViewById(R.id.consumption_detail);
+        mConsumptionDetail = (RelativeLayout)findViewById(R.id.consumption_detail);
         mViewPager = (ViewPager)findViewById(R.id.viewpager);
         mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
             @Override
@@ -266,6 +273,21 @@ public class BusCardRecordActivity2 extends BaseActivity {
 
             }
         });
+        mShowHideInputBar = (ImageView)findViewById(R.id.show_hide_input_bar);
+        mShowHideInputBar.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mInputBar.getVisibility() == View.VISIBLE) {
+                    mInputBar.setVisibility(View.GONE);
+                    mShowHideInputBar.setImageResource(R.drawable.show_input_bar_selector);
+                } else if (mInputBar.getVisibility() == View.GONE){
+                    mEditText.requestFocusFromTouch();
+                    mEditText.setError(null);
+                    mInputBar.setVisibility(View.VISIBLE);
+                    mShowHideInputBar.setImageResource(R.drawable.hide_input_bar_selector);
+                }
+            }
+        });
         mViewPagerTab = (HorizontalScrollView)findViewById(R.id.viewpager_tab);
         mTabContent = (LinearLayout)findViewById(R.id.tabcontent);
         mWaitingDialog = createWaitingDialog();
@@ -276,6 +298,7 @@ public class BusCardRecordActivity2 extends BaseActivity {
             return ;
         }
         String cardNumber = mEditText.getText().toString();
+        mEditText.requestFocusFromTouch();
         if (Utils.isValidBusCardNumber(cardNumber)) {
             mSendButton.setEnabled(false);
             mWaitingDialog.show();

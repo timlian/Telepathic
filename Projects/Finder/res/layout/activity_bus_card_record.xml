@@ -4,6 +4,7 @@
     android:orientation="vertical" >
 
     <LinearLayout
+        android:id="@+id/card_number_input_bar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -39,17 +40,17 @@
             android:text="@string/no_item_in_db" />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/consumption_detail"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
         android:visibility="gone" >
 
         <HorizontalScrollView
             android:id="@+id/viewpager_tab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:fadingEdge="none"
             android:scrollbars="none" >
 
@@ -62,14 +63,27 @@
         </HorizontalScrollView>
 
         <View
+            android:id="@+id/line"
+            android:layout_below="@id/viewpager_tab"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:background="#33B5E5" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/viewpager"
+            android:layout_below="@id/line"
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </LinearLayout>
+        
+        <ImageView 
+            android:id="@+id/show_hide_input_bar"
+            android:src="@drawable/show_input_bar_selector"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 
 </LinearLayout>
