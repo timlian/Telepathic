@@ -3,14 +3,16 @@ package com.telepathic.finder.sdk.traffic.task;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 
-import org.ksoap2.serialization.SoapObject;
-
+import com.telepathic.finder.sdk.traffic.request.GetBusLocationRequest;
+import com.telepathic.finder.sdk.traffic.request.RequestCallback;
+import com.telepathic.finder.sdk.traffic.request.RequestExecutor;
 import com.telepathic.finder.util.Utils;
 
 public class GetBusLocationTask extends ProgressiveTask<Integer> {
 	private static final String TAG = GetBusLocationTask.class.getSimpleName();
 	private final String mLineNumber;
 	private final ArrayList<String> mRoute;
+	
 	private final String mLastStation;
 	
 	private int mLocation;
@@ -26,7 +28,38 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 	@Override
 	protected void doWork() {
 		while (mLocation >= 0) {
-			NetworkManager.execute(new GetBusLocationRequest());
+			GetBusLocationRequest request = new GetBusLocationRequest(mLineNumber, getStationName(), mLastStation);
+			RequestExecutor.execute(request, new RequestCallback() {
+				@Override
+				public void onSuccess(Object result) {
+					Integer distance = (Integer) result;
+					if (distance >= 0) {
+						mLocation -= distance;
+						if (mLocation >= 0) {
+							setProgress(mLocation);
+							Utils.debug(TAG, "location: " + mLocation);
+						} else {
+							Utils.debug(TAG, "end: " + mLocation);
+							setTaskResult(null);
+						}
+					} else {
+						mLocation -= 1;
+						if (mLocation < 0) {
+							Utils.debug(TAG, "end: " + mLocation);
+							setTaskResult(null);
+						}
+					}
+				}
+				
+				@Override
+				public void onError(int errorCode, String errorMessage) {
+					TaskResult<Integer> taskResult = new TaskResult<Integer>();
+					taskResult.setResult(-1);
+					taskResult.setErrorCode(errorCode);
+					taskResult.setErrorMessage(errorMessage);
+					setTaskResult(taskResult);
+				}
+			});
 		}
 	}
 
@@ -40,58 +73,6 @@ public class GetBusLocationTask extends ProgressiveTask<Integer> {
 			result = mRoute.get(mLocation);
 		}
 		return result;
-	}
-
-	private class GetBusLocationRequest extends RPCBaseRequest {
-		private static final String METHOD_NAME = "getBusLocation";
-		private static final String KEY_LINE_NUMBER = "lineNumber";
-		private static final String KEY_GPS_NUMBER = "GPSNumber";
-		private static final String KEY_LAST_STATION = "lastStation";
-		private static final String KEY_DISTANCE = "distance";
-
-		GetBusLocationRequest() {
-			super(METHOD_NAME);
-			addParameter(KEY_LINE_NUMBER, mLineNumber);
-			addParameter(KEY_GPS_NUMBER, getStationName());
-			addParameter(KEY_LAST_STATION, mLastStation);
-		}
-
-		@Override
-		protected void handleError(int errorCode, String errorMessage) {
-			TaskResult<Integer> taskResult = new TaskResult<Integer>();
-			taskResult.setResult(-1);
-			taskResult.setErrorCode(errorCode);
-			taskResult.setErrorMessage(errorMessage);
-			setTaskResult(taskResult);
-		}
-
-		/*
-		 * Location response data example:
-		 * 
-		 * {lineNumber=102; distance=1; code=200; msg=�ɹ�; }
-		 */
-		@Override
-		protected void handleResponse(SoapObject newDataSet) {
-			final SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
-			final String lineNumber = firstDataEntry.getPrimitivePropertyAsString(KEY_LINE_NUMBER);
-			final int distance = Integer.parseInt(firstDataEntry.getPrimitivePropertyAsString(KEY_DISTANCE));
-			if (distance >= 0) {
-				mLocation -= distance;
-				if (mLocation >= 0) {
-					setProgress(mLocation);
-					Utils.debug(TAG, "location: " + mLocation);
-				} else {
-					Utils.debug(TAG, "end: " + mLocation);
-					setTaskResult(null);
-				}
-			} else {
-				mLocation -= 1;
-				if (mLocation < 0) {
-					Utils.debug(TAG, "end: " + mLocation);
-					setTaskResult(null);
-				}
-			}
-		}
 	}
 
 }

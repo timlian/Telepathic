@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk.traffic.task;
+package com.telepathic.finder.sdk.traffic.request;
 
 import java.io.IOException;
 
@@ -9,14 +9,15 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import com.telepathic.finder.util.Utils;
 
-public class NetworkManager {
-    private static final String TAG = NetworkManager.class.getSimpleName();
+public class RequestExecutor {
+    private static final String TAG = RequestExecutor.class.getSimpleName();
     private static final String TRAFFIC_SERVICE_URI = "http://client.10628106.com:4800/TrafficService.asmx";
     
     private static final int CONNECTION_TIME_OUT = 1000 * 30;
     private static final int MAX_RETRY_COUNT = 5;
 
-	public static void execute(RPCBaseRequest request) {
+	public static void execute(RPCBaseRequest request, RequestCallback callback) {
+		request.setCallback(callback);
 		Object response = null;
 		for (int count = 0; count < MAX_RETRY_COUNT; count++) {
 			try {

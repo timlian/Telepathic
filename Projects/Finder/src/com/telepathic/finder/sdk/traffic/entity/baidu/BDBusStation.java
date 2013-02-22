@@ -1,4 +1,4 @@
-package com.telepathic.finder.sdk.traffic.entity;
+package com.telepathic.finder.sdk.traffic.entity.baidu;
 
 public class BDBusStation {
     /**

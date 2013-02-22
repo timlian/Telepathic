@@ -13,6 +13,7 @@ public abstract class BaseTask<Result> {
     private Future<?> mTaskHandle;
     private ExecutorService mExecutorService;
     private TaskResult<Result> mTaskResult;
+    protected Runnable mCallback;
     
     public BaseTask(String taskName) {
     	mTaskName = taskName;
@@ -29,6 +30,9 @@ public abstract class BaseTask<Result> {
 					} catch (Exception e) {
 						Utils.debug(TAG, mTaskName + " catch exception: " + e.getMessage());
 					} finally {
+						if (mCallback != null) {
+							mCallback.run();
+						}
 						notifyTaskDone();
 					}
 				}
@@ -66,5 +70,9 @@ public abstract class BaseTask<Result> {
     		mTaskHandle.cancel(true);
     	}
     }
+    
+	public void setCallback(Runnable callback) {
+		mCallback = callback;	
+	}
 
 }

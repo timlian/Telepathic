@@ -4,12 +4,9 @@ package com.telepathic.finder.sdk.traffic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import android.content.Context;
@@ -23,9 +20,8 @@ import com.baidu.mapapi.MKRoute;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
-import com.telepathic.finder.sdk.traffic.entity.BusLine;
-import com.telepathic.finder.sdk.traffic.entity.BusLine.Direction;
-import com.telepathic.finder.sdk.traffic.entity.BusStationLines;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.task.GetBusCardRecordsTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLineTask;
@@ -129,130 +125,88 @@ public class TrafficManager {
         	mExecutorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					final BusStationLines stationLines = new BusStationLines();
-					synchronized (stationLines) {
+					try {
+						final KXBusStationLines stationLines = new KXBusStationLines();
 						stationLines.setGpsNumber(gpsNumber);
-					}
-					// Translate the specified gps number to corresponding station name.
-					Future<String> result1 = mExecutorService.submit(new TranslateToStationTask("", gpsNumber));
-					String stationName = null;
-					try {
-						stationName = result1.get();
-						synchronized (stationLines) {
-							stationLines.setStationName(stationName);
+						// Translate the specified gps number to corresponding station name.
+						TranslateToStationTask translateTask = new TranslateToStationTask("", gpsNumber);
+						translateTask.startTask();
+						translateTask.waitTaskDone();
+						TaskResult<String> translateRusult = translateTask.getTaskResult();
+						String stationName = null;
+						if (translateRusult != null) {
+							stationName = translateRusult.getResult();
 						}
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						return ;
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-						return ;
-					}
-					// Get the bus line numbers according to the gps number and station name.
-					Future<String[]> result2 = mExecutorService.submit(new GetBusStationLinesTask(stationName, gpsNumber));
-					String[] lineNumbers = null;
-					try {
-						lineNumbers = result2.get();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						return ;
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-						return ;
-					}
-					// Get the bus line details according to the line numbers.
-					final List<Future<String>>  result3 = new CopyOnWriteArrayList<Future<String>>();
-					final List<Future<BusLine>> result4 = new CopyOnWriteArrayList<Future<BusLine>>();
-					final CountDownLatch latch = new CountDownLatch(2 * lineNumbers.length);
-					
-					// Post the bus station lines result.
-					mExecutorService.execute(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								latch.await();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-								return ;
-							}
-							// Notify the get bus station lines operation finished.
-							Message msg = Message.obtain();
-				        	msg.arg1 = ITrafficeMessage.GET_BUS_STATION_LINES_DONE;
-				        	msg.arg2 = 0;
-				        	msg.obj = stationLines;
-				        	mMessageHandler.sendMessage(msg);
-				        	// store the data
-				        	long startTime = System.currentTimeMillis();
-							mTrafficStore.store(stationLines);
-							long endTime = System.currentTimeMillis();
-							Utils.debug(TAG, "store consume time: " + String.valueOf(endTime - startTime) + " in ms");
-							Utils.copyAppDatabaseFiles(mContext.getPackageName());
-							Utils.debug(TAG, "getBusStationLines(" + gpsNumber + ") finished");
+						if (stationName == null || stationName.equals("")) {
+							return ;
 						}
-					});
-					
-					for(String lineNumber: lineNumbers) {
-						result3.add(mExecutorService.submit(new TranslateToStationTask(lineNumber, gpsNumber)));
-						result4.add(mExecutorService.submit(new GetBusLineTask(lineNumber)));
-					}
-					// wait to process the result3
-					mExecutorService.execute(new Runnable() {
-						@Override
-						public void run() {
-							while (result3.size() > 0) {
-								for (Future<String> result : result3)
-									if (result.isDone()) {
-										try {
-											String[] stationLine  = result.get().split(",");
-											String lineNumber = stationLine[0];
-											String stationName = stationLine[1];
-											String direction = stationLine[2];
-											synchronized (stationLines) {
-												stationLines.setLineRoute(lineNumber, Direction.fromString(direction));
-											}
-										} catch (InterruptedException e) {
-											e.printStackTrace();
-											return ;
-										} catch (ExecutionException e) {
-											e.printStackTrace();
-											return ;
-										}
-										result3.remove(result);
-										latch.countDown();
-										Thread.yield();
+						stationLines.setName(stationName);
+						// Get the bus line numbers according to the gps number and station name.
+						GetBusStationLinesTask getLineNumbersTask = new GetBusStationLinesTask(stationName, gpsNumber);
+						getLineNumbersTask.startTask();
+						getLineNumbersTask.waitTaskDone();
+						TaskResult<List<String>> getLineNumbersResult = getLineNumbersTask.getTaskResult();
+						List<String> lineNumbers = null;
+						if (getLineNumbersResult != null) {
+							lineNumbers = getLineNumbersResult.getResult();
+						}
+						if (lineNumbers == null || lineNumbers.size() == 0) {
+							return ;
+						}
+						
+						// Get the bus line details according to the line numbers.
+						final CountDownLatch latch = new CountDownLatch(2 * lineNumbers.size());
+						
+						for(String lineNumber: lineNumbers) {
+							final TranslateToStationTask getDirectionTask = new TranslateToStationTask(lineNumber, gpsNumber);
+							getDirectionTask.setCallback(new Runnable() {
+								@Override
+								public void run() {
+									synchronized (stationLines) {
+										String[] stationLine  = getDirectionTask.getTaskResult().getResult().split(",");
+										String lineNumber = stationLine[0];
+										String stationName2 = stationLine[1];
+										String direction = stationLine[2];
+										stationLines.addLineDirection(lineNumber, Direction.fromString(direction));
 									}
-							}
-						}
-					});
-					
-					// wait to process the result4
-					mExecutorService.execute(new Runnable() {
-						@Override
-						public void run() {
-							while (result4.size() > 0) {
-								for (Future<BusLine> result : result4)
-									if (result.isDone()) {
-										try {
-											BusLine line = result.get();
-											synchronized (stationLines) {
-												stationLines.setBusLine(line);
-											}
-										} catch (InterruptedException e) {
-											e.printStackTrace();
-											return ;
-										} catch (ExecutionException e) {
-											e.printStackTrace();
-											return ;
-										}
-										result4.remove(result);
-										latch.countDown();
-										Thread.yield();
+									latch.countDown();
+								}
+							});
+							getDirectionTask.startTask();
+							
+							final GetBusLineTask getLineTask = new GetBusLineTask(lineNumber);
+							getLineTask.setCallback(new Runnable() {
+								@Override
+								public void run() {
+									synchronized (stationLines) {
+										stationLines.addBusLine(getLineTask.getTaskResult().getResult());
 									}
-							}
+									latch.countDown();
+								}
+							});
+							getLineTask.startTask();
 						}
-					});
+						
+						latch.await();
+						
+						// Notify the get bus station lines operation finished.
+						Message msg = Message.obtain();
+			        	msg.arg1 = ITrafficeMessage.GET_BUS_STATION_LINES_DONE;
+			        	msg.arg2 = 0;
+			        	msg.obj = stationLines;
+			        	mMessageHandler.sendMessage(msg);
+			        	// store the data
+			        	long startTime = System.currentTimeMillis();
+						mTrafficStore.store(stationLines);
+						long endTime = System.currentTimeMillis();
+						Utils.debug(TAG, "store consume time: " + String.valueOf(endTime - startTime) + " in ms");
+					} catch (InterruptedException e) {
+						Utils.debug(TAG, "getBusStationLines is interrupted.");
+					}
+					Utils.copyAppDatabaseFiles(mContext.getPackageName());
+					Utils.debug(TAG, "getBusStationLines(" + gpsNumber + ") finished");
 				}
-			});
+        	});
         	
         }
 

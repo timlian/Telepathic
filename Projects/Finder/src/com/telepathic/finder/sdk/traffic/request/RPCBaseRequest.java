@@ -1,10 +1,10 @@
-package com.telepathic.finder.sdk.traffic.task;
+package com.telepathic.finder.sdk.traffic.request;
 
 import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 
-abstract class RPCBaseRequest {
+public abstract class RPCBaseRequest {
 
     private static final String NAMESPACE = "http://tempuri.org/";
 
@@ -21,6 +21,8 @@ abstract class RPCBaseRequest {
     
     private String mRpcMethodName;
     private SoapObject mRpc;
+    
+    protected RequestCallback mCallback;
 
     public RPCBaseRequest(String name) {
     	mRpcMethodName = name;
@@ -31,6 +33,10 @@ abstract class RPCBaseRequest {
 
     abstract void handleResponse(SoapObject dataSet);
 
+    public void setCallback(RequestCallback callback) {
+    	mCallback = callback;
+    }
+    
     public long getRequestId() {
     	return mRequestId;
     }
