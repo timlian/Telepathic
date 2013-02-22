@@ -3,7 +3,10 @@ package com.telepathic.finder.app;
 
 import java.util.ArrayList;
 
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -42,6 +45,7 @@ public class BusStationActivity extends BaseActivity {
     private BusStationLines mStationLines;
     private ITrafficService mTrafficService;
     private MessageDispatcher mMessageDispatcher;
+    private ProgressDialog mWaitingDialog;
 
     private IMessageHandler mMessageHandler = new IMessageHandler() {
         @Override
@@ -51,7 +55,9 @@ public class BusStationActivity extends BaseActivity {
 
         @Override
         public void handleMessage(Message msg) {
+            mWaitingDialog.cancel();
             BusStationLines stationLines = (BusStationLines)msg.obj;
+            mBtnFindStation.setEnabled(true);
             mStationLines = stationLines;
             initBusLines(stationLines);
         }
@@ -140,6 +146,7 @@ public class BusStationActivity extends BaseActivity {
         mBtnFindStation = (Button)findViewById(R.id.find_bus_station);
         mLlNoItem = (LinearLayout)findViewById(R.id.no_item_tips);
         mLlStationInfo = (LinearLayout)findViewById(R.id.station_info);
+        mWaitingDialog = createWaitingDialog();
     }
 
     public void onFindBusStationClicked(View v) {
@@ -150,6 +157,8 @@ public class BusStationActivity extends BaseActivity {
         if (Utils.isValidGpsNumber(gpsNumber)) {
             Utils.hideSoftKeyboard(getApplicationContext(), mEtStationId);
             mTrafficService.getBusStationLines(gpsNumber);
+            mWaitingDialog.show();
+            mBtnFindStation.setEnabled(false);
         } else {
             Toast.makeText(this, "invalid gps number: " + gpsNumber, Toast.LENGTH_SHORT).show();
         }
@@ -170,6 +179,20 @@ public class BusStationActivity extends BaseActivity {
             mLlNoItem.setVisibility(View.GONE);
             mLlStationInfo.setVisibility(View.VISIBLE);
         }
+    }
+
+    private ProgressDialog createWaitingDialog() {
+        ProgressDialog prgDlg = new ProgressDialog(this);
+        prgDlg.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prgDlg.setMessage(getResources().getString(R.string.find_station_information));
+        prgDlg.setIndeterminate(true);
+        prgDlg.setOnCancelListener(new OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                mBtnFindStation.setEnabled(true);
+            }
+        });
+        return prgDlg;
     }
 
     public View getView(int position, BusStationLines stationLines) {
