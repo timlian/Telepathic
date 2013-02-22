@@ -20,6 +20,7 @@
     <string name="station_number_hint">Station GPS number</string>
     <string name="find_bus_route">Finding bus route, please wait.</string>
     <string name="find_ic_card_records">Finding ic card records, please wait.</string>
+    <string name="find_station_information">Finding bus station information, please wait.</string>
     <string name="select_bus_route">请选择%s路行驶方向</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>

@@ -42,17 +42,18 @@
             android:text="@string/no_item_in_db" />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/station_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#004A80"
-        android:orientation="vertical"
         android:visibility="gone" >
 
         <LinearLayout
+            android:id="@+id/station_name_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="5dp"
@@ -70,7 +71,9 @@
 
         <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/station_name_layout" >
 
             <LinearLayout
                 android:id="@+id/bus_line_list"
@@ -79,6 +82,15 @@
                 android:orientation="horizontal" >
             </LinearLayout>
         </HorizontalScrollView>
-    </LinearLayout>
+
+        <ImageView
+            android:id="@+id/show_hide_input_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            android:src="@drawable/show_input_bar_selector" />
+    </RelativeLayout>
 
 </LinearLayout>
