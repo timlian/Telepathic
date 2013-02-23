@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
@@ -291,6 +292,7 @@ public class BusCardRecordActivity extends BaseActivity {
         mViewPagerTab = (HorizontalScrollView)findViewById(R.id.viewpager_tab);
         mTabContent = (LinearLayout)findViewById(R.id.tabcontent);
         mWaitingDialog = createWaitingDialog();
+        setTitle("Hello bus cards.");
     }
 
     public void onSearchCardIdClicked(View v) {

@@ -504,9 +504,4 @@ public class BusLocationActivity extends MapActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        showDialog(EXIT_CONFIRM_DIALOG);
-    }
-
 }
