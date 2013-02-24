@@ -130,7 +130,7 @@ public interface ITrafficData {
 			/**
 			 * The last update time
 			 */
-			String LAST_UPDATE_TIME = "last_update_time";
+			//String LAST_UPDATE_TIME = "last_update_time";
 		}
 		
 		

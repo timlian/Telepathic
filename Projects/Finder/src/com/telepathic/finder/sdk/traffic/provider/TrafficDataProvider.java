@@ -325,7 +325,7 @@ public class TrafficDataProvider extends ContentProvider {
                     + KuaiXinData.BusRouteColumns.START_TIME + " TEXT, "
                     + KuaiXinData.BusRouteColumns.END_TIME + " TEXT, "
                     + KuaiXinData.BusRouteColumns.STATIONS + " TEXT, "
-                    + KuaiXinData.BusRouteColumns.LAST_UPDATE_TIME + " INTEGER, "
+                   // + KuaiXinData.BusRouteColumns.LAST_UPDATE_TIME + " INTEGER, "
                     + "UNIQUE (" + KuaiXinData.BusRouteColumns.LINE_NUMBER + ", " 
                     + KuaiXinData.BusRouteColumns.DIRECTION + ")"+ " )");
         	

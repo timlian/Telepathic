@@ -254,6 +254,8 @@ public class BusLocationActivity extends MapActivity {
         } else {
             Toast.makeText(this, R.string.invalid_input_hint,Toast.LENGTH_LONG).show();
         }
+        Intent intent = new Intent(this, BusRouteHistoryActivity.class);
+        startActivity(intent);
     }
 
     public void onSpeakClicked(View v){

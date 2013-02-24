@@ -139,7 +139,7 @@ public class TrafficStore {
 	    		route.put(KuaiXinData.BusRoute.START_TIME, busRoute.getStartTime());
 	    		route.put(KuaiXinData.BusRoute.END_TIME, busRoute.getEndTime());
 	    		route.put(KuaiXinData.BusRoute.STATIONS, busRoute.getStationNames());
-	    		route.put(KuaiXinData.BusRoute.LAST_UPDATE_TIME, System.currentTimeMillis());
+	    		//route.put(KuaiXinData.BusRoute.LAST_UPDATE_TIME, System.currentTimeMillis());
 	    		uri = mContentResolver.insert(KuaiXinData.BusRoute.CONTENT_URI, route);
 	    		if (stationLines.contains(busLine.getLineNumber(), busRoute.getDirection())) {
 		    		long routeId = Long.parseLong(uri.getLastPathSegment());

@@ -11,12 +11,14 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,11 +37,43 @@ import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
 import com.telepathic.finder.util.Utils;
 
 public class BusStationActivity extends BaseActivity {
     private static final String TAG = "BusStationActivity";
+    
+    private static final int HISTORY_LOADER_ID = 3000;
+	
+	private static final String[] STATION_LINES_PROJECTION = {
+		KuaiXinData.BusStation.NAME,
+		KuaiXinData.BusStation.GPS_NUMBER,
+		KuaiXinData.BusRoute.LINE_NUMBER,
+        KuaiXinData.BusRoute.DIRECTION,
+        KuaiXinData.BusRoute.START_TIME,
+        KuaiXinData.BusRoute.END_TIME,
+        KuaiXinData.BusRoute.STATIONS
+	};
+	private static final int IDX_NAME = 0;
+	private static final int IDX_GPS_NUMBER = 1 ;
+	private static final int IDX_LINE_NUMBER = 2;
+	private static final int IDX_DIRECTION = 3;
+	private static final int IDX_START_TIME = 4;
+	private static final int IDX_END_TIME = 5;
+	private static final int IDX_STATIONS = 6;
+	
+	private static final String SORT_ORDER;
+	static {
+		StringBuilder builder = new StringBuilder();
+		builder.append(KuaiXinData.BusStation.LAST_UPDATE_TIME)
+		       .append(" DESC ")
+		       .append("LIMIT 0,10");
+		SORT_ORDER = builder.toString();
+	}
+	
+	private Cursor mStationsLinesCursor;
+	
     private RelativeLayout mInputBar;
     private EditText mEtStationId;
     private Button mBtnFindStation;
@@ -62,10 +96,7 @@ public class BusStationActivity extends BaseActivity {
         @Override
         public void handleMessage(Message msg) {
             mWaitingDialog.cancel();
-            KXBusStationLines stationLines = (KXBusStationLines)msg.obj;
             mBtnFindStation.setEnabled(true);
-            mStationLines = stationLines;
-            initBusLines(stationLines);
         }
     };
 
@@ -79,7 +110,7 @@ public class BusStationActivity extends BaseActivity {
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
         mMessageDispatcher.add(mMessageHandler);
-        queryData();
+        getSupportLoaderManager().initLoader(HISTORY_LOADER_ID, null, new BusStationLinesLoaderCallback());
     }
 
     @Override
@@ -168,16 +199,22 @@ public class BusStationActivity extends BaseActivity {
         mWaitingDialog = createWaitingDialog();
     }
 
-    public void onFindBusStationClicked(View v) {
+    public void onSearchClicked(View v) {
+    	Utils.hideSoftKeyboard(getApplicationContext(), mEtStationId);
         if (!mBtnFindStation.equals(v)) {
             return ;
         }
         String gpsNumber = mEtStationId.getText().toString();
         if (Utils.isValidGpsNumber(gpsNumber)) {
-            Utils.hideSoftKeyboard(getApplicationContext(), mEtStationId);
-            mTrafficService.getBusStationLines(gpsNumber);
-            mWaitingDialog.show();
-            mBtnFindStation.setEnabled(false);
+        	KXBusStationLines stationLines = getStationLines(gpsNumber);
+        	if (stationLines == null) {
+	            mTrafficService.getBusStationLines(gpsNumber);
+	            mWaitingDialog.show();
+	            mBtnFindStation.setEnabled(false);
+        	} else {
+        		mStationLines = stationLines;
+        		initBusLines(stationLines);
+        	}
         } else {
             Toast.makeText(this, "invalid gps number: " + gpsNumber, Toast.LENGTH_SHORT).show();
         }
@@ -294,6 +331,68 @@ public class BusStationActivity extends BaseActivity {
         TextView tvStartingTime;
         TextView tvEndingTime;
         ListView lvStationNameList;
+    }
+    
+    private class BusStationLinesLoaderCallback implements LoaderCallbacks<Cursor> {
+    	
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			return new CursorLoader(getContext(),
+					ITrafficData.KuaiXinData.BusStationLines.CONTENT_URI,
+					STATION_LINES_PROJECTION, null, null, SORT_ORDER);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        	mStationsLinesCursor = data;
+        	showLastStationLines();
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+        	mStationsLinesCursor = null;
+        }
+        
+    }
+    
+    private void showLastStationLines() {
+    	Cursor cursor = mStationsLinesCursor;
+    	if (cursor != null && cursor.moveToFirst()) {
+    		String lastStationGpsNumber = cursor.getString(IDX_GPS_NUMBER);
+    		KXBusStationLines stationLines = getStationLines(lastStationGpsNumber);
+    		if (stationLines != null) {
+    			mStationLines = stationLines;
+    			initBusLines(mStationLines);
+    		}
+    	}
+    }
+    
+    private KXBusStationLines getStationLines(String gpsNumber) {
+    	KXBusStationLines stationLines = null;
+    	Cursor cursor = mStationsLinesCursor;
+    	if (cursor != null && cursor.moveToFirst()) {
+    		do {
+    			if (gpsNumber.equals(cursor.getString(IDX_GPS_NUMBER))) {
+    				if (stationLines == null) {
+    					stationLines = new KXBusStationLines();
+    					stationLines.setName(cursor.getString(IDX_NAME));
+        				stationLines.setGpsNumber(cursor.getString(IDX_GPS_NUMBER));
+    				}
+    				String lineNumber = cursor.getString(IDX_LINE_NUMBER);
+    				Direction direction = Direction.fromString(cursor.getString(IDX_DIRECTION));
+    				KXBusLine busLine = new KXBusLine(lineNumber);
+                    KXBusRoute busRoute = new KXBusRoute();
+                    busRoute.setStartTime(cursor.getString(IDX_START_TIME));
+                    busRoute.setEndTime(cursor.getString(IDX_END_TIME));
+                    busRoute.setStations(cursor.getString(IDX_STATIONS).split(","));
+                    busRoute.setDirection(direction);
+                    busLine.addRoute(busRoute);
+                    stationLines.addBusLine(busLine);
+                    stationLines.addLineDirection(lineNumber, direction);
+    			}
+    		} while(cursor.moveToNext());
+    	}
+    	return stationLines;
     }
 
 }
