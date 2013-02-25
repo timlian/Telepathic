@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -309,4 +310,17 @@ public class Utils {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
     }
+    
+	public static boolean isSameMonth(Date date) {
+		boolean result = false;
+		Calendar calendar1 = Calendar.getInstance();
+		Calendar calendar2 = Calendar.getInstance();
+		calendar1.setTimeInMillis(System.currentTimeMillis());
+		calendar2.setTime(date);
+		if (calendar1.get(Calendar.YEAR)  == calendar2.get(Calendar.YEAR) && 
+			calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH)) {
+			result = true;
+		}
+		return result;
+	}
 }

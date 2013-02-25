@@ -73,16 +73,18 @@ public class GetConsumerRecordsRequest extends RPCBaseRequest {
 					.getPrimitivePropertyAsString(KEY_BUS_NUMBER));
 			record.setCardID(dataEntry
 					.getPrimitivePropertyAsString(KEY_CARD_ID));
-			record.setConsumerTime(Utils.parseDate(dataEntry
-					.getPrimitivePropertyAsString(KEY_CONSUMER_TIME)));
+			record.setConsumerTime(Utils.parseDate(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_TIME)));
 			switch (record.getType()) {
 			case COUNT:
-				record.setConsumption(dataEntry
-						.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
-				record.setResidual(dataEntry
-						.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+				record.setConsumption(dataEntry.getPrimitivePropertyAsString(KEY_CONSUMER_COUNT));
+				record.setResidual(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
 				if (card.getResidualCount() == null) {
-					card.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+					if (Utils.isSameMonth(record.getConsumerTime())) {
+						card.setResidualCount(dataEntry.getPrimitivePropertyAsString(KEY_RESIDUAL_COUNT));
+					} else {
+						card.setResidualCount("0");
+					}
+					
 				}
 				break;
 			case EWALLET:
