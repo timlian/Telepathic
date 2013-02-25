@@ -209,8 +209,10 @@ public class BusLocationActivity extends MapActivity {
                     String errorMessage = (String) msg.obj;
                     showErrorMessage(errorMessage);
                 }
-                if (mBusRoute != null) {
-                	mMapView.getController().animateTo(mBusRoute.getEnd());
+                int midStationIndex = mBusRoute.getNumSteps() / 2;
+                MKStep midStation = mBusRoute.getStep(midStationIndex);
+                if (midStation != null) {
+                	mMapView.getController().animateTo(midStation.getPoint());
                 }
             }
         };
