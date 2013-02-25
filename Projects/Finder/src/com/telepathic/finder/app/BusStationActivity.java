@@ -68,7 +68,7 @@ public class BusStationActivity extends BaseActivity {
 		StringBuilder builder = new StringBuilder();
 		builder.append(KuaiXinData.BusStation.LAST_UPDATE_TIME)
 		       .append(" DESC ")
-		       .append("LIMIT 0,10");
+		       .append("LIMIT 0,20");
 		SORT_ORDER = builder.toString();
 	}
 	
@@ -370,6 +370,7 @@ public class BusStationActivity extends BaseActivity {
     private KXBusStationLines getStationLines(String gpsNumber) {
     	KXBusStationLines stationLines = null;
     	Cursor cursor = mStationsLinesCursor;
+    	Utils.printCursorContent(TAG, cursor);
     	if (cursor != null && cursor.moveToFirst()) {
     		do {
     			if (gpsNumber.equals(cursor.getString(IDX_GPS_NUMBER))) {
