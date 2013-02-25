@@ -151,6 +151,7 @@ public class TrafficStore {
 	    		}
 	    	}
 		}
+		mContentResolver.notifyChange(KuaiXinData.BusStationLines.CONTENT_URI, null);
 	}
 
 }
