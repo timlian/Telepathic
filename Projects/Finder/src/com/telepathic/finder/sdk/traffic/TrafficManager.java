@@ -299,6 +299,17 @@ public class TrafficManager {
 				}
 			}, 0, 20, TimeUnit.SECONDS);
 		}
+
+		@Override
+		public void shutDown() {
+			Utils.debug(TAG, "shutdown()");
+			if (mExecutorService != null) {
+				mExecutorService.shutdownNow();
+			}
+			if (mTaskScheduler != null) {
+				mTaskScheduler.shutdownNow();
+			}
+		}
 	}
 
 }

@@ -41,4 +41,8 @@ public interface ITrafficService {
      * @param gpsNumber The gps number of bus station.
      */
     void getBusStationLines(String gpsNumber);
+    /**
+     * Shut down the traffic service.
+     */
+    void shutDown();
 }

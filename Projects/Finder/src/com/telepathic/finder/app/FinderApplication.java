@@ -9,6 +9,7 @@ import com.baidu.mapapi.MKEvent;
 import com.baidu.mapapi.MKGeneralListener;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.TrafficManager;
+import com.telepathic.finder.util.Utils;
 
 public class FinderApplication extends Application {
     static FinderApplication mApp;

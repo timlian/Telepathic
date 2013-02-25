@@ -523,5 +523,11 @@ public class BusLocationActivity extends MapActivity {
             super.onPostExecute(result);
         }
     }
+    
+    @Override
+    public void onBackPressed() {
+    	mTrafficService.shutDown();
+    	super.onBackPressed();
+    }
 
 }
