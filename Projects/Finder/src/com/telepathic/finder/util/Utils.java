@@ -1,3 +1,4 @@
+
 package com.telepathic.finder.util;
 
 import java.io.File;
@@ -34,7 +35,7 @@ public class Utils {
     private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([aAbBcCdD])?";
 
     private static final String BUS_CARD_NUM_EXPRESSION = "\\d{8}";
-    
+
     private static final String BUS_STATION_GPS_NUMBER = "\\d{5}";
 
     private static final String START_WITH_ZERO_EXPRESSION = "^0+";
@@ -43,18 +44,19 @@ public class Utils {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private Utils() {}
+    private Utils() {
+    }
 
     public static void hideSoftKeyboard(Context c, EditText v) {
-        InputMethodManager imm = (InputMethodManager) c
+        InputMethodManager imm = (InputMethodManager)c
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
 
-    public static void showSoftKeyboard(Context c,EditText v) {
-        InputMethodManager imm = (InputMethodManager) c
+    public static void showSoftKeyboard(Context c, EditText v) {
+        InputMethodManager imm = (InputMethodManager)c
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.showSoftInput(v, InputMethodManager.SHOW_FORCED);
@@ -82,7 +84,7 @@ public class Utils {
         }
         return ret;
     }
-    
+
     public static boolean isValidGpsNumber(String number) {
         boolean ret = false;
         if (number != null) {
@@ -93,12 +95,12 @@ public class Utils {
         }
         return ret;
     }
-    
+
     public static ArrayList<String> parseBusLineNumber(String text) {
         Pattern p = Pattern.compile(BUS_LINE_NUM_EXPRESSION);
         Matcher m = p.matcher(text);
         ArrayList<String> busLineNumbers = new ArrayList<String>();
-        while(m.find()) {
+        while (m.find()) {
             busLineNumbers.add(m.group());
         }
         return busLineNumbers;
@@ -125,14 +127,16 @@ public class Utils {
         HashSet<String> hashSet = new HashSet<String>();
         List<String> newlist = new ArrayList<String>();
 
-        for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
-            String element = iterator.next();
-            if (hashSet.add(element)) {
-                newlist.add(element);
+        if (null != list) {
+            for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
+                String element = iterator.next();
+                if (hashSet.add(element)) {
+                    newlist.add(element);
+                }
             }
+            list.clear();
+            list.addAll(newlist);
         }
-        list.clear();
-        list.addAll(newlist);
         return list;
     }
 
@@ -177,7 +181,7 @@ public class Utils {
         File prefsDirectory = new File("/data/data/" + packageName + "/shared_prefs/");
         if (prefsDirectory.exists()) {
             File[] prefFiles = prefsDirectory.listFiles();
-            for(int i = 0; i < prefFiles.length; i++) {
+            for (int i = 0; i < prefFiles.length; i++) {
                 copyFileToExternalStorage(prefFiles[i]);
             }
         }
@@ -199,14 +203,14 @@ public class Utils {
 
     /**
      * Print the content of the cursor
-     *
+     * 
      * @param cursor, The cursor, which content needs to be printed
      * @param logTag, The log tag
      */
     public static void printCursorContent(String logTag, Cursor cursor) {
         if (cursor == null) {
             Log.d(logTag, "Cursor is NULL!");
-            return ;
+            return;
         }
         final int columnSpace = 2;
         ArrayList<Integer> columnWidth = new ArrayList<Integer>();
@@ -219,7 +223,8 @@ public class Utils {
                         value = cursor.getString(columnIndex);
                     } catch (Exception e) {
                         value = "BLOB";
-                        Log.d(logTag, "Get value from " + cursor.getColumnName(columnIndex) + " failed. Caused by " + e.getLocalizedMessage());
+                        Log.d(logTag, "Get value from " + cursor.getColumnName(columnIndex)
+                                + " failed. Caused by " + e.getLocalizedMessage());
                     }
                     if (!TextUtils.isEmpty(value) && value.length() > maxWidth) {
                         maxWidth = value.length();
@@ -247,7 +252,7 @@ public class Utils {
         }
         // Including the header
         int maxRowIndex = cursor.getCount() + 1;
-        for(int rowIndex = 0; rowIndex < maxRowIndex; rowIndex++) {
+        for (int rowIndex = 0; rowIndex < maxRowIndex; rowIndex++) {
             StringBuilder rowValues = new StringBuilder();
             for (int columnIndex = 0; columnIndex < cursor.getColumnCount(); columnIndex++) {
                 ArrayList<String> columnValues = tableContent.get(columnIndex);
@@ -264,7 +269,7 @@ public class Utils {
     }
 
     private static String appendColumnSpaces(String value, int columnWidth) {
-        StringBuilder builder =  new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         int spaceCount;
         if (value == null) {
             builder.append("null");
@@ -296,44 +301,44 @@ public class Utils {
     }
 
     /**
-     * Translate the dp(density-independent pixels) to px(pixels),
-     * according to the resolution of device;
+     * Translate the dp(density-independent pixels) to px(pixels), according to
+     * the resolution of device;
      */
     public static int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
+        return (int)(dpValue * scale + 0.5f);
     }
 
     /**
-     * Translate the px(pixels) to dp(density-independent pixels),
-     * according to the resolution of device;
+     * Translate the px(pixels) to dp(density-independent pixels), according to
+     * the resolution of device;
      */
     public static int px2dip(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
+        return (int)(pxValue / scale + 0.5f);
     }
-    
-	public static boolean isSameMonth(Date date) {
-		boolean result = false;
-		Calendar calendar1 = Calendar.getInstance();
-		Calendar calendar2 = Calendar.getInstance();
-		calendar1.setTimeInMillis(System.currentTimeMillis());
-		calendar2.setTime(date);
-		if (calendar1.get(Calendar.YEAR)  == calendar2.get(Calendar.YEAR) && 
-			calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH)) {
-			result = true;
-		}
-		return result;
-	}
-	
-	public static boolean hasActiveNetwork(Context context) {
-		ConnectivityManager cm = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo info = cm.getActiveNetworkInfo();
-		if(info != null){
-			return info.isAvailable();
-		}
-		return false;
-	}
+
+    public static boolean isSameMonth(Date date) {
+        boolean result = false;
+        Calendar calendar1 = Calendar.getInstance();
+        Calendar calendar2 = Calendar.getInstance();
+        calendar1.setTimeInMillis(System.currentTimeMillis());
+        calendar2.setTime(date);
+        if (calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR)
+                && calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH)) {
+            result = true;
+        }
+        return result;
+    }
+
+    public static boolean hasActiveNetwork(Context context) {
+        ConnectivityManager cm = (ConnectivityManager)context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        if (info != null) {
+            return info.isAvailable();
+        }
+        return false;
+    }
 
 }
