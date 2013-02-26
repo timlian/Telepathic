@@ -20,13 +20,13 @@
             android:onClick="onSearchClicked"
             android:text="@string/find" />
 
-        <EditText
-            android:id="@+id/station_id"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/find_bus_station"
-            android:hint="@string/station_number_hint" />
+        <AutoCompleteTextView
+                android:id="@+id/station_id"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:hint="@string/station_number_hint"/>
+        
     </RelativeLayout>
 
     <LinearLayout

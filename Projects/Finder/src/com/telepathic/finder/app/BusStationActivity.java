@@ -1,13 +1,17 @@
 
 package com.telepathic.finder.app;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
@@ -15,15 +19,21 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -36,6 +46,7 @@ import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStation;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
@@ -75,7 +86,7 @@ public class BusStationActivity extends BaseActivity {
 	private Cursor mStationsLinesCursor;
 	
     private RelativeLayout mInputBar;
-    private EditText mEtStationId;
+    //private EditText mEtStationId;
     private Button mBtnFindStation;
     private LinearLayout mLlBusLines;
     private TextView mTvStationName;
@@ -86,6 +97,9 @@ public class BusStationActivity extends BaseActivity {
     private ITrafficService mTrafficService;
     private MessageDispatcher mMessageDispatcher;
     private ProgressDialog mWaitingDialog;
+    private AutoCompleteTextView mGpsNumber;
+    private List<KXBusStation> mRecentStations;
+    private StationGpsNumberAdapter mAdapter;
 
     private IMessageHandler mMessageHandler = new IMessageHandler() {
         @Override
@@ -104,7 +118,8 @@ public class BusStationActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bus_station);
-        Utils.copyAppDatabaseFiles(getPackageName());
+        mRecentStations = new ArrayList<KXBusStation>();
+        mAdapter = new StationGpsNumberAdapter();
         setupView();
         FinderApplication app = (FinderApplication)getApplication();
         mTrafficService = app.getTrafficService();
@@ -178,7 +193,7 @@ public class BusStationActivity extends BaseActivity {
         mInputBar = (RelativeLayout)findViewById(R.id.station_id_input_bar);
         mLlBusLines = (LinearLayout)findViewById(R.id.bus_line_list);
         mTvStationName = (TextView)findViewById(R.id.bus_station_name);
-        mEtStationId = (EditText)findViewById(R.id.station_id);
+        mGpsNumber = (AutoCompleteTextView)findViewById(R.id.station_id);
         mBtnFindStation = (Button)findViewById(R.id.find_bus_station);
         mLlNoItem = (LinearLayout)findViewById(R.id.no_item_tips);
         mLlStationInfo = (RelativeLayout)findViewById(R.id.station_info);
@@ -190,21 +205,23 @@ public class BusStationActivity extends BaseActivity {
                     mInputBar.setVisibility(View.GONE);
                     mShowHideInputBar.setImageResource(R.drawable.show_input_bar_selector);
                 } else if (mInputBar.getVisibility() == View.GONE){
-                    mEtStationId.requestFocusFromTouch();
+                	mGpsNumber.requestFocusFromTouch();
+                	mGpsNumber.showDropDown();
                     mInputBar.setVisibility(View.VISIBLE);
                     mShowHideInputBar.setImageResource(R.drawable.hide_input_bar_selector);
                 }
             }
         });
         mWaitingDialog = createWaitingDialog();
+        mGpsNumber.setAdapter(mAdapter);
     }
 
     public void onSearchClicked(View v) {
-    	Utils.hideSoftKeyboard(getApplicationContext(), mEtStationId);
+    	Utils.hideSoftKeyboard(getApplicationContext(), mGpsNumber);
         if (!mBtnFindStation.equals(v)) {
             return ;
         }
-        String gpsNumber = mEtStationId.getText().toString();
+        String gpsNumber = mGpsNumber.getText().toString();
         if (Utils.isValidGpsNumber(gpsNumber)) {
         	KXBusStationLines stationLines = getStationLines(gpsNumber);
         	if (stationLines == null) {
@@ -345,6 +362,26 @@ public class BusStationActivity extends BaseActivity {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         	mStationsLinesCursor = data;
+        	if (data != null && data.moveToFirst()) {
+        		KXBusStation preStation = null;
+        		KXBusStation curStation = null;
+        		ArrayList<KXBusStation> stations = new ArrayList<KXBusStation>();
+        		do {
+        			curStation = new KXBusStation();
+        			curStation.setName(data.getString(IDX_NAME));
+        			curStation.setGpsNumber(data.getString(IDX_GPS_NUMBER));
+        			if (preStation != null) {
+        				if (preStation.getGpsNumber().equals(curStation.getGpsNumber()) == false) {
+        					stations.add(curStation);
+        				}
+        			} else {
+        				stations.add(curStation);
+        			}
+        			
+        		} while(data.moveToNext());
+        		mRecentStations = stations;
+        	}
+        	mAdapter.notifyDataSetChanged();
         	showLastStationLines();
         }
 
@@ -394,6 +431,38 @@ public class BusStationActivity extends BaseActivity {
     		} while(cursor.moveToNext());
     	}
     	return stationLines;
+    }
+    
+    private static class StationItem {
+    	TextView mNameText;
+    	TextView mGpsNumberText;
+    }
+    
+    private class StationGpsNumberAdapter extends ArrayAdapter<KXBusStation> {
+    	private LayoutInflater mInflater;
+    	
+		public StationGpsNumberAdapter() {
+			super(BusStationActivity.this, R.layout.station_gps_number_item,
+					mRecentStations);
+			mInflater = getLayoutInflater();
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.station_gps_number_item, parent, false);
+                StationItem holder = new StationItem();
+                holder.mNameText = (TextView) convertView.findViewById(R.id.station_name);
+                holder.mGpsNumberText = (TextView) convertView.findViewById(R.id.station_gps_number);
+                convertView.setTag(holder);
+            }
+			KXBusStation busStation = mRecentStations.get(position);
+            StationItem stationItem = (StationItem)convertView.getTag();
+            stationItem.mNameText.setText(busStation.getName());
+            stationItem.mGpsNumberText.setText(busStation.getGpsNumber());
+            return convertView;
+		}
+
     }
 
 }
