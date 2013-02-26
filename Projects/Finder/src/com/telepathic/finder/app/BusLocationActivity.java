@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -14,12 +15,12 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -27,25 +28,30 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.BMapManager;
-import com.baidu.mapapi.GeoPoint;
-import com.baidu.mapapi.LocationListener;
-import com.baidu.mapapi.MKPoiInfo;
-import com.baidu.mapapi.MKRoute;
-import com.baidu.mapapi.MKStep;
-import com.baidu.mapapi.MapActivity;
-import com.baidu.mapapi.MapView;
-import com.baidu.mapapi.MyLocationOverlay;
-import com.baidu.mapapi.Overlay;
-import com.baidu.mapapi.OverlayItem;
-import com.baidu.mapapi.RouteOverlay;
+import com.baidu.mapapi.map.LocationData;
+import com.baidu.mapapi.map.MKMapViewListener;
+import com.baidu.mapapi.map.MapController;
+import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationOverlay;
+import com.baidu.mapapi.map.Overlay;
+import com.baidu.mapapi.map.OverlayItem;
+import com.baidu.mapapi.map.RouteOverlay;
+import com.baidu.mapapi.search.MKPoiInfo;
+import com.baidu.mapapi.search.MKRoute;
+import com.baidu.mapapi.search.MKStep;
+import com.baidu.platform.comapi.basestruct.GeoPoint;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.util.Utils;
 
-public class BusLocationActivity extends MapActivity {
+public class BusLocationActivity extends Activity {
     private static final String TAG = BusLocationActivity.class.getSimpleName();
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
@@ -73,8 +79,12 @@ public class BusLocationActivity extends MapActivity {
     private MapView mMapView;
     private BMapManager mMapManager;
 
+    private MapController mMapController = null;
+    private LocationClient mLocClient;
+    private LocationData mLocData = null;
+    private MKMapViewListener mMapListener = null;
     private MyLocationOverlay mLocationOverlay;  //定位图层
-    private LocationListener mLocationListener; //onResume时注册此listener，onPause时需要Remove
+    private MyLocationListenner mLocationListener = new MyLocationListenner();
     private ITrafficService mTrafficService;
     private MessageDispatcher mMessageDispatcher;
     private MKRoute mBusRoute;
@@ -102,7 +112,7 @@ public class BusLocationActivity extends MapActivity {
         FinderApplication app = (FinderApplication) getApplication();
         mMapManager = app.getMapManager();
         mMapManager.start();
-        super.initMapActivity(mMapManager);
+        //        super.initMapActivity(mMapManager);
 
         // init traffic service
         mTrafficService = app.getTrafficService();
@@ -110,26 +120,29 @@ public class BusLocationActivity extends MapActivity {
         initMessageHandlers();
 
         mMapView = (MapView) findViewById(R.id.bmapView);
-        mMapView.setBuiltInZoomControls(true);
-        // 设置在缩放动画过程中也显示overlay,默认为不绘制
-        mMapView.setDrawOverlayWhenZooming(true);
+        mMapController = mMapView.getController();
 
-        // 添加定位图层
-        mLocationOverlay = new MyLocationOverlay(this, mMapView);
+        initMapView();
+
+        mLocClient = new LocationClient(getApplicationContext());
+        mLocClient.registerLocationListener(mLocationListener);
+        //        mMapView.setBuiltInZoomControls(true);
+
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(true);//打开gps
+        option.setCoorType("bd09ll");     //设置坐标类型
+        mLocClient.setLocOption(option);
+        mLocClient.start();
+        mMapController.setZoom(14);
+        mMapController.enableClick(true);
+
+        mMapView.displayZoomControls(true);
+        mLocationOverlay = new MyLocationOverlay(mMapView);
+        mLocData = new LocationData();
+        mLocationOverlay.setData(mLocData);
         mMapView.getOverlays().add(mLocationOverlay);
-
-        // 注册定位事件
-        mLocationListener = new LocationListener(){
-            @Override
-            public void onLocationChanged(Location location) {
-                if (location != null){
-                    GeoPoint pt = new GeoPoint((int)(location.getLatitude()*1e6), (int)(location.getLongitude()*1e6));
-                    mMapView.getController().animateTo(pt);
-                    mMapView.getController().setZoom(MAP_ZOOM_LEVEL);
-                    mMapManager.getLocationManager().removeUpdates(this);
-                }
-            }
-        };
+        mLocationOverlay.enableCompass();
+        mMapView.refresh();
     }
 
     private void initMessageHandlers() {
@@ -162,7 +175,7 @@ public class BusLocationActivity extends MapActivity {
                 mMapView.getOverlays().clear();
                 mMapView.getOverlays().add(routeOverlay);
                 mMapView.getOverlays().add(mLocationOverlay);
-                mMapView.invalidate();
+                mMapView.refresh();
                 mMapView.getController().animateTo(route.getStart());
                 mBtnSearch.setEnabled(true);
                 mBusRoute = route;
@@ -218,6 +231,12 @@ public class BusLocationActivity extends MapActivity {
         super.onDestroy();
     }
 
+    private void initMapView() {
+        mMapView.setLongClickable(true);
+        //mMapController.setMapClickEnable(true);
+        //mMapView.setSatellite(false);
+    }
+
     private void showErrorMessage(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
     }
@@ -254,8 +273,8 @@ public class BusLocationActivity extends MapActivity {
         } else {
             Toast.makeText(this, R.string.invalid_input_hint,Toast.LENGTH_LONG).show();
         }
-        Intent intent = new Intent(this, BusRouteHistoryActivity.class);
-        startActivity(intent);
+        //        Intent intent = new Intent(this, BusRouteHistoryActivity.class);
+        //        startActivity(intent);
     }
 
     public void onSpeakClicked(View v){
@@ -293,18 +312,34 @@ public class BusLocationActivity extends MapActivity {
 
     @Override
     protected void onPause() {
-        mMapManager.getLocationManager().removeUpdates(mLocationListener);
-        mLocationOverlay.disableMyLocation();
-        mMapManager.stop();
+        //        mMapManager.getLocationManager().removeUpdates(mLocationListener);
+        //        mLocationOverlay.disableMyLocation();
+        //        mMapManager.stop();
+        mMapView.onPause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        mMapManager.getLocationManager().requestLocationUpdates(mLocationListener);
-        mLocationOverlay.enableMyLocation();
-        mMapManager.start();
+        mLocClient.requestLocation();
+        //        mMapManager.getLocationManager().requestLocationUpdates(mLocationListener);
+        //        mLocationOverlay.enableMyLocation();
+        //        mMapManager.start();
+        mMapView.onResume();
         super.onResume();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mMapView.onSaveInstanceState(outState);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mMapView.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
@@ -407,12 +442,6 @@ public class BusLocationActivity extends MapActivity {
         return retDialog;
     }
 
-
-    @Override
-    protected boolean isRouteDisplayed() {
-        return false;
-    }
-
     private void showBusRoutesDlg(String busLineNumber, final ArrayList<MKPoiInfo> busRoutePois) {
         final String[] busRoutes = new String[busRoutePois.size()];
         for (int idx = 0; idx < busRoutePois.size(); idx++) {
@@ -468,6 +497,7 @@ public class BusLocationActivity extends MapActivity {
         List<Overlay> mapOverlays = mMapView.getOverlays();
         mapOverlays.add(overlay);
         mMapView.getController().animateTo(station.getPoint());
+        mMapView.refresh();
     }
 
     private class recognizeResultTask extends AsyncTask<ArrayList<String>, Void, ArrayList<String>> {
@@ -504,6 +534,35 @@ public class BusLocationActivity extends MapActivity {
             }
             super.onPostExecute(result);
         }
+    }
+
+    public class MyLocationListenner implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            if (location == null)
+                return ;
+
+            mLocData.latitude = location.getLatitude();
+            mLocData.longitude = location.getLongitude();
+            mLocData.direction = 2.0f;
+            mLocData.accuracy = location.getRadius();
+            mLocData.direction = location.getDerect();
+            Log.d("loctest",String.format("before: lat: %f lon: %f", location.getLatitude(),location.getLongitude()));
+            // GeoPoint p = CoordinateConver.fromGcjToBaidu(new GeoPoint((int)(locData.latitude* 1e6), (int)(locData.longitude *  1e6)));
+            //  Log.d("loctest",String.format("before: lat: %d lon: %d", p.getLatitudeE6(),p.getLongitudeE6()));
+            mLocationOverlay.setData(mLocData);
+            mMapView.refresh();
+            mMapController.animateTo(new GeoPoint((int)(mLocData.latitude* 1e6), (int)(mLocData.longitude *  1e6)), null);
+        }
+
+        @Override
+        public void onReceivePoi(BDLocation poiLocation) {
+            if (poiLocation == null){
+                return ;
+            }
+        }
+
     }
 
 }

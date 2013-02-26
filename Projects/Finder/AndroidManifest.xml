@@ -5,10 +5,15 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="5"
+        android:minSdkVersion="7"
         android:targetSdkVersion="14" >
     </uses-sdk>
 
+    <permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
+    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCES_MOCK_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_GPS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -67,7 +72,8 @@
         <activity android:name="com.telepathic.finder.app.BusRouteHistoryActivity">
             
         </activity>
-        
+        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
+        </service>
         <provider android:name="com.telepathic.finder.sdk.traffic.provider.TrafficDataProvider"
             android:authorities="com.telepathic.finder.provider" 
             android:multiprocess="false"
