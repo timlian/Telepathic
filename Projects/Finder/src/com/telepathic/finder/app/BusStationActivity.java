@@ -373,9 +373,11 @@ public class BusStationActivity extends BaseActivity {
         			if (preStation != null) {
         				if (preStation.getGpsNumber().equals(curStation.getGpsNumber()) == false) {
         					stations.add(curStation);
+        					preStation = curStation;
         				}
         			} else {
         				stations.add(curStation);
+        				preStation = curStation;
         			}
         			
         		} while(data.moveToNext());
