@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -323,4 +325,15 @@ public class Utils {
 		}
 		return result;
 	}
+	
+	public static boolean hasActiveNetwork(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo info = cm.getActiveNetworkInfo();
+		if(info != null){
+			return info.isAvailable();
+		}
+		return false;
+	}
+
 }
