@@ -37,8 +37,12 @@ public abstract class RPCBaseRequest {
     	mCallback = callback;
     }
     
-    public long getRequestId() {
+    public long getId() {
     	return mRequestId;
+    }
+    
+    public String getName() {
+    	return mRpcMethodName;
     }
     
     void addParameter(String key, Object value) {

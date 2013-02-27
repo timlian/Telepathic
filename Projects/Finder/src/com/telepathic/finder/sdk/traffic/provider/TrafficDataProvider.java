@@ -24,6 +24,7 @@ public class TrafficDataProvider extends ContentProvider {
     private static final String TABLE_KUAI_XIN_BUS_ROUTE = "kuaiXinBusRoute";
     private static final String TABLE_KUAI_XIN_BUS_STATION = "kuaiXinBusStation";
     private static final String TABLE_KUAI_XIN_BUS_ROUTE_STATION = "kuaiXinBusRouteStation";
+    private static final String TABLE_KUAI_XIN_PERFORMANCE = "kuaiXinPerformance";
     
     private static final String TABLE_BAI_DU_BUS_ROUTE = "baiDuBusRoute";
     private static final String TABLE_BAI_DU_BUS_STATION = "baiDuBusStation";
@@ -36,9 +37,10 @@ public class TrafficDataProvider extends ContentProvider {
 	private static final int MATCH_KUAI_XIN_BUS_STATION = 5;
 	private static final int MATCH_KUAI_XIN_BUS_ROUTE_STATION = 6;
 	private static final int MATCH_KUAI_XIN_BUS_STATION_LINES = 7;
-	private static final int MATCH_BAI_DU_BUS_ROUTE = 8;
-	private static final int MATCH_BAI_DU_BUS_STATION = 9;
-	private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 10;
+	private static final int MATCH_KUAI_XIN_PERFORMANCE = 8;
+	private static final int MATCH_BAI_DU_BUS_ROUTE = 9;
+	private static final int MATCH_BAI_DU_BUS_STATION = 10;
+	private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 11;
 	
 	private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 	
@@ -50,6 +52,7 @@ public class TrafficDataProvider extends ContentProvider {
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusStation", MATCH_KUAI_XIN_BUS_STATION);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusRouteStation", MATCH_KUAI_XIN_BUS_ROUTE_STATION);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusStationLines", MATCH_KUAI_XIN_BUS_STATION_LINES);
+		sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinPerformance", MATCH_KUAI_XIN_PERFORMANCE);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRoute", MATCH_BAI_DU_BUS_ROUTE);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusStation", MATCH_BAI_DU_BUS_STATION);
 		sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRouteStation", MATCH_BAI_DU_BUS_ROUTE_STATION);
@@ -225,6 +228,9 @@ public class TrafficDataProvider extends ContentProvider {
 		case MATCH_KUAI_XIN_BUS_ROUTE_STATION:
 			tableName = TABLE_KUAI_XIN_BUS_ROUTE_STATION;
 			break;
+		case MATCH_KUAI_XIN_PERFORMANCE:
+			tableName = TABLE_KUAI_XIN_PERFORMANCE;
+			break;
 		case MATCH_BAI_DU_BUS_ROUTE:
 			tableName = TABLE_BAI_DU_BUS_ROUTE;
 			break;
@@ -346,6 +352,15 @@ public class TrafficDataProvider extends ContentProvider {
                     + "REFERENCES " + TABLE_KUAI_XIN_BUS_STATION + "(" + KuaiXinData.BusStationColumns._ID + ") ON DELETE CASCADE, "
                     + "UNIQUE (" + KuaiXinData.BusRouteStationColumns.ROUTE_ID + ", "
                     + KuaiXinData.BusRouteStationColumns.STATION_ID + " )"+ " )");
+        	
+        	db.execSQL("CREATE TABLE " + TABLE_KUAI_XIN_PERFORMANCE + " ("
+                    + KuaiXinData.NetworkPerformance._ID + " INTEGER PRIMARY KEY, "
+                    + KuaiXinData.NetworkPerformance.REQUEST_NAME + " TEXT, "
+                    + KuaiXinData.NetworkPerformance.REQUEST_ID + " TEXT, "
+                    + KuaiXinData.NetworkPerformance.STATUS + " TEXT, "
+                    + KuaiXinData.NetworkPerformance.TIME + " TEXT, "
+                    + KuaiXinData.NetworkPerformance.RETRY + " TEXT, "
+                    + KuaiXinData.NetworkPerformance.ERROR + " TEXT"+ " )");
         	
         	db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_ROUTE + " ("
                     + BaiDuData.BusRouteColumns._ID + " INTEGER PRIMARY KEY, "

@@ -225,6 +225,48 @@ public interface ITrafficData {
 			public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.kuaiXinBusStationLines";
 		}
 		
+		interface Performance extends BaseColumns {
+			/**
+			 * The request name
+			 */
+			String REQUEST_NAME = "request_name";
+			/**
+			 * The request id
+			 */
+			String REQUEST_ID = "request_id";
+			/**
+			 * The request status
+			 */
+			String STATUS = "status";
+			/**
+			 * The request time
+			 */
+			String TIME = "time";
+			/**
+			 * The error description
+			 */
+			String ERROR = "error";
+			/**
+			 * The retry count
+			 */
+			String RETRY = "retry";
+		}
+		
+		class NetworkPerformance implements Performance {
+			/**
+			 * The content uri of this table
+			 */
+			public static final Uri CONTENT_URI = Uri.parse("content://com.telepathic.finder.provider/kuaiXinPerformance");
+			/**
+			 * The MIME type
+			 */
+			public static final String CONTENT_TYPE = "vnd.android.cursor.dir/com.telepathic.finder.provider.kuaiXinPerformance";
+			/**
+			 * The MIME type
+			 */
+			public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.kuaiXinPerformance";
+		}
+		
 	}
 	
 	/**

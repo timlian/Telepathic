@@ -54,6 +54,8 @@ public class GetBusLineRequest extends RPCBaseRequest {
 				busLine.addRoute(busRoute);
 			}
 		}
-		mCallback.onSuccess(busLine);
+		if (mCallback != null) {
+			mCallback.onSuccess(busLine);
+		}
     }
 }

@@ -102,6 +102,8 @@ public class GetConsumerRecordsRequest extends RPCBaseRequest {
 			consumerRecords.add(record);
 		}
 		card.setConsumerRecords(consumerRecords);
-		mCallback.onSuccess(card);
+		if (mCallback != null) {
+			mCallback.onSuccess(card);
+		}
 	}
 }
