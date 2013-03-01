@@ -203,7 +203,7 @@ public class Utils {
 
     /**
      * Print the content of the cursor
-     * 
+     *
      * @param cursor, The cursor, which content needs to be printed
      * @param logTag, The log tag
      */

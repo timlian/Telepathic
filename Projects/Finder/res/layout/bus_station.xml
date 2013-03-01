@@ -27,7 +27,7 @@
                 android:layout_toLeftOf="@id/find_bus_station"
                 android:layout_centerVertical="true"
                 android:hint="@string/station_number_hint"/>
-        
+
     </RelativeLayout>
 
     <LinearLayout

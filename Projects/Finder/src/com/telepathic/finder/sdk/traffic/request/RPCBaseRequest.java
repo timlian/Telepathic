@@ -13,19 +13,19 @@ public abstract class RPCBaseRequest {
     private static final String KEY_DOCUMENT_ELEMENT = "DocumentElement";
     private static final String KEY_ERROR_CODE = "code";
     private static final String KEY_ERROR_MESSAGE = "msg";
-    
+
     private static long COUNT = 0;
     private static final long mRequestId = COUNT++;
 
     private static final int NO_ERROR = 200;
-    
+
     private String mRpcMethodName;
     private SoapObject mRpc;
-    
+
     protected RequestCallback mCallback;
 
     public RPCBaseRequest(String name) {
-    	mRpcMethodName = name;
+        mRpcMethodName = name;
         mRpc = new SoapObject(NAMESPACE, mRpcMethodName);
     }
 
@@ -34,17 +34,17 @@ public abstract class RPCBaseRequest {
     abstract void handleResponse(SoapObject dataSet);
 
     public void setCallback(RequestCallback callback) {
-    	mCallback = callback;
+        mCallback = callback;
     }
-    
+
     public long getId() {
-    	return mRequestId;
+        return mRequestId;
     }
-    
+
     public String getName() {
-    	return mRpcMethodName;
+        return mRpcMethodName;
     }
-    
+
     void addParameter(String key, Object value) {
         if (key == null) {
             throw new IllegalArgumentException("The parameter key is null.");
@@ -110,7 +110,7 @@ public abstract class RPCBaseRequest {
                     if (NO_ERROR == errorCode) {
                         if (isValidDataEntry(firstDataEntry)) {
                             handleResponse(dataSet);
-                        } 
+                        }
                     } else {
                         handleError(errorCode, errorMessage);
                     }
@@ -120,9 +120,9 @@ public abstract class RPCBaseRequest {
     }
 
     private String getRpcResultTag() {
-    	return mRpcMethodName + "Result";
+        return mRpcMethodName + "Result";
     }
-    
+
     private static boolean isValidDataEntry(SoapObject dataEntry) {
         boolean isValid = false;
         if (dataEntry.getPropertyCount() <= 2) {

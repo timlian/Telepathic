@@ -1,7 +1,7 @@
 package com.telepathic.finder.sdk.traffic.entity;
 
 public class EWalletConsumerRecord extends ConsumerRecord {
-	 /**
+     /**
      * 消费金额
      */
     private String mConsumerAmount;
@@ -9,51 +9,51 @@ public class EWalletConsumerRecord extends ConsumerRecord {
      * 剩余金额
      */
     private String mResidualAmount;
-    
-	@Override
-	public ConsumerType getType() {
-		return ConsumerType.EWALLET;
-	}
 
-	@Override
-	public String getConsumption() {
-		return mConsumerAmount;
-	}
+    @Override
+    public ConsumerType getType() {
+        return ConsumerType.EWALLET;
+    }
 
-	@Override
-	public void setConsumption(String consumption) {
-		mConsumerAmount = consumption;
-	}
+    @Override
+    public String getConsumption() {
+        return mConsumerAmount;
+    }
 
-	@Override
-	public String getResidual() {
-		return mResidualAmount;
-	}
+    @Override
+    public void setConsumption(String consumption) {
+        mConsumerAmount = consumption;
+    }
 
-	@Override
-	public void setResidual(String residual) {
-		mResidualAmount = residual;
-	}
-	
-	@Override
-	public boolean equals(Object object) {
-		if (object == this) {
-			return true;
-		}
-		if (!(object instanceof EWalletConsumerRecord)) {
-			return false;
-		}
-		EWalletConsumerRecord record = (EWalletConsumerRecord) object;
-		return super.equals(object) && mConsumerAmount.equals(record.mConsumerAmount)
-									&& mResidualAmount.equals(record.mResidualAmount);
-	}
-	
-	@Override
-	public int hashCode() {
-		int result = super.hashCode();
-		result = 31 * result + mConsumerAmount.hashCode();
-		result = 31 * result + mResidualAmount.hashCode();
-		return  result;
-	}
+    @Override
+    public String getResidual() {
+        return mResidualAmount;
+    }
+
+    @Override
+    public void setResidual(String residual) {
+        mResidualAmount = residual;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof EWalletConsumerRecord)) {
+            return false;
+        }
+        EWalletConsumerRecord record = (EWalletConsumerRecord) object;
+        return super.equals(object) && mConsumerAmount.equals(record.mConsumerAmount)
+                                    && mResidualAmount.equals(record.mResidualAmount);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + mConsumerAmount.hashCode();
+        result = 31 * result + mResidualAmount.hashCode();
+        return  result;
+    }
 
 }

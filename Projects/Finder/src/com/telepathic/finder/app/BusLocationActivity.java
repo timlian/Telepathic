@@ -84,9 +84,9 @@ public class BusLocationActivity extends MapActivity {
     private IMessageHandler mSearchBusRouteDoneHandler;
     private IMessageHandler mGetBusLocationUpdateHandler;
     private IMessageHandler mGetBusLocationDoneHandler;
-    
+
     private boolean mIsFirstUpdate = true;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,7 +172,7 @@ public class BusLocationActivity extends MapActivity {
             }
         };
         mGetBusLocationUpdateHandler = new IMessageHandler() {
-        	
+
             @Override
             public int what() {
                 return ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
@@ -182,15 +182,15 @@ public class BusLocationActivity extends MapActivity {
             public void handleMessage(Message msg) {
                 Integer index = (Integer) msg.obj;
                 if (mBusRoute != null) {
-                	if (mIsFirstUpdate == true) {
-                		 RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
+                    if (mIsFirstUpdate == true) {
+                         RouteOverlay routeOverlay = new RouteOverlay(BusLocationActivity.this, mMapView);
                          routeOverlay.setData(mBusRoute);
                          mMapView.getOverlays().clear();
                          mMapView.getOverlays().add(routeOverlay);
                          mMapView.getOverlays().add(mLocationOverlay);
                          mMapView.invalidate();
                          mIsFirstUpdate = false;
-                	}
+                    }
                     MKStep station = mBusRoute.getStep(index);
                     updateBusLocation(station);
                 }
@@ -204,7 +204,7 @@ public class BusLocationActivity extends MapActivity {
 
             @Override
             public void handleMessage(Message msg) {
-            	mIsFirstUpdate = true;
+                mIsFirstUpdate = true;
                 if (msg.arg2 != 0) {
                     String errorMessage = (String) msg.obj;
                     showErrorMessage(errorMessage);
@@ -212,7 +212,7 @@ public class BusLocationActivity extends MapActivity {
                 int midStationIndex = mBusRoute.getNumSteps() / 2;
                 MKStep midStation = mBusRoute.getStep(midStationIndex);
                 if (midStation != null) {
-                	mMapView.getController().animateTo(midStation.getPoint());
+                    mMapView.getController().animateTo(midStation.getPoint());
                 }
             }
         };
@@ -523,11 +523,11 @@ public class BusLocationActivity extends MapActivity {
             super.onPostExecute(result);
         }
     }
-    
+
     @Override
     public void onBackPressed() {
-    	mTrafficService.shutDown();
-    	super.onBackPressed();
+        mTrafficService.shutDown();
+        super.onBackPressed();
     }
 
 }

@@ -70,13 +70,13 @@ public class FinderApplication extends Application {
     public BMapManager getMapManager() {
         return mBMapManager;
     }
-    
+
     public ITrafficService getTrafficService() {
-    	return mTrafficManager.getTrafficService();
+        return mTrafficManager.getTrafficService();
     }
-    
+
     public MessageDispatcher getMessageDispatcher() {
-    	return mMessageDispatcher;
+        return mMessageDispatcher;
     }
 
 }

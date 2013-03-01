@@ -13,21 +13,21 @@ public class BDBusStation {
      * The longitude of the bus station's position
      */
     private String mLongitude;
-    
+
     public BDBusStation(String name, String latitude, String longitude) {
         mName = name;
         mLatitude = latitude;
         mLongitude = longitude;
     }
-    
+
     public String getName() {
         return mName;
     }
-    
+
     public String getLatitude() {
         return mLatitude;
     }
-    
+
     public String getLongitude() {
         return mLongitude;
     }

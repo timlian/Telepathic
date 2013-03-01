@@ -23,13 +23,13 @@ public class BaseActivity extends FragmentActivity{
 
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
-//    	super.onCreate(savedInstanceState);
-//    	requestWindowFeature(Window.FEATURE_CUSTOM_TITLE); // 注意顺序   
-//        setContentView(R.layout.main); // 注意顺序   
-//        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,      // 注意顺序   
-//        R.layout.title);   
+//      super.onCreate(savedInstanceState);
+//      requestWindowFeature(Window.FEATURE_CUSTOM_TITLE); // 注意顺序
+//        setContentView(R.layout.main); // 注意顺序
+//        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,      // 注意顺序
+//        R.layout.title);
 //    }
-    
+
     @Override
     protected Dialog onCreateDialog(int id) {
         Dialog retDlg = null;

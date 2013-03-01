@@ -75,8 +75,8 @@
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-        
-        <ImageView 
+
+        <ImageView
             android:id="@+id/show_hide_input_bar"
             android:src="@drawable/show_input_bar_selector"
             android:layout_alignParentRight="true"

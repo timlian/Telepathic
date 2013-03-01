@@ -38,15 +38,15 @@ public abstract class ConsumerRecord implements Comparable<ConsumerRecord> {
 
 
     public abstract ConsumerType getType();
-    
+
     public abstract String getConsumption();
-    
+
     public abstract void setConsumption(String consumption);
-    
+
     public abstract String getResidual();
-    
+
     public abstract void setResidual(String residual);
-    
+
     public String getLineNumber() {
         return mLineNumber;
     }
@@ -81,13 +81,13 @@ public abstract class ConsumerRecord implements Comparable<ConsumerRecord> {
 
     @Override
     public boolean equals(Object object) {
-    	 if (object == this) {
+         if (object == this) {
              return true;
          }
         if(!(object instanceof ConsumerRecord)) {
             return false;
         }
-        
+
         ConsumerRecord record = (ConsumerRecord)object;
         if (getType() != record.getType()) {
             return false;
