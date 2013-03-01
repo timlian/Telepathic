@@ -83,6 +83,7 @@ public class BusLocationActivity extends Activity {
     private LocationClient mLocClient;
     private LocationData mLocData = null;
     private MKMapViewListener mMapListener = null;
+    private CustomItemizedOverlay mBusLocationOverlay;
     private MyLocationOverlay mLocationOverlay;  //定位图层
     private MyLocationListenner mLocationListener = new MyLocationListenner();
     private ITrafficService mTrafficService;
@@ -137,6 +138,13 @@ public class BusLocationActivity extends Activity {
         mMapController.enableClick(true);
 
         mMapView.displayZoomControls(true);
+
+        Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);
+        marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
+        /**
+         * 创建自定义的ItemizedOverlay
+         */
+        mBusLocationOverlay = new CustomItemizedOverlay(marker, this);
         mLocationOverlay = new MyLocationOverlay(mMapView);
         mLocData = new LocationData();
         mLocationOverlay.setData(mLocData);
@@ -179,6 +187,7 @@ public class BusLocationActivity extends Activity {
                 mMapView.getController().animateTo(route.getStart());
                 mBtnSearch.setEnabled(true);
                 mBusRoute = route;
+                mBusLocationOverlay.removeAllOverlay();
                 mTrafficService.getBusLocation(mLineNumber, getRouteStationNames(route));
             }
         };
@@ -480,22 +489,21 @@ public class BusLocationActivity extends Activity {
     }
 
     private void updateBusLocation(MKStep station) {
-        Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);
-        marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
-        /**
-         * 创建自定义的ItemizedOverlay
-         */
-        CustomItemizedOverlay overlay = new CustomItemizedOverlay(marker, this);
         /**
          * 创建并添加第一个标记：
          */
         OverlayItem overlayItem = new OverlayItem(station.getPoint(), "", station.getContent());
-        overlay.addOverlay(overlayItem);
+        mBusLocationOverlay.addOverlay(overlayItem);
         /**
          * 往地图上添加自定义的ItemizedOverlay
          */
         List<Overlay> mapOverlays = mMapView.getOverlays();
-        mapOverlays.add(overlay);
+        for (Overlay ol : mapOverlays) {
+            if (ol instanceof CustomItemizedOverlay) {
+                mapOverlays.remove(ol);
+            }
+        }
+        mapOverlays.add(mBusLocationOverlay);
         mMapView.getController().animateTo(station.getPoint());
         mMapView.refresh();
     }

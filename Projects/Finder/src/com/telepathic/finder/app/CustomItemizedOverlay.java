@@ -39,6 +39,11 @@ public class CustomItemizedOverlay extends ItemizedOverlay<OverlayItem> {
         this.populate();
     }
 
+    public void removeAllOverlay() {
+        overlayItemList.removeAll(overlayItemList);
+        this.populate();
+    }
+
     @Override
     // 处理点击事件
     protected boolean onTap(int i) {
