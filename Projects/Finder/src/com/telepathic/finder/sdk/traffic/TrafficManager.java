@@ -98,6 +98,7 @@ public class TrafficManager {
         }
 
         @Override
+
         public void searchBusRoute(final String city, final String routeUid) {
             final SearchBusRouteTask searchTask = new SearchBusRouteTask(mMapManager, city, routeUid);
             mExecutorService.execute(new Runnable() {
@@ -124,8 +125,7 @@ public class TrafficManager {
             });
         }
 
-        @Override
-        public void getBusStationLines(final String gpsNumber) {
+        @Override        public void getBusStationLines(final String gpsNumber) {
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -260,56 +260,56 @@ public class TrafficManager {
             });
         }
 
-		@Override
-		public void getBusLocation(final String lineNumber, final ArrayList<String> route) {
-			mTaskScheduler.scheduleAtFixedRate(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						final BlockingQueue<Integer> queue = new LinkedBlockingQueue<Integer>();
-						GetBusLocationTask task = new GetBusLocationTask(lineNumber, route, queue);
-						final Integer lastLocation = -1;
-						task.startTask();
-						task.setLastLocation(lastLocation);
-						while (!Thread.interrupted()) {
-							Integer location = null;
-							location = queue.take();
-							if (location != lastLocation) {
-								Message msg = Message.obtain();
-								msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
-								msg.arg2 = 0;
-								msg.obj = location;
-								mMessageHandler.sendMessage(msg);
-							} else {
-								TaskResult<Integer> taskResult = task.getTaskResult();
-								Message msg = Message.obtain();
-								msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_DONE;
-								if (taskResult != null) {
-									msg.arg2 = taskResult.getErrorCode();
-									msg.obj = taskResult.getErrorMessage();
-								}
-								mMessageHandler.sendMessage(msg);
-								Thread.currentThread().interrupt();
-							}
-						}
-					} catch (InterruptedException ex) {
-						Utils.debug(TAG, "getBusLocation is interrupted.");
-					}
-					Utils.debug(TAG, "getBusLocation finished.");
-				}
-			}, 0, 20, TimeUnit.SECONDS);
-		}
+        @Override
+        public void getBusLocation(final String lineNumber, final ArrayList<String> route) {
+            mTaskScheduler.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        final BlockingQueue<Integer> queue = new LinkedBlockingQueue<Integer>();
+                        GetBusLocationTask task = new GetBusLocationTask(lineNumber, route, queue);
+                        final Integer lastLocation = -1;
+                        task.startTask();
+                        task.setLastLocation(lastLocation);
+                        while (!Thread.interrupted()) {
+                            Integer location = null;
+                            location = queue.take();
+                            if (location != lastLocation) {
+                                Message msg = Message.obtain();
+                                msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_UPDATED;
+                                msg.arg2 = 0;
+                                msg.obj = location;
+                                mMessageHandler.sendMessage(msg);
+                            } else {
+                                TaskResult<Integer> taskResult = task.getTaskResult();
+                                Message msg = Message.obtain();
+                                msg.arg1 = ITrafficeMessage.GET_BUS_LOCATION_DONE;
+                                if (taskResult != null) {
+                                    msg.arg2 = taskResult.getErrorCode();
+                                    msg.obj = taskResult.getErrorMessage();
+                                }
+                                mMessageHandler.sendMessage(msg);
+                                Thread.currentThread().interrupt();
+                            }
+                        }
+                    } catch (InterruptedException ex) {
+                        Utils.debug(TAG, "getBusLocation is interrupted.");
+                    }
+                    Utils.debug(TAG, "getBusLocation finished.");
+                }
+            }, 0, 20, TimeUnit.SECONDS);
+        }
 
-		@Override
-		public void shutDown() {
-			Utils.debug(TAG, "shutdown()");
-			if (mExecutorService != null) {
-				mExecutorService.shutdownNow();
-			}
-			if (mTaskScheduler != null) {
-				mTaskScheduler.shutdownNow();
-			}
-		}
-	}
+        @Override
+        public void shutDown() {
+            Utils.debug(TAG, "shutdown()");
+            if (mExecutorService != null) {
+                mExecutorService.shutdownNow();
+            }
+            if (mTaskScheduler != null) {
+                mTaskScheduler.shutdownNow();
+            }
+        }
+    }
 
 }

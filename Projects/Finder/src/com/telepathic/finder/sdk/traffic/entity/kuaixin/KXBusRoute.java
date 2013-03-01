@@ -26,11 +26,11 @@ public class KXBusRoute {
      * The route stations
      */
     private List<String> mStations = new ArrayList<String>();
-    
+
     public String getStartTime() {
         return mStartTime;
     }
-    
+
     public void setStartTime(String startTime) {
         mStartTime = startTime;
     }
@@ -38,46 +38,46 @@ public class KXBusRoute {
     public String getEndTime() {
         return mEndTime;
     }
-    
+
     public void setEndTime(String endTime) {
         mEndTime = endTime;
     }
-    
+
     public Direction getDirection() {
-    	return mDirection;
+        return mDirection;
     }
-    
+
     public void setDirection(Direction direction) {
-    	mDirection = direction;
+        mDirection = direction;
     }
-    
+
     public List<String> getStations() {
-    	return Collections.unmodifiableList(mStations);
+        return Collections.unmodifiableList(mStations);
     }
-    
+
     public String getStationNames() {
-    	StringBuilder builder = new StringBuilder();
-    	for(String name : mStations) {
-    		builder.append(name);
-    		builder.append(",");
-    	}
-    	builder.deleteCharAt(builder.lastIndexOf(","));
-    	return builder.toString();
+        StringBuilder builder = new StringBuilder();
+        for(String name : mStations) {
+            builder.append(name);
+            builder.append(",");
+        }
+        builder.deleteCharAt(builder.lastIndexOf(","));
+        return builder.toString();
     }
-    
+
     public void setStations(String[] stations) {
-    	mStations = Arrays.asList(stations);
+        mStations = Arrays.asList(stations);
     }
-    
+
     public int getStationIndex(String stationName) {
-    	int index = -1;
-    	for(int idx = 0; idx < mStations.size(); idx++) {
-    		if (mStations.get(idx).equals(stationName)) {
-    			index = idx;
-    			break;
-    		}
-    	}
-    	return index;
+        int index = -1;
+        for(int idx = 0; idx < mStations.size(); idx++) {
+            if (mStations.get(idx).equals(stationName)) {
+                index = idx;
+                break;
+            }
+        }
+        return index;
     }
-    
+
 }

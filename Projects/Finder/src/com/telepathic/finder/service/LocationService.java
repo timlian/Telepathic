@@ -80,7 +80,7 @@ public class LocationService extends Service {
         if (isGpsProviderEnabled ) {
             lastGpsLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (lastGpsLocation != null) {
-            	Utils.debug(TAG, "last location from gps: " + lastGpsLocation.getLatitude() + ", " + lastGpsLocation.getLongitude());
+                Utils.debug(TAG, "last location from gps: " + lastGpsLocation.getLatitude() + ", " + lastGpsLocation.getLongitude());
             }
         }
 
@@ -88,7 +88,7 @@ public class LocationService extends Service {
         if (isNetworkProviderEnabled) {
             lastNetworkLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (lastNetworkLocation != null) {
-            	Utils.debug(TAG, "last location from network: " + lastNetworkLocation.getLatitude() + ", " + lastNetworkLocation.getLongitude());
+                Utils.debug(TAG, "last location from network: " + lastNetworkLocation.getLatitude() + ", " + lastNetworkLocation.getLongitude());
             }
         }
 

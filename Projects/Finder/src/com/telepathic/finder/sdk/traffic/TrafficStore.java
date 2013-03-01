@@ -62,13 +62,13 @@ public class TrafficStore {
     }
 
     public void store(MKBusLineResult busLine, boolean notifyChange) {
-        String lineNumber = Utils.parseBusLineNumber(busLine.getBusName()).get(0);
-        MKRoute route = busLine.getBusRoute();
-        ContentValues values = new ContentValues();
-        values.put(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, lineNumber);
-        final long routeId = -1;//mTrafficeStore.insertBusRoute(values);
-        final int stepNumber = route.getNumSteps();
-        for(int index = 0; index < stepNumber; index++) {
+          String lineNumber = Utils.parseBusLineNumber(busLine.getBusName()).get(0);
+          MKRoute route = busLine.getBusRoute();
+          ContentValues values = new ContentValues();
+          values.put(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, lineNumber);
+          final long routeId = -1;//mTrafficeStore.insertBusRoute(values);
+          final int stepNumber = route.getNumSteps();
+          for(int index = 0; index < stepNumber; index++) {
             MKStep station = route.getStep(index);
             values.clear();
             values.put(ITrafficData.BaiDuData.BusStation.NAME, station.getContent());
@@ -80,11 +80,10 @@ public class TrafficStore {
             values.put(ITrafficData.BaiDuData.BusRouteStation.STATION_ID, stationId);
             values.put(ITrafficData.BaiDuData.BusRouteStation.INDEX, index);
             //mTrafficeStore.insertBusRouteStation(values);
-        }
+          }
     }
 
-    public void store(String lineNumber, ArrayList<MKPoiInfo> poisInfo) {
-        for (int idx = 0; idx < poisInfo.size(); idx++) {
+    public void store(String lineNumber, ArrayList<MKPoiInfo> poisInfo) {        for (int idx = 0; idx < poisInfo.size(); idx++) {
             ContentValues route = new ContentValues();
             route.put(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, lineNumber);
             route.put(ITrafficData.BaiDuData.BusRoute.UID, poisInfo.get(idx).uid);

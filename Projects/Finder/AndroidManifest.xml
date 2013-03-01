@@ -37,9 +37,9 @@
         android:name="com.telepathic.finder.app.FinderApplication"
         android:allowBackup="true"
         android:icon="@drawable/icon"
-        android:label="@string/app_name" 
+        android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        
+
         <uses-library android:name="android.test.runner" />
 
         <activity
@@ -70,12 +70,12 @@
             android:name="com.telepathic.finder.app.BusCardRecordActivity" >
         </activity>
         <activity android:name="com.telepathic.finder.app.BusRouteHistoryActivity">
-            
+
         </activity>
         <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
         </service>
         <provider android:name="com.telepathic.finder.sdk.traffic.provider.TrafficDataProvider"
-            android:authorities="com.telepathic.finder.provider" 
+            android:authorities="com.telepathic.finder.provider"
             android:multiprocess="false"
             android:grantUriPermissions="true">
         </provider>
