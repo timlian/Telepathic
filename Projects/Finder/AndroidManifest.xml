@@ -53,6 +53,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.telepathic.finder.app.MainActivity"
+            android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
+        </activity>
+        <activity
             android:name="com.telepathic.finder.app.BusLocationActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/bus_location" >
