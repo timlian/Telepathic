@@ -1,29 +1,36 @@
 package com.telepathic.finder.app;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.text.InputType;
-import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.telepathic.finder.R;
 
-public class MainActivity extends SherlockActivity {
+public class MainActivity extends SherlockFragmentActivity {
 
-    private TextView mTvSearchKey;
+    //    private TextView mTvSearchKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_main);
-        setupView();
         super.onCreate(savedInstanceState);
+        setupView();
     }
 
     private void setupView(){
-        mTvSearchKey = (TextView) findViewById(R.id.search_key);
+        //        mTvSearchKey = (TextView) findViewById(R.id.search_key);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        actionBar.addTab(actionBar.newTab().setText("locations").setTabListener(new BusLocationTabListener(new BusLocationFragment())));
+        actionBar.addTab(actionBar.newTab().setText("records").setTabListener(new BusCardRecordTabListener(new BusCardRecordFragment())));
+        actionBar.addTab(actionBar.newTab().setText("stations").setTabListener(new BusStationTabListener(new BusStationFragment())));
     }
 
     @Override
@@ -45,7 +52,7 @@ public class MainActivity extends SherlockActivity {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mTvSearchKey.setText(query);
+                //                mTvSearchKey.setText(query);
                 return true;
             }
 
@@ -56,6 +63,93 @@ public class MainActivity extends SherlockActivity {
             }
         });
         return true;
+    }
+
+    private class BusLocationTabListener implements ActionBar.TabListener {
+        private BusLocationFragment mFragment;
+
+        public BusLocationTabListener(BusLocationFragment fragment) {
+            mFragment = fragment;
+        }
+
+        @Override
+        public void onTabSelected(Tab tab, FragmentTransaction ft) {
+            ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
+            ft.add(android.R.id.content, mFragment, mFragment.getTag());
+            ft.commit();
+        }
+
+        @Override
+        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+            ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
+            ft.remove(mFragment);
+            ft.commit();
+        }
+
+        @Override
+        public void onTabReselected(Tab tab, FragmentTransaction ft) {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+
+    private class BusCardRecordTabListener implements ActionBar.TabListener {
+        private BusCardRecordFragment mFragment;
+
+        public BusCardRecordTabListener(BusCardRecordFragment fragment) {
+            mFragment = fragment;
+        }
+
+        @Override
+        public void onTabSelected(Tab tab, FragmentTransaction ft) {
+            ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
+            ft.add(android.R.id.content, mFragment, mFragment.getTag());
+            ft.commit();
+        }
+
+        @Override
+        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+            ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
+            ft.remove(mFragment);
+            ft.commit();
+        }
+
+        @Override
+        public void onTabReselected(Tab tab, FragmentTransaction ft) {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+
+    private class BusStationTabListener implements ActionBar.TabListener {
+        private BusStationFragment mFragment;
+
+        public BusStationTabListener(BusStationFragment fragment) {
+            mFragment = fragment;
+        }
+
+        @Override
+        public void onTabSelected(Tab tab, FragmentTransaction ft) {
+            ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
+            ft.add(android.R.id.content, mFragment, mFragment.getTag());
+            ft.commit();
+        }
+
+        @Override
+        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+            ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
+            ft.remove(mFragment);
+            ft.commit();
+        }
+
+        @Override
+        public void onTabReselected(Tab tab, FragmentTransaction ft) {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 
 }
