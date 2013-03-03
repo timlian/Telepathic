@@ -73,6 +73,9 @@ public class TrafficManager {
         @Override
         public void searchBusLine(final String city, final String lineNumber) {
             final SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
+            if (mExecutorService.isShutdown()) {
+                mExecutorService = Executors.newCachedThreadPool();
+            }
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -101,6 +104,9 @@ public class TrafficManager {
 
         public void searchBusRoute(final String city, final String routeUid) {
             final SearchBusRouteTask searchTask = new SearchBusRouteTask(mMapManager, city, routeUid);
+            if (mExecutorService.isShutdown()) {
+                mExecutorService = Executors.newCachedThreadPool();
+            }
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -125,7 +131,11 @@ public class TrafficManager {
             });
         }
 
-        @Override        public void getBusStationLines(final String gpsNumber) {
+        @Override
+        public void getBusStationLines(final String gpsNumber) {
+            if (mExecutorService.isShutdown()) {
+                mExecutorService = Executors.newCachedThreadPool();
+            }
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -216,6 +226,9 @@ public class TrafficManager {
 
         @Override
         public void getBusCardRecords(final String cardNumber, final int count) {
+            if (mExecutorService.isShutdown()) {
+                mExecutorService = Executors.newCachedThreadPool();
+            }
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -262,6 +275,9 @@ public class TrafficManager {
 
         @Override
         public void getBusLocation(final String lineNumber, final ArrayList<String> route) {
+            if (mTaskScheduler.isShutdown()) {
+                mTaskScheduler = new ScheduledThreadPoolExecutor(1);
+            }
             mTaskScheduler.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
