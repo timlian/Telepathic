@@ -24,6 +24,7 @@ import android.net.NetworkInfo;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -47,7 +48,7 @@ public class Utils {
     private Utils() {
     }
 
-    public static void hideSoftKeyboard(Context c, EditText v) {
+    public static void hideSoftKeyboard(Context c, View v) {
         InputMethodManager imm = (InputMethodManager)c
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
