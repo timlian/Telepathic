@@ -287,9 +287,9 @@ public class BusLocationFragment extends SherlockFragment {
     }
 
     @Override
-    public void onDestroy() {
+    public void onStop() {
         clearMessageHandlers();
-        super.onDestroy();
+        super.onStop();
     }
 
     @Override
