@@ -115,7 +115,7 @@ public class BusStationFragment extends SherlockFragment {
         @Override
         public void handleMessage(Message msg) {
             mWaitingDialog.cancel();
-            mLlBusLines.requestFocusFromTouch();
+            mTvStationName.requestFocusFromTouch();
         }
     };
 
@@ -140,13 +140,13 @@ public class BusStationFragment extends SherlockFragment {
         FinderApplication app = (FinderApplication)mActivity.getApplication();
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
-        mMessageDispatcher.add(mMessageHandler);
         mActivity.getSupportLoaderManager().initLoader(HISTORY_LOADER_ID, null,
                 new BusStationLinesLoaderCallback());
     }
 
     @Override
     public void onStart() {
+        mMessageDispatcher.add(mMessageHandler);
         ActionBar actionBar = getSherlockActivity().getSupportActionBar();
         actionBar.setTitle(R.string.bus_stations);
         super.onStart();

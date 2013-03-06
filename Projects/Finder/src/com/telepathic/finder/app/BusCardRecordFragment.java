@@ -1,3 +1,4 @@
+
 package com.telepathic.finder.app;
 
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ public class BusCardRecordFragment extends SherlockFragment {
     private volatile boolean isClicked;
 
     private ProgressDialog mWaitingDialog;
+
     private MessageDispatcher mMessageDispatcher;
 
     private IMessageHandler mMessageHandler = new IMessageHandler() {
@@ -123,19 +125,21 @@ public class BusCardRecordFragment extends SherlockFragment {
         FinderApplication app = (FinderApplication)mActivity.getApplication();
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
-        mMessageDispatcher.add(mMessageHandler);
-        startLoadBusCards();
         Utils.copyAppDatabaseFiles(mActivity.getPackageName());
     }
 
     @Override
     public void onStart() {
+        mMessageDispatcher.add(mMessageHandler);
+        startLoadBusCards();
         ActionBar actionBar = getSherlockActivity().getSupportActionBar();
         actionBar.setTitle(R.string.card_records);
         super.onStart();
     }
+
     private void startLoadBusCards() {
-        mActivity.getSupportLoaderManager().initLoader(mBusCardLoaderId, null, new BusCardLoaderCallback());
+        mActivity.getSupportLoaderManager().initLoader(mBusCardLoaderId, null,
+                new BusCardLoaderCallback());
     }
 
     private class BusCardLoaderCallback implements LoaderCallbacks<Cursor> {
@@ -144,8 +148,8 @@ public class BusCardRecordFragment extends SherlockFragment {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             CursorLoader loader = null;
             if (mBusCardLoaderId == id) {
-                loader = new CursorLoader(mActivity.getContext(), ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null,
-                        null, null, null);
+                loader = new CursorLoader(mActivity.getContext(),
+                        ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null, null, null, null);
             }
             return loader;
         }
@@ -156,9 +160,12 @@ public class BusCardRecordFragment extends SherlockFragment {
                 mNoItemTips.setVisibility(View.GONE);
                 mConsumptionDetail.setVisibility(View.VISIBLE);
                 mBusCards = new ArrayList<BusCard>();
-                int idxCardNumber = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.CARD_NUMBER);
-                int idxResidualCount = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_COUNT);
-                int idxResidualAmount = data.getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_AMOUNT);
+                int idxCardNumber = data
+                        .getColumnIndex(ITrafficData.KuaiXinData.BusCard.CARD_NUMBER);
+                int idxResidualCount = data
+                        .getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_COUNT);
+                int idxResidualAmount = data
+                        .getColumnIndex(ITrafficData.KuaiXinData.BusCard.RESIDUAL_AMOUNT);
                 do {
                     BusCard card = new BusCard();
                     card.setCardNumber(data.getString(idxCardNumber));
@@ -296,7 +303,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         inflater.inflate(R.menu.menu_card_record, menu);
 
         // Get the SearchView and set the searchable configuration
-        mSearchView = (SearchView) menu.findItem(R.id.search_card_record).getActionView();
+        mSearchView = (SearchView)menu.findItem(R.id.search_card_record).getActionView();
         mSearchView.setQueryHint(getResources().getText(R.string.ic_card_hint));
         mSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
@@ -309,7 +316,8 @@ public class BusCardRecordFragment extends SherlockFragment {
                     Utils.hideSoftKeyboard(mActivity.getApplicationContext(), mSearchView);
                     mTrafficService.getBusCardRecords(cardNumber, 30);
                 } else {
-                    Toast.makeText(mActivity, R.string.card_id_error_notice, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, R.string.card_id_error_notice, Toast.LENGTH_SHORT)
+                            .show();
                 }
                 return true;
             }
@@ -370,8 +378,10 @@ public class BusCardRecordFragment extends SherlockFragment {
                         .getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.BUS_NUMBER);
                 final int idxConsumption = cursor
                         .getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.CONSUMPTION);
-                final int idxDate = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.DATE);
-                final int idxType = cursor.getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.TYPE);
+                final int idxDate = cursor
+                        .getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.DATE);
+                final int idxType = cursor
+                        .getColumnIndex(ITrafficData.KuaiXinData.ConsumerRecord.TYPE);
                 holder.lineNumber.setText(getResources().getString(R.string.line_number)
                         + cursor.getString(idxLineNumber));
                 holder.busNumber.setText(getResources().getString(R.string.bus_number)
@@ -410,7 +420,8 @@ public class BusCardRecordFragment extends SherlockFragment {
 
         public BusCardPageView(BusCard card) {
             mCard = card;
-            mRootView = mActivity.getLayoutInflater().inflate(R.layout.bus_card_consume_records, null);
+            mRootView = mActivity.getLayoutInflater().inflate(R.layout.bus_card_consume_records,
+                    null);
             mResidualCount = (TextView)mRootView.findViewById(R.id.residual_count_text);
             mResidualAmount = (TextView)mRootView.findViewById(R.id.residual_amount_text);
             mRecordList = (DropRefreshListView)mRootView.findViewById(R.id.consumer_record_list);
@@ -434,12 +445,12 @@ public class BusCardRecordFragment extends SherlockFragment {
                 CursorLoader loader = null;
                 if (mLoaderId == id) {
                     String cardNumber = mCard.getCardNumber();
-                    String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=" + "\'" + cardNumber
-                            + "\'";
+                    String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=" + "\'"
+                            + cardNumber + "\'";
                     String sortOrder = ITrafficData.KuaiXinData.ConsumerRecord.DATE + " DESC";
                     loader = new CursorLoader(mActivity.getContext(),
-                            ITrafficData.KuaiXinData.ConsumerRecord.CONTENT_URI, null, selection, null,
-                            sortOrder);
+                            ITrafficData.KuaiXinData.ConsumerRecord.CONTENT_URI, null, selection,
+                            null, sortOrder);
                 }
                 return loader;
             }
@@ -457,7 +468,8 @@ public class BusCardRecordFragment extends SherlockFragment {
                                 if (Utils.isValidBusCardNumber(cardNumber)) {
                                     mTrafficService.getBusCardRecords(cardNumber, 30);
                                 } else {
-                                    Toast.makeText(mActivity, R.string.card_id_error_notice, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mActivity, R.string.card_id_error_notice,
+                                            Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
