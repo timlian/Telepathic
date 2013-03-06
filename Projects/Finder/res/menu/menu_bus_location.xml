@@ -3,7 +3,7 @@
     <item
         android:id="@+id/search_bus_location"
         android:actionViewClass="com.actionbarsherlock.widget.SearchView"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/ic_menu_search_holo_light"
         android:showAsAction="ifRoom|collapseActionView|withText"
         android:title="@string/find"/>
 
