@@ -113,7 +113,7 @@ public class BusLocationFragment extends SherlockFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mActivity = (MainActivity)getActivity();
+        mActivity = (MainActivity)getSherlockActivity();
 
         Utils.copyAppDatabaseFiles(mActivity.getPackageName());
 

@@ -1,5 +1,6 @@
 package com.telepathic.finder.app;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTabHost;
 import android.view.LayoutInflater;
@@ -14,6 +15,10 @@ public class MainActivity extends SherlockFragmentActivity {
 
     //    private TextView mTvSearchKey;
     private FragmentTabHost mTabHost;
+
+    Context getContext() {
+        return this;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
