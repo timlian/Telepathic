@@ -1,66 +1,44 @@
 package com.telepathic.finder.app;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentTabHost;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TabHost.TabSpec;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.telepathic.finder.R;
 
 public class MainActivity extends SherlockFragmentActivity {
 
     //    private TextView mTvSearchKey;
+    private FragmentTabHost mTabHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         setupView();
     }
 
     private void setupView(){
         //        mTvSearchKey = (TextView) findViewById(R.id.search_key);
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
+        mTabHost.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
 
-        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.ic_tab_location).setTabListener(new BusTabListener<BusLocationFragment>(BusLocationFragment.class)));
-        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.ic_tab_card).setTabListener(new BusTabListener<BusCardRecordFragment>(BusCardRecordFragment.class)));
-        actionBar.addTab(actionBar.newTab().setIcon(R.drawable.ic_tab_station).setTabListener(new BusTabListener<BusStationFragment>(BusStationFragment.class)));
+        addTab(getString(R.string.bus_location), BusLocationFragment.class, R.drawable.ic_tab_location);
+        addTab(getString(R.string.card_records), BusCardRecordFragment.class, R.drawable.ic_tab_card);
+        addTab(getString(R.string.bus_stations), BusStationFragment.class, R.drawable.ic_tab_station);
+
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    private class BusTabListener <T extends SherlockFragment> implements ActionBar.TabListener {
-        private SherlockFragment mFragment;
-
-        public BusTabListener(Class<T> clazz) {
-            mFragment = (SherlockFragment)SherlockFragment.instantiate(MainActivity.this, clazz.getName());
-        }
-
-        @Override
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
-            ft.add(android.R.id.content, mFragment, mFragment.getTag());
-            ft.commit();
-        }
-
-        @Override
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
-            ft.remove(mFragment);
-            ft.commit();
-        }
-
-        @Override
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
-            // TODO Auto-generated method stub
-
-        }
-
+    private void addTab(String tag, Class<?> clazz, int iconResId) {
+        TabSpec spec = mTabHost.newTabSpec(tag);
+        View v = LayoutInflater.from(this).inflate(R.layout.tab_host_spec, null);
+        ((ImageView)v.findViewById(R.id.tab_name)).setImageResource(iconResId);
+        spec.setIndicator(v);
+        mTabHost.addTab(spec, clazz, null);
     }
 
 }
