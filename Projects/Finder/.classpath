@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
@@ -9,5 +7,7 @@
 	<classpathentry kind="lib" path="libs/baidumapapi_v2_0_0.jar"/>
 	<classpathentry kind="lib" path="libs/locSDK_3.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ActionBarSherlock4.2.0"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
