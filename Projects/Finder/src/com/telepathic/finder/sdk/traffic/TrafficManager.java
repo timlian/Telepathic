@@ -19,6 +19,7 @@ import android.os.Message;
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.search.MKPoiInfo;
 import com.baidu.mapapi.search.MKRoute;
+import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
@@ -252,13 +253,18 @@ public class TrafficManager {
                             TaskResult<BusCard> result = task.getTaskResult();
                             Message msg = Message.obtain();
                             msg.arg1 = ITrafficeMessage.GET_BUS_CARD_RECORDS_DONE;
-                            msg.arg2 = result.getErrorCode();
-                            msg.obj  = result.getErrorMessage();
-                            mMessageHandler.sendMessage(msg);
-                            BusCard busCard = result.getResult();
-                            if (busCard != null) {
-                                mTrafficStore.store(busCard, true);
+                            if (result != null) {
+                                msg.arg2 = result.getErrorCode();
+                                msg.obj  = result.getErrorMessage();
+                                BusCard busCard = result.getResult();
+                                if (busCard != null) {
+                                    mTrafficStore.store(busCard, true);
+                                }
+                            } else {
+                                msg.arg2 = ITrafficeMessage.GET_BUS_CARD_RECORDS_FAILED;
+                                msg.obj = mContext.getResources().getString(R.string.get_bus_card_records_failed);
                             }
+                            mMessageHandler.sendMessage(msg);
                         } else {
                             Message msg = Message.obtain();
                             msg.arg1 = ITrafficeMessage.GET_BUS_CARD_RECORDS_DONE;

@@ -102,6 +102,13 @@ public class BusCardRecordFragment extends SherlockFragment {
                 page.mRecordList.onRefreshComplete();
             }
             mConsumptionDetail.requestFocusFromTouch();
+            switch(msg.arg2) {
+                case ITrafficeMessage.GET_BUS_CARD_RECORDS_FAILED:
+                    Toast.makeText(mActivity, (CharSequence)msg.obj, Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
@@ -185,10 +192,8 @@ public class BusCardRecordFragment extends SherlockFragment {
                     }
                 };
                 Collections.sort(mBusCards, cp);
-                if (mViewPagerAdapter == null) {
-                    mViewPagerAdapter = new BusCardPageAdapter();
-                    mViewPager.setAdapter(mViewPagerAdapter);
-                }
+                mViewPagerAdapter = new BusCardPageAdapter();
+                mViewPager.setAdapter(mViewPagerAdapter);
                 initTab(mBusCards);
             } else {
                 mNoItemTips.setVisibility(View.VISIBLE);
@@ -236,6 +241,8 @@ public class BusCardRecordFragment extends SherlockFragment {
             mViewPagerTabView.get(mViewPager.getCurrentItem()).setBackgroundResource(
                     R.drawable.tab_selected);
         }
+        final float curLeftDistance = mScreenWidth * 0 / TAB_COUNT;
+        mViewPagerTab.smoothScrollTo((int)curLeftDistance, 0);
     }
 
     private ProgressDialog createWaitingDialog() {
@@ -317,7 +324,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                     mTrafficService.getBusCardRecords(cardNumber, 30);
                 } else {
                     Toast.makeText(mActivity, R.string.card_id_error_notice, Toast.LENGTH_SHORT)
-                            .show();
+                    .show();
                 }
                 return true;
             }
@@ -431,6 +438,10 @@ public class BusCardRecordFragment extends SherlockFragment {
             startLoadRecords();
         }
 
+        public String getCardNumber() {
+            return mCard.getCardNumber();
+        }
+
         public View getView() {
             return mRootView;
         }
@@ -508,11 +519,16 @@ public class BusCardRecordFragment extends SherlockFragment {
         public Object instantiateItem(ViewGroup container, int position) {
             BusCardPageView pageView = null;
             if (mPageViews.size() > position) {
-                pageView = mPageViews.get(position);
+                for (BusCardPageView pView : mPageViews) {
+                    if (pView.getCardNumber().equals(mBusCards.get(position).getCardNumber())) {
+                        pageView = pView;
+                        break;
+                    }
+                }
             }
             if (pageView == null) {
                 pageView = new BusCardPageView(mBusCards.get(position));
-                mPageViews.add(pageView);
+                mPageViews.add(position, pageView);
             }
             ((ViewPager)container).addView(pageView.getView());
             return pageView.getView();

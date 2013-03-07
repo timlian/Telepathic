@@ -17,4 +17,7 @@ public interface ITrafficeMessage {
 
     int GET_BUS_LOCATION_DONE = 7;
 
+    // The error code
+    int GET_BUS_CARD_RECORDS_FAILED=1001;
+
 }
