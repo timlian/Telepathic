@@ -15,6 +15,7 @@
     <string name="menu_settings">Settings</string>
     <string name="map_not_ready">Map is not ready yet</string>
     <string name="find">Find</string>
+    <string name="clear_cache">Clear cache</string>
     <string name="bus_number_hint">Bus line number</string>
     <string name="ic_card_hint">IC card number</string>
     <string name="station_number_hint">Station GPS number</string>
