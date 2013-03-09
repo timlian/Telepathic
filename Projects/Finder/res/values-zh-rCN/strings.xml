@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">Finder</string>
+    <string name="test_activity">IC Card Records</string>
+    <string name="home_activity">Home</string>
+    <string name="title_activity_tab_home">Home</string>
+    <string name="title_activity_bus_station">BusStationActivity</string>
+
+    <!-- Tab name -->
+    <string name="bus_location">公交位置</string>
+    <string name="card_records">公交卡</string>
+    <string name="bus_stations">公交站</string>
+    <string name="menu_settings">设置</string>
+    <string name="map_not_ready">地图尚未加载完成</string>
+    <string name="find">查询</string>
+    <string name="clear_cache">Clear cache</string>
+    <string name="bus_number_hint">公交线路号</string>
+    <string name="ic_card_hint">公交卡号</string>
+    <string name="station_number_hint">公交站GPS编号</string>
+    <string name="find_bus_route">正在查询公交路线信息, 请稍等。。.</string>
+    <string name="find_ic_card_records">正在查询公交卡信息, 请稍等。。。</string>
+    <string name="find_station_information">正在查询公交站台信息, 请稍等。。.</string>
+    <string name="select_bus_route">请选择%s路行驶方向</string>
+    <string name="ok">确认</string>
+    <string name="cancel">取消</string>
+    <string name="default_city">成都</string>
+    <string name="invalid_input_hint">请输入正确的公交车路线号码</string>
+    <string name="no_item_in_db">no  item</string>
+    <string name="starting_time">发车时间: <xliff:g id="starting_time" example="6:00">%1$s</xliff:g></string>
+    <string name="ending_time">收车时间: <xliff:g id="ending_time" example="21:00">%1$s</xliff:g></string>
+    <string name="confirm_exit_title">退出</string>
+    <string name="confirm_exit_message">是否退出应用程序?</string>
+
+    <!-- consumer record retrieve -->
+    <string name="card_id_error_notice">请输入正确的公交卡号</string>
+    <string name="line_number">公交路线:</string>
+    <string name="bus_number">车辆编号:</string>
+    <string name="consumer_count">消费次数: <xliff:g id="consumer_count" example="2">%1$s</xliff:g></string>
+    <string name="consumer_amount">消费金额: <xliff:g id="consumer_amount" example="1.8">%1$s</xliff:g></string>
+    <string name="residual_count">剩余次数: <xliff:g id="residual_count" example="10">%1$s</xliff:g></string>
+    <string name="residual_amount">剩余金额: <xliff:g id="residual_amount" example="46.40">%1$s</xliff:g></string>
+
+    <!-- Drop refresh listview -->
+    <string name="release_to_refresh">Release to refresh</string>
+    <string name="pull_to_refresh">Pull down to refresh</string>
+    <string name="refreshing">正在刷新…</string>
+
+    <!-- speech recognize notice -->
+    <string name="no_voice_search_title">Notice</string>
+    <string name="no_voice_search_msg">The speech recognize function need Google Voice Search to support, do you want to download it now?</string>
+    <string name="no_voice_search_cancel">Cancel</string>
+    <string name="no_voice_search_browser">From web</string>
+    <string name="no_voice_search_download">From market</string>
+    <string name="no_market_title">No App Store</string>
+    <string name="no_market_msg">You cellphone isn\'t install any app store to handle the request. Do you want to download it from browser?</string>
+    <string name="no_market_cancel">Cancel</string>
+    <string name="no_market_download">Download from browser</string>
+    <string name="speak_busline_number">Please speak out busline number</string>
+    <string name="no_matches_busline">No matches bus line</string>
+
+    <!-- Baidu map error message definition -->
+    <string name="error_location_falied">定位失败</string>
+    <string name="error_network_connect">网络连接错误</string>
+    <string name="error_network_data">网络数据错误</string>
+    <string name="error_permission_denied">授权验证失败</string>
+    <string name="error_result_not_found">未找到搜索结果</string>
+    <string name="error_route_addr">路线搜索起点或终点有歧义</string>
+    
+    <!-- Error messages -->
+    <string name="get_bus_card_records_failed">获取公交卡信息失败.</string>
+
+</resources>
