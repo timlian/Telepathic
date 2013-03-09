@@ -8,8 +8,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -43,7 +41,6 @@ public class TrafficManager {
     private TrafficStore mTrafficStore;
     private Handler mMessageHandler;
     private ExecutorService mExecutorService;
-    private ScheduledThreadPoolExecutor mTaskScheduler;
     private BMapManager mMapManager;
     private TrafficConfig mTrafficConfig;
 
@@ -52,7 +49,6 @@ public class TrafficManager {
         mMapManager = manager;
         mMessageHandler = msgHandler;
         mExecutorService = Executors.newCachedThreadPool();
-        mTaskScheduler = new ScheduledThreadPoolExecutor(1);
         mTrafficStore =  new TrafficStore(mContext, mExecutorService);
         mTrafficConfig = new TrafficConfig();
     }
@@ -281,10 +277,10 @@ public class TrafficManager {
 
         @Override
         public void getBusLocation(final String lineNumber, final ArrayList<String> route) {
-            if (mTaskScheduler.isShutdown()) {
-                mTaskScheduler = new ScheduledThreadPoolExecutor(1);
+            if (mExecutorService.isShutdown()) {
+            	mExecutorService = Executors.newCachedThreadPool();
             }
-            mTaskScheduler.scheduleAtFixedRate(new Runnable() {
+            mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -319,17 +315,13 @@ public class TrafficManager {
                     }
                     Utils.debug(TAG, "getBusLocation finished.");
                 }
-            }, 0, 20, TimeUnit.SECONDS);
+            });
         }
 
         @Override
         public void shutDown() {
-            Utils.debug(TAG, "shutdown()");
             if (mExecutorService != null) {
                 mExecutorService.shutdownNow();
-            }
-            if (mTaskScheduler != null) {
-                mTaskScheduler.shutdownNow();
             }
         }
     }
