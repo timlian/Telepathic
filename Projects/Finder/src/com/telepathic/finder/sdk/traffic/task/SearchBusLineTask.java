@@ -6,9 +6,11 @@ import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.search.MKPoiInfo;
 import com.baidu.mapapi.search.MKPoiResult;
 import com.baidu.mapapi.search.MKSearch;
+import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
+import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusRoute;
 import com.telepathic.finder.util.Utils;
 
-public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
+public class SearchBusLineTask extends BaseTask<BDBusLine>{
     private static final String TAG = SearchBusLineTask.class.getSimpleName();
     private MKSearch mMapSearch;
     private final String mCity;
@@ -39,26 +41,23 @@ public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
     private class PoiSearchListener extends MKSearchListenerImpl {
         @Override
         public void onGetPoiResult(MKPoiResult res, int type, int error) {
-            ArrayList<MKPoiInfo> busPois = null;
-            String busLineNumber = null;
+        	BDBusLine line = new BDBusLine(mLineNumber);
             if (error == 0 || res != null) {
                 ArrayList<MKPoiInfo> allPois = res.getAllPoi();
                 if (allPois != null && allPois.size() > 0) {
-                    busPois = new ArrayList<MKPoiInfo>();
                     for (MKPoiInfo poiInfo : allPois) {
-                        // poi类型，0：普通点，1：公交站，2：公交线路，3：地铁站，4：地铁线路
+                        // poi类型:
+                    	// 0：普通点，1：公交站，
+                    	// 2：公交线路，3：地铁站，4：地铁线路
                         if (poiInfo.ePoiType == 2) {
-                            if (busLineNumber == null) {
-                                busLineNumber = Utils.parseBusLineNumber(poiInfo.name).get(0);
-                            }
-                            busPois.add(poiInfo);
+                        	line.addRoute(new BDBusRoute(poiInfo.uid, poiInfo.name, poiInfo.city));
                         }
                     }
                 }
             }
-            TaskResult<ArrayList<MKPoiInfo>> taskResult = new TaskResult<ArrayList<MKPoiInfo>>();
+            TaskResult<BDBusLine> taskResult = new TaskResult<BDBusLine>();
             taskResult.setErrorCode(error);
-            taskResult.setResult(busPois);
+            taskResult.setResult(line);
             setTaskResult(taskResult);
             synchronized (mLock) {
                 mLock.notifyAll();

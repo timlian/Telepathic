@@ -1,6 +1,5 @@
 package com.telepathic.finder.sdk.traffic;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
 import android.content.ContentResolver;
@@ -10,11 +9,11 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.baidu.mapapi.search.MKBusLineResult;
-import com.baidu.mapapi.search.MKPoiInfo;
 import com.baidu.mapapi.search.MKRoute;
 import com.baidu.mapapi.search.MKStep;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
+import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
@@ -27,14 +26,9 @@ public class TrafficStore {
      * The context resolver
      */
     private final ContentResolver mContentResolver;
-    /**
-     * The executor service
-     */
-    private final ExecutorService mExecutorService;
 
     public TrafficStore(Context context, ExecutorService service) {
         mContentResolver = context.getContentResolver();
-        mExecutorService = service;
     }
 
     public void store(final BusCard busCard, final boolean notifyChange) {
@@ -83,11 +77,13 @@ public class TrafficStore {
           }
     }
 
-    public void store(String lineNumber, ArrayList<MKPoiInfo> poisInfo) {        for (int idx = 0; idx < poisInfo.size(); idx++) {
+    public void store(String lineNumber, BDBusLine line) {        
+    	for (int idx = 0; idx < line.getRouteCount(); idx++) {
             ContentValues route = new ContentValues();
+            route.put(ITrafficData.BaiDuData.BusRoute.CITY, line.getRoute(idx).getCity());
             route.put(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, lineNumber);
-            route.put(ITrafficData.BaiDuData.BusRoute.UID, poisInfo.get(idx).uid);
-            route.put(ITrafficData.BaiDuData.BusRoute.NAME,  poisInfo.get(idx).name);
+            route.put(ITrafficData.BaiDuData.BusRoute.UID, line.getRoute(idx).getUid());
+            route.put(ITrafficData.BaiDuData.BusRoute.NAME,line.getRoute(idx).getName());
             route.put(ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME, System.currentTimeMillis());
             mContentResolver.insert(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, route);
         }

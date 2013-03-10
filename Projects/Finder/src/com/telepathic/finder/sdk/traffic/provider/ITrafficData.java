@@ -289,6 +289,10 @@ public interface ITrafficData {
              */
             String NAME = "name";
             /**
+             * The city name
+             */
+            String CITY = "city";
+            /**
              * The last update time
              */
             String LAST_UPDATE_TIME = "last_update_time";

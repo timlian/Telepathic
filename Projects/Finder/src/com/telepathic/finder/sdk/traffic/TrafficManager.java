@@ -21,6 +21,7 @@ import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
+import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
@@ -80,7 +81,7 @@ public class TrafficManager {
                         searchTask.startTask();
                         searchTask.waitTaskDone();
                         // Notify the search bus line operation finished.
-                        TaskResult<ArrayList<MKPoiInfo>> taskResult = searchTask.getTaskResult();
+                        TaskResult<BDBusLine> taskResult = searchTask.getTaskResult();
                         Message msg = Message.obtain();
                         msg.arg1 = ITrafficeMessage.SEARCH_BUS_LINE_DONE;
                         msg.arg2 = taskResult.getErrorCode();
@@ -92,7 +93,6 @@ public class TrafficManager {
                         Utils.debug(TAG, "searchBusLine is interrupted.");
                     }
                     Utils.debug(TAG, "searchBusLine(" + city + ", " + lineNumber + ") finished.");
-                    Utils.copyAppDatabaseFiles(mContext.getPackageName());
                 }
             });
         }

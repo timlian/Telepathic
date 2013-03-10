@@ -364,6 +364,7 @@ public class TrafficDataProvider extends ContentProvider {
 
             db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_ROUTE + " ("
                     + BaiDuData.BusRouteColumns._ID + " INTEGER PRIMARY KEY, "
+                    + BaiDuData.BusRouteColumns.CITY + " TEXT, "
                     + BaiDuData.BusRouteColumns.LINE_NUMBER + " TEXT, "
                     + BaiDuData.BusRouteColumns.UID + " TEXT, "
                     + BaiDuData.BusRouteColumns.NAME + " TEXT, "
