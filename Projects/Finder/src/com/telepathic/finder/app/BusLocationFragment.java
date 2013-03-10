@@ -454,11 +454,12 @@ public class BusLocationFragment extends SherlockFragment {
         mTrafficService.searchBusRoute(city, uid);
     }
 
+    
     private void updateBusLocation(MKStep station) {
         /**
          * 创建并添加第一个标记：
          */
-        OverlayItem overlayItem = new OverlayItem(station.getPoint(), "", station.getContent());
+        OverlayItem overlayItem = new OverlayItem(station.getPoint(), station.getContent(), "");
         mBusLocationOverlay.addOverlay(overlayItem);
         /**
          * 往地图上添加自定义的ItemizedOverlay

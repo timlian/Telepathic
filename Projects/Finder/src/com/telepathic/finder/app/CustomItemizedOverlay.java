@@ -11,7 +11,6 @@ import com.baidu.mapapi.map.OverlayItem;
 
 
 public class CustomItemizedOverlay extends ItemizedOverlay<OverlayItem> {
-
     private ArrayList<OverlayItem> overlayItemList = new ArrayList<OverlayItem>();
     private Context context;
 
