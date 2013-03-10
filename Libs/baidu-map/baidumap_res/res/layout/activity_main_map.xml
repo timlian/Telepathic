@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:layout_gravity="top|left|center" android:id="@id/mapview" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    <LinearLayout android:id="@id/flowview" android:background="@android:color/white" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    <RelativeLayout android:orientation="vertical" android:id="@id/topContainer" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:id="@id/header_container" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true">
+            <FrameLayout android:id="@id/headerView" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+        </LinearLayout>
+        <RelativeLayout android:id="@id/notifyView" android:background="#cc4c4c4c" android:paddingLeft="@dimen/component_edge_margin" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="45.0dip" android:layout_below="@id/header_container">
+            <TextView android:textSize="@dimen/text_size_small" android:textColor="#ffffffff" android:id="@id/notifyTV" android:padding="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="TipString" android:layout_toLeftOf="@id/naviButton" />
+            <Button android:textSize="14.0dip" android:textColor="#ffffffff" android:id="@id/naviButton" android:background="@drawable/map_btn_navi" android:visibility="gone" android:layout_width="78.0dip" android:layout_height="fill_parent" android:text="导航" android:layout_alignParentRight="true" />
+        </RelativeLayout>
+        <RelativeLayout android:layout_gravity="center" android:id="@id/topview_left" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="4.5dip" android:layout_marginTop="4.5dip" android:layout_below="@id/notifyView">
+            <ImageButton android:gravity="center" android:id="@id/locateBtn" android:background="@drawable/main_map_button_bg" android:layout_width="38.0dip" android:layout_height="38.0dip" android:src="@drawable/ft_loc_normal" android:layout_centerInParent="true" />
+            <ProgressBar android:id="@id/locProgress" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" style="@style/LocationProgressStyle" />
+        </RelativeLayout>
+        <LinearLayout android:orientation="vertical" android:id="@id/main_map_map_area_icon_layout" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:layout_marginRight="4.5dip" android:layout_below="@id/notifyView" android:layout_alignParentRight="true">
+            <ToggleButton android:id="@id/trafficToggle" android:background="@drawable/traffic_toggle_bg" android:layout_width="38.0dip" android:layout_height="38.0dip" android:checked="false" android:textOn="" android:textOff="" />
+            <ImageButton android:id="@id/layerButton" android:background="@drawable/main_map_button_bg" android:visibility="visible" android:layout_width="38.0dip" android:layout_height="38.0dip" android:src="@drawable/main_map_icon_layer" />
+            <ImageButton android:id="@id/streetScapeButton" android:background="@drawable/main_map_button_bg" android:layout_width="38.0dip" android:layout_height="38.0dip" android:src="@drawable/main_map_icon_streetscape_normal" />
+            <ImageButton android:id="@id/clearButton" android:background="@drawable/main_map_button_bg" android:visibility="visible" android:layout_width="38.0dip" android:layout_height="38.0dip" android:src="@drawable/main_map_icon_clearlayer" />
+            <ImageButton android:id="@id/arButton" android:background="@drawable/main_map_button_bg" android:visibility="visible" android:layout_width="38.0dip" android:layout_height="38.0dip" android:src="@drawable/main_map_icon_ar" />
+            <ImageButton android:id="@id/refreshSearch" android:background="@drawable/main_map_button_bg" android:visibility="gone" android:layout_width="38.0dip" android:layout_height="38.0dip" android:src="@drawable/main_map_icon_research" />
+        </LinearLayout>
+    </RelativeLayout>
+    <RelativeLayout android:gravity="bottom" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <RelativeLayout android:gravity="bottom" android:id="@id/zoomContainer" android:layout_width="fill_parent" android:layout_height="100.0dip" android:layout_marginRight="4.5dip" android:layout_marginBottom="@dimen/bottom_bar_margin" android:layout_above="@id/footerView" android:layout_alignParentRight="true" android:layout_alignWithParentIfMissing="true">
+            <ImageButton android:id="@id/zoominBtn" android:background="@drawable/zoomin_btn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" />
+            <ImageButton android:id="@id/zoomoutBtn" android:background="@drawable/zoomout_btn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/zoominBtn" android:layout_alignParentRight="true" />
+            <Button android:textColor="#ffffffff" android:id="@id/ButtonZoomStreet" android:background="@drawable/zoompop" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="40.0dip" android:text="街道" android:layout_toLeftOf="@id/zoominBtn" android:layout_alignTop="@id/zoominBtn" />
+            <Button android:textColor="#ffffffff" android:id="@id/ButtonZoomCity" android:background="@drawable/zoompop" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="40.0dip" android:text="全城" android:layout_toLeftOf="@id/zoomoutBtn" android:layout_alignTop="@id/zoomoutBtn" />
+        </RelativeLayout>
+        <LinearLayout android:layout_gravity="bottom|center" android:orientation="horizontal" android:id="@id/route_switch_container" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/bottom_bar_margin" android:layout_above="@id/footerView" android:layout_centerHorizontal="true">
+            <ImageButton android:id="@id/routePrevBtn" android:background="@drawable/btn_route_prev_node" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <ImageButton android:id="@id/routeNextBtn" android:background="@drawable/btn_route_next_node" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+        <FrameLayout android:id="@id/scale_container" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginBottom="@dimen/bottom_bar_margin" android:layout_above="@id/footerView">
+            <LinearLayout android:layout_gravity="bottom" android:orientation="vertical" android:visibility="visible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip">
+                <FrameLayout android:layout_gravity="center_horizontal" android:id="@id/frameLayout1" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <TextView android:textSize="11.0sp" android:textColor="#ffffffff" android:id="@id/btnScaleTextBG" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:singleLine="true" />
+                    <TextView android:textSize="11.0sp" android:textColor="#ff000000" android:id="@id/btnScaleText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:singleLine="true" />
+                </FrameLayout>
+                <Button android:id="@id/btnScale" android:background="@drawable/icon_scale" android:focusable="false" android:clickable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:height="7.0px" />
+            </LinearLayout>
+        </FrameLayout>
+        <View android:id="@id/glrefresh_helper" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+        <include android:id="@id/sliding_drawer" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="42.0dip" android:layout_alignParentTop="true" layout="@layout/vertical_menu" />
+        <RelativeLayout android:id="@id/footerView" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+            <LinearLayout android:gravity="bottom" android:orientation="horizontal" android:id="@id/footerView_ll" android:background="@drawable/main_map_btn_bg" android:layout_width="fill_parent" android:layout_height="48.0dip">
+                <Button android:textSize="10.0dip" android:textColor="@color/main_map_bottom_normal" android:layout_gravity="center_vertical" android:id="@id/nearBtn" android:background="@drawable/main_map_btn_bg_item" android:layout_width="80.0dip" android:layout_height="fill_parent" android:text="附近" android:drawableTop="@drawable/main_map_icon_around_check" />
+                <ImageView android:paddingTop="5.0dip" android:layout_width="1.0dip" android:layout_height="fill_parent" android:src="@drawable/main_map_bottom_div" android:scaleType="fitXY" android:baselineAlignBottom="true" />
+                <Button android:textSize="10.0dip" android:textColor="@color/main_map_bottom_normal" android:layout_gravity="center_vertical" android:id="@id/poiBtn" android:background="@drawable/main_map_btn_bg_item" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="搜索" android:drawableTop="@drawable/main_map_icon_search" android:layout_weight="1.0" />
+                <Button android:textSize="10.0dip" android:textColor="@color/main_map_bottom_normal" android:layout_gravity="center_vertical" android:id="@id/routeBtn" android:background="@drawable/main_map_btn_bg_item" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="路线" android:drawableTop="@drawable/main_map_icon_route" android:layout_weight="1.0" />
+                <Button android:textSize="10.0dip" android:textColor="@color/main_map_bottom_normal" android:layout_gravity="center_vertical" android:id="@id/navBtn" android:background="@drawable/main_map_btn_bg_item" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="导航" android:drawableTop="@drawable/main_map_icon_nav_normal" android:layout_weight="1.0" />
+                <ImageView android:paddingTop="5.0dip" android:layout_width="1.0dip" android:layout_height="fill_parent" android:src="@drawable/main_map_bottom_div" android:scaleType="fitXY" android:baselineAlignBottom="true" />
+                <ImageButton android:layout_gravity="center_vertical" android:id="@id/moreBtn" android:background="@drawable/main_map_btn_bg_item" android:layout_width="57.0dip" android:layout_height="fill_parent" android:src="@drawable/main_map_icon_my_normal" />
+            </LinearLayout>
+            <Button android:textColor="#ffffffff" android:id="@id/message_num" android:background="@drawable/icon_message_num_1" android:paddingRight="1.0dip" android:paddingBottom="1.0dip" android:clickable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:layout_marginRight="5.0dip" android:text="1" android:layout_alignRight="@id/moreBtn" android:layout_alignParentRight="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+</merge>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:paddingLeft="4.5dip" android:paddingRight="4.5dip" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:background="@drawable/main_map_popdialog_top_bg" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1.0" />
+        <ImageButton android:id="@id/PopDialog_CloseButton" android:background="@drawable/main_map_popdialog_btn_bg" android:layout_width="38.0dip" android:layout_height="38.0dip" android:src="@drawable/main_map_popdialog_close_btn" />
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:background="@drawable/main_map_popdialog_bg" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+        <LinearLayout android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="7.0dip" android:layout_marginTop="5.0dip" android:layout_marginRight="7.0dip" android:layout_weight="1.0">
+            <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="2.0dip" android:layout_marginRight="2.0dip" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="top|center" android:id="@id/map_mode_satellite" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/main_map_mode_satellite_normal" />
+                <TextView android:gravity="center" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="7.0dip" android:text="@string/map_mode_satellite" style="@style/Text.PopDialogLabel" />
+            </LinearLayout>
+            <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="2.0dip" android:layout_marginRight="2.0dip" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="top|center" android:id="@id/map_mode_plain" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/main_map_mode_plain_normal" />
+                <TextView android:gravity="center" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="7.0dip" android:text="@string/map_mode_plain" style="@style/Text.PopDialogLabel" />
+            </LinearLayout>
+            <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="2.0dip" android:layout_marginRight="2.0dip" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="top|center" android:id="@id/map_mode_3d" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/main_map_mode_3d_normal" />
+                <TextView android:gravity="center" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="7.0dip" android:text="@string/map_mode_3d" style="@style/Text.PopDialogLabel" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="7.0dip" android:layout_marginTop="10.0dip" android:layout_marginRight="7.0dip" android:layout_marginBottom="5.0dip" android:layout_weight="1.0">
+            <CheckBox android:textSize="11.0sp" android:textColor="#ff333333" android:id="@id/map_layer_Indoor" android:layout_width="fill_parent" android:layout_height="wrap_content" android:button="@drawable/main_map_layer_toggle" android:text="@string/map_layer_indoor" android:layout_weight="1.0" />
+            <CheckBox android:textSize="11.0sp" android:textColor="#ff333333" android:id="@id/map_layer_Favorite" android:layout_width="fill_parent" android:layout_height="wrap_content" android:button="@drawable/main_map_layer_toggle" android:text="@string/map_layer_favorite" android:layout_weight="1.0" />
+            <CheckBox android:textSize="11.0sp" android:textColor="#ff333333" android:id="@id/map_layer_Friend" android:layout_width="fill_parent" android:layout_height="wrap_content" android:button="@drawable/main_map_layer_toggle" android:text="@string/map_layer_friend" android:layout_weight="1.0" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

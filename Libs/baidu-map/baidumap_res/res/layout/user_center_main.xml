@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@color/listdef" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include android:id="@id/title_bar" android:layout_width="fill_parent" android:layout_height="wrap_content" layout="@layout/title_bar" />
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <ExpandableListView android:id="@id/user_footmark_list" android:background="@drawable/list_selector_background" android:fadingEdge="none" android:layout_width="fill_parent" android:layout_height="fill_parent" android:cacheColorHint="#00000000" android:divider="@drawable/list_divider" android:dividerHeight="1.0dip" android:layout_below="@id/divider" android:layout_alignParentBottom="true" />
+    </LinearLayout>
+    <RelativeLayout android:id="@id/empty" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <include android:id="@id/header" android:layout_width="fill_parent" android:layout_height="wrap_content" layout="@layout/user_center_main_header" />
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/header">
+            <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_centerVertical="true">
+                <ImageView android:id="@id/empty_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/user_center_footmark_empty" android:layout_centerHorizontal="true" />
+                <TextView android:textSize="18.0sp" android:textColor="#ff636262" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="发个评论，记录你的感受吧" android:layout_below="@id/empty_image" android:layout_centerHorizontal="true" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+</LinearLayout>

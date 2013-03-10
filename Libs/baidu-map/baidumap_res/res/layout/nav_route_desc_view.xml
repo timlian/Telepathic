@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:focusable="true" android:focusableInTouchMode="true" android:clickable="true" android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="@drawable/nav_bg_route_desc_above" android:padding="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@android:color/white" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="全程" android:singleLine="true" />
+        <TextView android:textAppearance="?android:textAppearanceLarge" android:textStyle="bold" android:textColor="@android:color/white" android:id="@id/route_desc_distance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:text="12.3" android:singleLine="true" />
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@android:color/white" android:id="@id/route_desc_distance_unit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="公里" android:singleLine="true" />
+        <TextView android:textAppearance="?android:textAppearanceLarge" android:textStyle="bold" android:textColor="@android:color/white" android:id="@id/route_desc_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:text="20" android:singleLine="true" />
+    </LinearLayout>
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="@drawable/nav_bg_route_desc_below" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <ImageView android:id="@id/end_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="10.0dip" android:src="@drawable/nav_route_result_end_point" android:scaleType="fitXY" />
+        <com.baidu.navi.ui.widget.AlwaysMarqueeTextView android:textAppearance="?android:textAppearanceLarge" android:textColor="@android:color/white" android:ellipsize="marquee" android:id="@id/route_desc_end_name" android:focusable="true" android:focusableInTouchMode="true" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="10.0dip" android:text="西二旗城铁站fgdgdfgfgfdgdfgdfgdfgfdgfdgdfgdfgfd" android:singleLine="true" android:marqueeRepeatLimit="marquee_forever" />
+    </LinearLayout>
+</LinearLayout>

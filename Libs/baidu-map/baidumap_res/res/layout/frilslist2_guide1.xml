@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@id/layoutFriGuide1" android:background="@drawable/list_selector_background" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/layoutFriTitle1" android:background="@drawable/header_bg" android:layout_width="fill_parent" android:layout_height="@dimen/title_bar_height">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/fls_guide_title" android:singleLine="true" android:layout_centerInParent="true" style="@style/Text.primaryTitle" />
+    </RelativeLayout>
+    <ScrollView android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0">
+        <LinearLayout android:orientation="vertical" android:paddingLeft="12.0dip" android:paddingRight="14.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <TextView android:textSize="16.0sp" android:textStyle="bold" android:textColor="#ff000000" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/fls_what_is" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="您是否也曾经：" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="●     迷路时在电话上怎么也说不清楚自己在哪儿" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="●     找不到朋友所描述的他所在的位置" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="●     约会时隔5分钟一个电话看看朋友到哪儿了" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="百度地图位置共享，让这一切不再困扰。" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:id="@id/frilist_guide_tip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="把你的位置实时共享给朋友，帮您实现无限可能。" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="●     通过手机通讯录找到好友，无需账号，免注册！" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="●     用短信发送好友邀请，更加及时可靠。" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="（目前仅支持Android平台，其他联系人可以通过浏览器查看您的历史位置）" />
+        </LinearLayout>
+    </ScrollView>
+    <LinearLayout android:orientation="horizontal" android:background="@drawable/beijing2" android:paddingLeft="12.0dip" android:paddingRight="14.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="8.0dip" android:layout_marginTop="16.0dip" android:layout_marginRight="8.0dip">
+        <Button android:textSize="16.0sp" android:textColor="#ff000000" android:layout_gravity="center_vertical" android:id="@id/buttonCloseGuide" android:background="@drawable/btn_default" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_marginRight="10.0dip" android:text="@string/fls_close_guide" android:layout_weight="1.0" />
+        <Button android:textSize="16.0sp" android:textColor="#ff000000" android:layout_gravity="center_vertical" android:id="@id/buttonGuideNext" android:background="@drawable/btn_default" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/fls_next_guide" android:layout_weight="1.0" />
+    </LinearLayout>
+</LinearLayout>

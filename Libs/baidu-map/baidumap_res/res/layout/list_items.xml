@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:id="@id/LinearLayout01" android:background="@drawable/list_selector_default" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="44.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:layout_gravity="center_vertical" android:id="@id/ItemImage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="8.0dip" />
+    <LinearLayout android:layout_gravity="center_vertical" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <TextView android:id="@id/ItemTitle" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="12.0dip" android:singleLine="true" style="@style/Text.primaryListTitle" />
+            <TextView android:id="@id/ItemText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_below="@id/ItemTitle" android:layout_alignLeft="@id/ItemTitle" style="@style/Text.secondaryListTitle" />
+            <TextView android:id="@id/ItemDistance" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_below="@id/ItemText" android:layout_alignLeft="@id/ItemTitle" style="@style/Text.thirdListTitle" />
+        </RelativeLayout>
+    </LinearLayout>
+    <com.baidu.BaiduMap.widget.ListImageButton android:layout_gravity="center_vertical" android:id="@id/BtnDefault" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginRight="16.0dip" />
+</LinearLayout>

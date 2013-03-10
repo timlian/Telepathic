@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/LinearLayout01" android:background="@drawable/list_selector_default" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="64.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_gravity="center_vertical" android:paddingBottom="8.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <com.baidu.BaiduMap.search.poi.widget.AsyncImageView android:id="@id/ItemImage" android:background="@drawable/poi_result_list_icon_wutu" android:padding="4.0dip" android:layout_width="73.0dip" android:layout_height="63.0dip" android:layout_marginLeft="8.0dip" android:layout_marginTop="12.0dip" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" />
+        <RelativeLayout android:id="@id/layout_title" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip" android:layout_marginTop="12.0dip" android:layout_toLeftOf="@id/llExt" android:layout_toRightOf="@id/ItemImage">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:weightSum="10.0">
+                <TextView android:id="@id/ItemTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="1.0dip" android:singleLine="true" android:layout_weight="9.0" style="@style/Text.placeListItem_Primary" />
+                <Button android:layout_gravity="center_vertical" android:id="@id/discount_count" android:background="@drawable/poi_result_list_count_bg" android:focusable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minWidth="20.0dip" android:layout_weight="1.0" />
+            </LinearLayout>
+        </RelativeLayout>
+        <LinearLayout android:orientation="horizontal" android:id="@id/llExt" android:layout_width="wrap_content" android:layout_height="24.0dip" android:layout_marginLeft="5.0dip" android:layout_marginTop="12.0dip" android:layout_marginRight="8.0dip" android:layout_alignParentRight="true">
+            <TextView android:layout_gravity="center_vertical" android:id="@id/ItemDistance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/Text.placeListItem_Second" />
+        </LinearLayout>
+        <LinearLayout android:id="@id/discount_item" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8.0dip" android:layout_below="@id/layout_title" android:layout_alignLeft="@id/layout_title">
+            <ImageView android:id="@id/discount_flag_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/poi_result_list_flag_discount" android:layout_centerVertical="true" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff333333" android:ellipsize="end" android:id="@id/discount_comment" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="2.0dip" android:layout_marginRight="12.0dip" android:maxLines="2" />
+        </LinearLayout>
+        <RelativeLayout android:id="@id/RatingItem" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8.0dip" android:layout_below="@id/discount_item" android:layout_alignLeft="@id/layout_title">
+            <LinearLayout android:id="@id/ratingbar_layout" android:layout_width="120.0dip" android:layout_height="wrap_content">
+                <RatingBar android:id="@id/place_ratingbar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="27.0dip" android:progressDrawable="@drawable/place_ratingbar" android:stepSize="0.1" style="?android:attr/ratingBarStyleSmall" />
+            </LinearLayout>
+            <TextView android:layout_gravity="center_vertical" android:id="@id/average_price" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="1.0dip" android:singleLine="true" android:layout_toRightOf="@id/ratingbar_layout" style="@style/Text.placeListItem" />
+        </RelativeLayout>
+        <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:layout_below="@id/RatingItem" android:layout_alignLeft="@id/layout_title">
+            <TextView android:id="@id/buy_count" android:layout_width="120.0dip" android:layout_height="wrap_content" android:singleLine="true" android:layout_alignParentLeft="true" android:layout_centerVertical="true" style="@style/Text.placeListItem" />
+            <TextView android:id="@id/place_tag" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_toRightOf="@id/buy_count" android:layout_centerVertical="true" style="@style/Text.placeListItem" />
+        </RelativeLayout>
+    </RelativeLayout>
+    <ImageView android:id="@id/favorite_icon" android:background="@drawable/poi_result_list_icon_fav" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_alignParentBottom="true" />
+</RelativeLayout>

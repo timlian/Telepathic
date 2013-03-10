@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/layoutFriGuide2" android:background="@drawable/list_selector_background" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/layoutFriTitle2" android:background="@drawable/header_bg" android:layout_width="fill_parent" android:layout_height="@dimen/title_bar_height">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="12.0dip" android:text="位置共享向导" android:singleLine="true" android:layout_centerInParent="true" style="@style/Text.primaryTitle" />
+    </RelativeLayout>
+    <LinearLayout android:orientation="vertical" android:paddingLeft="12.0dip" android:paddingRight="14.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/layoutFriTitle2">
+        <TextView android:textSize="16.0sp" android:textStyle="bold" android:textColor="#ff000000" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="位置共享安全么？" />
+        <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="●     每次打开地图对所有好友默认隐身，还可以针对不同好友设置隐私，免除后顾之忧。" />
+        <TextView android:textSize="14.0sp" android:textColor="#ff727272" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="●     除非你主动分享，百度不会以任何形式泄露您的位置信息" />
+    </LinearLayout>
+    <LinearLayout android:orientation="horizontal" android:background="@drawable/beijing2" android:paddingLeft="12.0dip" android:paddingRight="14.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="8.0dip" android:layout_marginTop="16.0dip" android:layout_marginRight="8.0dip" android:layout_alignParentBottom="true">
+        <Button android:textSize="16.0sp" android:textColor="#ff000000" android:layout_gravity="center_vertical" android:id="@id/buttonGuidePrev" android:background="@drawable/btn_default" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_marginRight="10.0dip" android:text="上一步" android:layout_weight="1.0" />
+        <Button android:textSize="16.0sp" android:textColor="#ff000000" android:layout_gravity="center_vertical" android:id="@id/buttonGuideGo" android:background="@drawable/btn_default" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="马上体验" android:layout_weight="1.0" />
+    </LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@color/page_bg" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:id="@id/layout01" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/LinearLayout_nav_tab" android:layout_alignParentTop="true">
+        <RelativeLayout android:background="@drawable/header_bg" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true">
+            <Button android:textSize="@dimen/title_bar_btn_tx_size" android:textColor="@color/defaultText" android:gravity="center" android:id="@id/btn_navresult_bus_back" android:background="@drawable/leftbtn" android:paddingLeft="10.0dip" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="@dimen/title_bar_btn_height" android:layout_marginLeft="@dimen/title_bar_btn_margin" android:layout_marginTop="@dimen/title_bar_btn_margin" android:text="返回" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+            <TextView android:textSize="@dimen/title_bar_title_tx_size" android:textColor="@color/defaultText" android:gravity="center" android:id="@id/title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="公交方案" android:layout_centerInParent="true" />
+        </RelativeLayout>
+        <LinearLayout android:orientation="horizontal" android:background="@drawable/list_selector_default" android:layout_width="fill_parent" android:layout_height="42.0dip" android:weightSum="2.0" android:layout_below="@id/layout01">
+            <LinearLayout android:layout_gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="center_vertical" android:id="@id/imageview_navresult_bus_startview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" />
+                <TextView android:textSize="17.0sp" android:textColor="@color/defaultText" android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/textview_navresult_bus_startname" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" />
+            </LinearLayout>
+            <LinearLayout android:layout_gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="center_vertical" android:id="@id/imageview_navresult_bus_endview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" />
+                <TextView android:textSize="17.0sp" android:textColor="@color/defaultText" android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/textview_navresult_bus_endname" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" />
+            </LinearLayout>
+        </LinearLayout>
+        <ImageView android:orientation="horizontal" android:id="@id/SpliteLine01" android:layout_width="fill_parent" android:layout_height="1.0dip" android:src="#ffd9d9d9" />
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <ExpandableListView android:id="@id/listview_navresult_busroute" android:background="#fff1f1f1" android:layout_width="fill_parent" android:layout_height="fill_parent" android:cacheColorHint="#00000000" android:divider="@drawable/list_divider" android:dividerHeight="1.0dip" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:gravity="bottom" android:orientation="horizontal" android:id="@id/LinearLayout_nav_tab" android:background="#ff333333" android:layout_width="fill_parent" android:layout_height="45.0dip" android:layout_alignParentBottom="true">
+        <LinearLayout android:layout_gravity="top" android:orientation="vertical" android:id="@id/LinearLayout_nav_tab1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <RelativeLayout android:id="@id/RelativeLayout_nav_tab1" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <Button android:textSize="14.0sp" android:textColor="#ff6d6d6d" android:id="@id/btn_navresult_bus_tab01" android:background="@drawable/btn_nav_tab_normal" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="较快捷" />
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_gravity="top" android:orientation="vertical" android:id="@id/LinearLayout_nav_tab2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <RelativeLayout android:id="@id/RelativeLayout_nav_tab2" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <Button android:textSize="14.0sp" android:textColor="#ff6d6d6d" android:id="@id/btn_navresult_bus_tab02" android:background="@drawable/btn_nav_tab" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="少换乘" />
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_gravity="top" android:orientation="vertical" android:id="@id/LinearLayout_nav_tab3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <RelativeLayout android:id="@id/RelativeLayout_nav_tab3" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <Button android:textSize="14.0sp" android:textColor="#ff6d6d6d" android:id="@id/btn_navresult_bus_tab03" android:background="@drawable/btn_nav_tab" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="少步行" />
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_gravity="top" android:orientation="vertical" android:id="@id/LinearLayout_nav_tab4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <RelativeLayout android:id="@id/RelativeLayout_nav_tab4" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <Button android:textSize="14.0sp" android:textColor="#ff6d6d6d" android:id="@id/btn_navresult_bus_tab04" android:background="@drawable/btn_nav_tab" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="不坐地铁" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:background="@android:color/white" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout android:layout_gravity="top|left|center" android:id="@id/mapview" android:background="@android:color/white" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    <LinearLayout android:id="@id/flowview" android:background="@android:color/white" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    <RelativeLayout android:orientation="vertical" android:id="@id/topContainer" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:id="@id/header_container" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true">
+            <include android:layout_width="fill_parent" android:layout_height="wrap_content" layout="@layout/title_bar" />
+        </LinearLayout>
+    </RelativeLayout>
+    <RelativeLayout android:layout_gravity="bottom" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/component_edge_margin" android:layout_marginRight="@dimen/component_edge_margin">
+        <FrameLayout android:id="@id/zoom_container" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginBottom="@dimen/bottom_bar_margin">
+            <LinearLayout android:layout_gravity="bottom|right|center" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <ImageButton android:id="@id/zoominBtn" android:background="@drawable/zoomin_btn" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <ImageButton android:id="@id/zoomoutBtn" android:background="@drawable/zoomout_btn" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </FrameLayout>
+        <FrameLayout android:id="@id/scale_container" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginBottom="@dimen/bottom_bar_margin">
+            <LinearLayout android:layout_gravity="bottom" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <FrameLayout android:layout_gravity="center_horizontal" android:id="@id/frameLayout1" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <TextView android:textSize="11.0sp" android:textColor="#ffffffff" android:id="@id/btnScaleTextBG" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:singleLine="true" />
+                    <TextView android:textSize="11.0sp" android:textColor="#ff000000" android:id="@id/btnScaleText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:singleLine="true" />
+                </FrameLayout>
+                <Button android:id="@id/btnScale" android:background="@drawable/icon_scale" android:focusable="false" android:clickable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:height="7.0px" />
+            </LinearLayout>
+        </FrameLayout>
+    </RelativeLayout>
+</FrameLayout>

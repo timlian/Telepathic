@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textSize="@dimen/Text_Size_Pixel_21" android:textColor="@color/localmap_tab_text_color" android:gravity="center" android:layout_gravity="center" android:id="@id/lm_tab_view" android:background="@drawable/localmap_tab_bg" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+</LinearLayout>

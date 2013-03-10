@@ -1,0 +1,1 @@
+function setImageUrl(e,a){var d=e.content&&e.content.data,b=e.content&&e.content.type;if(!d||!b){c=""}else{var c="data:"+b+";base64,"+d;T.g("baseInfoPic").style.backgroundImage='url("'+c+'")'}window.PlaceDataMgr.addPlaceData(a+"_img",c)};

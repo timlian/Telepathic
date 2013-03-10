@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@drawable/list_selector_background" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/RelativeLayout01" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:gravity="center_horizontal" android:id="@id/RelativeLayoutTitle02" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="25.0dip">
+            <TextView android:textSize="@dimen/Text_Size_Pixel_18" android:textColor="@color/localmap_red" android:id="@id/nav_textview_wifi_status" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+    </RelativeLayout>
+    <ListView android:id="@id/ExpandableListView01" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/RelativeLayout03" android:layout_below="@id/RelativeLayout01" style="@style/ListView.defListEx" />
+    <ScrollView android:id="@id/emptyListNote" android:background="@android:color/transparent" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/RelativeLayout03">
+        <LinearLayout android:orientation="vertical" android:background="#00000000" android:paddingLeft="12.0dip" android:paddingRight="14.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <TextView android:textSize="14.0sp" android:textColor="#ffff0000" android:layout_gravity="center_horizontal" android:id="@id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14.0dip" android:text="暂无下载，赶紧点击右侧“地区列表”进行下载！" />
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="18.0dip">
+                <TextView android:textSize="15.0sp" android:textStyle="bold" android:textColor="#ff000000" android:id="@id/TextView03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="使用导航资源包的好处：" />
+                <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:id="@id/TextView04" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginTop="10.0dip" android:text="●   导航过程中零流量查看路口引导实景图。\n" />
+                <TextView android:textSize="15.0sp" android:textStyle="bold" android:textColor="#ff000000" android:id="@id/TextView03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="注：导航离线资源包仅包含路口实景图资源（非地图数据包），不下载仍可正常使用导航功能。如需节省流量，请配合【离线地图包】使用。" />
+            </LinearLayout>
+            <TextView android:textSize="15.0sp" android:textStyle="bold" android:textColor="#ff000000" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="28.0dip" android:text="下载方式：" />
+            <TableLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:stretchColumns="1">
+                <TableRow>
+                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:gravity="right" android:layout_width="56.0dip" android:layout_height="wrap_content" android:text="方法1：" />
+                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PC官网下载后导入手机;" />
+                </TableRow>
+                <TableRow>
+                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:autoLink="web" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_column="1" android:text="地址：http://shouji.baidu.com/map/" />
+                </TableRow>
+                <TableRow>
+                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:gravity="right" android:layout_width="56.0dip" android:layout_height="wrap_content" android:text="方法2：" />
+                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="直接在手机中下载；" />
+                </TableRow>
+                <TableRow>
+                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_column="1" android:text="进入导航资源，在地区列表中点击下载。" />
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+    <LinearLayout android:id="@id/RelativeLayout03" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+        <TextView android:textSize="12.0sp" android:textColor="@android:color/white" android:gravity="center_vertical" android:background="@drawable/bg_tip" android:paddingLeft="16.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="9.0dip" android:layout_marginRight="9.0dip" android:text="@string/nav_off_map_tip" android:drawableLeft="@drawable/tip" android:drawablePadding="16.0dip" />
+    </LinearLayout>
+</RelativeLayout>

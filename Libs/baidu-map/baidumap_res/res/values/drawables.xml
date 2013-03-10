@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="drawable" name="border_color">#ffcccccc</item>
+    <item type="drawable" name="cstmBottomIcon" />
+    <item type="drawable" name="cstmTopIcon" />
+    <drawable name="app_icon">@drawable/notification_icon</drawable>
+    <item type="drawable" name="screen_background_light">#ffffffff</item>
+</resources>

@@ -1,0 +1,1 @@
+function getImgBase64(d){var a=d.url,c=d.width,j=d.height,h=d.align,i=d.quality,b=d.id,f=c?"width="+c+"&":"",k=j?"height="+j+"&":"",e=h?"align="+h+"&":"",g=i?"quality="+i+"&":"";if(!a||!c&&!j){return}scriptRequest("http://map.baidu.com/maps/services/thumbnails?"+f+k+e+g+"src="+a,"thumbnails",{cbStr:"cb",cbFun:"setImageUrl",sendUid:1})};

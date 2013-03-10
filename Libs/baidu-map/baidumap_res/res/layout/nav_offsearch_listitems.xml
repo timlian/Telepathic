@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/LinearLayout01" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="@dimen/Layout_Size_Pixel_66"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:id="@id/LinearLayout01" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="12.0dip" android:layout_marginRight="10.0dip" android:layout_toLeftOf="@id/Item_Button_off_search" android:layout_centerVertical="true">
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <TextView android:textSize="@dimen/Text_Size_Pixel_21" android:textColor="@android:color/black" android:id="@id/ItemName" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="北京市" android:layout_alignParentLeft="true" />
+            <TextView android:textSize="@dimen/Text_Size_Pixel_18" android:textColor="@android:color/black" android:id="@id/ItemSize" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" />
+            <TextView android:textSize="@dimen/Text_Size_Pixel_21" android:textColor="@android:color/black" android:id="@id/ItemStatusText" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="正在下载" android:layout_toRightOf="@id/ItemName" />
+        </RelativeLayout>
+    </LinearLayout>
+    <com.baidu.navi.download.ui.ListImageButton android:id="@id/Item_Button_off_search" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="12.0dip" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+</RelativeLayout>

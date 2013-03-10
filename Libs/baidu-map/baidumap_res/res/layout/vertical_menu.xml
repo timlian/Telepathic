@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.baidu.BaiduMap.widget.VerticalDrawer android:layout_width="fill_parent" android:layout_height="fill_parent" baidu:handle="@id/handle" baidu:content="@id/content" baidu:topOffset="40.0dip" baidu:springLength="79.0dip" baidu:contentTopOffset="-6.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:baidu="http://schemas.android.com/apk/res/com.baidu.BaiduMap">
+    <RelativeLayout android:id="@id/handle" android:background="@drawable/handle_bk" android:layout_width="fill_parent" android:layout_height="24.599976dip" />
+    <RelativeLayout android:id="@id/content" android:background="#ffe8e8e9" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <LinearLayout android:orientation="vertical" android:id="@id/headercontent" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <RelativeLayout android:orientation="horizontal" android:id="@id/enter_user_center" android:layout_width="fill_parent" android:layout_height="60.0dip" android:minHeight="60.0dip">
+                <TextView android:textSize="16.0sp" android:textColor="#ff4f4444" android:layout_gravity="center_vertical" android:id="@id/enter_user_center_title1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="13.0dip" android:text="欢迎回来，进入我的个人中心" android:layout_centerVertical="true" />
+                <TextView android:textSize="14.0sp" android:textColor="#ff4f4444" android:layout_gravity="center_vertical" android:id="@id/enter_user_center_title2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="13.0dip" android:text="登录可以同步收藏夹、\n查看个人足迹点评和图片哦~ !" android:layout_centerVertical="true" />
+                <Button android:textSize="14.0sp" android:textColor="#ffffffff" android:id="@id/enter_user_center_login" android:background="@drawable/btn_blue_normal" android:layout_width="73.29999dip" android:layout_height="36.0dip" android:layout_marginRight="13.0dip" android:text="登录" android:layout_alignRight="@id/enter_user_center_title2" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+                <ImageView android:layout_gravity="center_vertical" android:id="@id/usercenter_arrowhead" android:background="@drawable/icon_arrowhead" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="13.0dip" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+            </RelativeLayout>
+            <RelativeLayout android:orientation="horizontal" android:id="@id/event_banner_layout" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <com.baidu.BaiduMap.operateControl.view.AutoImageView android:layout_gravity="center_vertical" android:id="@id/event_banner" android:layout_width="fill_parent" android:layout_height="@dimen/operate_banner_thumb_height" android:scaleType="fitXY" android:layout_centerVertical="true" />
+                <ImageButton android:id="@id/close_banner" android:background="@android:color/transparent" android:clickable="true" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/event_banner_close" android:layout_alignRight="@id/event_banner" android:layout_alignParentRight="true" />
+            </RelativeLayout>
+        </LinearLayout>
+        <ImageView android:id="@id/split_line1" android:layout_width="fill_parent" android:layout_height="0.5dip" android:src="#ffb4b4b4" android:layout_below="@id/headercontent" />
+        <ImageView android:id="@id/split_line2" android:layout_width="fill_parent" android:layout_height="0.5dip" android:src="#fffdfdfd" android:layout_below="@id/split_line1" />
+        <GridView android:id="@id/gridcontent" android:background="#ffe8e8e9" android:scrollbars="none" android:fadingEdge="none" android:layout_width="fill_parent" android:layout_height="fill_parent" android:listSelector="@null" android:cacheColorHint="#00000000" android:stretchMode="columnWidth" android:numColumns="4" android:layout_below="@id/split_line2" />
+    </RelativeLayout>
+</com.baidu.BaiduMap.widget.VerticalDrawer>

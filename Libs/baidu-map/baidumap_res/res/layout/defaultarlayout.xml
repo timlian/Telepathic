@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.baidu.ar.gui.RotateLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:id="@id/linearLayoutLocinfo" android:background="@drawable/bg_ar_bottom" android:paddingTop="3.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+            <TextView android:textSize="15.0sp" android:textColor="#ffffffff" android:gravity="center_horizontal" android:id="@id/textView1" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="我的位置附近" />
+            <TextView android:textSize="13.0sp" android:textColor="#ff969696" android:gravity="center_horizontal" android:id="@id/textView2" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="您当前不是GPS定位，建议打开GPS以获得更高精度" />
+        </LinearLayout>
+        <ImageButton android:id="@id/btn_ar_back" android:background="@android:color/transparent" android:paddingTop="20.0dip" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/btn_ar_back" android:layout_alignParentTop="true" android:layout_alignParentRight="true" />
+        <com.baidu.BaiduMap.ar.sandTableView android:id="@id/imageView" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginTop="10.0dip" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" />
+        <RelativeLayout android:gravity="center" android:id="@id/relativeLayout3" android:background="@drawable/keyboard_popup_panel_background" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_centerVertical="true">
+            <LinearLayout android:orientation="horizontal" android:id="@id/body" android:paddingLeft="8.0dip" android:paddingTop="10.0dip" android:paddingRight="8.0dip" android:paddingBottom="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:baselineAligned="false">
+                <ProgressBar android:id="@android:id/progress" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="12.0dip" android:max="10000" style="@android:style/Widget.ProgressBar" />
+                <TextView android:textSize="14.0sp" android:textColor="#ffffffff" android:id="@id/textView1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="7.0dip" android:text="正在搜索您所需要的信息..." android:singleLine="true" />
+            </LinearLayout>
+        </RelativeLayout>
+        <RelativeLayout android:gravity="center" android:id="@id/relativeLayout4" android:background="@drawable/keyboard_popup_panel_background" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_centerVertical="true">
+            <TextView android:textSize="16.0sp" android:textColor="#ffffffff" android:id="@id/textViewtoast" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="7.0dip" android:text="网络数据错误..." android:singleLine="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+</com.baidu.ar.gui.RotateLayout>

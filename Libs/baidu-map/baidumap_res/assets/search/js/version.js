@@ -1,0 +1,1 @@
+function versionCheckCbk(a){if(window.templateVersion[window.mobileType]){if(a[window.mobileType].templateVersion!=window.templateVersion[window.mobileType]){callAppFun("refresh")}}else{if(a[window.mobileType].templateVersion!=window.templateVersion){callAppFun("refresh")}}}versionCheckCbk&&versionCheckCbk({android:{templateVersion:"1.2"},iphone:{templateVersion:"1.2"}});

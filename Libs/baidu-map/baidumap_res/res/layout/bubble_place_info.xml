@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@id/popup_place_linearlayout" android:visibility="visible" android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RatingBar android:id="@id/bubble_place_ratingbar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="1.0dip" android:progressDrawable="@drawable/place_ratingbar" android:stepSize="0.1" style="?android:attr/ratingBarStyleSmall" />
+    <TextView android:textSize="14.0sp" android:textColor="#ffffffff" android:id="@id/bubble_price_textview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="7.0dip" android:text="￥20" android:singleLine="true" />
+</LinearLayout>

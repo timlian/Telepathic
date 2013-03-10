@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/LinearLayout01" android:background="@drawable/list_selector_default" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="64.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_gravity="center_vertical" android:paddingBottom="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <com.baidu.BaiduMap.search.poi.widget.AsyncImageView android:id="@id/ItemImage" android:background="@drawable/poi_result_list_icon_wutu" android:padding="4.0dip" android:layout_width="73.0dip" android:layout_height="63.0dip" android:layout_marginLeft="6.0dip" android:layout_marginTop="8.0dip" android:layout_alignParentLeft="true" android:layout_alignParentTop="true" />
+        <RelativeLayout android:id="@id/layout_title" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip" android:layout_marginTop="8.0dip" android:layout_toLeftOf="@id/llExt" android:layout_toRightOf="@id/ItemImage">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:weightSum="10.0">
+                <TextView android:id="@id/ItemTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="1.0dip" android:singleLine="true" android:layout_weight="9.0" style="@style/Text.placeListItem_Primary" />
+                <Button android:textColor="@android:color/black" android:layout_gravity="center_vertical" android:id="@id/groupon_count" android:background="@drawable/poi_result_list_count_bg" android:focusable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minWidth="20.0dip" android:layout_weight="1.0" />
+            </LinearLayout>
+        </RelativeLayout>
+        <LinearLayout android:orientation="horizontal" android:id="@id/llExt" android:layout_width="wrap_content" android:layout_height="24.0dip" android:layout_marginLeft="5.0dip" android:layout_marginTop="8.0dip" android:layout_marginRight="8.0dip" android:layout_alignParentRight="true">
+            <TextView android:layout_gravity="center_vertical" android:id="@id/ItemDistance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/Text.placeListItem_Second" />
+        </LinearLayout>
+        <RelativeLayout android:id="@id/groupon_item" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3.0dip" android:layout_below="@id/layout_title" android:layout_alignLeft="@id/layout_title">
+            <ImageView android:id="@id/groupon_flag_image" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/poi_result_list_flag_groupon" android:layout_centerVertical="true" />
+            <TextView android:textSize="14.0sp" android:textColor="#ff333333" android:ellipsize="end" android:id="@id/groupon_comment" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="2.0dip" android:layout_marginRight="12.0dip" android:maxLines="2" android:layout_toRightOf="@id/groupon_flag_image" />
+        </RelativeLayout>
+        <RelativeLayout android:id="@id/priceItem" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3.0dip" android:layout_below="@id/groupon_item" android:layout_alignLeft="@id/layout_title">
+            <LinearLayout android:id="@id/priceExt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="23.0dip">
+                <TextView android:textSize="16.0sp" android:textStyle="bold" android:textColor="#ffff7800" android:id="@id/current_price" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="3.0dip" android:singleLine="true" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+                <TextView android:id="@id/origional_price" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_toRightOf="@id/current_price" android:layout_centerVertical="true" style="@style/Text.placeListItem_Second" />
+            </LinearLayout>
+            <TextView android:id="@id/discount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2.0dip" android:singleLine="true" android:layout_toRightOf="@id/priceExt" android:layout_centerVertical="true" style="@style/Text.placeListItem_Second" />
+        </RelativeLayout>
+        <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2.0dip" android:layout_below="@id/priceItem" android:layout_alignLeft="@id/layout_title">
+            <TextView android:id="@id/buy_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="23.0dip" android:singleLine="true" android:layout_alignParentLeft="true" android:layout_centerVertical="true" style="@style/Text.placeListItem_Second" />
+            <TextView android:id="@id/place_tag" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_toRightOf="@id/buy_count" android:layout_centerVertical="true" style="@style/Text.placeListItem_Second" />
+        </RelativeLayout>
+    </RelativeLayout>
+    <ImageView android:id="@id/favorite_icon" android:background="@drawable/poi_result_list_icon_fav" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_alignParentBottom="true" />
+</RelativeLayout>

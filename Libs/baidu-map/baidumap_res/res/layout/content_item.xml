@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:background="@drawable/content_selector" android:layout_width="fill_parent" android:layout_height="fill_parent" android:minHeight="80.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:baidu="http://schemas.android.com/apk/res/com.baidu.BaiduMap">
+    <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <com.baidu.BaiduMap.widget.TileView android:id="@id/left" android:layout_width="1.0px" android:layout_height="80.0dip" baidu:src="@drawable/gridpadding_left" />
+        <com.baidu.BaiduMap.widget.TileView android:id="@id/right" android:layout_width="1.0px" android:layout_height="80.0dip" android:layout_alignParentRight="true" baidu:src="@drawable/gridpadding_right" />
+        <com.baidu.BaiduMap.widget.TileView android:id="@id/top" android:layout_width="fill_parent" android:layout_height="1.0px" baidu:src="@drawable/gridpadding_top" />
+        <com.baidu.BaiduMap.widget.TileView android:id="@id/bottom" android:layout_width="fill_parent" android:layout_height="1.0px" android:layout_alignParentBottom="true" baidu:src="@drawable/gridpadding_bottom" />
+        <TextView android:textSize="12.0dip" android:textColor="#ff6a6c74" android:gravity="center_horizontal" android:id="@id/text" android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:drawablePadding="10.0dip" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <Button android:textSize="8.0dip" android:textStyle="bold" android:textColor="#ffffffff" android:gravity="center" android:layout_gravity="right" android:id="@id/btnHot" android:background="@drawable/icon_message_num_2" android:focusable="false" android:visibility="gone" android:clickable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:layout_marginRight="2.0dip" android:text="HOT" />
+</FrameLayout>

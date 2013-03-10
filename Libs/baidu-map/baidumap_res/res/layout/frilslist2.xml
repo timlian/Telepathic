@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewAnimator android:id="@id/animator" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include android:id="@id/guide1" layout="@layout/frilslist2_guide1" />
+    <include android:id="@id/guide2" layout="@layout/frilslist2_guide2" />
+    <RelativeLayout android:background="#fff7f7f7" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <include android:id="@id/title_bar" layout="@layout/title_bar" />
+        <TextView android:textColor="#ff808080" android:gravity="center_horizontal" android:id="@id/my_location" android:padding="5.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/title_bar" />
+        <ListView android:id="@id/list" android:scrollbars="none" android:fadingEdge="none" android:layout_width="fill_parent" android:layout_height="fill_parent" android:cacheColorHint="#00000000" android:divider="@drawable/fls_lis_divider" android:dividerHeight="1.0dip" android:layout_below="@id/my_location" />
+    </RelativeLayout>
+</ViewAnimator>

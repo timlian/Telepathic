@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="64.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip">
+        <TextView android:textSize="16.0sp" android:textColor="#ff000000" android:id="@id/ItemTitle" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="TextView01" android:singleLine="true" />
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@drawable/comment_eidt_round_bg" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="horizontal" android:id="@id/title" android:layout_width="fill_parent" android:layout_height="47.0dip" android:layout_marginTop="-3.0dip">
+        <LinearLayout android:orientation="horizontal" android:id="@id/cancel_ccontainer" android:focusable="true" android:layout_width="50.0dip" android:layout_height="46.0dip">
+            <ImageView android:layout_gravity="center" android:id="@id/comment_cancle_button" android:duplicateParentState="true" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginLeft="20.0dip" android:layout_marginRight="5.0dip" android:src="@drawable/btn_comment_cancel" />
+        </LinearLayout>
+        <TextView android:textSize="16.0dip" android:textColor="@color/comment_title_color" android:ellipsize="end" android:gravity="center" android:layout_gravity="center" android:id="@id/place_name" android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:layout_width="0.0dip" android:layout_height="fill_parent" android:text="潇湘府（上地店）" android:singleLine="true" android:layout_weight="1.0" />
+        <LinearLayout android:orientation="horizontal" android:id="@id/confirm_container" android:focusable="true" android:layout_width="50.0dip" android:layout_height="46.0dip">
+            <ImageView android:layout_gravity="center" android:id="@id/comment_confirm_button" android:duplicateParentState="true" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginLeft="10.0dip" android:layout_marginRight="-10.0dip" android:src="@drawable/btn_comment_confirm" />
+        </LinearLayout>
+    </LinearLayout>
+    <com.baidu.BaiduMap.search.poi.widget.NoTouchScrollView android:focusable="false" android:focusableInTouchMode="false" android:clickable="false" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginTop="5.0dip">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginBottom="0.0dip">
+            <LinearLayout android:orientation="horizontal" android:id="@id/satisfy_btn_bar" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginTop="0.0dip" android:layout_marginRight="10.0dip" android:layout_marginBottom="6.0dip">
+                <LinearLayout android:orientation="horizontal" android:id="@id/satisfy_btn_container" android:background="@drawable/select_recomment_normal_left" android:clickable="true" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_marginRight="-1.0dip" android:layout_weight="1.0">
+                    <ImageView android:layout_gravity="center" android:id="@id/satisfy_img" android:focusable="true" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="13.0dip" android:src="@drawable/icon_satisfy" />
+                    <TextView android:textSize="16.0dip" android:textColor="@color/comment_title_color" android:gravity="center" android:layout_gravity="center" android:id="@id/satisfy_title" android:layout_width="0.0dip" android:layout_height="fill_parent" android:text="@string/satisfy_text" android:layout_weight="1.0" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/justso_btn_container" android:background="@drawable/select_recomment_normal_middle" android:clickable="true" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_marginRight="-1.0dip" android:layout_weight="1.0">
+                    <ImageView android:layout_gravity="center" android:id="@id/justso_img" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="13.0dip" android:src="@drawable/icon_general" />
+                    <TextView android:textSize="16.0dip" android:textColor="@color/comment_title_color" android:gravity="center" android:layout_gravity="center" android:id="@id/justso_title" android:paddingLeft="5.0dip" android:paddingRight="5.0dip" android:layout_width="0.0dip" android:layout_height="fill_parent" android:text="@string/justso_text" android:layout_weight="1.0" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:id="@id/unsatisfy_btn_container" android:background="@drawable/select_recomment_normal_right" android:clickable="true" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+                    <ImageView android:layout_gravity="center" android:id="@id/unsatisfy_img" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="7.0dip" android:src="@drawable/icon_unsatisfy" />
+                    <TextView android:textSize="16.0dip" android:textColor="@color/comment_title_color" android:gravity="center" android:layout_gravity="center" android:id="@id/unsatisfy_title" android:paddingLeft="0.0dip" android:paddingRight="2.0dip" android:layout_width="0.0dip" android:layout_height="fill_parent" android:text="@string/unsatisfy_text" android:singleLine="true" android:layout_weight="1.0" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:orientation="vertical" android:id="@id/comment_edit_ccontainer" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginTop="2.0dip" android:layout_marginRight="10.0dip" android:layout_marginBottom="15.0dip">
+                <LinearLayout android:orientation="horizontal" android:background="@drawable/input_up_bg" android:focusable="true" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                    <com.baidu.BaiduMap.widget.LineEditText android:textSize="16.0dip" android:textColor="#ffbbbbbb" android:gravity="top|left|center" android:id="@id/add_comment_et" android:background="#00000000" android:paddingLeft="10.0dip" android:scrollbars="vertical" android:layout_width="fill_parent" android:layout_height="99.0dip" android:layout_marginTop="5.0dip" android:hint="@string/comment_input_hint" android:maxLength="3000" />
+                </LinearLayout>
+                <View android:id="@id/sectionView" android:background="#ffd8d8d8" android:layout_width="fill_parent" android:layout_height="2.0dip" android:layout_marginLeft="-2.0dip" android:layout_marginTop="0.0dip" android:layout_marginRight="-2.0dip" />
+                <LinearLayout android:orientation="horizontal" android:id="@id/pay_input_container" android:background="@drawable/input_down_bg" android:focusable="true" android:layout_width="fill_parent" android:layout_height="40.0dip">
+                    <TextView android:textSize="16.0dip" android:textColor="#ff4b4d51" android:gravity="center" android:id="@id/pay_title" android:background="#ffffffff" android:paddingTop="5.0dip" android:paddingBottom="5.0dip" android:layout_width="100.0dip" android:layout_height="fill_parent" android:text="@string/avepay_title" />
+                    <EditText android:textSize="16.0dip" android:textColor="#ffbbbbbb" android:id="@id/avgpay_input_et" android:background="#ffffffff" android:paddingLeft="2.0dip" android:focusable="true" android:clickable="true" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginTop="-1.0dip" android:layout_marginRight="10.0dip" android:layout_marginBottom="0.0dip" android:hint="@string/avepay_input_hint" android:maxLength="6" android:inputType="number" style="?android:attr/textViewStyle" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </com.baidu.BaiduMap.search.poi.widget.NoTouchScrollView>
+</LinearLayout>

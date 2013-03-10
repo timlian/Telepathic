@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:id="@id/border_holder" android:background="@drawable/border_color" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="horizontal" android:id="@id/LinearLayout01" android:background="@drawable/normal_bk_color" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="44.0dip">
+        <ImageView android:layout_gravity="center_vertical" android:id="@id/ItemImage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="12.0dip" android:layout_alignParentLeft="true" />
+        <TextView android:layout_gravity="center_vertical" android:id="@id/BtnTelDetail" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="12.0dip" android:layout_marginRight="15.0dip" android:singleLine="true" android:layout_toRightOf="@id/ItemImage" style="@style/Text.primaryListTitle" />
+    </LinearLayout>
+</FrameLayout>

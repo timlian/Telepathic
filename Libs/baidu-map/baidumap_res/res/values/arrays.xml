@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="roadsearchpointoption">
+        <item>使用我的位置</item>
+        <item>在地图上选取</item>
+        <item>从收藏夹选择</item>
+    </string-array>
+    <string-array name="roadsearchpointhints">
+        <item>输入起点…</item>
+        <item>输入终点…</item>
+        <item>我的位置</item>
+        <item>地图上的点</item>
+        <item>收藏夹</item>
+    </string-array>
+    <string-array name="poi_nearby_center_types">
+        <item>使用我的位置</item>
+        <item>在地图上选取</item>
+        <item>从收藏夹选择</item>
+        <item>输入中心点</item>
+    </string-array>
+    <array name="cstmBottomKey" />
+    <array name="cstmBottomValue" />
+    <array name="cstmTopKey" />
+    <array name="cstmTopValue" />
+    <string-array name="main_map_poi_config">
+        <item>折扣[20130128,20130209]</item>
+        <item>优惠</item>
+        <item>团购</item>
+        <item>KTV</item>
+        <item>电影院</item>
+        <item>景点</item>
+    </string-array>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/widget33" android:background="@drawable/list_selector_default" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include android:id="@id/title_bar" android:layout_width="fill_parent" android:layout_height="wrap_content" layout="@layout/title_bar" />
+    <WebView android:id="@id/webview" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/title_bar" style="@style/ListView.defList" />
+    <LinearLayout android:gravity="center" android:orientation="vertical" android:id="@id/soft_recommend_loading_layout" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <ProgressBar android:id="@id/soft_recommend_loading_pbar" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <TextView android:id="@id/soft_recommend_loading_textview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loading_page" />
+        <TextView android:id="@id/error" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/net_error" />
+    </LinearLayout>
+</RelativeLayout>

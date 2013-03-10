@@ -1,0 +1,1 @@
+function makeDataAndSave(a,b){window.saveData=a;return checkAndSaveData(b)};

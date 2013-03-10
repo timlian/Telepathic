@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@color/page_bg" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:background="@drawable/header_bg" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <Button android:textSize="@dimen/title_bar_btn_tx_size" android:textColor="@android:color/black" android:gravity="center" android:id="@id/title_btn_left" android:background="@drawable/title_left_btn" android:paddingLeft="10.0dip" android:paddingRight="10.0dip" android:layout_width="wrap_content" android:layout_height="@dimen/title_bar_btn_height" android:layout_marginLeft="@dimen/title_bar_btn_margin" android:layout_marginTop="@dimen/title_bar_btn_margin" android:text="@string/title_back" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <RadioGroup android:gravity="center" android:layout_gravity="center" android:orientation="horizontal" android:id="@id/title_bar_radio_group" android:layout_width="wrap_content" android:layout_height="@dimen/title_bar_btn_height" android:checkedButton="@id/title_btn_local_map" android:layout_centerInParent="true">
+            <RadioButton android:textSize="@dimen/title_bar_btn_tx_size" android:textColor="@color/tab_bar_color" android:id="@id/title_btn_local_map" android:background="@drawable/tab_bar_btn_left" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:minWidth="60.0dip" android:minHeight="33.0dip" android:text="@string/lm_title_local_map" />
+            <RadioButton android:textSize="@dimen/title_bar_btn_tx_size" android:textColor="@color/tab_bar_color" android:id="@id/title_btn_navigation" android:background="@drawable/tab_bar_btn_right" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:minWidth="60.0dip" android:minHeight="33.0dip" android:text="@string/lm_title_navigation" />
+        </RadioGroup>
+    </RelativeLayout>
+    <TabHost android:id="@id/tabhost" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent"
+      xmlns:android="http://schemas.android.com/apk/res/android">
+        <LinearLayout android:orientation="vertical" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <TabWidget android:id="@android:id/tabs" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="40.0dip" />
+            <FrameLayout android:id="@android:id/tabcontent" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                <RelativeLayout android:id="@id/lm_layout_dl" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                    <LinearLayout android:gravity="center_horizontal" android:id="@id/lm_layout_dl_wifi_status" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="25.0dip">
+                        <TextView android:textSize="@dimen/Text_Size_Pixel_18" android:textColor="@color/localmap_red" android:id="@id/lm_textview_wifi_status" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                        <TextView android:textSize="@dimen/Text_Size_Pixel_18" android:textColor="@color/localmap_red" android:id="@id/lm_textview_saved_bytes" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <LinearLayout android:orientation="vertical" android:id="@id/lm_layout_dl_downloading" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/lm_layout_dl_tips" android:layout_below="@id/lm_layout_dl_wifi_status">
+                        <ListView android:id="@id/lm_listview_dl_downloading" android:layout_width="fill_parent" android:layout_height="fill_parent" android:fastScrollEnabled="true" style="@style/ListView.defList" />
+                    </LinearLayout>
+                    <ScrollView android:id="@id/lm_layout_dl_no_task" android:background="@android:color/transparent" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/lm_layout_dl_tips">
+                        <LinearLayout android:orientation="vertical" android:background="#00000000" android:paddingLeft="12.0dip" android:paddingRight="14.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                            <TextView android:textSize="14.0sp" android:textColor="#ffff0000" android:layout_gravity="center_horizontal" android:id="@id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14.0dip" android:text="暂无下载，赶紧点击右侧“城市列表”进行下载！" />
+                            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="18.0dip">
+                                <TextView android:textSize="15.0sp" android:textStyle="bold" android:textColor="#ff000000" android:id="@id/TextView03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="使用离线地图的好处：" />
+                                <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:id="@id/TextView04" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginTop="10.0dip" android:text="●   节省90%的手机流量" />
+                                <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:id="@id/TextView05" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_marginTop="3.0dip" android:text="●   地图浏览健步如飞" />
+                            </LinearLayout>
+                            <TextView android:textSize="15.0sp" android:textStyle="bold" android:textColor="#ff000000" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="28.0dip" android:text="下载方式：" />
+                            <TableLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:stretchColumns="1">
+                                <TableRow>
+                                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:gravity="right" android:layout_width="56.0dip" android:layout_height="wrap_content" android:text="方法1：" />
+                                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PC官网下载后导入手机；" />
+                                </TableRow>
+                                <TableRow>
+                                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:autoLink="web" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_column="1" android:text="地址：http://shouji.baidu.com/map/" />
+                                </TableRow>
+                                <TableRow>
+                                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:gravity="right" android:layout_width="56.0dip" android:layout_height="wrap_content" android:text="方法2：" />
+                                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="直接在手机中下载；" />
+                                </TableRow>
+                                <TableRow>
+                                    <TextView android:textSize="14.0sp" android:textColor="#ff363636" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_column="1" android:text="进入离线地图，在城市列表中点击下载" />
+                                </TableRow>
+                            </TableLayout>
+                        </LinearLayout>
+                    </ScrollView>
+                    <LinearLayout android:id="@id/lm_layout_dl_tips" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+                        <TextView android:textSize="12.0sp" android:textColor="@android:color/white" android:gravity="center_vertical" android:id="@id/lm_textview_dl_tips" android:background="@drawable/bg_tip" android:paddingLeft="16.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="9.0dip" android:layout_marginRight="9.0dip" android:drawableLeft="@drawable/tip" android:drawablePadding="16.0dip" />
+                    </LinearLayout>
+                </RelativeLayout>
+                <RelativeLayout android:id="@id/lm_layout_cl" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                    <RelativeLayout android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/lm_layout_cl_search_top" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="3.0dip" android:layout_marginBottom="2.0dip" android:layout_alignParentLeft="true" android:layout_alignParentTop="true">
+                        <EditText android:textSize="@dimen/Text_Size_Pixel_21" android:textColor="#ff6d6d6d" android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/lm_edittext_cl_search" android:background="@drawable/search_box" android:layout_width="fill_parent" android:layout_height="32.0dip" android:layout_marginLeft="5.0dip" android:layout_marginRight="5.0dip" android:hint="输入城市名" android:singleLine="true" android:maxLength="20" />
+                        <ImageButton android:id="@id/lm_button_cl_search_delete" android:background="@android:color/transparent" android:visibility="gone" android:layout_width="30.0dip" android:layout_height="30.0dip" android:layout_margin="1.0dip" android:src="@drawable/btn_icon_delete" android:layout_alignRight="@id/lm_edittext_cl_search" android:layout_centerVertical="true" />
+                    </RelativeLayout>
+                    <LinearLayout android:orientation="vertical" android:id="@id/lm_layout_cl_all" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/lm_layout_cl_search_top">
+                        <ListView android:id="@id/lm_listview_cl_all" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/ListView.defList" />
+                    </LinearLayout>
+                    <LinearLayout android:orientation="vertical" android:id="@id/lm_layout_cl_province_detail" android:background="@android:color/transparent" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/lm_layout_cl_search_top">
+                        <ListView android:id="@id/lm_listview_cl_province_detail" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/ListView.defList" />
+                    </LinearLayout>
+                    <FrameLayout android:orientation="vertical" android:id="@id/lm_layout_cl_search_list" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/lm_layout_cl_search_top">
+                        <ListView android:id="@id/lm_listview_cl_search_list" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/ListView.defList" />
+                        <TextView android:textSize="16.0sp" android:textColor="@android:color/black" android:layout_gravity="center_horizontal" android:id="@id/lm_textview_cl_noresult" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="30.0dip" android:text="未找到相关城市" />
+                    </FrameLayout>
+                </RelativeLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+    <include layout="@layout/nav_off_download_tabhost_layout" />
+</LinearLayout>

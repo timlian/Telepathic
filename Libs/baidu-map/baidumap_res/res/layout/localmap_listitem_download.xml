@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@android:color/transparent" android:descendantFocusability="blocksDescendants" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/lm_ld_download" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <ImageView android:id="@id/lm_ld_ItemImageIndicator" android:background="@drawable/expander_ic_minimized" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="12.0dip" android:layout_marginRight="12.0dip" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        <LinearLayout android:orientation="vertical" android:id="@id/lm_ld_LinearLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="12.0dip" android:layout_toLeftOf="@id/lm_ld_ItemImageIndicator" android:layout_centerVertical="true">
+            <TableLayout android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:stretchColumns="1" android:shrinkColumns="0">
+                <TableRow android:gravity="center_vertical" android:id="@id/tableRow1" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="@dimen/Layout_Size_Pixel_66">
+                    <TextView android:textSize="@dimen/Text_Size_Pixel_21" android:textColor="@android:color/black" android:ellipsize="end" android:id="@id/lm_ld_ItemName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" />
+                    <TextView android:textSize="@dimen/Text_Size_Pixel_21" android:textColor="@android:color/black" android:ellipsize="none" android:id="@id/lm_ld_ItemSize" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" />
+                    <TextView android:textSize="@dimen/Text_Size_Pixel_18" android:textColor="@android:color/black" android:ellipsize="none" android:id="@id/lm_ld_ItemStateTips" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" />
+                </TableRow>
+            </TableLayout>
+            <ProgressBar android:id="@id/lm_ld_ProgressBar01" android:layout_width="fill_parent" android:layout_height="10.0dip" android:layout_marginTop="6.0dip" android:layout_marginBottom="6.0dip" android:max="100" android:progressDrawable="@drawable/progressbar_normal" style="?android:attr/progressBarStyleHorizontal" />
+            <ProgressBar android:id="@id/lm_ld_ProgressBarStop" android:layout_width="fill_parent" android:layout_height="10.0dip" android:layout_marginTop="6.0dip" android:layout_marginBottom="6.0dip" android:max="100" android:progressDrawable="@drawable/progressbar_disabled" style="?android:attr/progressBarStyleHorizontal" />
+        </LinearLayout>
+    </RelativeLayout>
+    <com.baidu.BaiduMap.map.localmap.DownloadCityLayout android:orientation="horizontal" android:id="@id/lm_ld_LinearLayout02" android:background="@android:color/transparent" android:clickable="true" android:layout_width="fill_parent" android:layout_height="@dimen/Layout_Size_Pixel_66" android:layout_marginLeft="12.0dip" android:layout_marginRight="12.0dip">
+        <Button android:textSize="15.0sp" android:textColor="@android:color/black" android:layout_gravity="center_vertical" android:id="@id/lm_ld_Button00" android:background="@drawable/btn_default" android:focusable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="6.0dip" android:text="查看地图" android:layout_weight="1.0" />
+        <Button android:textSize="15.0sp" android:textColor="@android:color/black" android:layout_gravity="center_vertical" android:id="@id/lm_ld_Button01" android:background="@drawable/btn_default" android:focusable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="开始下载" android:layout_weight="1.0" />
+        <Button android:textSize="15.0sp" android:textColor="@android:color/black" android:layout_gravity="center_vertical" android:id="@id/lm_ld_Button02" android:background="@drawable/btn_default" android:focusable="false" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="6.0dip" android:text="　删除　" android:layout_weight="1.0" />
+    </com.baidu.BaiduMap.map.localmap.DownloadCityLayout>
+</LinearLayout>

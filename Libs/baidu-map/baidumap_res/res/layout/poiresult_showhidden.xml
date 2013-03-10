@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:gravity="center_horizontal" android:id="@id/page_showhidden_layout" android:background="@drawable/poi_hidden_background" android:paddingTop="23.0dip" android:paddingBottom="23.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/showHiddenImage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/poi_hidden_image" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    <TextView android:textSize="15.0dip" android:textColor="#ff767676" android:id="@id/showHiddenText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="5.0dip" android:layout_toLeftOf="@id/showHiddenImage" android:layout_centerVertical="true" />
+</RelativeLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@drawable/nav_list_selector_default" android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:textColor="#ff333333" android:id="@id/RelativeLayout_option_top" android:background="@drawable/nav_bg_route_result_title" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true">
+        <TextView android:textAppearance="?android:textAppearanceLarge" android:textColor="#ff333333" android:gravity="center" android:id="@id/TextView_option" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/menu_app_navi_set" android:layout_centerVertical="true" />
+        <Button android:textColor="#ff333333" android:id="@id/nav_option_retrun" android:background="@drawable/nav_btn_back" android:layout_width="52.0dip" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip" android:text="返回" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <ListView android:id="@id/ListView_option" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/RelativeLayout_option_top" style="@style/ListView.defList" />
+</RelativeLayout>

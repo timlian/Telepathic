@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost android:id="@id/nav_tabhost" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <TabWidget android:id="@android:id/tabs" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="40.0dip" />
+        <FrameLayout android:id="@android:id/tabcontent" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <include android:id="@id/nav_dl_offman_layout" layout="@layout/nav_off_res_man" />
+            <include android:id="@id/nav_dl_offsearch_layout" layout="@layout/nav_offsearch" />
+        </FrameLayout>
+    </LinearLayout>
+</TabHost>

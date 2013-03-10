@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:id="@id/route_node_item" android:layout_width="fill_parent" android:layout_height="90.0px" android:divider="@drawable/nav_route_result_item_divider" android:dividerHeight="1.0px"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:layout_gravity="center_vertical" android:id="@id/next_turn_icon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="8.0dip" android:layout_marginTop="5.0dip" android:layout_marginRight="4.0dip" android:layout_marginBottom="5.0dip" />
+    <TextView android:textSize="18.0dip" android:textColor="#ff666666" android:layout_gravity="center_vertical" android:id="@id/next_road" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="4.0dip" android:layout_marginTop="5.0dip" android:layout_marginRight="12.0dip" android:layout_marginBottom="5.0dip" />
+</LinearLayout>

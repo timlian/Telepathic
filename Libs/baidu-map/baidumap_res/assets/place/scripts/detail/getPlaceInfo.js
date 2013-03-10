@@ -1,0 +1,1 @@
+function getPlaceInfo(f,d,c,b,e){b=b||config.dataUrl+"/detail";d=d||{qt:"ninf",uid:window.poiInfo.uid,from:"webview",os:"map_"+window.mobileType+"_app"};e=e||"getPlaceInfo";c={cbFun:f,sendUid:1};b=b+"?t="+Date.now();for(var a in d){if(d.hasOwnProperty(a)&&d[a]){b=b+"&"+a+"="+d[a]}}scriptRequest(b,e,c)};

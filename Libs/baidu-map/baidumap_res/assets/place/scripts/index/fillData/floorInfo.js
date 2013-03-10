@@ -1,0 +1,1 @@
+function floorInfo(b,a){resetTemp.floorInfo=resetTemp.floorInfo||{};resetTemp.floorInfo.floor=resetTemp.floorInfo.floor||b;T.g("floorCon").innerHTML='<img src="../img/transparent.gif" class="iconfloor"/><a href="javascript:void(0)" onclick="addStat(\''+STAT_INDEX_CLICK_FLOOR+"');callAppFun('newwindow',{page:'floor.html'})\">楼层分布</a>";T.g("floorCon").style.display=""};

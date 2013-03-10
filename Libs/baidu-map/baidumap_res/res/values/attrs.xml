@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="handle" format="reference" />
+    <attr name="content" format="reference" />
+    <attr name="topOffset" format="reference|dimension" />
+    <attr name="bottomOffset" format="reference|dimension" />
+    <attr name="springLength" format="reference|dimension" />
+    <attr name="contentTopOffset" format="reference|dimension" />
+    <attr name="src" format="reference" />
+    <attr name="max" format="integer" />
+    <attr name="fill" format="boolean" />
+    <attr name="paint_width" format="reference|dimension" />
+    <attr name="paint_color" format="reference|color" />
+    <attr name="inside_interval" format="reference|dimension" />
+    <attr name="text_color" format="reference|color" />
+</resources>

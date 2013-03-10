@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="horizontal" android:background="#ffe2e2e3" android:layout_width="fill_parent" android:layout_height="44.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textSize="16.0sp" android:textColor="#ff696970" android:id="@id/user_info_bottom_tv" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="加载更多..." />
+    <ProgressBar android:layout_gravity="center_vertical" android:id="@id/user_info_bottom_progressbar" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+</LinearLayout>

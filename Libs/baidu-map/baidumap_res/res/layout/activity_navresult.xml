@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@color/page_bg" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@id/LinearLayout_nav_tab" android:layout_alignParentTop="true">
+        <include android:layout_width="fill_parent" android:layout_height="wrap_content" layout="@layout/title_bar" />
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:weightSum="2.0">
+            <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="44.0dip" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="center_vertical" android:id="@id/imageview_navresult_startview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" />
+                <TextView android:textSize="17.0sp" android:textColor="@color/defaultText" android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/textview_navresult_startname" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" />
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="44.0dip" android:layout_weight="1.0">
+                <ImageView android:layout_gravity="center_vertical" android:id="@id/imageview_navresult_endview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" />
+                <TextView android:textSize="17.0sp" android:textColor="@color/defaultText" android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/textview_navresult_endname" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:paddingBottom="10.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:weightSum="2.0">
+            <TextView android:textColor="@color/defaultText" android:gravity="center_vertical" android:id="@id/textview_navresult_disance" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_weight="1.0" />
+            <TextView android:textColor="@color/defaultText" android:gravity="center_vertical" android:id="@id/textview_navresult_fee" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:layout_weight="1.0" />
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:weightSum="2.0">
+            <Button android:textSize="16.0sp" android:textColor="@color/defaultText" android:id="@id/btn_navresult_realnav" android:background="@drawable/title_right_btn" android:paddingLeft="10.0dip" android:layout_width="fill_parent" android:layout_height="44.0dip" android:text="导航" android:drawableLeft="@drawable/btn_icon_car" android:layout_weight="1.0" />
+            <Button android:textSize="16.0sp" android:textColor="@color/defaultText" android:id="@id/btn_navresult_fakenav" android:background="@drawable/title_right_btn" android:paddingLeft="10.0dip" android:layout_width="fill_parent" android:layout_height="44.0dip" android:layout_marginLeft="-1.0dip" android:text="模拟导航" android:drawableLeft="@drawable/btn_icon_car2" android:layout_weight="1.0" />
+        </LinearLayout>
+        <RelativeLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <ListView android:id="@id/listview_navresult_route" android:background="#fff1f1f1" android:fadingEdge="none" android:layout_width="fill_parent" android:layout_height="wrap_content" android:cacheColorHint="#00000000" android:divider="@drawable/list_divider" android:dividerHeight="1.0dip" />
+        </RelativeLayout>
+    </LinearLayout>
+    <LinearLayout android:gravity="bottom" android:orientation="horizontal" android:id="@id/LinearLayout_nav_tab" android:background="#ff333333" android:layout_width="fill_parent" android:layout_height="45.0dip" android:layout_alignParentBottom="true">
+        <LinearLayout android:layout_gravity="top" android:orientation="vertical" android:id="@id/LinearLayout_nav_tab1_5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <RelativeLayout android:id="@id/RelativeLayout_nav_tab1_5" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <Button android:textSize="14.0sp" android:textColor="@color/tab_not_selected" android:id="@id/btn_navresult_tab015" android:background="@drawable/btn_nav_tab" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="避开拥堵" />
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_gravity="top" android:orientation="vertical" android:id="@id/LinearLayout_nav_tab1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <RelativeLayout android:id="@id/RelativeLayout_nav_tab1" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <Button android:textSize="14.0sp" android:textColor="@color/tab_selected" android:id="@id/btn_navresult_tab01" android:background="@drawable/btn_nav_tab_normal" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="最少时间" />
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_gravity="top" android:orientation="vertical" android:id="@id/LinearLayout_nav_tab2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <RelativeLayout android:id="@id/RelativeLayout_nav_tab2" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <Button android:textSize="14.0sp" android:textColor="@color/tab_not_selected" android:id="@id/btn_navresult_tab02" android:background="@drawable/btn_nav_tab" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="最短距离" />
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_gravity="top" android:orientation="vertical" android:id="@id/LinearLayout_nav_tab3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <RelativeLayout android:id="@id/RelativeLayout_nav_tab3" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <Button android:textSize="14.0sp" android:textColor="@color/tab_not_selected" android:id="@id/btn_navresult_tab03" android:background="@drawable/btn_nav_tab" android:layout_width="fill_parent" android:layout_height="fill_parent" android:text="不走高速" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

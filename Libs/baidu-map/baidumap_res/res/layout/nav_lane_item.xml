@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:background="#ff3d3d3d" android:layout_width="34.0dip" android:layout_height="45.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:layout_gravity="center" android:id="@id/nav_lane_item_direct_img" android:layout_width="19.0dip" android:layout_height="22.0dip" />
+    <View android:layout_gravity="right" android:id="@id/nav_lane_item_div" android:background="@drawable/nav_lane_div" android:layout_width="2.0px" android:layout_height="fill_parent" />
+</FrameLayout>

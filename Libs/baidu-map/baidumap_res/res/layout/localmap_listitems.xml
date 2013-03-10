@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="@dimen/Layout_Size_Pixel_66"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="12.0dip" android:layout_marginRight="10.0dip" android:layout_toLeftOf="@id/lm_l_Item_Button_download" android:layout_centerVertical="true">
+        <TextView android:textSize="@dimen/Text_Size_Pixel_21" android:textColor="@android:color/black" android:id="@id/lm_l_ItemName" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentLeft="true" />
+        <TextView android:textSize="@dimen/Text_Size_Pixel_21" android:textColor="@android:color/black" android:id="@id/lm_l_ItemStatusText" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@id/lm_l_ItemName" />
+        <TextView android:textSize="@dimen/Text_Size_Pixel_18" android:textColor="@android:color/black" android:id="@id/lm_l_ItemSize" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" />
+    </RelativeLayout>
+    <com.baidu.BaiduMap.widget.ListImageButton android:id="@id/lm_l_Item_Button_download" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="12.0dip" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+</RelativeLayout>

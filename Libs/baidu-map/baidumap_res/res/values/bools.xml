@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="buildNumberVisable">false</bool>
+    <bool name="oemNumberVisable">false</bool>
+    <bool name="publicTesting">false</bool>
+    <bool name="enableUpdate">true</bool>
+    <bool name="bNotifyExitDialog">true</bool>
+    <bool name="bExitWithBack">false</bool>
+    <bool name="bCountAppInRom">false</bool>
+    <bool name="enableSoftwareRecommend">true</bool>
+    <bool name="enableLocationSharing">true</bool>
+    <bool name="enableCallTelephone">true</bool>
+    <bool name="bGPRSAccessMode">true</bool>
+    <bool name="enableVoiceSearch">true</bool>
+    <bool name="showWarranty">false</bool>
+    <bool name="enablePushService">true</bool>
+    <bool name="enableBaiduNavi">true</bool>
+    <bool name="enableAR">true</bool>
+    <bool name="enableLogToSdcard">false</bool>
+    <bool name="enableLogToLogcat">false</bool>
+    <bool name="enableLogUserOperation">true</bool>
+    <bool name="enableLogParameter">true</bool>
+    <bool name="enableFetionShare">false</bool>
+    <bool name="flowHintVisable">false</bool>
+    <bool name="navDebugDemoGPS">false</bool>
+    <bool name="navDebugGpsTrack">false</bool>
+    <bool name="navDebugSetTrackStartEnd">false</bool>
+    <bool name="navDebugLog">true</bool>
+    <bool name="navDebugRoadTest">false</bool>
+    <bool name="navDebugOffResUpdate">false</bool>
+</resources>

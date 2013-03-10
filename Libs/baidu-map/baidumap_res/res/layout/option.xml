@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@drawable/list_selector_default" android:layout_width="wrap_content" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:id="@id/RelativeLayout_option_top" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true">
+        <include android:layout_width="fill_parent" android:layout_height="wrap_content" layout="@layout/title_bar" />
+    </RelativeLayout>
+    <ListView android:id="@id/listView_option" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/RelativeLayout_option_top" style="@style/ListView.defList" />
+</RelativeLayout>

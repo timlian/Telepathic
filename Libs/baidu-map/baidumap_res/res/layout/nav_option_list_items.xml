@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:id="@id/option_list_RelativeLayout" style="@style/NavListViewItem"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:layout_gravity="center_vertical" android:id="@id/option_list_LinearLayout11" android:layout_width="wrap_content" android:layout_height="66.0dip">
+        <ImageView android:gravity="left|center" android:id="@id/option_list_ImageView" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginLeft="5.0dip" />
+    </LinearLayout>
+    <LinearLayout android:layout_gravity="center_vertical" android:orientation="vertical" android:id="@id/option_list_LinearLayout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="20.0dip" android:layout_weight="1.0" android:layout_alignParentLeft="true">
+        <TextView android:layout_gravity="center_vertical" android:id="@id/option_list_ItemTitle" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="TextView01" android:singleLine="true" style="@style/Nav.Text.primaryTitle" />
+        <TextView android:layout_gravity="center_vertical" android:id="@id/option_list_ItemText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="TextView02" android:layout_below="@id/ItemTitle" style="@style/Nav.Text.secondaryTitle" />
+    </LinearLayout>
+    <LinearLayout android:layout_gravity="center_vertical" android:id="@id/option_list_LinearLayout1" android:layout_width="wrap_content" android:layout_height="66.0dip">
+        <CheckBox android:gravity="right|center" android:id="@id/option_list_ItemCheck" android:focusable="false" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginLeft="10.0dip" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@color/poilistdef" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <include android:id="@id/title_bar" layout="@layout/title_bar" />
+    <LinearLayout android:orientation="vertical" android:id="@id/linearLayoutTop" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/title_bar">
+        <RelativeLayout android:orientation="horizontal" android:id="@id/RelativeLayoutDetail" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <LinearLayout android:layout_gravity="center_vertical" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="9.0dip">
+                <RelativeLayout android:id="@id/RelativeLayoutDetail_top_left" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentLeft="true">
+                    <RelativeLayout android:layout_gravity="center_vertical" android:id="@id/RelativeLayout_Name_Addr" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                        <TextView android:textSize="16.0sp" android:textColor="#ff000000" android:id="@id/ItemTitleDetail" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:text="TextView01" android:layout_alignParentLeft="true" />
+                        <TextView android:textSize="14.0sp" android:textColor="#ff000000" android:id="@id/ItemTextDetail" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:text="TextView02" android:layout_below="@id/ItemTitleDetail" android:layout_alignParentLeft="true" />
+                    </RelativeLayout>
+                    <TextView android:textSize="12.0sp" android:textColor="#ff464646" android:id="@id/ItemDisDetail" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dip" android:text="TextView03" android:layout_below="@id/RelativeLayout_Name_Addr" android:layout_alignParentLeft="true" />
+                    <com.baidu.BaiduMap.widget.RotateImageButton android:id="@id/ImageButtonDirection" android:background="@android:color/transparent" android:layout_width="20.0dip" android:layout_height="20.0dip" android:layout_marginLeft="4.0dip" android:src="@drawable/icon_direction" android:layout_toRightOf="@id/ItemDisDetail" android:layout_below="@id/RelativeLayout_Name_Addr" />
+                </RelativeLayout>
+            </LinearLayout>
+            <ImageButton android:id="@id/ImageButtonFavor" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="9.0dip" android:layout_marginRight="9.0dip" android:src="@drawable/icon_poi_favor" android:layout_alignParentTop="true" android:layout_alignParentRight="true" />
+        </RelativeLayout>
+        <LinearLayout android:orientation="horizontal" android:id="@id/LinearLayoutFunBtn" android:paddingLeft="5.0dip" android:paddingTop="7.0dip" android:paddingRight="5.0dip" android:paddingBottom="10.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <TableLayout android:id="@id/TableLayout01" android:layout_width="fill_parent" android:layout_height="wrap_content" android:stretchColumns="0,1,2,3">
+                <TableRow android:layout_width="fill_parent" android:layout_height="50.0dip">
+                    <TextView android:gravity="center_horizontal" android:id="@id/ImageButtonViewMap" android:background="@drawable/btn_set_about" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginRight="7.0dip" android:text="查看地图" android:drawableTop="@drawable/icon_result_viewmap" />
+                    <TextView android:gravity="center_horizontal" android:id="@id/ImageButtonGo" android:background="@drawable/btn_set_about" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginRight="7.0dip" android:text="到这里去" android:drawableTop="@drawable/icon_result_go" />
+                    <TextView android:gravity="center_horizontal" android:id="@id/ImageButtonCome" android:background="@drawable/btn_set_about" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginRight="7.0dip" android:text="从这出发" android:drawableTop="@drawable/icon_result_come" />
+                    <TextView android:gravity="center_horizontal" android:id="@id/ImageButtonSearchNear" android:background="@drawable/btn_set_about" android:layout_width="wrap_content" android:layout_height="fill_parent" android:text="在附近找" android:drawableTop="@drawable/icon_result_nearsearch" />
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <ListView android:id="@id/ListView01" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginLeft="5.0dip" android:layout_marginRight="5.0dip" android:cacheColorHint="#00000000" android:dividerHeight="0.0dip" android:layout_below="@id/linearLayoutTop" />
+</RelativeLayout>
