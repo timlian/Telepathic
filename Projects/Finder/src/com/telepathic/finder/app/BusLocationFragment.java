@@ -21,6 +21,7 @@ import android.os.Message;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
+import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -81,6 +83,8 @@ public class BusLocationFragment extends SherlockFragment {
     private static final int MAP_ZOOM_LEVEL = 14;
 
     private MainActivity mActivity;
+
+    private SearchView mSearchView;
 
     private MapView mMapView;
 
@@ -512,21 +516,19 @@ public class BusLocationFragment extends SherlockFragment {
         inflater.inflate(R.menu.menu_bus_location, menu);
 
         // Get the SearchView and set the searchable configuration
-        final SearchView searchView = (SearchView)menu.findItem(R.id.search_bus_location)
+        mSearchView = (SearchView)menu.findItem(R.id.search_bus_location)
                 .getActionView();
-        searchView.setQueryHint(getResources().getText(R.string.bus_number_hint));
-        searchView.setInputType(InputType.TYPE_CLASS_TEXT);
-        searchView.setOnQueryTextListener(new OnQueryTextListener() {
-
+        mSearchView.setQueryHint(getResources().getText(R.string.bus_number_hint));
+        mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
+        mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                String lineNumber = query;
+                String lineNumber = query.toUpperCase();
                 if (Utils.isValidBusLineNumber(lineNumber)) {
                     String city = getResources().getString(R.string.default_city);
-                    Utils.hideSoftKeyboard(mActivity, searchView);
+                    Utils.hideSoftKeyboard(mActivity, mSearchView);
                     showDialog(BUS_LINE_SEARCH_DLG);
                     mLineNumber = lineNumber;
-                    getBusLineNumbers("1");
                     BDBusLine line = getBusLine(lineNumber);
                     if (line != null) {
                         handleSearchResult(line);
@@ -543,8 +545,32 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (newText!=null && !newText.equals("")) {
+                    Cursor cursor = getBusLineNumbers(newText);
+                    String[] from = new String[]{ITrafficData.BaiDuData.BusRoute.LINE_NUMBER};
+                    int[] to = new int[]{android.R.id.text1};
+                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, android.R.layout.simple_list_item_1, cursor, from, to, 0);
+                    mSearchView.setSuggestionsAdapter(adapter);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+        mSearchView.setOnSuggestionListener(new OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
                 // TODO Auto-generated method stub
                 return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                Cursor cursor = (Cursor)mSearchView.getSuggestionsAdapter().getItem(position);
+                int suggestionIndex = cursor.getColumnIndex(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER);
+
+                mSearchView.setQuery(cursor.getString(suggestionIndex), true);
+                return true;
             }
         });
         super.onCreateOptionsMenu(menu, inflater);
@@ -640,20 +666,21 @@ public class BusLocationFragment extends SherlockFragment {
         }
         return retLine;
     }
-    
+
     private Cursor getBusLineNumbers(String keyword) {
-    	ContentResolver resolver = mActivity.getContentResolver();
-    	String sortOrder = ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME + " DESC ";
-    	String selection = ITrafficData.BaiDuData.BusRoute.LINE_NUMBER + " LIKE \'" + keyword + "%\'";
-    	Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, ROUTE_HISTORY_PROJECTION, selection, null, sortOrder);
-    	Utils.printCursorContent(TAG, cursor);
-    	return cursor;
+        ContentResolver resolver = mActivity.getContentResolver();
+        String sortOrder = ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME + " DESC ";
+        String selection = ITrafficData.BaiDuData.BusRoute.LINE_NUMBER + " LIKE ?";
+        String[] args = new String[]{keyword+"%"};
+        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, ROUTE_HISTORY_PROJECTION, selection, args, sortOrder);
+        Utils.printCursorContent(TAG, cursor);
+        return cursor;
     }
 
     private void handleSearchResult(BDBusLine line) {
         removeDialog();
         if (line != null) {
-            showBusRoutesDlg(mLineNumber, line); 
+            showBusRoutesDlg(mLineNumber, line);
             mMapView.requestFocusFromTouch();
         }
     }
