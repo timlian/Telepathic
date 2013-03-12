@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -38,6 +40,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
+import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ITrafficService;
@@ -50,6 +53,8 @@ import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 
 public class BusCardRecordFragment extends SherlockFragment {
+
+    private static final String TAG = BusCardRecordFragment.class.getSimpleName();
 
     private MainActivity mActivity;
 
@@ -88,6 +93,11 @@ public class BusCardRecordFragment extends SherlockFragment {
     private ProgressDialog mWaitingDialog;
 
     private MessageDispatcher mMessageDispatcher;
+
+    private static final String[] CARD_RECORDS_HISTORY = {
+        ITrafficData.KuaiXinData.BusCard._ID,
+        ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
+    };
 
     private IMessageHandler mMessageHandler = new IMessageHandler() {
         @Override
@@ -331,8 +341,32 @@ public class BusCardRecordFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (newText!=null && !newText.equals("")) {
+                    Cursor cursor = getBusCardID(newText);
+                    String[] from = new String[]{ITrafficData.KuaiXinData.BusCard.CARD_NUMBER};
+                    int[] to = new int[]{android.R.id.text1};
+                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, android.R.layout.simple_list_item_1, cursor, from, to, 0);
+                    mSearchView.setSuggestionsAdapter(adapter);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+        mSearchView.setOnSuggestionListener(new OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
                 // TODO Auto-generated method stub
                 return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                Cursor cursor = (Cursor)mSearchView.getSuggestionsAdapter().getItem(position);
+                int suggestionIndex = cursor.getColumnIndex(ITrafficData.KuaiXinData.BusCard.CARD_NUMBER);
+
+                mSearchView.setQuery(cursor.getString(suggestionIndex), true);
+                return true;
             }
         });
         super.onCreateOptionsMenu(menu, inflater);
@@ -340,6 +374,16 @@ public class BusCardRecordFragment extends SherlockFragment {
 
     private static int getLoaderId() {
         return LOADER_ID++;
+    }
+
+    private Cursor getBusCardID(String keywords) {
+        ContentResolver resolver = mActivity.getContentResolver();
+        String sortOrder = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " ASC ";
+        String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " LIKE ?";
+        String[] args = new String[]{keywords+"%"};
+        Cursor cursor = resolver.query(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, CARD_RECORDS_HISTORY, selection, args, sortOrder);
+        Utils.printCursorContent(TAG, cursor);
+        return cursor;
     }
 
     private static class RecordItemHolder {
