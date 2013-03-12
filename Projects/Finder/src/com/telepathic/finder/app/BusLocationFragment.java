@@ -526,7 +526,7 @@ public class BusLocationFragment extends SherlockFragment {
                     Utils.hideSoftKeyboard(mActivity, searchView);
                     showDialog(BUS_LINE_SEARCH_DLG);
                     mLineNumber = lineNumber;
-                    getBusLineNumbers();
+                    getBusLineNumbers("1");
                     BDBusLine line = getBusLine(lineNumber);
                     if (line != null) {
                         handleSearchResult(line);
@@ -641,17 +641,19 @@ public class BusLocationFragment extends SherlockFragment {
         return retLine;
     }
     
-    private Cursor getBusLineNumbers() {
+    private Cursor getBusLineNumbers(String keyword) {
     	ContentResolver resolver = mActivity.getContentResolver();
     	String sortOrder = ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME + " DESC ";
-    	Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, ROUTE_HISTORY_PROJECTION, null, null, sortOrder);
+    	String selection = ITrafficData.BaiDuData.BusRoute.LINE_NUMBER + " LIKE \'" + keyword + "%\'";
+    	Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, ROUTE_HISTORY_PROJECTION, selection, null, sortOrder);
+    	Utils.printCursorContent(TAG, cursor);
     	return cursor;
     }
 
     private void handleSearchResult(BDBusLine line) {
         removeDialog();
         if (line != null) {
-            showBusRoutesDlg(mLineNumber, line);
+            showBusRoutesDlg(mLineNumber, line); 
             mMapView.requestFocusFromTouch();
         }
     }
