@@ -9,6 +9,7 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -525,6 +526,7 @@ public class BusLocationFragment extends SherlockFragment {
                     Utils.hideSoftKeyboard(mActivity, searchView);
                     showDialog(BUS_LINE_SEARCH_DLG);
                     mLineNumber = lineNumber;
+                    getBusLineNumbers();
                     BDBusLine line = getBusLine(lineNumber);
                     if (line != null) {
                         handleSearchResult(line);
@@ -637,6 +639,13 @@ public class BusLocationFragment extends SherlockFragment {
             }
         }
         return retLine;
+    }
+    
+    private Cursor getBusLineNumbers() {
+    	ContentResolver resolver = mActivity.getContentResolver();
+    	String sortOrder = ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME + " DESC ";
+    	Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, ROUTE_HISTORY_PROJECTION, null, null, sortOrder);
+    	return cursor;
     }
 
     private void handleSearchResult(BDBusLine line) {
