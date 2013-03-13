@@ -8,6 +8,7 @@ import java.util.Comparator;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
@@ -95,8 +97,7 @@ public class BusCardRecordFragment extends SherlockFragment {
     private MessageDispatcher mMessageDispatcher;
 
     private static final String[] CARD_RECORDS_HISTORY = {
-        ITrafficData.KuaiXinData.BusCard._ID,
-        ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
+            ITrafficData.KuaiXinData.BusCard._ID, ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
     };
 
     private IMessageHandler mMessageHandler = new IMessageHandler() {
@@ -112,7 +113,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                 page.mRecordList.onRefreshComplete();
             }
             mConsumptionDetail.requestFocusFromTouch();
-            switch(msg.arg2) {
+            switch (msg.arg2) {
                 case ITrafficeMessage.GET_BUS_CARD_RECORDS_FAILED:
                     Toast.makeText(mActivity, (CharSequence)msg.obj, Toast.LENGTH_SHORT).show();
                     break;
@@ -315,6 +316,20 @@ public class BusCardRecordFragment extends SherlockFragment {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear_cache:
+                // TODO: Need implement
+                return true;
+            case R.id.about:
+                startActivity(new Intent(mActivity, AboutActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the options menu from XML
         inflater.inflate(R.menu.menu_card_record, menu);
@@ -334,18 +349,23 @@ public class BusCardRecordFragment extends SherlockFragment {
                     mTrafficService.getBusCardRecords(cardNumber, 30);
                 } else {
                     Toast.makeText(mActivity, R.string.card_id_error_notice, Toast.LENGTH_SHORT)
-                    .show();
+                            .show();
                 }
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText!=null && !newText.equals("")) {
+                if (newText != null && !newText.equals("")) {
                     Cursor cursor = getBusCardID(newText);
-                    String[] from = new String[]{ITrafficData.KuaiXinData.BusCard.CARD_NUMBER};
-                    int[] to = new int[]{android.R.id.text1};
-                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, android.R.layout.simple_list_item_1, cursor, from, to, 0);
+                    String[] from = new String[] {
+                        ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
+                    };
+                    int[] to = new int[] {
+                        android.R.id.text1
+                    };
+                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
+                            android.R.layout.simple_list_item_1, cursor, from, to, 0);
                     mSearchView.setSuggestionsAdapter(adapter);
                     return true;
                 } else {
@@ -363,7 +383,8 @@ public class BusCardRecordFragment extends SherlockFragment {
             @Override
             public boolean onSuggestionClick(int position) {
                 Cursor cursor = (Cursor)mSearchView.getSuggestionsAdapter().getItem(position);
-                int suggestionIndex = cursor.getColumnIndex(ITrafficData.KuaiXinData.BusCard.CARD_NUMBER);
+                int suggestionIndex = cursor
+                        .getColumnIndex(ITrafficData.KuaiXinData.BusCard.CARD_NUMBER);
 
                 mSearchView.setQuery(cursor.getString(suggestionIndex), true);
                 return true;
@@ -380,8 +401,11 @@ public class BusCardRecordFragment extends SherlockFragment {
         ContentResolver resolver = mActivity.getContentResolver();
         String sortOrder = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " ASC ";
         String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " LIKE ?";
-        String[] args = new String[]{keywords+"%"};
-        Cursor cursor = resolver.query(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, CARD_RECORDS_HISTORY, selection, args, sortOrder);
+        String[] args = new String[] {
+            keywords + "%"
+        };
+        Cursor cursor = resolver.query(ITrafficData.KuaiXinData.BusCard.CONTENT_URI,
+                CARD_RECORDS_HISTORY, selection, args, sortOrder);
         Utils.printCursorContent(TAG, cursor);
         return cursor;
     }

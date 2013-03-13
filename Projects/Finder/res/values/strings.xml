@@ -7,6 +7,9 @@
     <string name="home_activity">Home</string>
     <string name="title_activity_tab_home">Home</string>
     <string name="title_activity_bus_station">BusStationActivity</string>
+    <string name="title_activity_about">About</string>
+    <string name="version">Version: <xliff:g id="version" example="1.0">%1$s</xliff:g></string>
+    <string name="copyright">Copyright ©2012–2013 All Rights Reserved.</string>
 
     <!-- Tab name -->
     <string name="bus_location">Map Location</string>
@@ -67,8 +70,11 @@
     <string name="error_permission_denied">授权验证失败</string>
     <string name="error_result_not_found">未找到搜索结果</string>
     <string name="error_route_addr">路线搜索起点或终点有歧义</string>
-    
+
     <!-- Error messages -->
     <string name="get_bus_card_records_failed">Get bus card record failed.</string>
+    
+    <!-- App description -->
+    <string name="app_description">Finder is an app help you to find the location of bus in Chengdu. It also supply to query IC card consumption records by card number, and query bus station infomation by station GPS number.&lt;br/>&lt;br/>If you get any questions, Please contact us.&lt;br/>&lt;br/>Thanks for using this app!</string>
 
 </resources>

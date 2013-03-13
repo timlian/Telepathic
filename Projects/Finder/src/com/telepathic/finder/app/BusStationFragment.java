@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
@@ -56,16 +58,15 @@ public class BusStationFragment extends SherlockFragment {
     private static final int HISTORY_LOADER_ID = 3000;
 
     private static final String[] STATION_LINES_PROJECTION = {
-        KuaiXinData.BusStation.NAME, KuaiXinData.BusStation.GPS_NUMBER,
-        KuaiXinData.BusRoute.LINE_NUMBER, KuaiXinData.BusRoute.DIRECTION,
-        KuaiXinData.BusRoute.START_TIME, KuaiXinData.BusRoute.END_TIME,
-        KuaiXinData.BusRoute.STATIONS
+            KuaiXinData.BusStation.NAME, KuaiXinData.BusStation.GPS_NUMBER,
+            KuaiXinData.BusRoute.LINE_NUMBER, KuaiXinData.BusRoute.DIRECTION,
+            KuaiXinData.BusRoute.START_TIME, KuaiXinData.BusRoute.END_TIME,
+            KuaiXinData.BusRoute.STATIONS
     };
 
     private static final String[] BUS_STATIONS_PROJECTION = {
-        KuaiXinData.BusStation._ID,
-        KuaiXinData.BusStation.GPS_NUMBER,
-        KuaiXinData.BusStation.NAME
+            KuaiXinData.BusStation._ID, KuaiXinData.BusStation.GPS_NUMBER,
+            KuaiXinData.BusStation.NAME
     };
 
     private static final int IDX_NAME = 0;
@@ -86,7 +87,7 @@ public class BusStationFragment extends SherlockFragment {
     static {
         StringBuilder builder = new StringBuilder();
         builder.append(KuaiXinData.BusStation.LAST_UPDATE_TIME).append(" DESC ")
-        .append("LIMIT 0,20");
+                .append("LIMIT 0,20");
         SORT_ORDER = builder.toString();
     }
 
@@ -227,6 +228,20 @@ public class BusStationFragment extends SherlockFragment {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear_cache:
+                // TODO: Need implement
+                return true;
+            case R.id.about:
+                startActivity(new Intent(mActivity, AboutActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the options menu from XML
         inflater.inflate(R.menu.menu_bus_station, menu);
@@ -259,11 +274,16 @@ public class BusStationFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText!=null && !newText.equals("")) {
+                if (newText != null && !newText.equals("")) {
                     Cursor cursor = getBusStations(newText);
-                    String[] from = new String[]{KuaiXinData.BusStation.GPS_NUMBER, KuaiXinData.BusStation.NAME};
-                    int[] to = new int[]{R.id.station_gps_number, R.id.station_name};
-                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, R.layout.station_gps_number_item, cursor, from, to, 0);
+                    String[] from = new String[] {
+                            KuaiXinData.BusStation.GPS_NUMBER, KuaiXinData.BusStation.NAME
+                    };
+                    int[] to = new int[] {
+                            R.id.station_gps_number, R.id.station_name
+                    };
+                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
+                            R.layout.station_gps_number_item, cursor, from, to, 0);
                     mSearchView.setSuggestionsAdapter(adapter);
                     return true;
                 } else {
@@ -403,8 +423,11 @@ public class BusStationFragment extends SherlockFragment {
         ContentResolver resolver = mActivity.getContentResolver();
         String sortOrder = KuaiXinData.BusStation.GPS_NUMBER + " ASC ";
         String selection = KuaiXinData.BusStation.GPS_NUMBER + " LIKE ?";
-        String[] args = new String[]{keyword+"%"};
-        Cursor cursor = resolver.query(KuaiXinData.BusStation.CONTENT_URI, BUS_STATIONS_PROJECTION, selection, args, sortOrder);
+        String[] args = new String[] {
+            keyword + "%"
+        };
+        Cursor cursor = resolver.query(KuaiXinData.BusStation.CONTENT_URI, BUS_STATIONS_PROJECTION,
+                selection, args, sortOrder);
         Utils.printCursorContent(TAG, cursor);
         return cursor;
     }

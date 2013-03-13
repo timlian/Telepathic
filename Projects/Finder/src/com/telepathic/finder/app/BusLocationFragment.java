@@ -34,6 +34,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
@@ -129,20 +130,20 @@ public class BusLocationFragment extends SherlockFragment {
     private static final int BIADU_BUS_LINE_LOADER_ID = 2000;
 
     private static final String[] ROUTE_HISTORY_PROJECTION = {
-        ITrafficData.BaiDuData.BusRoute._ID,
-        ITrafficData.BaiDuData.BusRoute.CITY,
-        ITrafficData.BaiDuData.BusRoute.LINE_NUMBER,
-        ITrafficData.BaiDuData.BusRoute.NAME,
-        ITrafficData.BaiDuData.BusRoute.UID,
-        ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME
+            ITrafficData.BaiDuData.BusRoute._ID, ITrafficData.BaiDuData.BusRoute.CITY,
+            ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, ITrafficData.BaiDuData.BusRoute.NAME,
+            ITrafficData.BaiDuData.BusRoute.UID, ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME
     };
+
     private static final int IDX_LINE_CITY = 1;
+
     private static final int IDX_LINE_NUMBER = 2;
+
     private static final int IDX_ROUTE_NAME = 3;
+
     private static final int IDX_ROUTE_UID = 4;
 
     private List<BDBusLine> mLineList;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -159,7 +160,8 @@ public class BusLocationFragment extends SherlockFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = (MainActivity)getSherlockActivity();
-        mActivity.getSupportLoaderManager().initLoader(BIADU_BUS_LINE_LOADER_ID, null, new BusRouteHistoryLoaderCallback());
+        mActivity.getSupportLoaderManager().initLoader(BIADU_BUS_LINE_LOADER_ID, null,
+                new BusRouteHistoryLoaderCallback());
         // init map service
         FinderApplication app = (FinderApplication)mActivity.getApplication();
         mMapManager = app.getMapManager();
@@ -210,7 +212,7 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void handleMessage(Message msg) {
-                handleSearchResult((BDBusLine) msg.obj);
+                handleSearchResult((BDBusLine)msg.obj);
             }
         };
         mSearchBusRouteDoneHandler = new IMessageHandler() {
@@ -371,73 +373,73 @@ public class BusLocationFragment extends SherlockFragment {
                 break;
             case DOWN_VOICE_SEARCH_DLG:
                 AlertDialog.Builder vsDlg = new AlertDialog.Builder(mActivity)
-                .setTitle(R.string.no_voice_search_title)
-                .setMessage(R.string.no_voice_search_msg)
-                .setNegativeButton(R.string.no_voice_search_cancel,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .setNeutralButton(R.string.no_voice_search_browser,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri
-                                .parse("http://m.wandoujia.com/apps/com.google.android.voicesearch"));
-                        startActivity(intent);
-                    }
-                })
-                .setPositiveButton(R.string.no_voice_search_download,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent installIntent = new Intent(Intent.ACTION_VIEW);
-                        installIntent.setData(Uri
-                                .parse("market://details?id=com.google.android.voicesearch"));
-                        try {
-                            startActivity(installIntent);
-                        } catch (ActivityNotFoundException ex) {
-                            dialog.dismiss();
-                            showDialog(DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG);
-                        }
-                    }
-                });
+                        .setTitle(R.string.no_voice_search_title)
+                        .setMessage(R.string.no_voice_search_msg)
+                        .setNegativeButton(R.string.no_voice_search_cancel,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                        .setNeutralButton(R.string.no_voice_search_browser,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        intent.setData(Uri
+                                                .parse("http://m.wandoujia.com/apps/com.google.android.voicesearch"));
+                                        startActivity(intent);
+                                    }
+                                })
+                        .setPositiveButton(R.string.no_voice_search_download,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+                                        installIntent.setData(Uri
+                                                .parse("market://details?id=com.google.android.voicesearch"));
+                                        try {
+                                            startActivity(installIntent);
+                                        } catch (ActivityNotFoundException ex) {
+                                            dialog.dismiss();
+                                            showDialog(DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG);
+                                        }
+                                    }
+                                });
                 mDialog = vsDlg.create();
                 break;
             case DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG:
                 AlertDialog.Builder vsBrowserDlg = new AlertDialog.Builder(mActivity)
-                .setTitle(R.string.no_market_title)
-                .setMessage(R.string.no_market_msg)
-                .setNegativeButton(R.string.no_market_cancel,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .setPositiveButton(R.string.no_market_download,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri
-                                .parse("http://m.wandoujia.com/apps/com.google.android.voicesearch"));
-                        startActivity(intent);
-                    }
-                });
+                        .setTitle(R.string.no_market_title)
+                        .setMessage(R.string.no_market_msg)
+                        .setNegativeButton(R.string.no_market_cancel,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                        .setPositiveButton(R.string.no_market_download,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        intent.setData(Uri
+                                                .parse("http://m.wandoujia.com/apps/com.google.android.voicesearch"));
+                                        startActivity(intent);
+                                    }
+                                });
                 mDialog = vsBrowserDlg.create();
                 break;
             case EXIT_CONFIRM_DIALOG:
                 Builder exitDlgBuilder = new Builder(mActivity)
-                .setTitle(R.string.confirm_exit_title)
-                .setMessage(R.string.confirm_exit_message)
-                .setPositiveButton(android.R.string.ok, new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mActivity.finish();
-                    }
-                }).setNegativeButton(android.R.string.cancel, null);
+                        .setTitle(R.string.confirm_exit_title)
+                        .setMessage(R.string.confirm_exit_message)
+                        .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mActivity.finish();
+                            }
+                        }).setNegativeButton(android.R.string.cancel, null);
                 mDialog = exitDlgBuilder.create();
                 break;
             default:
@@ -460,35 +462,34 @@ public class BusLocationFragment extends SherlockFragment {
         for (int idx = 0; idx < routeCount; idx++) {
             String name = line.getRoute(idx).getName();
             int startPos = name.indexOf('(');
-            int endPos   = name.indexOf(')');
+            int endPos = name.indexOf(')');
             busRoutes[idx] = name.substring(startPos + 1, endPos);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         final String titleText = String.format(getResources().getString(R.string.select_bus_route),
                 busLineNumber);
         builder.setTitle(titleText).setSingleChoiceItems(busRoutes, 0, null)
-        .setOnCancelListener(null)
-        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-                final int selectedPosition = ((AlertDialog)dialog).getListView()
-                        .getCheckedItemPosition();
-                final BDBusRoute route = line.getRoute(selectedPosition);
-                searchBusRoute(route.getCity(), route.getUid());
-            }
-        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        }).create().show();
+                .setOnCancelListener(null)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                        final int selectedPosition = ((AlertDialog)dialog).getListView()
+                                .getCheckedItemPosition();
+                        final BDBusRoute route = line.getRoute(selectedPosition);
+                        searchBusRoute(route.getCity(), route.getUid());
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
     }
 
     private void searchBusRoute(String city, String uid) {
         mTrafficService.searchBusRoute(city, uid);
     }
-
 
     private void updateBusLocation(MKStep station) {
         /**
@@ -511,13 +512,26 @@ public class BusLocationFragment extends SherlockFragment {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear_cache:
+                // TODO: Need implement
+                return true;
+            case R.id.about:
+                startActivity(new Intent(mActivity, AboutActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the options menu from XML
         inflater.inflate(R.menu.menu_bus_location, menu);
 
         // Get the SearchView and set the searchable configuration
-        mSearchView = (SearchView)menu.findItem(R.id.search_bus_location)
-                .getActionView();
+        mSearchView = (SearchView)menu.findItem(R.id.search_bus_location).getActionView();
         mSearchView.setQueryHint(getResources().getText(R.string.bus_number_hint));
         mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
@@ -538,18 +552,23 @@ public class BusLocationFragment extends SherlockFragment {
                     Utils.copyAppDatabaseFiles(mActivity.getPackageName());
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_input_hint, Toast.LENGTH_LONG)
-                    .show();
+                            .show();
                 }
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText!=null && !newText.equals("")) {
+                if (newText != null && !newText.equals("")) {
                     Cursor cursor = getBusLineNumbers(newText);
-                    String[] from = new String[]{ITrafficData.BaiDuData.BusRoute.LINE_NUMBER};
-                    int[] to = new int[]{android.R.id.text1};
-                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, android.R.layout.simple_list_item_1, cursor, from, to, 0);
+                    String[] from = new String[] {
+                        ITrafficData.BaiDuData.BusRoute.LINE_NUMBER
+                    };
+                    int[] to = new int[] {
+                        android.R.id.text1
+                    };
+                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
+                            android.R.layout.simple_list_item_1, cursor, from, to, 0);
                     mSearchView.setSuggestionsAdapter(adapter);
                     return true;
                 } else {
@@ -567,7 +586,8 @@ public class BusLocationFragment extends SherlockFragment {
             @Override
             public boolean onSuggestionClick(int position) {
                 Cursor cursor = (Cursor)mSearchView.getSuggestionsAdapter().getItem(position);
-                int suggestionIndex = cursor.getColumnIndex(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER);
+                int suggestionIndex = cursor
+                        .getColumnIndex(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER);
 
                 mSearchView.setQuery(cursor.getString(suggestionIndex), true);
                 return true;
@@ -616,8 +636,7 @@ public class BusLocationFragment extends SherlockFragment {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             CursorLoader loader = null;
             if (BIADU_BUS_LINE_LOADER_ID == id) {
-                loader = new CursorLoader(mActivity,
-                        ITrafficData.BaiDuData.BusRoute.CONTENT_URI,
+                loader = new CursorLoader(mActivity, ITrafficData.BaiDuData.BusRoute.CONTENT_URI,
                         ROUTE_HISTORY_PROJECTION, null, null, null);
             }
             return loader;
@@ -659,7 +678,7 @@ public class BusLocationFragment extends SherlockFragment {
         if (mLineList == null || mLineList.size() == 0) {
             return retLine;
         }
-        for(BDBusLine line : mLineList) {
+        for (BDBusLine line : mLineList) {
             if (line.getLineNumber().equals(lineNumber)) {
                 retLine = line;
             }
@@ -671,8 +690,11 @@ public class BusLocationFragment extends SherlockFragment {
         ContentResolver resolver = mActivity.getContentResolver();
         String sortOrder = ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME + " DESC ";
         String selection = ITrafficData.BaiDuData.BusRoute.LINE_NUMBER + " LIKE ?";
-        String[] args = new String[]{keyword+"%"};
-        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, ROUTE_HISTORY_PROJECTION, selection, args, sortOrder);
+        String[] args = new String[] {
+            keyword + "%"
+        };
+        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI,
+                ROUTE_HISTORY_PROJECTION, selection, args, sortOrder);
         Utils.printCursorContent(TAG, cursor);
         return cursor;
     }
