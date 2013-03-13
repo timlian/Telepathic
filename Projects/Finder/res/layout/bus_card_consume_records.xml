@@ -26,6 +26,7 @@
 
     <com.telepathic.finder.view.DropRefreshListView
         android:id="@+id/consumer_record_list"
+        android:listSelector="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
