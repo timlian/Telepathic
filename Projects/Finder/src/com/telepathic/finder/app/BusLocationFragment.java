@@ -559,7 +559,7 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText != null && !newText.equals("")) {
+                if (newText != null && !newText.equals("") && mActivity != null) {
                     Cursor cursor = getBusLineNumbers(newText);
                     String[] from = new String[] {
                         ITrafficData.BaiDuData.BusRoute.LINE_NUMBER

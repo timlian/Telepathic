@@ -274,7 +274,7 @@ public class BusStationFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText != null && !newText.equals("")) {
+                if (newText != null && !newText.equals("") && mActivity != null) {
                     Cursor cursor = getBusStations(newText);
                     String[] from = new String[] {
                             KuaiXinData.BusStation.GPS_NUMBER, KuaiXinData.BusStation.NAME
