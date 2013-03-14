@@ -130,6 +130,8 @@ public class BusLocationFragment extends SherlockFragment {
     private static final String[] BUS_LINE_PROJECTION = {
         ITrafficData.BaiDuData.BusLine._ID,
         ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
+        ITrafficData.BaiDuData.BusLine.START_STATION,
+        ITrafficData.BaiDuData.BusLine.END_STATION
     };
     private static final int IDX_BUS_LINE_ID = 0;
     private static final int IDX_BUS_LINE_NUMBER = 1;
@@ -566,9 +568,17 @@ public class BusLocationFragment extends SherlockFragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 Cursor cursor = queryBusLines(newText);
-                String[] from = new String[]{ ITrafficData.BaiDuData.BusLine.LINE_NUMBER };
-                int[] to = new int[]{android.R.id.text1};
-                SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, android.R.layout.simple_list_item_1, cursor, from, to, 0);
+                String[] from = new String[]{
+                        ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
+                        ITrafficData.BaiDuData.BusLine.START_STATION,
+                        ITrafficData.BaiDuData.BusLine.END_STATION
+                };
+                int[] to = new int[]{
+                        R.id.line_number,
+                        R.id.start_station,
+                        R.id.end_station
+                };
+                SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, R.layout.bus_line_suggestion_item, cursor, from, to, 0);
                 mSearchView.setSuggestionsAdapter(adapter);
                 return true;
             }
