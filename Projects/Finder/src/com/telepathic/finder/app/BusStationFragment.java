@@ -232,6 +232,7 @@ public class BusStationFragment extends SherlockFragment {
         switch (item.getItemId()) {
             case R.id.clear_cache:
                 // TODO: Need implement
+                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));

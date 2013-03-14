@@ -143,7 +143,6 @@ public class BusCardRecordFragment extends SherlockFragment {
         FinderApplication app = (FinderApplication)mActivity.getApplication();
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
-        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
     }
 
     @Override
@@ -320,6 +319,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         switch (item.getItemId()) {
             case R.id.clear_cache:
                 // TODO: Need implement
+                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));

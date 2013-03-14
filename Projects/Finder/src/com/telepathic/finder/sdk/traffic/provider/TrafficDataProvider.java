@@ -75,10 +75,10 @@ public class TrafficDataProvider extends ContentProvider {
             + " LEFT OUTER JOIN " + TABLE_KUAI_XIN_BUS_ROUTE + " ON "
             + "(" + TABLE_KUAI_XIN_BUS_ROUTE_STATION + "." + KuaiXinData.BusRouteStation.ROUTE_ID + "="
             + TABLE_KUAI_XIN_BUS_ROUTE + "." + KuaiXinData.BusRoute._ID + ")";
-    
-    private static final String BD_LINE_JOIN_ROUTE_TABLE  = 
-    		TABLE_BAI_DU_BUS_LINE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE + " ON "
-    		+ "(" + TABLE_BAI_DU_BUS_LINE + "." + BaiDuData.BusLine._ID + "=" + BaiDuData.BusRoute.LINE_ID + ")";
+
+    private static final String BD_LINE_JOIN_ROUTE_TABLE  =
+            TABLE_BAI_DU_BUS_LINE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE + " ON "
+            + "(" + TABLE_BAI_DU_BUS_LINE + "." + BaiDuData.BusLine._ID + "=" + BaiDuData.BusRoute.LINE_ID + ")";
 
 
     private DbHelper mDBHelper;
@@ -116,11 +116,11 @@ public class TrafficDataProvider extends ContentProvider {
             tableName = KUAI_XIN_STATION_JOIN_ROUTE_STATION_JOIN__ROUTE;
             break;
         case MATCH_BAI_DU_BUS_LINE:
-        	tableName = TABLE_BAI_DU_BUS_LINE;
-        	break;
+            tableName = TABLE_BAI_DU_BUS_LINE;
+            break;
         case MATCH_BD_LINE_JOIN_ROUTE:
-        	tableName = BD_LINE_JOIN_ROUTE_TABLE;
-        	break;
+            tableName = BD_LINE_JOIN_ROUTE_TABLE;
+            break;
         case MATCH_BAI_DU_BUS_ROUTE:
             tableName = TABLE_BAI_DU_BUS_ROUTE;
             break;
@@ -248,7 +248,7 @@ public class TrafficDataProvider extends ContentProvider {
             tableName = TABLE_KUAI_XIN_PERFORMANCE;
             break;
         case MATCH_BAI_DU_BUS_LINE:
-        	rowId = db.insertWithOnConflict(TABLE_BAI_DU_BUS_LINE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+            rowId = db.insertWithOnConflict(TABLE_BAI_DU_BUS_LINE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
             if (rowId == -1) {
                 long conflictRowId = -1;
                 String[] projection = new String[]{BaseColumns._ID};
@@ -268,7 +268,7 @@ public class TrafficDataProvider extends ContentProvider {
                 rowId = conflictRowId;
             }
             inserted = true;
-        	break;
+            break;
         case MATCH_BAI_DU_BUS_ROUTE:
             rowId = db.insertWithOnConflict(TABLE_BAI_DU_BUS_ROUTE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
             if (rowId == -1) {
@@ -333,8 +333,8 @@ public class TrafficDataProvider extends ContentProvider {
             tableName = TABLE_KUAI_XIN_BUS_ROUTE_STATION;
             break;
         case MATCH_BAI_DU_BUS_LINE:
-        	tableName = TABLE_BAI_DU_BUS_LINE;
-        	break;
+            tableName = TABLE_BAI_DU_BUS_LINE;
+            break;
         case MATCH_BAI_DU_BUS_ROUTE:
             tableName = TABLE_BAI_DU_BUS_ROUTE;
             break;
@@ -430,7 +430,7 @@ public class TrafficDataProvider extends ContentProvider {
                     + BaiDuData.BusLineColumns.END_STATION + " TEXT, "
                     + BaiDuData.BusLineColumns.LAST_UPDATE_TIME + " INTEGER, "
                     + "UNIQUE (" + BaiDuData.BusLineColumns.LINE_NUMBER + ")"+ " )");
-            
+
             db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_ROUTE + " ("
                     + BaiDuData.BusRouteColumns._ID + " INTEGER PRIMARY KEY, "
                     + BaiDuData.BusRouteColumns.LINE_ID + " INTEGER, "

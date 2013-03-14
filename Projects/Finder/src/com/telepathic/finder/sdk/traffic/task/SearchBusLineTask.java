@@ -39,16 +39,16 @@ public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
     private class PoiSearchListener extends MKSearchListenerImpl {
         @Override
         public void onGetPoiResult(MKPoiResult res, int type, int error) {
-        	ArrayList<MKPoiInfo> poiList = new ArrayList<MKPoiInfo>();
+            ArrayList<MKPoiInfo> poiList = new ArrayList<MKPoiInfo>();
             if (error == 0 || res != null) {
                 ArrayList<MKPoiInfo> allPois = res.getAllPoi();
                 if (allPois != null && allPois.size() > 0) {
                     for (MKPoiInfo poiInfo : allPois) {
                         // poi类型:
-                    	// 0：普通点，1：公交站，
-                    	// 2：公交线路，3：地铁站，4：地铁线路
+                        // 0：普通点，1：公交站，
+                        // 2：公交线路，3：地铁站，4：地铁线路
                         if (poiInfo.ePoiType == 2) {
-                        	poiList.add(poiInfo);
+                            poiList.add(poiInfo);
                         }
                     }
                 }

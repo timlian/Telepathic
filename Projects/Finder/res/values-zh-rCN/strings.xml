@@ -17,7 +17,7 @@
     <string name="menu_settings">设置</string>
     <string name="map_not_ready">地图尚未加载完成</string>
     <string name="find">查询</string>
-    <string name="clear_cache">Clear cache</string>
+    <string name="clear_cache">清空历史记录</string>
     <string name="bus_number_hint">公交线路号</string>
     <string name="ic_card_hint">公交卡号</string>
     <string name="station_number_hint">公交站GPS编号</string>

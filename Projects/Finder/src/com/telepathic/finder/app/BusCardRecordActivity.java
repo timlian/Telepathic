@@ -114,7 +114,6 @@ public class BusCardRecordActivity extends BaseActivity {
         mMessageDispatcher = app.getMessageDispatcher();
         mMessageDispatcher.add(mMessageHandler);
         startLoadBusCards();
-        Utils.copyAppDatabaseFiles(getPackageName());
     }
 
     @Override

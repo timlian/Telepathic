@@ -129,44 +129,28 @@ public class BusLocationFragment extends SherlockFragment {
 
     private static final int BIADU_BUS_LINE_LOADER_ID = 2000;
 
-<<<<<<< HEAD
     private static final String[] BUS_LINE_PROJECTION = {
-    	ITrafficData.BaiDuData.BusLine._ID,
+        ITrafficData.BaiDuData.BusLine._ID,
         ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
     };
     private static final int IDX_BUS_LINE_ID = 0;
     private static final int IDX_BUS_LINE_NUMBER = 1;
-    
+
     private static final String[] BUS_ROUTE_PROJECTON = {
-    	ITrafficData.BaiDuData.BusLine.CITY,
-    	ITrafficData.BaiDuData.BusRoute.UID,
-    	ITrafficData.BaiDuData.BusRoute.FIRST_STATION,
-    	ITrafficData.BaiDuData.BusRoute.LAST_STATION
+        ITrafficData.BaiDuData.BusLine.CITY,
+        ITrafficData.BaiDuData.BusRoute.UID,
+        ITrafficData.BaiDuData.BusRoute.FIRST_STATION,
+        ITrafficData.BaiDuData.BusRoute.LAST_STATION
     };
     private static final int IDX_BUS_ROUTE_CITY = 0;
     private static final int IDX_BUS_ROUTE_UID  = 1;
     private static final int IDX_BUS_ROUTE_FIRST_STATION = 2;
     private static final int IDX_BUS_ROUTE_LAST_STATION  = 3;
-    
+
    // private static final int IDX_LINE_CITY = 1;
   //  private static final int IDX_LINE_NUMBER = 2;
   //  private static final int IDX_ROUTE_NAME = 3;
   //  private static final int IDX_ROUTE_UID = 4;
-=======
-    private static final String[] ROUTE_HISTORY_PROJECTION = {
-            ITrafficData.BaiDuData.BusRoute._ID, ITrafficData.BaiDuData.BusRoute.CITY,
-            ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, ITrafficData.BaiDuData.BusRoute.NAME,
-            ITrafficData.BaiDuData.BusRoute.UID, ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME
-    };
-
-    private static final int IDX_LINE_CITY = 1;
-
-    private static final int IDX_LINE_NUMBER = 2;
-
-    private static final int IDX_ROUTE_NAME = 3;
-
-    private static final int IDX_ROUTE_UID = 4;
->>>>>>> d4f5b08d11ba90a8d8137fe972cc0c08a2827e58
 
     private List<BDBusLine> mLineList;
 
@@ -185,12 +169,7 @@ public class BusLocationFragment extends SherlockFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = (MainActivity)getSherlockActivity();
-<<<<<<< HEAD
         //mActivity.getSupportLoaderManager().initLoader(BIADU_BUS_LINE_LOADER_ID, null, new BusRouteHistoryLoaderCallback());
-=======
-        mActivity.getSupportLoaderManager().initLoader(BIADU_BUS_LINE_LOADER_ID, null,
-                new BusRouteHistoryLoaderCallback());
->>>>>>> d4f5b08d11ba90a8d8137fe972cc0c08a2827e58
         // init map service
         FinderApplication app = (FinderApplication)mActivity.getApplication();
         mMapManager = app.getMapManager();
@@ -241,12 +220,8 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void handleMessage(Message msg) {
-<<<<<<< HEAD
-            	removeDialog();
+                removeDialog();
                 handleSearchResult(mLineNumber);
-=======
-                handleSearchResult((BDBusLine)msg.obj);
->>>>>>> d4f5b08d11ba90a8d8137fe972cc0c08a2827e58
             }
         };
         mSearchBusRouteDoneHandler = new IMessageHandler() {
@@ -494,16 +469,9 @@ public class BusLocationFragment extends SherlockFragment {
         final int routeCount = line.getRouteCount();
         final String[] busRoutes = new String[routeCount];
         for (int idx = 0; idx < routeCount; idx++) {
-<<<<<<< HEAD
             String firstStation = line.getRoute(idx).getFirstStation();
             String lastStation  = line.getRoute(idx).getLastStation();
             busRoutes[idx] = firstStation + " - " + lastStation;
-=======
-            String name = line.getRoute(idx).getName();
-            int startPos = name.indexOf('(');
-            int endPos = name.indexOf(')');
-            busRoutes[idx] = name.substring(startPos + 1, endPos);
->>>>>>> d4f5b08d11ba90a8d8137fe972cc0c08a2827e58
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         final String titleText = String.format(getResources().getString(R.string.select_bus_route),
@@ -556,6 +524,7 @@ public class BusLocationFragment extends SherlockFragment {
         switch (item.getItemId()) {
             case R.id.clear_cache:
                 // TODO: Need implement
+                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));
@@ -583,9 +552,9 @@ public class BusLocationFragment extends SherlockFragment {
                     Utils.hideSoftKeyboard(mActivity, mSearchView);
                     mLineNumber = lineNumber;
                     if (!handleSearchResult(lineNumber)) {
-                    	showDialog(BUS_LINE_SEARCH_DLG);
-                    	mTrafficService.searchBusLine(city, mLineNumber);
-                    } 
+                        showDialog(BUS_LINE_SEARCH_DLG);
+                        mTrafficService.searchBusLine(city, mLineNumber);
+                    }
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_input_hint, Toast.LENGTH_LONG)
                             .show();
@@ -595,24 +564,11 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-<<<<<<< HEAD
                 if (newText!=null && !newText.equals("")) {
                     Cursor cursor = queryBusLines(newText);
                     String[] from = new String[]{ ITrafficData.BaiDuData.BusLine.LINE_NUMBER };
                     int[] to = new int[]{android.R.id.text1};
                     SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, android.R.layout.simple_list_item_1, cursor, from, to, 0);
-=======
-                if (newText != null && !newText.equals("") && mActivity != null) {
-                    Cursor cursor = getBusLineNumbers(newText);
-                    String[] from = new String[] {
-                        ITrafficData.BaiDuData.BusRoute.LINE_NUMBER
-                    };
-                    int[] to = new int[] {
-                        android.R.id.text1
-                    };
-                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
-                            android.R.layout.simple_list_item_1, cursor, from, to, 0);
->>>>>>> d4f5b08d11ba90a8d8137fe972cc0c08a2827e58
                     mSearchView.setSuggestionsAdapter(adapter);
                     return true;
                 } else {
@@ -630,13 +586,7 @@ public class BusLocationFragment extends SherlockFragment {
             @Override
             public boolean onSuggestionClick(int position) {
                 Cursor cursor = (Cursor)mSearchView.getSuggestionsAdapter().getItem(position);
-<<<<<<< HEAD
                 int suggestionIndex = cursor.getColumnIndex(ITrafficData.BaiDuData.BusLine.LINE_NUMBER);
-=======
-                int suggestionIndex = cursor
-                        .getColumnIndex(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER);
-
->>>>>>> d4f5b08d11ba90a8d8137fe972cc0c08a2827e58
                 mSearchView.setQuery(cursor.getString(suggestionIndex), true);
                 return true;
             }
@@ -679,7 +629,6 @@ public class BusLocationFragment extends SherlockFragment {
 
     }
 
-<<<<<<< HEAD
 //    private class BusRouteHistoryLoaderCallback implements LoaderCallbacks<Cursor> {
 //        @Override
 //        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -729,78 +678,11 @@ public class BusLocationFragment extends SherlockFragment {
         String selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + " LIKE ?";
         String[] args = new String[]{ lineNumber + "%" };
         Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, selection, args, sortOrder);
-=======
-    private class BusRouteHistoryLoaderCallback implements LoaderCallbacks<Cursor> {
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            CursorLoader loader = null;
-            if (BIADU_BUS_LINE_LOADER_ID == id) {
-                loader = new CursorLoader(mActivity, ITrafficData.BaiDuData.BusRoute.CONTENT_URI,
-                        ROUTE_HISTORY_PROJECTION, null, null, null);
-            }
-            return loader;
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-            ArrayList<BDBusLine> lineList = new ArrayList<BDBusLine>();
-            if (cursor != null && cursor.moveToFirst()) {
-                String preLineNumber = null, curLineNumber = null;
-                BDBusLine line = null;
-                do {
-                    curLineNumber = cursor.getString(IDX_LINE_NUMBER);
-                    if (!curLineNumber.equals(preLineNumber)) {
-                        line = new BDBusLine(curLineNumber);
-                        lineList.add(line);
-                    }
-                    String uid = cursor.getString(IDX_ROUTE_UID);
-                    String name = cursor.getString(IDX_ROUTE_NAME);
-                    String city = cursor.getString(IDX_LINE_CITY);
-                    BDBusRoute route = new BDBusRoute(uid, name, city);
-                    line.addRoute(route);
-                    preLineNumber = curLineNumber;
-                } while (cursor.moveToNext());
-            }
-            if (lineList != null && lineList.size() > 0) {
-                mLineList = lineList;
-            }
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-
-        }
-    }
-
-    private BDBusLine getBusLine(String lineNumber) {
-        BDBusLine retLine = null;
-        if (mLineList == null || mLineList.size() == 0) {
-            return retLine;
-        }
-        for (BDBusLine line : mLineList) {
-            if (line.getLineNumber().equals(lineNumber)) {
-                retLine = line;
-            }
-        }
-        return retLine;
-    }
-
-    private Cursor getBusLineNumbers(String keyword) {
-        ContentResolver resolver = mActivity.getContentResolver();
-        String sortOrder = ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME + " DESC ";
-        String selection = ITrafficData.BaiDuData.BusRoute.LINE_NUMBER + " LIKE ?";
-        String[] args = new String[] {
-            keyword + "%"
-        };
-        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI,
-                ROUTE_HISTORY_PROJECTION, selection, args, sortOrder);
-        Utils.printCursorContent(TAG, cursor);
->>>>>>> d4f5b08d11ba90a8d8137fe972cc0c08a2827e58
         return cursor;
     }
-    
+
     private Cursor queryBusLineRoutes(String lineNumber) {
-    	 ContentResolver resolver = mActivity.getContentResolver();
+         ContentResolver resolver = mActivity.getContentResolver();
          String selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + "=?";
          String[] args = new String[]{ lineNumber };
          Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI_WITH_ROUTE, BUS_ROUTE_PROJECTON, selection, args, null);
@@ -808,28 +690,27 @@ public class BusLocationFragment extends SherlockFragment {
     }
 
     private boolean handleSearchResult(String lineNumber) {
-    	boolean result = false;
-    	Cursor cursor = queryBusLineRoutes(lineNumber);
-    	if (cursor != null && cursor.moveToFirst()) {
-    		try {
-    			BDBusLine line = new BDBusLine(mLineNumber);
-    	        do {
-    	        	BDBusRoute route = new BDBusRoute();
-    	        	route.setCity( cursor.getString(IDX_BUS_ROUTE_CITY));
-    	        	route.setUid(cursor.getString(IDX_BUS_ROUTE_UID));
-    	        	route.setFirstStation(cursor.getString(IDX_BUS_ROUTE_FIRST_STATION));
-    	        	route.setLastStation(cursor.getString(IDX_BUS_ROUTE_LAST_STATION));
-    	        	line.addRoute(route);
-    	        } while(cursor.moveToNext());
-    	        result = true;
-    	        showBusRoutesDlg(mLineNumber, line);
-    	        mMapView.requestFocusFromTouch();
-    	        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-    		} finally {
-    			cursor.close();
-    		}
-    	}
-    	return result;
+        boolean result = false;
+        Cursor cursor = queryBusLineRoutes(lineNumber);
+        if (cursor != null && cursor.moveToFirst()) {
+            try {
+                BDBusLine line = new BDBusLine(mLineNumber);
+                do {
+                    BDBusRoute route = new BDBusRoute();
+                    route.setCity( cursor.getString(IDX_BUS_ROUTE_CITY));
+                    route.setUid(cursor.getString(IDX_BUS_ROUTE_UID));
+                    route.setFirstStation(cursor.getString(IDX_BUS_ROUTE_FIRST_STATION));
+                    route.setLastStation(cursor.getString(IDX_BUS_ROUTE_LAST_STATION));
+                    line.addRoute(route);
+                } while(cursor.moveToNext());
+                result = true;
+                showBusRoutesDlg(mLineNumber, line);
+                mMapView.requestFocusFromTouch();
+            } finally {
+                cursor.close();
+            }
+        }
+        return result;
     }
 
 }

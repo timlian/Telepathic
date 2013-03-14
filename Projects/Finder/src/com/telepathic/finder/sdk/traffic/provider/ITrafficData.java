@@ -275,8 +275,8 @@ public interface ITrafficData {
      */
     interface BaiDuData {
 
-    	interface BusLineColumns extends BaseColumns {
-    		 /**
+        interface BusLineColumns extends BaseColumns {
+             /**
              *  Bus line number
              */
             String LINE_NUMBER = "line_number";
@@ -296,18 +296,18 @@ public interface ITrafficData {
              * The last update time
              */
             String LAST_UPDATE_TIME = "last_update_time";
-    	}
-    	
-    	class BusLine implements BusLineColumns {
-    		 /**
+        }
+
+        class BusLine implements BusLineColumns {
+             /**
              * The content uri of this table
              */
             public static final Uri CONTENT_URI = Uri.parse("content://com.telepathic.finder.provider/baiDuBusLine");
             /**
-             * 
+             *
              */
-            public static final Uri CONTENT_URI_WITH_ROUTE = 
-            		Uri.parse("content://com.telepathic.finder.provider/baiDuBusLineWithBusRoute");
+            public static final Uri CONTENT_URI_WITH_ROUTE =
+                    Uri.parse("content://com.telepathic.finder.provider/baiDuBusLineWithBusRoute");
             /**
              * The MIME type
              */
@@ -316,10 +316,10 @@ public interface ITrafficData {
              * The MIME type
              */
             public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.baiDuBusLine";
-    	}
-    	
+        }
+
         interface BusRouteColumns extends BaseColumns {
-        	 /**
+             /**
              *  Bus line id
              */
             String LINE_ID = "line_id";

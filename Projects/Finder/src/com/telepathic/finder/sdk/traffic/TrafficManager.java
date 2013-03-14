@@ -88,14 +88,14 @@ public class TrafficManager {
 //                        BDBusLine busLine = new BDBusLine(lineNumber);
 //                        ArrayList<MKPoiInfo> lineRoutes =  taskResult.getResult();
 //                        for(MKPoiInfo poiInfo : lineRoutes) {
-//                        	busLine.addRoute(new BDBusRoute(poiInfo.uid, poiInfo.name, poiInfo.city));
+//                          busLine.addRoute(new BDBusRoute(poiInfo.uid, poiInfo.name, poiInfo.city));
 //                        }
                         Message msg = Message.obtain();
                         msg.arg1 = ITrafficeMessage.SEARCH_BUS_LINE_DONE;
                         msg.arg2 = taskResult.getErrorCode();
                         msg.obj = null;
                         mMessageHandler.sendMessage(msg);
-                       
+
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "searchBusLine is interrupted.");
                     }
@@ -130,7 +130,6 @@ public class TrafficManager {
                         Utils.debug(TAG, "searchBusRoute is interrupted.");
                     }
                     Utils.debug(TAG, "searchBusRoute(" + city + ", " + routeUid + ") finished.");
-                    Utils.copyAppDatabaseFiles(mContext.getPackageName());
                 }
             });
         }
@@ -221,7 +220,6 @@ public class TrafficManager {
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "getBusStationLines is interrupted.");
                     }
-                    Utils.copyAppDatabaseFiles(mContext.getPackageName());
                     Utils.debug(TAG, "getBusStationLines(" + gpsNumber + ") finished");
                 }
             });
@@ -277,7 +275,6 @@ public class TrafficManager {
                         Utils.debug(TAG, "getBusCardRecords is interrupted.");
                     }
                     Utils.debug(TAG, "getBusCardRecords(" + cardNumber + ", " + count + ") finished.");
-                    Utils.copyAppDatabaseFiles(mContext.getPackageName());
                 }
             });
         }
@@ -285,7 +282,7 @@ public class TrafficManager {
         @Override
         public void getBusLocation(final String lineNumber, final ArrayList<String> route) {
             if (mExecutorService.isShutdown()) {
-            	mExecutorService = Executors.newCachedThreadPool();
+                mExecutorService = Executors.newCachedThreadPool();
             }
             mExecutorService.execute(new Runnable() {
                 @Override

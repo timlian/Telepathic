@@ -103,8 +103,6 @@ public class BusLocationActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bus_location_view);
 
-        Utils.copyAppDatabaseFiles(getPackageName());
-
         mBtnSearch = (ImageButton) findViewById(R.id.search);
 
         mTvSearchKey = (AutoCompleteTextView) findViewById(R.id.search_key);
