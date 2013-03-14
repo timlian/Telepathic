@@ -1,0 +1,61 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".AboutActivity" >
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/icon" />
+
+    <TextView
+        android:id="@+id/app_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/icon"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_name"
+        android:gravity="center"
+        android:text="@string/version"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/copyright"
+        android:gravity="center"
+        android:text="@string/copyright"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp" />
+
+    <ScrollView
+        android:id="@+id/description_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/copyright"
+        android:layout_below="@id/version"
+        android:layout_margin="20dp" >
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/app_description" />
+    </ScrollView>
+
+</RelativeLayout>
