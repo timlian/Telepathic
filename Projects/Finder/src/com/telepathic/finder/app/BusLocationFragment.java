@@ -23,6 +23,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -564,16 +565,12 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText!=null && !newText.equals("")) {
-                    Cursor cursor = queryBusLines(newText);
-                    String[] from = new String[]{ ITrafficData.BaiDuData.BusLine.LINE_NUMBER };
-                    int[] to = new int[]{android.R.id.text1};
-                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, android.R.layout.simple_list_item_1, cursor, from, to, 0);
-                    mSearchView.setSuggestionsAdapter(adapter);
-                    return true;
-                } else {
-                    return false;
-                }
+                Cursor cursor = queryBusLines(newText);
+                String[] from = new String[]{ ITrafficData.BaiDuData.BusLine.LINE_NUMBER };
+                int[] to = new int[]{android.R.id.text1};
+                SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, android.R.layout.simple_list_item_1, cursor, from, to, 0);
+                mSearchView.setSuggestionsAdapter(adapter);
+                return true;
             }
         });
         mSearchView.setOnSuggestionListener(new OnSuggestionListener() {
@@ -675,9 +672,12 @@ public class BusLocationFragment extends SherlockFragment {
     private Cursor queryBusLines(String lineNumber) {
         ContentResolver resolver = mActivity.getContentResolver();
         String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC ";
-        String selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + " LIKE ?";
-        String[] args = new String[]{ lineNumber + "%" };
-        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, selection, args, sortOrder);
+        String selection = null, selectionArgs[] = null;
+        if (!TextUtils.isEmpty(lineNumber)) {
+        	selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + " LIKE ?";
+        	selectionArgs = new String[]{ lineNumber + "%" };
+        }
+        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, selection, selectionArgs, sortOrder);
         return cursor;
     }
 
