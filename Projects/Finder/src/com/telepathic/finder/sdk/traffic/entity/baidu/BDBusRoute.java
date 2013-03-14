@@ -6,26 +6,44 @@ public class BDBusRoute {
 	 */
 	private String mUid;
 	/**
-	 * The route name
+	 * The first station
 	 */
-	private String mName;
+	private String mFirstStation;
+	/**
+	 * The last station
+	 */
+	private String mLastStation;
 	/**
 	 * The city
 	 */
 	private String mCity;
 	
-	public BDBusRoute(String uid, String name, String city) {
-		mUid = uid;
-		mName = name;
+	public void setCity(String city) {
 		mCity = city;
+	}
+	
+	public void setUid(String uid) {
+		mUid = uid;
+	}
+	
+	public void setFirstStation(String firstStation) {
+		mFirstStation = firstStation;
+	}
+	
+	public void setLastStation(String lastStation) {
+		mLastStation = lastStation;
 	}
 	
 	public String getUid() {
 		return mUid;
 	}
 	
-	public String getName() {
-		return mName;
+	public String getFirstStation() {
+		return mFirstStation;
+	}
+	
+	public String getLastStation() {
+		return mLastStation;
 	}
 	
 	public String getCity() {

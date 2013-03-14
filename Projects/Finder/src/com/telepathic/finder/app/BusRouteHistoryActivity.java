@@ -25,8 +25,8 @@ public class BusRouteHistoryActivity extends BaseActivity {
 
     private static final String[] ROUTE_HISTORY_PROJECTION = {
         ITrafficData.BaiDuData.BusRoute._ID,
-        ITrafficData.BaiDuData.BusRoute.NAME,
-        ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME
+       // ITrafficData.BaiDuData.BusRoute.NAME,
+       // ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME
     };
     private static final int IDX_LINE_NAME = 1;
     private static final int IDX_TIMESTAMP = 2;

@@ -6,11 +6,9 @@ import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.search.MKPoiInfo;
 import com.baidu.mapapi.search.MKPoiResult;
 import com.baidu.mapapi.search.MKSearch;
-import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
-import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusRoute;
 import com.telepathic.finder.util.Utils;
 
-public class SearchBusLineTask extends BaseTask<BDBusLine>{
+public class SearchBusLineTask extends BaseTask<ArrayList<MKPoiInfo>>{
     private static final String TAG = SearchBusLineTask.class.getSimpleName();
     private MKSearch mMapSearch;
     private final String mCity;
@@ -41,7 +39,7 @@ public class SearchBusLineTask extends BaseTask<BDBusLine>{
     private class PoiSearchListener extends MKSearchListenerImpl {
         @Override
         public void onGetPoiResult(MKPoiResult res, int type, int error) {
-        	BDBusLine line = new BDBusLine(mLineNumber);
+        	ArrayList<MKPoiInfo> poiList = new ArrayList<MKPoiInfo>();
             if (error == 0 || res != null) {
                 ArrayList<MKPoiInfo> allPois = res.getAllPoi();
                 if (allPois != null && allPois.size() > 0) {
@@ -50,14 +48,14 @@ public class SearchBusLineTask extends BaseTask<BDBusLine>{
                     	// 0：普通点，1：公交站，
                     	// 2：公交线路，3：地铁站，4：地铁线路
                         if (poiInfo.ePoiType == 2) {
-                        	line.addRoute(new BDBusRoute(poiInfo.uid, poiInfo.name, poiInfo.city));
+                        	poiList.add(poiInfo);
                         }
                     }
                 }
             }
-            TaskResult<BDBusLine> taskResult = new TaskResult<BDBusLine>();
+            TaskResult<ArrayList<MKPoiInfo>> taskResult = new TaskResult<ArrayList<MKPoiInfo>>();
             taskResult.setErrorCode(error);
-            taskResult.setResult(line);
+            taskResult.setResult(poiList);
             setTaskResult(taskResult);
             synchronized (mLock) {
                 mLock.notifyAll();

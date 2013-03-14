@@ -22,6 +22,7 @@ import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
+import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusRoute;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
@@ -81,14 +82,20 @@ public class TrafficManager {
                         searchTask.startTask();
                         searchTask.waitTaskDone();
                         // Notify the search bus line operation finished.
-                        TaskResult<BDBusLine> taskResult = searchTask.getTaskResult();
+                        TaskResult<ArrayList<MKPoiInfo>> taskResult = searchTask.getTaskResult();
+                        // store bus line info.
+                        mTrafficStore.store(lineNumber, taskResult.getResult());
+//                        BDBusLine busLine = new BDBusLine(lineNumber);
+//                        ArrayList<MKPoiInfo> lineRoutes =  taskResult.getResult();
+//                        for(MKPoiInfo poiInfo : lineRoutes) {
+//                        	busLine.addRoute(new BDBusRoute(poiInfo.uid, poiInfo.name, poiInfo.city));
+//                        }
                         Message msg = Message.obtain();
                         msg.arg1 = ITrafficeMessage.SEARCH_BUS_LINE_DONE;
                         msg.arg2 = taskResult.getErrorCode();
-                        msg.obj = taskResult.getResult();
+                        msg.obj = null;
                         mMessageHandler.sendMessage(msg);
-                        // store bus line info.
-                        mTrafficStore.store(lineNumber, taskResult.getResult());
+                       
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "searchBusLine is interrupted.");
                     }

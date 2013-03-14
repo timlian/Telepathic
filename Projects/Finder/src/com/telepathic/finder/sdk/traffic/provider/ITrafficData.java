@@ -275,27 +275,66 @@ public interface ITrafficData {
      */
     interface BaiDuData {
 
-        interface BusRouteColumns extends BaseColumns {
-            /**
+    	interface BusLineColumns extends BaseColumns {
+    		 /**
              *  Bus line number
              */
             String LINE_NUMBER = "line_number";
-            /**
-             *  Bus route uid
-             */
-            String UID = "uid";
-            /**
-             *  Bus route name
-             */
-            String NAME = "name";
             /**
              * The city name
              */
             String CITY = "city";
             /**
+             * The start station
+             */
+            String START_STATION = "start_station";
+            /**
+             * The end station
+             */
+            String END_STATION = "end_station";
+            /**
              * The last update time
              */
             String LAST_UPDATE_TIME = "last_update_time";
+    	}
+    	
+    	class BusLine implements BusLineColumns {
+    		 /**
+             * The content uri of this table
+             */
+            public static final Uri CONTENT_URI = Uri.parse("content://com.telepathic.finder.provider/baiDuBusLine");
+            /**
+             * 
+             */
+            public static final Uri CONTENT_URI_WITH_ROUTE = 
+            		Uri.parse("content://com.telepathic.finder.provider/baiDuBusLineWithBusRoute");
+            /**
+             * The MIME type
+             */
+            public static final String CONTENT_TYPE = "vnd.android.cursor.dir/com.telepathic.finder.provider.baiDuBusLine";
+            /**
+             * The MIME type
+             */
+            public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.baiDuBusLine";
+    	}
+    	
+        interface BusRouteColumns extends BaseColumns {
+        	 /**
+             *  Bus line id
+             */
+            String LINE_ID = "line_id";
+            /**
+             *  Bus route uid
+             */
+            String UID = "uid";
+            /**
+             *  The first station name of the route.
+             */
+            String FIRST_STATION = "first_station";
+            /**
+             *  The last station name of the route.
+             */
+            String LAST_STATION = "last_station";
         }
 
         class BusRoute implements BusRouteColumns {

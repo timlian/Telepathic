@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.provider.BaseColumns;
 
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.BaiDuData;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
@@ -26,6 +27,7 @@ public class TrafficDataProvider extends ContentProvider {
     private static final String TABLE_KUAI_XIN_BUS_ROUTE_STATION = "kuaiXinBusRouteStation";
     private static final String TABLE_KUAI_XIN_PERFORMANCE = "kuaiXinPerformance";
 
+    private static final String TABLE_BAI_DU_BUS_LINE = "baiDuBusLine";
     private static final String TABLE_BAI_DU_BUS_ROUTE = "baiDuBusRoute";
     private static final String TABLE_BAI_DU_BUS_STATION = "baiDuBusStation";
     private static final String TABLE_BAI_DU_BUS_ROUTE_STATION = "baiDuBusRouteStation";
@@ -38,9 +40,11 @@ public class TrafficDataProvider extends ContentProvider {
     private static final int MATCH_KUAI_XIN_BUS_ROUTE_STATION = 6;
     private static final int MATCH_KUAI_XIN_BUS_STATION_LINES = 7;
     private static final int MATCH_KUAI_XIN_PERFORMANCE = 8;
-    private static final int MATCH_BAI_DU_BUS_ROUTE = 9;
-    private static final int MATCH_BAI_DU_BUS_STATION = 10;
-    private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 11;
+    private static final int MATCH_BAI_DU_BUS_LINE = 9;
+    private static final int MATCH_BD_LINE_JOIN_ROUTE = 10;
+    private static final int MATCH_BAI_DU_BUS_ROUTE = 11;
+    private static final int MATCH_BAI_DU_BUS_STATION = 12;
+    private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 13;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -53,6 +57,8 @@ public class TrafficDataProvider extends ContentProvider {
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusRouteStation", MATCH_KUAI_XIN_BUS_ROUTE_STATION);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusStationLines", MATCH_KUAI_XIN_BUS_STATION_LINES);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinPerformance", MATCH_KUAI_XIN_PERFORMANCE);
+        sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusLine", MATCH_BAI_DU_BUS_LINE);
+        sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusLineWithBusRoute", MATCH_BD_LINE_JOIN_ROUTE);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRoute", MATCH_BAI_DU_BUS_ROUTE);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusStation", MATCH_BAI_DU_BUS_STATION);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRouteStation", MATCH_BAI_DU_BUS_ROUTE_STATION);
@@ -69,6 +75,10 @@ public class TrafficDataProvider extends ContentProvider {
             + " LEFT OUTER JOIN " + TABLE_KUAI_XIN_BUS_ROUTE + " ON "
             + "(" + TABLE_KUAI_XIN_BUS_ROUTE_STATION + "." + KuaiXinData.BusRouteStation.ROUTE_ID + "="
             + TABLE_KUAI_XIN_BUS_ROUTE + "." + KuaiXinData.BusRoute._ID + ")";
+    
+    private static final String BD_LINE_JOIN_ROUTE_TABLE  = 
+    		TABLE_BAI_DU_BUS_LINE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE + " ON "
+    		+ "(" + TABLE_BAI_DU_BUS_LINE + "." + BaiDuData.BusLine._ID + "=" + BaiDuData.BusRoute.LINE_ID + ")";
 
 
     private DbHelper mDBHelper;
@@ -105,6 +115,12 @@ public class TrafficDataProvider extends ContentProvider {
         case MATCH_KUAI_XIN_BUS_STATION_LINES:
             tableName = KUAI_XIN_STATION_JOIN_ROUTE_STATION_JOIN__ROUTE;
             break;
+        case MATCH_BAI_DU_BUS_LINE:
+        	tableName = TABLE_BAI_DU_BUS_LINE;
+        	break;
+        case MATCH_BD_LINE_JOIN_ROUTE:
+        	tableName = BD_LINE_JOIN_ROUTE_TABLE;
+        	break;
         case MATCH_BAI_DU_BUS_ROUTE:
             tableName = TABLE_BAI_DU_BUS_ROUTE;
             break;
@@ -231,8 +247,49 @@ public class TrafficDataProvider extends ContentProvider {
         case MATCH_KUAI_XIN_PERFORMANCE:
             tableName = TABLE_KUAI_XIN_PERFORMANCE;
             break;
+        case MATCH_BAI_DU_BUS_LINE:
+        	rowId = db.insertWithOnConflict(TABLE_BAI_DU_BUS_LINE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+            if (rowId == -1) {
+                long conflictRowId = -1;
+                String[] projection = new String[]{BaseColumns._ID};
+                String selection = BaiDuData.BusLine.LINE_NUMBER + "=?";
+                String[] selectionArgs = new String[]{values.getAsString(BaiDuData.BusLine.LINE_NUMBER)};
+                Cursor cursor = query(BaiDuData.BusLine.CONTENT_URI, projection, selection, selectionArgs, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    conflictRowId = cursor.getLong(0);
+                }
+                if (conflictRowId == -1) {
+                    throw new RuntimeException("insert bai du bus line failed and there is no conflict row.");
+                }
+                int updateRows = update(BaiDuData.BusLine.CONTENT_URI, values, BaiDuData.BusLine._ID + "=?", new String[]{String.valueOf(conflictRowId)});
+                if (updateRows != 1) {
+                    throw new RuntimeException("update the conflict row caused " + updateRows + " rows updated");
+                }
+                rowId = conflictRowId;
+            }
+            inserted = true;
+        	break;
         case MATCH_BAI_DU_BUS_ROUTE:
-            tableName = TABLE_BAI_DU_BUS_ROUTE;
+            rowId = db.insertWithOnConflict(TABLE_BAI_DU_BUS_ROUTE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+            if (rowId == -1) {
+                long conflictRowId = -1;
+                String[] projection = new String[]{BaseColumns._ID};
+                String selection = BaiDuData.BusRoute.UID + "=?";
+                String[] selectionArgs = new String[]{values.getAsString(BaiDuData.BusRoute.UID)};
+                Cursor cursor = query(BaiDuData.BusRoute.CONTENT_URI, projection, selection, selectionArgs, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    conflictRowId = cursor.getLong(0);
+                }
+                if (conflictRowId == -1) {
+                    throw new RuntimeException("insert bai du bus route failed and there is no conflict row.");
+                }
+                int updateRows = update(BaiDuData.BusRoute.CONTENT_URI, values, BaiDuData.BusRoute._ID + "=?", new String[]{String.valueOf(conflictRowId)});
+                if (updateRows != 1) {
+                    throw new RuntimeException("update the conflict row caused " + updateRows + " rows updated");
+                }
+                rowId = conflictRowId;
+            }
+            inserted = true;
             break;
         case MATCH_BAI_DU_BUS_STATION:
             tableName = TABLE_BAI_DU_BUS_STATION;
@@ -275,6 +332,9 @@ public class TrafficDataProvider extends ContentProvider {
         case MATCH_KUAI_XIN_BUS_ROUTE_STATION:
             tableName = TABLE_KUAI_XIN_BUS_ROUTE_STATION;
             break;
+        case MATCH_BAI_DU_BUS_LINE:
+        	tableName = TABLE_BAI_DU_BUS_LINE;
+        	break;
         case MATCH_BAI_DU_BUS_ROUTE:
             tableName = TABLE_BAI_DU_BUS_ROUTE;
             break;
@@ -362,13 +422,21 @@ public class TrafficDataProvider extends ContentProvider {
                     + KuaiXinData.NetworkPerformance.RETRY + " TEXT, "
                     + KuaiXinData.NetworkPerformance.ERROR + " TEXT"+ " )");
 
+            db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_LINE + " ("
+                    + BaiDuData.BusLineColumns._ID + " INTEGER PRIMARY KEY, "
+                    + BaiDuData.BusLineColumns.LINE_NUMBER + " TEXT, "
+                    + BaiDuData.BusLineColumns.CITY + " TEXT, "
+                    + BaiDuData.BusLineColumns.START_STATION + " TEXT, "
+                    + BaiDuData.BusLineColumns.END_STATION + " TEXT, "
+                    + BaiDuData.BusLineColumns.LAST_UPDATE_TIME + " INTEGER, "
+                    + "UNIQUE (" + BaiDuData.BusLineColumns.LINE_NUMBER + ")"+ " )");
+            
             db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_ROUTE + " ("
                     + BaiDuData.BusRouteColumns._ID + " INTEGER PRIMARY KEY, "
-                    + BaiDuData.BusRouteColumns.CITY + " TEXT, "
-                    + BaiDuData.BusRouteColumns.LINE_NUMBER + " TEXT, "
+                    + BaiDuData.BusRouteColumns.LINE_ID + " INTEGER, "
                     + BaiDuData.BusRouteColumns.UID + " TEXT, "
-                    + BaiDuData.BusRouteColumns.NAME + " TEXT, "
-                    + BaiDuData.BusRouteColumns.LAST_UPDATE_TIME + " INTEGER, "
+                    + BaiDuData.BusRouteColumns.FIRST_STATION + " TEXT, "
+                    + BaiDuData.BusRouteColumns.LAST_STATION + " TEXT, "
                     + "UNIQUE (" + BaiDuData.BusRouteColumns.UID + ")"+ " )");
 
             db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_STATION + " ("

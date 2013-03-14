@@ -1,5 +1,6 @@
 package com.telepathic.finder.sdk.traffic;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
 import android.content.ContentResolver;
@@ -7,8 +8,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.baidu.mapapi.search.MKBusLineResult;
+import com.baidu.mapapi.search.MKPoiInfo;
 import com.baidu.mapapi.search.MKRoute;
 import com.baidu.mapapi.search.MKStep;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
@@ -22,6 +25,7 @@ import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
 import com.telepathic.finder.util.Utils;
 
 public class TrafficStore {
+	private static final String TAG = "TrafficStore";
     /**
      * The context resolver
      */
@@ -59,7 +63,7 @@ public class TrafficStore {
           String lineNumber = Utils.parseBusLineNumber(busLine.getBusName()).get(0);
           MKRoute route = busLine.getBusRoute();
           ContentValues values = new ContentValues();
-          values.put(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, lineNumber);
+          //values.put(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, lineNumber);
           final long routeId = -1;//mTrafficeStore.insertBusRoute(values);
           final int stepNumber = route.getNumSteps();
           for(int index = 0; index < stepNumber; index++) {
@@ -77,26 +81,53 @@ public class TrafficStore {
           }
     }
 
-    public void store(String lineNumber, BDBusLine line) {        
-    	for (int idx = 0; idx < line.getRouteCount(); idx++) {
-            ContentValues route = new ContentValues();
-            route.put(ITrafficData.BaiDuData.BusRoute.CITY, line.getRoute(idx).getCity());
-            route.put(ITrafficData.BaiDuData.BusRoute.LINE_NUMBER, lineNumber);
-            route.put(ITrafficData.BaiDuData.BusRoute.UID, line.getRoute(idx).getUid());
-            route.put(ITrafficData.BaiDuData.BusRoute.NAME,line.getRoute(idx).getName());
-            route.put(ITrafficData.BaiDuData.BusRoute.LAST_UPDATE_TIME, System.currentTimeMillis());
-            mContentResolver.insert(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, route);
-        }
+    public void store(String lineNumber, ArrayList<MKPoiInfo> lineRoutes) {
+    	if (TextUtils.isEmpty(lineNumber) || lineRoutes == null || lineRoutes.size() == 0) {
+    		return ;
+    	}
+    	boolean isFirstRoute = true;
+    	long lineId = -1;
+    	for(int idx = 0; idx < lineRoutes.size(); idx++) {
+    		MKPoiInfo poiInfo = lineRoutes.get(idx);
+    		int startPos = poiInfo.name.indexOf('(');
+            int endPos   = poiInfo.name.indexOf(')');
+    		String station[] = poiInfo.name.substring(startPos+1, endPos).split("-");
+    		String firstStation = station[0].trim();
+    		String lastStation  = station[1].trim();
+    		if (isFirstRoute) {
+    			ContentValues line = new ContentValues();
+    	    	line.put(ITrafficData.BaiDuData.BusLine.LINE_NUMBER, lineNumber);
+    	    	line.put(ITrafficData.BaiDuData.BusLine.CITY, poiInfo.city);
+    	    	line.put(ITrafficData.BaiDuData.BusLine.START_STATION, firstStation);
+    	    	line.put(ITrafficData.BaiDuData.BusLine.END_STATION, lastStation);
+    	    	line.put(ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME, System.currentTimeMillis());
+    	    	Uri uri = mContentResolver.insert(ITrafficData.BaiDuData.BusLine.CONTENT_URI, line);
+    	        lineId = Long.parseLong(uri.getLastPathSegment());
+    	        isFirstRoute = false;
+    		}
+    		ContentValues route = new ContentValues();
+	        route.put(ITrafficData.BaiDuData.BusRoute.LINE_ID, lineId);
+	        route.put(ITrafficData.BaiDuData.BusRoute.UID, poiInfo.uid);
+	        route.put(ITrafficData.BaiDuData.BusRoute.FIRST_STATION, firstStation);
+	        route.put(ITrafficData.BaiDuData.BusRoute.LAST_STATION, lastStation);
+	        Uri uri = mContentResolver.insert(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, route);
+	        Utils.debug(TAG, "insert bus route: " + uri);
+    	}
     }
 
     public void store(String routeUid, MKRoute route) {
-        String[] projection = new String[] { ITrafficData.BaiDuData.BusRouteColumns._ID };
+        String[] projection = new String[] { 
+        		ITrafficData.BaiDuData.BusRouteColumns._ID, 
+        		ITrafficData.BaiDuData.BusRouteColumns.LINE_ID
+        		};
         String selection = ITrafficData.BaiDuData.BusRouteColumns.UID + "=?";
         String[] selectionArgs = new String[] { routeUid };
         Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI, projection, selection, selectionArgs, null);
-        long routeId = -1;
+        long routeId = -1, lineId = -1;
         if (cursor != null && cursor.moveToFirst()) {
             routeId = cursor.getLong(0);
+            lineId  = cursor.getLong(1);
+            cursor.close();
         }
         if (routeId > 0) {
             final int stepNumber = route.getNumSteps();
@@ -114,6 +145,12 @@ public class TrafficStore {
                 busRouteStation.put(ITrafficData.BaiDuData.BusRouteStation.STATION_ID, stationId);
                 busRouteStation.put(ITrafficData.BaiDuData.BusRouteStation.INDEX, index);
                 mContentResolver.insert(ITrafficData.BaiDuData.BusRouteStation.CONTENT_URI, busRouteStation);
+            }
+            if (lineId > 0) {
+            	ContentValues values = new ContentValues();
+            	values.put(ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME, System.currentTimeMillis());
+            	String where = ITrafficData.BaiDuData.BusLine._ID + "=?";
+            	mContentResolver.update(ITrafficData.BaiDuData.BusLine.CONTENT_URI, values, where, new String[]{String.valueOf(lineId)});
             }
         }
     }
