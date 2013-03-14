@@ -8,8 +8,11 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -544,6 +547,9 @@ public class BusLocationFragment extends SherlockFragment {
 
         // Get the SearchView and set the searchable configuration
         mSearchView = (SearchView)menu.findItem(R.id.search_bus_location).getActionView();
+        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(Context.SEARCH_SERVICE);
+        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity().getComponentName());
+        mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.bus_number_hint));
         mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
@@ -567,6 +573,9 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (mActivity == null) {
+                    return false;
+                }
                 Cursor cursor = queryBusLines(newText);
                 String[] from = new String[]{
                         ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
