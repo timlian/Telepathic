@@ -107,7 +107,7 @@ public class BaiDuDataCache {
 	private ArrayList<MKStep> getRouteSteps(String uid) {
     	ArrayList<MKStep> stepList = null;
     	Cursor cursor = queryBusRouteStations(uid);
-    	if (cursor != null && cursor.moveToFirst()) {
+    	if (cursor != null && cursor.getCount() > 1 && cursor.moveToFirst()) {
     		try {
     			Method setPoint = null, setContent = null;
     			try {
@@ -146,7 +146,7 @@ public class BaiDuDataCache {
 		ArrayList<ArrayList<GeoPoint>> result = null;
 		ArrayList<GeoPoint> routePoints = null;
 		Cursor cursor = queryBusRoutePoints(uid);
-		if (cursor != null && cursor.moveToFirst()) {
+		if (cursor != null && cursor.getCount() > 1 && cursor.moveToFirst()) {
 			try {
 				routePoints = new ArrayList<GeoPoint>();
 				do {

@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,12 +24,14 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.EditorInfo;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -97,7 +101,7 @@ public class BusCardRecordFragment extends SherlockFragment {
     private MessageDispatcher mMessageDispatcher;
 
     private static final String[] CARD_RECORDS_HISTORY = {
-            ITrafficData.KuaiXinData.BusCard._ID, ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
+        ITrafficData.KuaiXinData.BusCard._ID, ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
     };
 
     private IMessageHandler mMessageHandler = new IMessageHandler() {
@@ -336,8 +340,12 @@ public class BusCardRecordFragment extends SherlockFragment {
 
         // Get the SearchView and set the searchable configuration
         mSearchView = (SearchView)menu.findItem(R.id.search_card_record).getActionView();
+        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(Context.SEARCH_SERVICE);
+        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity().getComponentName());
+        mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.ic_card_hint));
         mSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        mSearchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
             @Override
@@ -349,28 +357,27 @@ public class BusCardRecordFragment extends SherlockFragment {
                     mTrafficService.getBusCardRecords(cardNumber, 30);
                 } else {
                     Toast.makeText(mActivity, R.string.card_id_error_notice, Toast.LENGTH_SHORT)
-                            .show();
+                    .show();
                 }
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText != null && !newText.equals("") && mActivity != null) {
-                    Cursor cursor = getBusCardID(newText);
-                    String[] from = new String[] {
-                        ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
-                    };
-                    int[] to = new int[] {
-                        android.R.id.text1
-                    };
-                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
-                            android.R.layout.simple_list_item_1, cursor, from, to, 0);
-                    mSearchView.setSuggestionsAdapter(adapter);
-                    return true;
-                } else {
+                if (mActivity == null) {
                     return false;
                 }
+                Cursor cursor = queryBusCardID(newText);
+                String[] from = new String[] {
+                        ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
+                };
+                int[] to = new int[] {
+                        android.R.id.text1
+                };
+                SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
+                        android.R.layout.simple_list_item_1, cursor, from, to, 0);
+                mSearchView.setSuggestionsAdapter(adapter);
+                return true;
             }
         });
         mSearchView.setOnSuggestionListener(new OnSuggestionListener() {
@@ -397,15 +404,19 @@ public class BusCardRecordFragment extends SherlockFragment {
         return LOADER_ID++;
     }
 
-    private Cursor getBusCardID(String keywords) {
+    private Cursor queryBusCardID(String keywords) {
         ContentResolver resolver = mActivity.getContentResolver();
         String sortOrder = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " ASC ";
-        String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " LIKE ?";
-        String[] args = new String[] {
-            keywords + "%"
-        };
+        String selection = null;
+        String[] selectionArgs = null;
+        if(!TextUtils.isEmpty(keywords)){
+            selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " LIKE ?";
+            selectionArgs = new String[] {
+                    keywords + "%"
+            };
+        }
         Cursor cursor = resolver.query(ITrafficData.KuaiXinData.BusCard.CONTENT_URI,
-                CARD_RECORDS_HISTORY, selection, args, sortOrder);
+                CARD_RECORDS_HISTORY, selection, selectionArgs, sortOrder);
         Utils.printCursorContent(TAG, cursor);
         return cursor;
     }
