@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import com.baidu.mapapi.search.MKRoute;
 import com.baidu.mapapi.search.MKStep;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
+import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
+import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusRoute;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.util.Utils;
 
@@ -25,6 +27,17 @@ public class BaiDuDataCache {
 	 */
 	private ContentResolver mContentResolver;
 	
+	private static final String[] BUS_ROUTE_PROJECTON = {
+		ITrafficData.BaiDuData.BusLine.CITY,
+		ITrafficData.BaiDuData.BusRoute.UID,
+		ITrafficData.BaiDuData.BusRoute.FIRST_STATION,
+		ITrafficData.BaiDuData.BusRoute.LAST_STATION 
+	};
+	private static final int IDX_BUS_ROUTE_CITY = 0;
+	private static final int IDX_BUS_ROUTE_UID = 1;
+	private static final int IDX_BUS_ROUTE_FIRST_STATION = 2;
+	private static final int IDX_BUS_ROUTE_LAST_STATION = 3;
+	    
     private static final String[] BUS_ROUTE_STATION_PROJECTION = {
     	ITrafficData.BaiDuData.BusStation.NAME,
     	ITrafficData.BaiDuData.BusStation.LATITUDE,
@@ -51,6 +64,28 @@ public class BaiDuDataCache {
 		}
 	}
 
+	public BDBusLine getBusLine(String lineNumber) {
+		BDBusLine retLine = null;
+		Cursor cursor = queryBusLineRoutes(lineNumber);
+		if (cursor != null && cursor.moveToFirst()) {
+			try {
+				BDBusLine line = new BDBusLine(lineNumber);
+				do {
+					BDBusRoute route = new BDBusRoute();
+					route.setCity(cursor.getString(IDX_BUS_ROUTE_CITY));
+					route.setUid(cursor.getString(IDX_BUS_ROUTE_UID));
+					route.setFirstStation(cursor.getString(IDX_BUS_ROUTE_FIRST_STATION));
+					route.setLastStation(cursor.getString(IDX_BUS_ROUTE_LAST_STATION));
+					line.addRoute(route);
+				} while (cursor.moveToNext());
+				retLine = line;
+			} finally {
+				cursor.close();
+			}
+		}
+		return retLine;
+	}
+	
 	public MKRoute getRoute(String uid) {
 		MKRoute retRoute = null;
     	ArrayList<ArrayList<GeoPoint>> routePoints = null;
@@ -177,6 +212,13 @@ public class BaiDuDataCache {
         String[] args = new String[]{ routeUid };
         Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI_WITH_POINT, BUS_ROUTE_POINT_PROJECTION, selection, args, null);
         Utils.printCursorContent("Test", cursor);
+        return cursor;
+    }
+    
+    private Cursor queryBusLineRoutes(String lineNumber) {
+        String selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + "=?";
+        String[] args = new String[]{ lineNumber };
+        Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI_WITH_ROUTE, BUS_ROUTE_PROJECTON, selection, args, null);
         return cursor;
     }
 
