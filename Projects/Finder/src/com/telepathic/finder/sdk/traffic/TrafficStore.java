@@ -1,5 +1,6 @@
 package com.telepathic.finder.sdk.traffic;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
@@ -14,6 +15,7 @@ import com.baidu.mapapi.search.MKBusLineResult;
 import com.baidu.mapapi.search.MKPoiInfo;
 import com.baidu.mapapi.search.MKRoute;
 import com.baidu.mapapi.search.MKStep;
+import com.baidu.platform.comapi.basestruct.GeoPoint;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
 import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
@@ -146,6 +148,33 @@ public class TrafficStore {
                 busRouteStation.put(ITrafficData.BaiDuData.BusRouteStation.INDEX, index);
                 mContentResolver.insert(ITrafficData.BaiDuData.BusRouteStation.CONTENT_URI, busRouteStation);
             }
+            // store internal points
+            ArrayList<ArrayList<GeoPoint>> internalPoints = null;
+			try {
+				Class<?> routeClass = MKRoute.class;
+	            Field routeField = routeClass.getDeclaredField("a");
+				routeField.setAccessible(true);
+				internalPoints = (ArrayList<ArrayList<GeoPoint>>)routeField.get(route);
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+			if (internalPoints != null && internalPoints.size() > 0) {
+				for (int i = 0; i < internalPoints.size(); i++) {
+		    		for(GeoPoint point : internalPoints.get(i)) {
+		    			ContentValues pointValues = new ContentValues();
+		    			pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.ROUTE_ID, routeId);
+		    			pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.INDEX, i);
+		    			pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.LATITUDE, point.getLatitudeE6());
+		    			pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.LONGITUDE, point.getLongitudeE6());
+		    			mContentResolver.insert(ITrafficData.BaiDuData.BusRoutePoint.CONTENT_URI, pointValues);
+		    		}
+				}
+			}
+			// update bus line last_update_time
             if (lineId > 0) {
                 ContentValues values = new ContentValues();
                 values.put(ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME, System.currentTimeMillis());

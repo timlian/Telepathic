@@ -31,6 +31,7 @@ public class TrafficDataProvider extends ContentProvider {
     private static final String TABLE_BAI_DU_BUS_ROUTE = "baiDuBusRoute";
     private static final String TABLE_BAI_DU_BUS_STATION = "baiDuBusStation";
     private static final String TABLE_BAI_DU_BUS_ROUTE_STATION = "baiDuBusRouteStation";
+    private static final String TABLE_BAI_DU_BUS_ROUTE_POINT = "baiDuBusRoutePoint";
 
     private static final int MATCH_KUAI_XIN_BUS_CARD = 1;
     private static final int MATCH_KUAI_XIN_BUS_CARD_BY_ID = 2;
@@ -43,8 +44,11 @@ public class TrafficDataProvider extends ContentProvider {
     private static final int MATCH_BAI_DU_BUS_LINE = 9;
     private static final int MATCH_BD_LINE_JOIN_ROUTE = 10;
     private static final int MATCH_BAI_DU_BUS_ROUTE = 11;
-    private static final int MATCH_BAI_DU_BUS_STATION = 12;
-    private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 13;
+    private static final int MATCH_BD_ROUTE_JOIN_STATION = 12;
+    private static final int MATCH_BAI_DU_BUS_STATION = 13;
+    private static final int MATCH_BAI_DU_BUS_ROUTE_STATION = 14;
+    private static final int MATCH_BD_ROUTE_POINT = 15;
+    private static final int MATCH_BD_ROUTE_JOIN_POINT = 16;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -57,11 +61,15 @@ public class TrafficDataProvider extends ContentProvider {
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusRouteStation", MATCH_KUAI_XIN_BUS_ROUTE_STATION);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusStationLines", MATCH_KUAI_XIN_BUS_STATION_LINES);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinPerformance", MATCH_KUAI_XIN_PERFORMANCE);
+        
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusLine", MATCH_BAI_DU_BUS_LINE);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusLineWithBusRoute", MATCH_BD_LINE_JOIN_ROUTE);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRoute", MATCH_BAI_DU_BUS_ROUTE);
+        sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRouteWithStation", MATCH_BD_ROUTE_JOIN_STATION);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusStation", MATCH_BAI_DU_BUS_STATION);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRouteStation", MATCH_BAI_DU_BUS_ROUTE_STATION);
+        sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRoutePoint", MATCH_BD_ROUTE_POINT);
+        sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRouteWithPoint", MATCH_BD_ROUTE_JOIN_POINT);
     }
 
     private static final String KUAI_XIN_BUS_CARD_JOIN_CONSUMER_RECORD =
@@ -80,6 +88,17 @@ public class TrafficDataProvider extends ContentProvider {
             TABLE_BAI_DU_BUS_LINE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE + " ON "
             + "(" + TABLE_BAI_DU_BUS_LINE + "." + BaiDuData.BusLine._ID + "=" + BaiDuData.BusRoute.LINE_ID + ")";
 
+    private static final String BD_ROUTE_JOIN_STATION = 
+    		TABLE_BAI_DU_BUS_ROUTE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE_STATION + " ON "
+    		+ "(" + TABLE_BAI_DU_BUS_ROUTE + "." + BaiDuData.BusRoute._ID + "=" + BaiDuData.BusRouteStation.ROUTE_ID + ")"
+    		+ " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_STATION + " ON "
+    		+ "(" + BaiDuData.BusRouteStation.STATION_ID + "=" + TABLE_BAI_DU_BUS_STATION + "." +BaiDuData.BusStation._ID + ")";
+    
+    private static final String BD_ROUTE_JOIN_POINT = 
+    		TABLE_BAI_DU_BUS_ROUTE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE_POINT + " ON "
+    		+ "(" + TABLE_BAI_DU_BUS_ROUTE + "." + BaiDuData.BusRoute._ID + "=" 
+    		+ TABLE_BAI_DU_BUS_ROUTE_POINT + "." + BaiDuData.BusRoutePoint.ROUTE_ID + ")";
+    
 
     private DbHelper mDBHelper;
 
@@ -124,12 +143,18 @@ public class TrafficDataProvider extends ContentProvider {
         case MATCH_BAI_DU_BUS_ROUTE:
             tableName = TABLE_BAI_DU_BUS_ROUTE;
             break;
+        case MATCH_BD_ROUTE_JOIN_STATION:
+        	tableName = BD_ROUTE_JOIN_STATION;
+        	break;
         case MATCH_BAI_DU_BUS_STATION:
             tableName = TABLE_BAI_DU_BUS_STATION;
             break;
         case MATCH_BAI_DU_BUS_ROUTE_STATION:
             tableName = TABLE_BAI_DU_BUS_ROUTE_STATION;
             break;
+        case MATCH_BD_ROUTE_JOIN_POINT:
+        	tableName = BD_ROUTE_JOIN_POINT;
+        	break;
         default:
             throw new IllegalArgumentException("query() - Unknown uri: " + uri);
         }
@@ -297,6 +322,9 @@ public class TrafficDataProvider extends ContentProvider {
         case MATCH_BAI_DU_BUS_ROUTE_STATION:
             tableName = TABLE_BAI_DU_BUS_ROUTE_STATION;
             break;
+        case MATCH_BD_ROUTE_POINT:
+        	tableName = TABLE_BAI_DU_BUS_ROUTE_POINT;
+        	break;
         default:
             throw new UnsupportedOperationException("Can't insert into uri: " + uri);
         }
@@ -457,6 +485,16 @@ public class TrafficDataProvider extends ContentProvider {
                     + "REFERENCES " + TABLE_BAI_DU_BUS_STATION + "(" + BaiDuData.BusStationColumns._ID + ") ON DELETE CASCADE, "
                     + "UNIQUE (" + BaiDuData.BusRouteStationColumns.ROUTE_ID + ", "
                     + BaiDuData.BusRouteStationColumns.STATION_ID + " )"+ " )");
+            
+            db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_ROUTE_POINT + " ("
+                    + BaiDuData.BusRoutePoint._ID + " INTEGER PRIMARY KEY, "
+                    + BaiDuData.BusRoutePoint.ROUTE_ID + " INTEGER, "
+                    + BaiDuData.BusRoutePoint.INDEX + " INTEGER, "
+                    + BaiDuData.BusRoutePoint.LATITUDE + " INTEGER, "
+                    + BaiDuData.BusRoutePoint.LONGITUDE + " INTEGER, "
+                    + "UNIQUE (" + BaiDuData.BusRoutePoint.LATITUDE + ", "
+                    + BaiDuData.BusRoutePoint.LONGITUDE + ")"+ " )");
+
         }
 
         // Called whenever newVersion != oldVersion

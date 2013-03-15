@@ -18,9 +18,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -45,7 +42,6 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.map.LocationData;
-import com.baidu.mapapi.map.MKMapViewListener;
 import com.baidu.mapapi.map.MapController;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationOverlay;
@@ -65,69 +61,39 @@ import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.util.Utils;
 
 public class BusLocationFragment extends SherlockFragment {
-
     private static final String TAG = BusLocationFragment.class.getSimpleName();
-
+    
     private static final int CUSTOM_DIALOG_ID_START = 100;
-
     private static final int BUS_LINE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 1;
-
     private static final int DOWN_VOICE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 2;
-
     private static final int DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG = CUSTOM_DIALOG_ID_START + 3;
-
     private static final int EXIT_CONFIRM_DIALOG = CUSTOM_DIALOG_ID_START + 4;
-
-    private static final int CUSTOM_INTENT_REQUEST_CODE_START = 0x1000;
-
-    private static final int START_SPEECH_RECOGNIZE = CUSTOM_INTENT_REQUEST_CODE_START + 1;
-
     private static final int MAP_ZOOM_LEVEL = 14;
-
+    
     private MainActivity mActivity;
-
     private SearchView mSearchView;
-
     private MapView mMapView;
-
     private ImageButton mUpdateLocation;
-
     private BMapManager mMapManager;
-
     private MapController mMapController = null;
-
     private LocationClient mLocClient;
-
     private LocationData mLocData = null;
-
-    private MKMapViewListener mMapListener = null;
-
     private CustomItemizedOverlay mBusLocationOverlay;
 
     private MyLocationOverlay mLocationOverlay; // 定位图层
-
     private MyLocationListenner mLocationListener = new MyLocationListenner();
-
     private ITrafficService mTrafficService;
-
     private MessageDispatcher mMessageDispatcher;
-
     private MKRoute mBusRoute;
-
     private String mLineNumber;
-
     private Dialog mDialog;
-
     private IMessageHandler mSearchBusLineDoneHandler;
-
     private IMessageHandler mSearchBusRouteDoneHandler;
-
     private IMessageHandler mGetBusLocationUpdateHandler;
-
     private IMessageHandler mGetBusLocationDoneHandler;
-
     private boolean mIsFirstUpdate = true;
-
+    private BaiDuDataCache mDataCache;
+    
     private static final int BIADU_BUS_LINE_LOADER_ID = 2000;
 
     private static final String[] BUS_LINE_PROJECTION = {
@@ -147,14 +113,25 @@ public class BusLocationFragment extends SherlockFragment {
     private static final int IDX_BUS_ROUTE_UID  = 1;
     private static final int IDX_BUS_ROUTE_FIRST_STATION = 2;
     private static final int IDX_BUS_ROUTE_LAST_STATION  = 3;
-
-   // private static final int IDX_LINE_CITY = 1;
-  //  private static final int IDX_LINE_NUMBER = 2;
-  //  private static final int IDX_ROUTE_NAME = 3;
-  //  private static final int IDX_ROUTE_UID = 4;
-
-    private List<BDBusLine> mLineList;
-
+    
+    private static final String[] BUS_ROUTE_STATION_PROJECTION = {
+    	ITrafficData.BaiDuData.BusStation.NAME,
+    	ITrafficData.BaiDuData.BusStation.LATITUDE,
+    	ITrafficData.BaiDuData.BusStation.LONGITUDE
+    };
+    private static final int IDX_BUS_STATION_NAME = 0;
+    private static final int IDX_BUS_STATION_LATITUDE  = 1;
+    private static final int IDX_BUS_STATION_LONGITUDE = 2;
+    
+    private static final String[] BUS_ROUTE_POINT_PROJECTION = {
+    	ITrafficData.BaiDuData.BusRoutePoint.INDEX,
+    	ITrafficData.BaiDuData.BusRoutePoint.LATITUDE,
+    	ITrafficData.BaiDuData.BusRoutePoint.LONGITUDE,
+    };
+    private static final int IDX_BUS_ROUTE_POINT_INDEX = 0;
+    private static final int IDX_BUS_ROUTE_POINT_LATITUDE  = 1;
+    private static final int IDX_BUS_ROUTE_POINT_LONGITUDE = 2;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,6 +147,7 @@ public class BusLocationFragment extends SherlockFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = (MainActivity)getSherlockActivity();
+        mDataCache  = new BaiDuDataCache(mActivity);
         //mActivity.getSupportLoaderManager().initLoader(BIADU_BUS_LINE_LOADER_ID, null, new BusRouteHistoryLoaderCallback());
         // init map service
         FinderApplication app = (FinderApplication)mActivity.getApplication();
@@ -496,10 +474,26 @@ public class BusLocationFragment extends SherlockFragment {
                 }).create().show();
     }
 
-    private void searchBusRoute(String city, String uid) {
-        mTrafficService.searchBusRoute(city, uid);
-    }
+    
+    
+	private void searchBusRoute(String city, String uid) {
+		MKRoute route = mDataCache.getRoute(uid);
+		if (route != null) {
+			refreshMap(route);
+		} else {
+			mTrafficService.searchBusRoute(city, uid);
+		}
+	}
 
+	private void refreshMap(MKRoute route) {
+		RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
+		routeOverlay.setData(route);
+		mMapView.getOverlays().clear();
+		mMapView.getOverlays().add(routeOverlay);
+		mMapView.getOverlays().add(mLocationOverlay);
+		mMapView.refresh();
+		mMapView.getController().animateTo(route.getStart());
+	}
     private void updateBusLocation(MKStep station) {
         /**
          * 创建并添加第一个标记：
@@ -688,6 +682,24 @@ public class BusLocationFragment extends SherlockFragment {
          Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI_WITH_ROUTE, BUS_ROUTE_PROJECTON, selection, args, null);
          return cursor;
     }
+    
+    private Cursor queryBusRouteStations(String routeUid) {
+    	ContentResolver resolver = mActivity.getContentResolver();
+        String selection = ITrafficData.BaiDuData.BusRoute.UID + "=?";
+        String[] args = new String[]{ routeUid };
+        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI_WITH_STATION, BUS_ROUTE_STATION_PROJECTION, selection, args, null);
+        Utils.printCursorContent("Test", cursor);
+        return cursor;
+    }
+    
+    private Cursor queryBusRoutePoints(String routeUid) {
+    	ContentResolver resolver = mActivity.getContentResolver();
+        String selection = ITrafficData.BaiDuData.BusRoute.UID + "=?";
+        String[] args = new String[]{ routeUid };
+        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI_WITH_POINT, BUS_ROUTE_POINT_PROJECTION, selection, args, null);
+        Utils.printCursorContent("Test", cursor);
+        return cursor;
+    }
 
     private boolean handleSearchResult(String lineNumber) {
         boolean result = false;
@@ -712,5 +724,6 @@ public class BusLocationFragment extends SherlockFragment {
         }
         return result;
     }
+    
 
 }

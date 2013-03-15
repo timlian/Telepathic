@@ -343,6 +343,14 @@ public interface ITrafficData {
              */
             public static final Uri CONTENT_URI = Uri.parse("content://com.telepathic.finder.provider/baiDuBusRoute");
             /**
+             * The content uri of this table
+             */
+            public static final Uri CONTENT_URI_WITH_STATION = Uri.parse("content://com.telepathic.finder.provider/baiDuBusRouteWithStation");
+            /**
+             * The content uri of this table
+             */
+            public static final Uri CONTENT_URI_WITH_POINT = Uri.parse("content://com.telepathic.finder.provider/baiDuBusRouteWithPoint");
+            /**
              * The MIME type
              */
             public static final String CONTENT_TYPE = "vnd.android.cursor.dir/com.telepathic.finder.provider.baiDuBusRoute";
@@ -410,6 +418,40 @@ public interface ITrafficData {
              * The MIME type
              */
             public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.baiDuBusRouteStation";
+        }
+        
+        interface BusRoutePointColumns extends BaseColumns {
+            /**
+             * The bus route identification.
+             */
+            String ROUTE_ID = "route_id";
+            /**
+             * The station index in the route.
+             */
+            String INDEX = "idx";
+            /**
+             * The latitude
+             */
+            String LATITUDE = "latitude";
+            /**
+             * The longitude
+             */
+            String LONGITUDE = "longitude";
+        }
+        
+        class BusRoutePoint implements BusRoutePointColumns {
+        	 /**
+             * The content uri of this table
+             */
+            public static final Uri CONTENT_URI = Uri.parse("content://com.telepathic.finder.provider/baiDuBusRoutePoint");
+            /**
+             * The MIME type
+             */
+            public static final String CONTENT_TYPE = "vnd.android.cursor.dir/com.telepathic.finder.provider.baiDuBusRoutePoint";
+            /**
+             * The MIME type
+             */
+            public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.baiDuBusRoutePoint";
         }
     }
 }
