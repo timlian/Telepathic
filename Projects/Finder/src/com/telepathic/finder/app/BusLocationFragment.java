@@ -57,6 +57,7 @@ import com.baidu.mapapi.search.MKStep;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
+import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
@@ -451,7 +452,21 @@ public class BusLocationFragment extends SherlockFragment {
         }).create().show();
     }
 
-    
+    private void searchBusLine(String city, String lineNumber) {
+    	mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
+			@Override
+			public void onSuccess(Object result) {
+				BDBusLine line = (BDBusLine) result;
+				Utils.debug(TAG, "Thread Info: " + Thread.currentThread());
+				Toast.makeText(mActivity, "Search bus line success", Toast.LENGTH_SHORT).show();
+			}
+			@Override
+			public void onFailure(int errorCode, String errorText) {
+				Utils.debug(TAG, "Thread Info: " + Thread.currentThread());
+				Toast.makeText(mActivity, "Search bus line failed", Toast.LENGTH_SHORT).show();
+			}
+		});
+    }
     
 	private void searchBusRoute(String city, String uid) {
 		MKRoute route = mDataCache.getRoute(uid);
@@ -529,7 +544,7 @@ public class BusLocationFragment extends SherlockFragment {
                     mLineNumber = lineNumber;
                     if (!handleSearchResult(lineNumber)) {
                         showDialog(BUS_LINE_SEARCH_DLG);
-                        mTrafficService.searchBusLine(city, mLineNumber);
+                        searchBusLine(city, lineNumber);
                     }
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_input_hint, Toast.LENGTH_LONG)

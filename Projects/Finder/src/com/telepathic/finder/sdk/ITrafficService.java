@@ -2,6 +2,7 @@ package com.telepathic.finder.sdk;
 
 import java.util.ArrayList;
 
+
 public interface ITrafficService {
     /**
      * Search the bus line route detail information according to the specified line number.
@@ -9,7 +10,7 @@ public interface ITrafficService {
      * @param city   The name of the city, which the bus route belongs to.
      * @param lineNumber The unique identity of the bus route.
      */
-    void searchBusLine(String city, String lineNumber);
+    void searchBusLine(String city, String lineNumber, ICompletionListener listener);
 
     /**
      * Search the bus line route detail information according to the specified line number.

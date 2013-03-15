@@ -299,7 +299,7 @@ public class BusLocationActivity extends Activity {
             mBtnSearch.setEnabled(false);
             showDialog(BUS_LINE_SEARCH_DLG);
             mLineNumber = lineNumber;
-            mTrafficService.searchBusLine(city, mLineNumber);
+            mTrafficService.searchBusLine(city, mLineNumber, null);
             Utils.debug(TAG, "UI Thread: " + Thread.currentThread().toString());
         } else {
             Toast.makeText(this, R.string.invalid_input_hint,Toast.LENGTH_LONG).show();

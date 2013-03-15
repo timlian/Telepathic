@@ -9,15 +9,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.search.MKPoiInfo;
 import com.baidu.mapapi.search.MKRoute;
 import com.telepathic.finder.R;
+import com.telepathic.finder.sdk.ICompletionListener;
+import com.telepathic.finder.sdk.IErrorCode;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
@@ -70,32 +74,35 @@ public class TrafficManager {
     private class TrafficeService implements ITrafficService {
 
         @Override
-        public void searchBusLine(final String city, final String lineNumber) {
-            final SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
-            if (mExecutorService.isShutdown()) {
-                mExecutorService = Executors.newCachedThreadPool();
-            }
+        public void searchBusLine(final String city, final String lineNumber, final ICompletionListener listener) {
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
+                    	if (!Utils.hasActiveNetwork(mContext)) {
+                    		notifyFailure(listener, IErrorCode.NO_NETWORK, "No networking.");
+                    	}
+                    	SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
                         searchTask.startTask();
                         searchTask.waitTaskDone();
-                        // Notify the search bus line operation finished.
+                        
                         TaskResult<ArrayList<MKPoiInfo>> taskResult = searchTask.getTaskResult();
-                        // store bus line info.
-                        mTrafficStore.store(lineNumber, taskResult.getResult());
-//                        BDBusLine busLine = new BDBusLine(lineNumber);
-//                        ArrayList<MKPoiInfo> lineRoutes =  taskResult.getResult();
-//                        for(MKPoiInfo poiInfo : lineRoutes) {
-//                          busLine.addRoute(new BDBusRoute(poiInfo.uid, poiInfo.name, poiInfo.city));
-//                        }
-                        Message msg = Message.obtain();
-                        msg.arg1 = ITrafficeMessage.SEARCH_BUS_LINE_DONE;
-                        msg.arg2 = taskResult.getErrorCode();
-                        msg.obj = null;
-                        mMessageHandler.sendMessage(msg);
-
+                        if (taskResult != null) {
+                        	int errorCode = taskResult.getErrorCode();
+                        	if (errorCode != 0) {
+                        		notifyFailure(listener, IErrorCode.SEARCH_BUS_LINE_FAILED, taskResult.getErrorMessage());
+                        	} else {
+	                        	ArrayList<MKPoiInfo> line = taskResult.getResult();
+	                        	 if (line != null && line.size() > 0) {
+	                                mTrafficStore.store(lineNumber, line);
+	                                notifySuccess(listener, null);
+	                            } else {
+	                            	notifyFailure(listener, IErrorCode.SEARCH_BUS_LINE_FAILED, "No bus line info.");
+	                            }
+                        	}
+                        } else {
+                        	notifyFailure(listener, IErrorCode.SEARCH_BUS_LINE_FAILED, "Exception: the task result is null.");
+                        }
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "searchBusLine is interrupted.");
                     }
@@ -328,6 +335,28 @@ public class TrafficManager {
                 mExecutorService.shutdownNow();
             }
         }
+    }
+    
+    private void notifySuccess(final ICompletionListener listener, final Object result) {
+    	if (listener != null) {
+    		mMessageHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onSuccess(result);
+				}
+			});
+    	}
+    }
+    
+    private void notifyFailure(final ICompletionListener listener, final int errorCode, final String errorText) {
+    	if (listener != null) {
+    		mMessageHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					listener.onFailure(errorCode, errorText);
+				}
+			});
+    	}
     }
 
 }

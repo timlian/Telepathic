@@ -72,6 +72,8 @@
     
     <!-- Error messages -->
     <string name="get_bus_card_records_failed">获取公交卡信息失败.</string>
+    <string name="no_network">无网络</string>
+    <string name="search_bus_line_failed">查询公交路线信息失败。</string>
 
     <!-- App description -->
     <string name="app_description">成都公交可以帮助你查询成都市内公交车辆的位置。它还提供了根据公交卡号查询公交卡消费记录和根据GPS编号查找公交站台信息的功能。&lt;br/>&lt;br/>如果有任何问题，请联系我们。&lt;br/>&lt;br/>感谢您使用此应用！</string>
