@@ -1,5 +1,7 @@
 package com.telepathic.finder.app;
 
+import java.lang.Thread.UncaughtExceptionHandler;
+
 import android.app.Application;
 import android.os.Handler;
 import android.widget.Toast;
@@ -9,7 +11,7 @@ import com.baidu.mapapi.MKGeneralListener;
 import com.baidu.mapapi.map.MKEvent;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.TrafficManager;
-import com.telepathic.finder.util.Utils;
+import com.telepathic.finder.util.Logger;
 
 public class FinderApplication extends Application {
     static FinderApplication mApp;
@@ -43,11 +45,13 @@ public class FinderApplication extends Application {
 
     @Override
     public void onCreate() {
+    	setUncatchedExceptionHandler();
         mApp = this;
         mBMapManager = new BMapManager(this);
         boolean isSuccess = mBMapManager.init(this.mStrKey, new MyGeneralListener());
         Handler msgHandler = mMessageDispatcher.getMessageHandler(getMainLooper());
         mTrafficManager = TrafficManager.getTrafficManager(mBMapManager, getApplicationContext(), msgHandler);
+        
         // 初始化地图sdk成功，设置定位监听时间
         if (isSuccess) {
             //            mBMapManager.getLocationManager().setNotifyInternal(10, 5);
@@ -79,4 +83,13 @@ public class FinderApplication extends Application {
         return mMessageDispatcher;
     }
 
+    private void setUncatchedExceptionHandler() {
+    	Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(Thread thread, Throwable ex) {
+				Logger.logTrace(thread, ex);
+			}
+		});
+    }
+    
 }
