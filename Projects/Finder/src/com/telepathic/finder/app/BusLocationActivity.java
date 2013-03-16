@@ -507,7 +507,7 @@ public class BusLocationActivity extends Activity {
     }
 
     private void searchBusRoute(String city, String uid) {
-        mTrafficService.searchBusRoute(city, uid);
+        mTrafficService.searchBusRoute(city, uid, null);
     }
 
     private void updateBusLocation(MKStep station) {

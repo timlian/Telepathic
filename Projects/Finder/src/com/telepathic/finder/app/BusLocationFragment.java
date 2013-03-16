@@ -135,6 +135,12 @@ public class BusLocationFragment extends SherlockFragment {
         mMessageDispatcher = app.getMessageDispatcher();
 
         mUpdateLocation = (ImageButton)getView().findViewById(R.id.update_location);
+        mUpdateLocation.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+			}
+		});
 
         mMapView = (MapView)getView().findViewById(R.id.bmapView);
         mMapController = mMapView.getController();
@@ -170,46 +176,6 @@ public class BusLocationFragment extends SherlockFragment {
     }
 
     private void initMessageHandlers() {
-        mSearchBusLineDoneHandler = new IMessageHandler() {
-            @Override
-            public int what() {
-                return ITrafficeMessage.SEARCH_BUS_LINE_DONE;
-            }
-
-            @Override
-            public void handleMessage(Message msg) {
-                // removeDialog();
-                // handleSearchResult(mLineNumber);
-            }
-        };
-        mSearchBusRouteDoneHandler = new IMessageHandler() {
-            @Override
-            public int what() {
-                return ITrafficeMessage.SEARCH_BUS_ROUTE_DONE;
-            }
-
-            @Override
-            public void handleMessage(Message msg) {
-                final MKRoute route = (MKRoute)msg.obj;
-                RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
-                routeOverlay.setData(route);
-                mMapView.getOverlays().clear();
-                mMapView.getOverlays().add(routeOverlay);
-                mMapView.getOverlays().add(mLocationOverlay);
-                mMapView.refresh();
-                mMapView.getController().animateTo(route.getStart());
-                mBusRoute = route;
-                mBusLocationOverlay.removeAllOverlay();
-                mUpdateLocation.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // mTrafficService.getBusLocation(mLineNumber, getRouteStationNames(route));
-                        mUpdateLocation.setVisibility(View.GONE);
-                    }
-                });
-                // mTrafficService.getBusLocation(mLineNumber, getRouteStationNames(route));
-            }
-        };
         mGetBusLocationUpdateHandler = new IMessageHandler() {
 
             @Override
@@ -485,21 +451,40 @@ public class BusLocationFragment extends SherlockFragment {
     private void searchBusRoute(String city, String uid) {
         MKRoute route = mDataCache.getRoute(uid);
         if (route != null) {
-            refreshMap(route);
-        } else {
-            mTrafficService.searchBusRoute(city, uid);
-        }
+        	drawRoute(route);
+            return ;
+        } 
+        mTrafficService.searchBusRoute(city, uid, new ICompletionListener() {
+			@Override
+			public void onSuccess(Object result) {
+				MKRoute route = (MKRoute)result;
+				if (route != null) {
+					mBusRoute = route;
+					drawRoute(route);
+				}
+			}
+			@Override
+			public void onFailure(int errorCode, String errorText) {
+				 Utils.debug(TAG, "Search bus route failed: " + errorText);
+	             String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
+	             String description = getString(R.string.search_bus_route_failed, reason);
+	             Toast.makeText(mActivity, description, Toast.LENGTH_SHORT).show();
+			}
+		});
     }
 
-    private void refreshMap(MKRoute route) {
-        RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
+    private void drawRoute(MKRoute route) {
+    	RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
         routeOverlay.setData(route);
         mMapView.getOverlays().clear();
         mMapView.getOverlays().add(routeOverlay);
         mMapView.getOverlays().add(mLocationOverlay);
         mMapView.refresh();
         mMapView.getController().animateTo(route.getStart());
+        mBusLocationOverlay.removeAllOverlay();
+        mUpdateLocation.setVisibility(View.VISIBLE);
     }
+    
     private void updateBusLocation(MKStep station) {
         /**
          * 创建并添加第一个标记：

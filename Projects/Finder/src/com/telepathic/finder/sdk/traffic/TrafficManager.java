@@ -9,12 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.search.MKPoiInfo;
@@ -25,8 +23,6 @@ import com.telepathic.finder.sdk.IErrorCode;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
-import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
-import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusRoute;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
@@ -102,7 +98,7 @@ public class TrafficManager {
 	                            }
                         	}
                         } else {
-                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the task result is null.");
+                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the search bus line task result is null.");
                         }
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "searchBusLine is interrupted.");
@@ -113,27 +109,36 @@ public class TrafficManager {
         }
 
         @Override
-
-        public void searchBusRoute(final String city, final String routeUid) {
+        public void searchBusRoute(final String city, final String routeUid, final ICompletionListener listener) {
+        	// The creation of search bus route task must be in the thread, which has looper. 
             final SearchBusRouteTask searchTask = new SearchBusRouteTask(mMapManager, city, routeUid);
-            if (mExecutorService.isShutdown()) {
-                mExecutorService = Executors.newCachedThreadPool();
-            }
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
+                    	if (!Utils.hasActiveNetwork(mContext)) {
+                    		notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No networking.");
+                    	}
                         searchTask.startTask();
                         searchTask.waitTaskDone();
-                        // Notify the search bus route operation finished.
                         TaskResult<MKRoute> taskResult = searchTask.getTaskResult();
-                        Message msg = Message.obtain();
-                        msg.arg1 = ITrafficeMessage.SEARCH_BUS_ROUTE_DONE;
-                        msg.arg2 = taskResult.getErrorCode();
-                        msg.obj = taskResult.getResult();
-                        mMessageHandler.sendMessage(msg);
-                        // store the bus route info.
-                        mTrafficStore.store(routeUid, taskResult.getResult());
+                        if (taskResult != null) {
+                        	int errorCode = taskResult.getErrorCode();
+                        	if (errorCode != 0) {
+                        		notifyFailure(listener, errorCode, taskResult.getErrorMessage());
+                        	} else {
+                        		MKRoute route = taskResult.getResult();
+                        		if (route != null) {
+        	                        // store the bus route info.
+        	                        mTrafficStore.store(routeUid, taskResult.getResult());
+        	                        notifySuccess(listener, route);
+                        		} else {
+                        			notifyFailure(listener, IErrorCode.ERROR_NO_DATA, "No bus route info.");
+                        		}
+                        	}
+                        } else {
+                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the search bus route task result is null.");
+                        }
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "searchBusRoute is interrupted.");
                     }

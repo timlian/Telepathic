@@ -18,7 +18,7 @@ public interface ITrafficService {
      * @param city   The name of the city, which the bus route belongs to.
      * @param lineNumber The unique identity of the bus route.
      */
-    void searchBusRoute(String city, String routeUid);
+    void searchBusRoute(String city, String routeUid, ICompletionListener listener);
 
 
     /**
