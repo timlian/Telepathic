@@ -93,8 +93,6 @@ public class BusLocationFragment extends SherlockFragment {
     private MKRoute mBusRoute;
     private String mBusRouteUid;
     private Dialog mDialog;
-    private IMessageHandler mSearchBusLineDoneHandler;
-    private IMessageHandler mSearchBusRouteDoneHandler;
     private IMessageHandler mGetBusLocationUpdateHandler;
     private IMessageHandler mGetBusLocationDoneHandler;
     private boolean mIsFirstUpdate = true;
@@ -228,16 +226,11 @@ public class BusLocationFragment extends SherlockFragment {
                 mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity);
             }
         };
-
-        mMessageDispatcher.add(mSearchBusLineDoneHandler);
-        mMessageDispatcher.add(mSearchBusRouteDoneHandler);
         mMessageDispatcher.add(mGetBusLocationUpdateHandler);
         mMessageDispatcher.add(mGetBusLocationDoneHandler);
     }
 
     private void clearMessageHandlers() {
-        mMessageDispatcher.remove(mSearchBusLineDoneHandler);
-        mMessageDispatcher.remove(mSearchBusRouteDoneHandler);
         mMessageDispatcher.remove(mGetBusLocationUpdateHandler);
         mMessageDispatcher.remove(mGetBusLocationDoneHandler);
     }
