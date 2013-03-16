@@ -10,7 +10,6 @@
         android:clickable="true" />
     
     <ImageButton
-        android:visibility="gone"
         android:id="@+id/update_location"
         android:layout_marginTop="5dp"
         android:layout_marginRight="2dp"

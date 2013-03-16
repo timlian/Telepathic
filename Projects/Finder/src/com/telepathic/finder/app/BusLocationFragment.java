@@ -138,9 +138,10 @@ public class BusLocationFragment extends SherlockFragment {
         mUpdateLocation.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
+				getRouteLocation(mBusRoute);
 			}
 		});
+        mUpdateLocation.setEnabled(false);
 
         mMapView = (MapView)getView().findViewById(R.id.bmapView);
         mMapController = mMapView.getController();
@@ -225,7 +226,6 @@ public class BusLocationFragment extends SherlockFragment {
                  * 创建一个新的自定义的ItemizedOverlay，以便更新时使用
                  */
                 mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity);
-                mUpdateLocation.setVisibility(View.VISIBLE);
             }
         };
 
@@ -451,7 +451,7 @@ public class BusLocationFragment extends SherlockFragment {
     private void searchBusRoute(String city, String uid) {
         MKRoute route = mDataCache.getRoute(uid);
         if (route != null) {
-        	drawRoute(route);
+        	updateRoute(route);
             return ;
         } 
         mTrafficService.searchBusRoute(city, uid, new ICompletionListener() {
@@ -459,8 +459,7 @@ public class BusLocationFragment extends SherlockFragment {
 			public void onSuccess(Object result) {
 				MKRoute route = (MKRoute)result;
 				if (route != null) {
-					mBusRoute = route;
-					drawRoute(route);
+					updateRoute(route);
 				}
 			}
 			@Override
@@ -472,6 +471,14 @@ public class BusLocationFragment extends SherlockFragment {
 			}
 		});
     }
+    
+    private void getRouteLocation(MKRoute route) {
+    	if (route == null) {
+    		return ;
+    	}
+    	//Todo: get the bus locatin from kuai xin server
+    	//mTrafficService.getBusLocation(route., route);
+    }
 
     private void drawRoute(MKRoute route) {
     	RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
@@ -482,7 +489,6 @@ public class BusLocationFragment extends SherlockFragment {
         mMapView.refresh();
         mMapView.getController().animateTo(route.getStart());
         mBusLocationOverlay.removeAllOverlay();
-        mUpdateLocation.setVisibility(View.VISIBLE);
     }
     
     private void updateBusLocation(MKStep station) {
@@ -646,6 +652,14 @@ public class BusLocationFragment extends SherlockFragment {
         }
         Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, selection, selectionArgs, sortOrder);
         return cursor;
+    }
+    
+    private void updateRoute(MKRoute route) {
+    	if (route != null) {
+	    	mBusRoute = route;
+	    	mUpdateLocation.setEnabled(true);
+	    	drawRoute(route);
+    	}
     }
 
 }
