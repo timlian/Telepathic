@@ -568,19 +568,7 @@ public class BusLocationFragment extends SherlockFragment {
                 if (mActivity == null) {
                     return false;
                 }
-                Cursor cursor = queryBusLines(newText);
-                String[] from = new String[]{
-                        ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
-                        ITrafficData.BaiDuData.BusLine.START_STATION,
-                        ITrafficData.BaiDuData.BusLine.END_STATION
-                };
-                int[] to = new int[]{
-                        R.id.line_number,
-                        R.id.start_station,
-                        R.id.end_station
-                };
-                SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, R.layout.bus_line_suggestion_item, cursor, from, to, 0);
-                mSearchView.setSuggestionsAdapter(adapter);
+                getSuggestions(newText);
                 return true;
             }
         });
@@ -604,11 +592,28 @@ public class BusLocationFragment extends SherlockFragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 String queryText = mSearchView.getQuery().toString();
                 if (hasFocus && !TextUtils.isEmpty(queryText)) {
+                    getSuggestions(queryText);
                     mSearchView.setQuery(queryText, false);
                 }
             }
         });
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void getSuggestions(String queryText) {
+        Cursor cursor = queryBusLines(queryText);
+        String[] from = new String[]{
+                ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
+                ITrafficData.BaiDuData.BusLine.START_STATION,
+                ITrafficData.BaiDuData.BusLine.END_STATION
+        };
+        int[] to = new int[]{
+                R.id.line_number,
+                R.id.start_station,
+                R.id.end_station
+        };
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, R.layout.bus_line_suggestion_item, cursor, from, to, 0);
+        mSearchView.setSuggestionsAdapter(adapter);
     }
 
     public class MyLocationListenner implements BDLocationListener {
