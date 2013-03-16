@@ -63,6 +63,15 @@
     <string name="speak_busline_number">Please speak out busline number</string>
     <string name="no_matches_busline">No matches bus line</string>
 
+    <!-- Toast messages -->
+    <string name="start_get_location">start to get the bus location&#8230;</string>
+    <string name="get_location_finished">get bus location done。</string>
+     
+    <!-- Generic Error messages -->
+    <string name="error_unknown">Unknown Error</string>
+    <string name="error_no_network">No Network</string>
+    <string name="error_no_data">No Data</string>
+    
     <!-- Baidu map error message definition -->
     <string name="error_location_falied">定位失败</string>
     <string name="error_network_connect">网络连接错误</string>
@@ -70,15 +79,6 @@
     <string name="error_permission_denied">授权验证失败</string>
     <string name="error_result_not_found">未找到搜索结果</string>
     <string name="error_route_addr">路线搜索起点或终点有歧义</string>
-
-    <!-- Toast messages -->
-    <string name="start_get_location">start to get the bus location&#8230;</string>
-    <string name="get_location_finished">get bus location done。</string>
-     
-    <!-- Error messages -->
-    <string name="error_unknown">Unknown Error</string>
-    <string name="error_no_network">No Network</string>
-    <string name="error_no_data">No Data</string>
     
     <!-- Toast error messages -->
     <string name="search_bus_line_failed">Search bus line failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
