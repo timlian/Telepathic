@@ -139,7 +139,11 @@ public class BusLocationFragment extends SherlockFragment {
 				getRouteLocation(mBusRoute, mBusRouteUid);
 			}
 		});
-        mUpdateLocation.setEnabled(false);
+        if (mBusRoute != null && mBusRouteUid != null) {
+        	mUpdateLocation.setEnabled(true);
+        } else {
+        	mUpdateLocation.setEnabled(false);
+        }
 
         if (mMapView == null) {
             mMapView = (MapView)getView().findViewById(R.id.bmapView);
@@ -223,6 +227,7 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void handleMessage(Message msg) {
+            	Toast.makeText(mActivity, getString(R.string.get_location_finished), Toast.LENGTH_SHORT).show();
                 mIsFirstUpdate = true;
                 if (msg.arg2 != 0) {
                     String errorMessage = (String)msg.obj;
@@ -486,6 +491,7 @@ public class BusLocationFragment extends SherlockFragment {
     	}
     	String lineNumber = mDataCache.getRouteLineNumber(uid);
     	if (Utils.isValidBusLineNumber(lineNumber)) {
+    		Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT).show();
     		mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route));
     	}
     }

@@ -70,6 +70,10 @@
     <string name="error_result_not_found">未找到搜索结果</string>
     <string name="error_route_addr">路线搜索起点或终点有歧义</string>
     
+    <!-- Toast messages -->
+    <string name="start_get_location">开始获取车辆位置信息&#8230;</string>
+    <string name="get_location_finished">获取车辆位置信息完毕。</string>
+    
     <!-- Error messages -->
     <string name="error_unknown">未知错误</string>
     <string name="error_no_network">无网络</string>
