@@ -75,14 +75,15 @@ public class TrafficManager {
 
         @Override
         public void searchBusLine(final String city, final String lineNumber, final ICompletionListener listener) {
+        	// The creation of search bus line task must be in the thread, which has looper. 
+        	final SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
                     	if (!Utils.hasActiveNetwork(mContext)) {
-                    		notifyFailure(listener, IErrorCode.NO_NETWORK, "No networking.");
+                    		notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No networking.");
                     	}
-                    	SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
                         searchTask.startTask();
                         searchTask.waitTaskDone();
                         
@@ -90,18 +91,18 @@ public class TrafficManager {
                         if (taskResult != null) {
                         	int errorCode = taskResult.getErrorCode();
                         	if (errorCode != 0) {
-                        		notifyFailure(listener, IErrorCode.SEARCH_BUS_LINE_FAILED, taskResult.getErrorMessage());
+                        		notifyFailure(listener, errorCode, taskResult.getErrorMessage());
                         	} else {
 	                        	ArrayList<MKPoiInfo> line = taskResult.getResult();
 	                        	 if (line != null && line.size() > 0) {
 	                                mTrafficStore.store(lineNumber, line);
 	                                notifySuccess(listener, null);
 	                            } else {
-	                            	notifyFailure(listener, IErrorCode.SEARCH_BUS_LINE_FAILED, "No bus line info.");
+	                            	notifyFailure(listener, IErrorCode.ERROR_NO_DATA, "No bus line info.");
 	                            }
                         	}
                         } else {
-                        	notifyFailure(listener, IErrorCode.SEARCH_BUS_LINE_FAILED, "Exception: the task result is null.");
+                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the task result is null.");
                         }
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "searchBusLine is interrupted.");

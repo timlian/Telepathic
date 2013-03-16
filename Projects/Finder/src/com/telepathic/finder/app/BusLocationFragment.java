@@ -177,8 +177,8 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void handleMessage(Message msg) {
-                removeDialog();
-                handleSearchResult(mLineNumber);
+               // removeDialog();
+               // handleSearchResult(mLineNumber);
             }
         };
         mSearchBusRouteDoneHandler = new IMessageHandler() {
@@ -416,13 +416,13 @@ public class BusLocationFragment extends SherlockFragment {
         }
     }
 
-    private void removeDialog() {
-        if (mDialog != null) {
+    private void dismissWaittingDialog() {
+        if (mDialog != null && mDialog.isShowing()) {
             mDialog.dismiss();
         }
     }
 
-    private void showBusRoutesDlg(String busLineNumber, final BDBusLine line) {
+    private void showBusLineDlg(final BDBusLine line) {
         final int routeCount = line.getRouteCount();
         final String[] busRoutes = new String[routeCount];
         for (int idx = 0; idx < routeCount; idx++) {
@@ -432,7 +432,7 @@ public class BusLocationFragment extends SherlockFragment {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         final String titleText = String.format(getResources().getString(R.string.select_bus_route),
-                busLineNumber);
+                line.getLineNumber());
         builder.setTitle(titleText).setSingleChoiceItems(busRoutes, 0, null)
         .setOnCancelListener(null)
         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -452,21 +452,34 @@ public class BusLocationFragment extends SherlockFragment {
         }).create().show();
     }
 
-    private void searchBusLine(String city, String lineNumber) {
-    	mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
+	private void searchBusLine(final String city, final String lineNumber) {
+		BDBusLine line = mDataCache.getBusLine(lineNumber);
+		if (line != null) {
+			dismissWaittingDialog();
+			showBusLineDlg(line);
+			mMapView.requestFocusFromTouch();
+			return;
+		}
+		mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
 			@Override
 			public void onSuccess(Object result) {
-				BDBusLine line = (BDBusLine) result;
-				Utils.debug(TAG, "Thread Info: " + Thread.currentThread());
-				Toast.makeText(mActivity, "Search bus line success", Toast.LENGTH_SHORT).show();
+				dismissWaittingDialog();
+				BDBusLine line = mDataCache.getBusLine(lineNumber);
+				if (line != null) {
+					showBusLineDlg(line);
+					mMapView.requestFocusFromTouch();
+				}
 			}
 			@Override
 			public void onFailure(int errorCode, String errorText) {
-				Utils.debug(TAG, "Thread Info: " + Thread.currentThread());
-				Toast.makeText(mActivity, "Search bus line failed", Toast.LENGTH_SHORT).show();
+				Utils.debug(TAG, "Search bus line failed: " + errorText);
+				dismissWaittingDialog();
+				String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
+				String description = getString(R.string.search_bus_line_failed, reason);
+				Toast.makeText(mActivity, description, Toast.LENGTH_SHORT).show();
 			}
 		});
-    }
+	}
     
 	private void searchBusRoute(String city, String uid) {
 		MKRoute route = mDataCache.getRoute(uid);
@@ -541,14 +554,10 @@ public class BusLocationFragment extends SherlockFragment {
                 if (Utils.isValidBusLineNumber(lineNumber)) {
                     String city = getResources().getString(R.string.default_city);
                     Utils.hideSoftKeyboard(mActivity, mSearchView);
-                    mLineNumber = lineNumber;
-                    if (!handleSearchResult(lineNumber)) {
-                        showDialog(BUS_LINE_SEARCH_DLG);
-                        searchBusLine(city, lineNumber);
-                    }
+                    showDialog(BUS_LINE_SEARCH_DLG);
+                    searchBusLine(city, lineNumber);
                 } else {
-                    Toast.makeText(mActivity, R.string.invalid_input_hint, Toast.LENGTH_LONG)
-                    .show();
+                    Toast.makeText(mActivity, R.string.invalid_input_hint, Toast.LENGTH_LONG).show();
                 }
                 return true;
             }
@@ -637,17 +646,6 @@ public class BusLocationFragment extends SherlockFragment {
         }
         Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, selection, selectionArgs, sortOrder);
         return cursor;
-    }
-
-    private boolean handleSearchResult(String lineNumber) {
-        boolean result = false;
-        BDBusLine line = mDataCache.getBusLine(lineNumber);
-        if (line != null) {
-        	 showBusRoutesDlg(mLineNumber, line);
-             mMapView.requestFocusFromTouch();
-             result = true;
-        }
-        return result;
     }
 
 }

@@ -2,7 +2,10 @@ package com.telepathic.finder.app;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.content.Context;
 import android.os.Handler;
 import android.widget.Toast;
 
@@ -12,8 +15,13 @@ import com.baidu.mapapi.map.MKEvent;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.TrafficManager;
 import com.telepathic.finder.util.Logger;
+import com.telepathic.finder.util.Utils;
 
 public class FinderApplication extends Application {
+	private static final String TAG = FinderApplication.class.getName();
+	
+	private static final String MAIN_PROCESS_NAME = "com.telepathic.finder";
+	
     static FinderApplication mApp;
 
     private BMapManager mBMapManager = null;
@@ -45,19 +53,21 @@ public class FinderApplication extends Application {
 
     @Override
     public void onCreate() {
-    	setUncatchedExceptionHandler();
-        mApp = this;
-        mBMapManager = new BMapManager(this);
-        boolean isSuccess = mBMapManager.init(this.mStrKey, new MyGeneralListener());
-        Handler msgHandler = mMessageDispatcher.getMessageHandler(getMainLooper());
-        mTrafficManager = TrafficManager.getTrafficManager(mBMapManager, getApplicationContext(), msgHandler);
-        
-        // 初始化地图sdk成功，设置定位监听时间
-        if (isSuccess) {
-            //            mBMapManager.getLocationManager().setNotifyInternal(10, 5);
-        } else {
-            // 地图sdk初始化失败，不能使用sdk
-        }
+    	if (MAIN_PROCESS_NAME.equals(getCurrentProcessName())) {
+    		//setUncatchedExceptionHandler();
+    		mApp = this;
+	        mBMapManager = new BMapManager(this);
+	        boolean isSuccess = mBMapManager.init(this.mStrKey, new MyGeneralListener());
+	        Handler msgHandler = mMessageDispatcher.getMessageHandler(getMainLooper());
+	        mTrafficManager = TrafficManager.getTrafficManager(mBMapManager, getApplicationContext(), msgHandler);
+	        // 初始化地图sdk成功，设置定位监听时间
+	        if (isSuccess) {
+	            // mBMapManager.getLocationManager().setNotifyInternal(10, 5);
+	        } else {
+	            // 地图sdk初始化失败，不能使用sdk
+	        }
+    	}
+       
         super.onCreate();
     }
 
@@ -90,6 +100,17 @@ public class FinderApplication extends Application {
 				Logger.logTrace(thread, ex);
 			}
 		});
+    }
+    
+    private String getCurrentProcessName() {
+        int pid = android.os.Process.myPid();
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningAppProcessInfo appProcess : activityManager.getRunningAppProcesses()) {
+            if (appProcess.pid == pid) {
+                return appProcess.processName;
+            }
+        }
+        return null;
     }
     
 }
