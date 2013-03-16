@@ -1,6 +1,10 @@
 package com.telepathic.finder.app;
 
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTabHost;
 import android.view.LayoutInflater;
@@ -13,7 +17,9 @@ import com.telepathic.finder.R;
 
 public class MainActivity extends SherlockFragmentActivity {
 
-    //    private TextView mTvSearchKey;
+    private static final int BASE_ACTIVITY_CUSTOM_DIALOG_START = 1000;
+
+    private static final int EXIT_CONFIRM_DIALOG = BASE_ACTIVITY_CUSTOM_DIALOG_START + 1;
     private FragmentTabHost mTabHost;
 
     Context getContext() {
@@ -45,5 +51,35 @@ public class MainActivity extends SherlockFragmentActivity {
         spec.setIndicator(v);
         mTabHost.addTab(spec, clazz, null);
     }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        Dialog retDlg = null;
+        switch (id) {
+            case EXIT_CONFIRM_DIALOG:
+                Builder exitDlgBuilder = new Builder(getContext())
+                .setTitle(R.string.confirm_exit_title)
+                .setMessage(R.string.confirm_exit_message)
+                .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        MainActivity.this.finish();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null);
+                retDlg = exitDlgBuilder.create();
+                break;
+            default:
+                break;
+        }
+        return retDlg;
+    }
+
+    @Override
+    public void onBackPressed() {
+        showDialog(EXIT_CONFIRM_DIALOG);
+    }
+
+
 
 }
