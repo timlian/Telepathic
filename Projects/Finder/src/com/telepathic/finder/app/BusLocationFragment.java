@@ -87,7 +87,7 @@ public class BusLocationFragment extends SherlockFragment {
     private CustomItemizedOverlay mBusLocationOverlay;
 
     private MyLocationOverlay mLocationOverlay; // 定位图层
-    private MyLocationListenner mLocationListener = new MyLocationListenner();
+    private MyLocationListenner mLocationListener;
     private ITrafficService mTrafficService;
     private MessageDispatcher mMessageDispatcher;
     private MKRoute mBusRoute;
@@ -141,36 +141,51 @@ public class BusLocationFragment extends SherlockFragment {
 		});
         mUpdateLocation.setEnabled(false);
 
-        mMapView = (MapView)getView().findViewById(R.id.bmapView);
-        mMapController = mMapView.getController();
+        if (mMapView == null) {
+            mMapView = (MapView)getView().findViewById(R.id.bmapView);
+        }
+        if (mMapController == null) {
+            mMapController = mMapView.getController();
+            GeoPoint point = new GeoPoint((int)(30.6633*1e6),(int)(104.0723*1e6));// Set the map center in Tianfu Square
+            mMapController.setCenter(point);
+            mMapController.setZoom(MAP_ZOOM_LEVEL);
+            mMapController.enableClick(true);
+        }
+        if (mLocationListener == null) {
+            mLocationListener = new MyLocationListenner();
+        }
 
         initMapView();
 
-        mLocClient = new LocationClient(mActivity.getApplicationContext());
-        mLocClient.registerLocationListener(mLocationListener);
+        if (mLocClient == null) {
+            mLocClient = new LocationClient(mActivity.getApplicationContext());
+            mLocClient.registerLocationListener(mLocationListener);
 
-        LocationClientOption option = new LocationClientOption();
-        option.setOpenGps(true);// 打开gps
-        option.setCoorType("bd09ll"); // 设置坐标类型
-        mLocClient.setLocOption(option);
-        mLocClient.start();
+            LocationClientOption option = new LocationClientOption();
+            option.setOpenGps(true);// 打开gps
+            option.setCoorType("bd09ll"); // 设置坐标类型
+            mLocClient.setLocOption(option);
+            mLocClient.start();
+        }
 
-        GeoPoint point = new GeoPoint((int)(30.6633*1e6),(int)(104.0723*1e6));// Set the map center in Tianfu Square
-        mMapController.setCenter(point);
-        mMapController.setZoom(MAP_ZOOM_LEVEL);
-        mMapController.enableClick(true);
 
-        Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);
-        marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
-        /**
-         * 创建自定义的ItemizedOverlay
-         */
-        mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity);
-        mLocationOverlay = new MyLocationOverlay(mMapView);
-        mLocData = new LocationData();
-        mLocationOverlay.setData(mLocData);
-        mMapView.getOverlays().add(mLocationOverlay);
-        mLocationOverlay.enableCompass();
+        if(mBusLocationOverlay == null) {
+            Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);
+            marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
+            /**
+             * 创建自定义的ItemizedOverlay
+             */
+            mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity);
+        }
+        if (mLocationOverlay == null) {
+            mLocationOverlay = new MyLocationOverlay(mMapView);
+            if (mLocData == null) {
+                mLocData = new LocationData();
+                mLocationOverlay.setData(mLocData);
+            }
+            mMapView.getOverlays().add(mLocationOverlay);
+            mLocationOverlay.enableCompass();
+        }
         mMapView.refresh();
     }
 
