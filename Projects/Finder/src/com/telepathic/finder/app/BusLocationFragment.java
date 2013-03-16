@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
@@ -67,14 +68,14 @@ import com.telepathic.finder.util.Utils;
 
 public class BusLocationFragment extends SherlockFragment {
     private static final String TAG = BusLocationFragment.class.getSimpleName();
-    
+
     private static final int CUSTOM_DIALOG_ID_START = 100;
     private static final int BUS_LINE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 1;
     private static final int DOWN_VOICE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 2;
     private static final int DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG = CUSTOM_DIALOG_ID_START + 3;
     private static final int EXIT_CONFIRM_DIALOG = CUSTOM_DIALOG_ID_START + 4;
     private static final int MAP_ZOOM_LEVEL = 14;
-    
+
     private MainActivity mActivity;
     private SearchView mSearchView;
     private MapView mMapView;
@@ -98,7 +99,7 @@ public class BusLocationFragment extends SherlockFragment {
     private IMessageHandler mGetBusLocationDoneHandler;
     private boolean mIsFirstUpdate = true;
     private BaiDuDataCache mDataCache;
-    
+
     private static final String[] BUS_LINE_PROJECTION = {
         ITrafficData.BaiDuData.BusLine._ID,
         ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
@@ -177,8 +178,8 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void handleMessage(Message msg) {
-               // removeDialog();
-               // handleSearchResult(mLineNumber);
+                // removeDialog();
+                // handleSearchResult(mLineNumber);
             }
         };
         mSearchBusRouteDoneHandler = new IMessageHandler() {
@@ -452,53 +453,53 @@ public class BusLocationFragment extends SherlockFragment {
         }).create().show();
     }
 
-	private void searchBusLine(final String city, final String lineNumber) {
-		BDBusLine line = mDataCache.getBusLine(lineNumber);
-		if (line != null) {
-			dismissWaittingDialog();
-			showBusLineDlg(line);
-			mMapView.requestFocusFromTouch();
-			return;
-		}
-		mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
-			@Override
-			public void onSuccess(Object result) {
-				dismissWaittingDialog();
-				BDBusLine line = mDataCache.getBusLine(lineNumber);
-				if (line != null) {
-					showBusLineDlg(line);
-					mMapView.requestFocusFromTouch();
-				}
-			}
-			@Override
-			public void onFailure(int errorCode, String errorText) {
-				Utils.debug(TAG, "Search bus line failed: " + errorText);
-				dismissWaittingDialog();
-				String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
-				String description = getString(R.string.search_bus_line_failed, reason);
-				Toast.makeText(mActivity, description, Toast.LENGTH_SHORT).show();
-			}
-		});
-	}
-    
-	private void searchBusRoute(String city, String uid) {
-		MKRoute route = mDataCache.getRoute(uid);
-		if (route != null) {
-			refreshMap(route);
-		} else {
-			mTrafficService.searchBusRoute(city, uid);
-		}
-	}
+    private void searchBusLine(final String city, final String lineNumber) {
+        BDBusLine line = mDataCache.getBusLine(lineNumber);
+        if (line != null) {
+            dismissWaittingDialog();
+            showBusLineDlg(line);
+            mMapView.requestFocusFromTouch();
+            return;
+        }
+        mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
+            @Override
+            public void onSuccess(Object result) {
+                dismissWaittingDialog();
+                BDBusLine line = mDataCache.getBusLine(lineNumber);
+                if (line != null) {
+                    showBusLineDlg(line);
+                    mMapView.requestFocusFromTouch();
+                }
+            }
+            @Override
+            public void onFailure(int errorCode, String errorText) {
+                Utils.debug(TAG, "Search bus line failed: " + errorText);
+                dismissWaittingDialog();
+                String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
+                String description = getString(R.string.search_bus_line_failed, reason);
+                Toast.makeText(mActivity, description, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
-	private void refreshMap(MKRoute route) {
-		RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
-		routeOverlay.setData(route);
-		mMapView.getOverlays().clear();
-		mMapView.getOverlays().add(routeOverlay);
-		mMapView.getOverlays().add(mLocationOverlay);
-		mMapView.refresh();
-		mMapView.getController().animateTo(route.getStart());
-	}
+    private void searchBusRoute(String city, String uid) {
+        MKRoute route = mDataCache.getRoute(uid);
+        if (route != null) {
+            refreshMap(route);
+        } else {
+            mTrafficService.searchBusRoute(city, uid);
+        }
+    }
+
+    private void refreshMap(MKRoute route) {
+        RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
+        routeOverlay.setData(route);
+        mMapView.getOverlays().clear();
+        mMapView.getOverlays().add(routeOverlay);
+        mMapView.getOverlays().add(mLocationOverlay);
+        mMapView.refresh();
+        mMapView.getController().animateTo(route.getStart());
+    }
     private void updateBusLocation(MKStep station) {
         /**
          * 创建并添加第一个标记：
@@ -596,6 +597,15 @@ public class BusLocationFragment extends SherlockFragment {
                 int suggestionIndex = cursor.getColumnIndex(ITrafficData.BaiDuData.BusLine.LINE_NUMBER);
                 mSearchView.setQuery(cursor.getString(suggestionIndex), true);
                 return true;
+            }
+        });
+        mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                String queryText = mSearchView.getQuery().toString();
+                if (hasFocus && !TextUtils.isEmpty(queryText)) {
+                    mSearchView.setQuery(queryText, false);
+                }
             }
         });
         super.onCreateOptionsMenu(menu, inflater);
