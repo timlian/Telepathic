@@ -5,20 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
-import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -71,9 +67,6 @@ public class BusLocationFragment extends SherlockFragment {
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
     private static final int BUS_LINE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 1;
-    private static final int DOWN_VOICE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 2;
-    private static final int DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG = CUSTOM_DIALOG_ID_START + 3;
-    private static final int EXIT_CONFIRM_DIALOG = CUSTOM_DIALOG_ID_START + 4;
     private static final int MAP_ZOOM_LEVEL = 14;
 
     private MainActivity mActivity;
@@ -134,15 +127,15 @@ public class BusLocationFragment extends SherlockFragment {
 
         mUpdateLocation = (ImageButton)getView().findViewById(R.id.update_location);
         mUpdateLocation.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getRouteLocation(mBusRoute, mBusRouteUid);
-			}
-		});
+            @Override
+            public void onClick(View v) {
+                getRouteLocation(mBusRoute, mBusRouteUid);
+            }
+        });
         if (mBusRoute != null && mBusRouteUid != null) {
-        	mUpdateLocation.setEnabled(true);
+            mUpdateLocation.setEnabled(true);
         } else {
-        	mUpdateLocation.setEnabled(false);
+            mUpdateLocation.setEnabled(false);
         }
 
         if (mMapView == null) {
@@ -227,7 +220,7 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void handleMessage(Message msg) {
-            	Toast.makeText(mActivity, getString(R.string.get_location_finished), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, getString(R.string.get_location_finished), Toast.LENGTH_SHORT).show();
                 mIsFirstUpdate = true;
                 if (msg.arg2 != 0) {
                     String errorMessage = (String)msg.obj;
@@ -317,77 +310,6 @@ public class BusLocationFragment extends SherlockFragment {
                 prgDlg.setOnCancelListener(null);
                 mDialog = prgDlg;
                 break;
-            case DOWN_VOICE_SEARCH_DLG:
-                AlertDialog.Builder vsDlg = new AlertDialog.Builder(mActivity)
-                .setTitle(R.string.no_voice_search_title)
-                .setMessage(R.string.no_voice_search_msg)
-                .setNegativeButton(R.string.no_voice_search_cancel,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .setNeutralButton(R.string.no_voice_search_browser,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri
-                                .parse("http://m.wandoujia.com/apps/com.google.android.voicesearch"));
-                        startActivity(intent);
-                    }
-                })
-                .setPositiveButton(R.string.no_voice_search_download,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent installIntent = new Intent(Intent.ACTION_VIEW);
-                        installIntent.setData(Uri
-                                .parse("market://details?id=com.google.android.voicesearch"));
-                        try {
-                            startActivity(installIntent);
-                        } catch (ActivityNotFoundException ex) {
-                            dialog.dismiss();
-                            showDialog(DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG);
-                        }
-                    }
-                });
-                mDialog = vsDlg.create();
-                break;
-            case DOWN_VOICE_SEARCH_THROUGH_BROWSER_DLG:
-                AlertDialog.Builder vsBrowserDlg = new AlertDialog.Builder(mActivity)
-                .setTitle(R.string.no_market_title)
-                .setMessage(R.string.no_market_msg)
-                .setNegativeButton(R.string.no_market_cancel,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .setPositiveButton(R.string.no_market_download,
-                        new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri
-                                .parse("http://m.wandoujia.com/apps/com.google.android.voicesearch"));
-                        startActivity(intent);
-                    }
-                });
-                mDialog = vsBrowserDlg.create();
-                break;
-            case EXIT_CONFIRM_DIALOG:
-                Builder exitDlgBuilder = new Builder(mActivity)
-                .setTitle(R.string.confirm_exit_title)
-                .setMessage(R.string.confirm_exit_message)
-                .setPositiveButton(android.R.string.ok, new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mActivity.finish();
-                    }
-                }).setNegativeButton(android.R.string.cancel, null);
-                mDialog = exitDlgBuilder.create();
-                break;
             default:
                 break;
         }
@@ -464,40 +386,40 @@ public class BusLocationFragment extends SherlockFragment {
     private void searchBusRoute(final String city, final String uid) {
         MKRoute route = mDataCache.getRoute(uid);
         if (route != null) {
-        	updateRoute(route, uid);
+            updateRoute(route, uid);
             return ;
-        } 
+        }
         mTrafficService.searchBusRoute(city, uid, new ICompletionListener() {
-			@Override
-			public void onSuccess(Object result) {
-				MKRoute route = (MKRoute)result;
-				if (route != null) {
-					updateRoute(route, uid);
-				}
-			}
-			@Override
-			public void onFailure(int errorCode, String errorText) {
-				 Utils.debug(TAG, "Search bus route failed: " + errorText);
-	             String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
-	             String description = getString(R.string.search_bus_route_failed, reason);
-	             Toast.makeText(mActivity, description, Toast.LENGTH_SHORT).show();
-			}
-		});
+            @Override
+            public void onSuccess(Object result) {
+                MKRoute route = (MKRoute)result;
+                if (route != null) {
+                    updateRoute(route, uid);
+                }
+            }
+            @Override
+            public void onFailure(int errorCode, String errorText) {
+                Utils.debug(TAG, "Search bus route failed: " + errorText);
+                String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
+                String description = getString(R.string.search_bus_route_failed, reason);
+                Toast.makeText(mActivity, description, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
-    
+
     private void getRouteLocation(MKRoute route, String uid) {
-    	if (route == null) {
-    		return ;
-    	}
-    	String lineNumber = mDataCache.getRouteLineNumber(uid);
-    	if (Utils.isValidBusLineNumber(lineNumber)) {
-    		Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT).show();
-    		mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route));
-    	}
+        if (route == null) {
+            return ;
+        }
+        String lineNumber = mDataCache.getRouteLineNumber(uid);
+        if (Utils.isValidBusLineNumber(lineNumber)) {
+            Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT).show();
+            mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route));
+        }
     }
 
     private void drawRoute(MKRoute route) {
-    	RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
+        RouteOverlay routeOverlay = new RouteOverlay(mActivity, mMapView);
         routeOverlay.setData(route);
         mMapView.getOverlays().clear();
         mMapView.getOverlays().add(routeOverlay);
@@ -506,7 +428,7 @@ public class BusLocationFragment extends SherlockFragment {
         mMapView.getController().animateTo(route.getStart());
         mBusLocationOverlay.removeAllOverlay();
     }
-    
+
     private void updateBusLocation(MKStep station) {
         /**
          * 创建并添加第一个标记：
@@ -669,14 +591,14 @@ public class BusLocationFragment extends SherlockFragment {
         Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, selection, selectionArgs, sortOrder);
         return cursor;
     }
-    
+
     private void updateRoute(MKRoute route, String uid) {
-    	if (route != null && !TextUtils.isEmpty(uid)) {
-	    	mBusRoute = route;
-	    	mBusRouteUid = uid;
-	    	mUpdateLocation.setEnabled(true);
-	    	drawRoute(route);
-    	}
+        if (route != null && !TextUtils.isEmpty(uid)) {
+            mBusRoute = route;
+            mBusRouteUid = uid;
+            mUpdateLocation.setEnabled(true);
+            drawRoute(route);
+        }
     }
 
 }
