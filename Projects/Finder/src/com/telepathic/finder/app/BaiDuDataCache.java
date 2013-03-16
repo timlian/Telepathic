@@ -12,9 +12,11 @@ import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusRoute;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.util.Utils;
 
+import android.R.integer;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 
 public class BaiDuDataCache {
 	private static final String TAG = "BaiDuDataCache";
@@ -26,6 +28,11 @@ public class BaiDuDataCache {
 	 * The content resolver
 	 */
 	private ContentResolver mContentResolver;
+	
+	private static final String[] BUS_LINE_PROJECTION = {
+		ITrafficData.BaiDuData.BusLine.LINE_NUMBER
+	};
+	private static final int IDX_BUS_LINE_NUMBER = 0;
 	
 	private static final String[] BUS_ROUTE_PROJECTON = {
 		ITrafficData.BaiDuData.BusLine.CITY,
@@ -64,6 +71,21 @@ public class BaiDuDataCache {
 		}
 	}
 
+	public String getRouteLineNumber(String uid) {
+		String lineNumber = null;
+		if (!TextUtils.isEmpty(uid)) {
+			Cursor cursor = queryRouteLineNumber(uid);
+			if (cursor != null && cursor.moveToFirst()) {
+				try {
+					lineNumber = cursor.getString(IDX_BUS_LINE_NUMBER);
+				} finally {
+					cursor.close();
+				}
+			}
+		}
+		return lineNumber;
+	}
+	
 	public BDBusLine getBusLine(String lineNumber) {
 		BDBusLine retLine = null;
 		Cursor cursor = queryBusLineRoutes(lineNumber);
@@ -220,6 +242,13 @@ public class BaiDuDataCache {
         String[] args = new String[]{ lineNumber };
         Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI_WITH_ROUTE, BUS_ROUTE_PROJECTON, selection, args, null);
         return cursor;
+    }
+    
+    private Cursor queryRouteLineNumber(String routeUid) {
+    	 String selection = ITrafficData.BaiDuData.BusRoute.UID + "=?";
+         String[] args = new String[]{ routeUid };
+         Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI_WITH_ROUTE, BUS_LINE_PROJECTION, selection, args, null);
+         return cursor;
     }
 
 }

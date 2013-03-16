@@ -91,7 +91,7 @@ public class BusLocationFragment extends SherlockFragment {
     private ITrafficService mTrafficService;
     private MessageDispatcher mMessageDispatcher;
     private MKRoute mBusRoute;
-    private String mLineNumber;
+    private String mBusRouteUid;
     private Dialog mDialog;
     private IMessageHandler mSearchBusLineDoneHandler;
     private IMessageHandler mSearchBusRouteDoneHandler;
@@ -138,7 +138,7 @@ public class BusLocationFragment extends SherlockFragment {
         mUpdateLocation.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				getRouteLocation(mBusRoute);
+				getRouteLocation(mBusRoute, mBusRouteUid);
 			}
 		});
         mUpdateLocation.setEnabled(false);
@@ -448,10 +448,10 @@ public class BusLocationFragment extends SherlockFragment {
         });
     }
 
-    private void searchBusRoute(String city, String uid) {
+    private void searchBusRoute(final String city, final String uid) {
         MKRoute route = mDataCache.getRoute(uid);
         if (route != null) {
-        	updateRoute(route);
+        	updateRoute(route, uid);
             return ;
         } 
         mTrafficService.searchBusRoute(city, uid, new ICompletionListener() {
@@ -459,7 +459,7 @@ public class BusLocationFragment extends SherlockFragment {
 			public void onSuccess(Object result) {
 				MKRoute route = (MKRoute)result;
 				if (route != null) {
-					updateRoute(route);
+					updateRoute(route, uid);
 				}
 			}
 			@Override
@@ -472,12 +472,14 @@ public class BusLocationFragment extends SherlockFragment {
 		});
     }
     
-    private void getRouteLocation(MKRoute route) {
+    private void getRouteLocation(MKRoute route, String uid) {
     	if (route == null) {
     		return ;
     	}
-    	//Todo: get the bus locatin from kuai xin server
-    	//mTrafficService.getBusLocation(route., route);
+    	String lineNumber = mDataCache.getRouteLineNumber(uid);
+    	if (Utils.isValidBusLineNumber(lineNumber)) {
+    		mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route));
+    	}
     }
 
     private void drawRoute(MKRoute route) {
@@ -654,9 +656,10 @@ public class BusLocationFragment extends SherlockFragment {
         return cursor;
     }
     
-    private void updateRoute(MKRoute route) {
-    	if (route != null) {
+    private void updateRoute(MKRoute route, String uid) {
+    	if (route != null && !TextUtils.isEmpty(uid)) {
 	    	mBusRoute = route;
+	    	mBusRouteUid = uid;
 	    	mUpdateLocation.setEnabled(true);
 	    	drawRoute(route);
     	}
