@@ -13,7 +13,7 @@
     <!-- Tab name -->
     <string name="bus_location">公交车位置</string>
     <string name="card_records">公交卡消费记录</string>
-    <string name="bus_stations">公交站台</string>
+    <string name="bus_stations">公交站台信息</string>
     <string name="menu_settings">设置</string>
     <string name="map_not_ready">地图尚未加载完成</string>
     <string name="find">查询</string>
