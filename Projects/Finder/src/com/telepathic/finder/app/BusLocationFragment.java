@@ -4,7 +4,6 @@ package com.telepathic.finder.app;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R.integer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -26,8 +25,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
+import android.view.animation.RotateAnimation;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -73,7 +74,8 @@ public class BusLocationFragment extends SherlockFragment {
     private MainActivity mActivity;
     private SearchView mSearchView;
     private MapView mMapView;
-    private ImageButton mUpdateLocation;
+    private LinearLayout mUpdateLocation;
+    private ImageView mUpdateIcon;
     private BMapManager mMapManager;
     private MapController mMapController = null;
     private LocationClient mLocClient;
@@ -91,6 +93,7 @@ public class BusLocationFragment extends SherlockFragment {
     private IMessageHandler mGetBusLocationDoneHandler;
     private boolean mIsFirstUpdate = true;
     private BaiDuDataCache mDataCache;
+    private RotateAnimation mRotateAnimation;
 
     private static final String[] BUS_LINE_PROJECTION = {
         ITrafficData.BaiDuData.BusLine._ID,
@@ -105,6 +108,11 @@ public class BusLocationFragment extends SherlockFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mRotateAnimation = new RotateAnimation(0, 359, RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+        mRotateAnimation.setDuration(2000);
+        mRotateAnimation.setRepeatCount(RotateAnimation.INFINITE);
+        mRotateAnimation.setRepeatMode(RotateAnimation.RESTART);
     }
 
     @Override
@@ -126,17 +134,25 @@ public class BusLocationFragment extends SherlockFragment {
         mTrafficService = app.getTrafficService();
         mMessageDispatcher = app.getMessageDispatcher();
 
-        mUpdateLocation = (ImageButton)getView().findViewById(R.id.update_location);
+        mUpdateLocation = (LinearLayout)getView().findViewById(R.id.update_location);
+        mUpdateIcon = (ImageView)getView().findViewById(R.id.update_icon);
         mUpdateLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getRouteLocation(mBusRoute, mBusRouteUid);
+                mUpdateIcon.setImageResource(R.drawable.progress_bar_circle);
+                mUpdateIcon.startAnimation(mRotateAnimation);
+                mRotateAnimation.start();
+                mUpdateLocation.setEnabled(false);
+                mUpdateIcon.setEnabled(false);
             }
         });
         if (mBusRoute != null && mBusRouteUid != null) {
             mUpdateLocation.setEnabled(true);
+            mUpdateIcon.setEnabled(true);
         } else {
             mUpdateLocation.setEnabled(false);
+            mUpdateIcon.setEnabled(false);
         }
 
         if (mMapView == null) {
@@ -238,6 +254,10 @@ public class BusLocationFragment extends SherlockFragment {
                  * 创建一个新的自定义的ItemizedOverlay，以便更新时使用
                  */
                 mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity);
+                mUpdateLocation.setEnabled(true);
+                mUpdateIcon.setEnabled(true);
+                mRotateAnimation.cancel();
+                mUpdateIcon.setImageResource(R.drawable.bus_location_update_selector);
             }
         };
         mMessageDispatcher.add(mGetBusLocationUpdateHandler);
@@ -599,6 +619,7 @@ public class BusLocationFragment extends SherlockFragment {
             mBusRoute = route;
             mBusRouteUid = uid;
             mUpdateLocation.setEnabled(true);
+            mUpdateIcon.setEnabled(true);
             drawRoute(route);
         }
     }
