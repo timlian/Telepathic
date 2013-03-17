@@ -4,6 +4,7 @@ package com.telepathic.finder.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -453,8 +454,9 @@ public class BusLocationFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_cache:
-                // TODO: Need implement
                 Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                int rows = mDataCache.deleteAllBusLines();
+                Utils.debug(TAG, "deleted rows: " + rows);
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));

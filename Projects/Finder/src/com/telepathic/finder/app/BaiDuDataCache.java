@@ -161,6 +161,10 @@ public class BaiDuDataCache {
 		return retRoute;
 	}
 	
+	public int deleteAllBusLines() {
+		return mContentResolver.delete(ITrafficData.BaiDuData.BusLine.CONTENT_URI, null, null);
+	}
+	
 	private ArrayList<MKStep> getRouteSteps(String uid) {
     	ArrayList<MKStep> stepList = null;
     	Cursor cursor = queryBusRouteStations(uid);

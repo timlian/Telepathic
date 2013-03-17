@@ -1,5 +1,6 @@
 package com.telepathic.finder.sdk.traffic.provider;
 
+import android.R.integer;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -336,9 +337,16 @@ public class TrafficDataProvider extends ContentProvider {
 
 
     @Override
-    public synchronized int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
-    }
+	public synchronized int delete(Uri uri, String selection, String[] selectionArgs) {
+    	int affectedRows = 0;
+    	SQLiteDatabase db = mDBHelper.getWritableDatabase();
+		switch (sUriMatcher.match(uri)) {
+		case MATCH_BAI_DU_BUS_LINE:
+			affectedRows = db.delete(TABLE_BAI_DU_BUS_LINE, selection, selectionArgs);
+			break;
+		}
+		return affectedRows;
+	}
 
     @Override
     public synchronized int update(Uri uri, ContentValues values, String selection,
@@ -465,6 +473,8 @@ public class TrafficDataProvider extends ContentProvider {
                     + BaiDuData.BusRouteColumns.UID + " TEXT, "
                     + BaiDuData.BusRouteColumns.FIRST_STATION + " TEXT, "
                     + BaiDuData.BusRouteColumns.LAST_STATION + " TEXT, "
+                    + "FOREIGN KEY" + " (" + BaiDuData.BusRouteColumns.LINE_ID + ") "
+                    + "REFERENCES " + TABLE_BAI_DU_BUS_LINE + "(" + BaiDuData.BusLine._ID + ") ON DELETE CASCADE, "
                     + "UNIQUE (" + BaiDuData.BusRouteColumns.UID + ")"+ " )");
 
             db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_STATION + " ("
@@ -492,6 +502,8 @@ public class TrafficDataProvider extends ContentProvider {
                     + BaiDuData.BusRoutePoint.INDEX + " INTEGER, "
                     + BaiDuData.BusRoutePoint.LATITUDE + " INTEGER, "
                     + BaiDuData.BusRoutePoint.LONGITUDE + " INTEGER, "
+                    + "FOREIGN KEY" + " (" + BaiDuData.BusRoutePoint.ROUTE_ID + ") "
+                    + "REFERENCES " + TABLE_BAI_DU_BUS_ROUTE + "(" + BaiDuData.BusRoute._ID + ") ON DELETE CASCADE, "
                     + "UNIQUE (" + BaiDuData.BusRoutePoint.LATITUDE + ", "
                     + BaiDuData.BusRoutePoint.LONGITUDE + ")"+ " )");
 
