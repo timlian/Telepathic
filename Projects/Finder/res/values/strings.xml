@@ -78,6 +78,9 @@
     <string name="error_result_not_found">未找到搜索结果</string>
     <string name="error_route_addr">路线搜索起点或终点有歧义</string>
     
+    <!-- Kuai xin error message definition -->
+    <string name="error_gps_number_not_present">The GPS number is not present.</string>
+    
     <!-- Toast generic error messages -->
     <string name="invalid_line_number">Invalid bus line number.</string>
     <string name="invalid_card_number">Invalid bus car number.</string>

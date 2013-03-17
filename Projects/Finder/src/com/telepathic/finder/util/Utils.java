@@ -376,6 +376,9 @@ public class Utils {
 		case IErrorCode.ERROR_ROUTE_ADDR:
 			retMessage = res.getString(R.string.error_route_addr);
 			break;
+		case IErrorCode.ERROR_GPS_NUMBER_NOT_PRESENT:
+			retMessage = res.getString(R.string.error_gps_number_not_present);
+			break;
 		default:
 			Logger.logTrace(String.valueOf(errorCode) + ": " + errorText);
 			retMessage = errorText;

@@ -166,8 +166,17 @@ public class TrafficManager {
                         	return ;
                         } 
                         String stationName = translateRusult.getResult();
+                        int errorCode = translateRusult.getErrorCode();
+                        if (errorCode != 0) {
+                        	String errorMessage = translateRusult.getErrorMessage();
+							notifyFailure(listener, IErrorCode.ERROR_UNKNOWN,
+									"Translate gps number(" + gpsNumber + ")"
+											+ " failed - errorCode: " + errorCode + ", description: " + errorMessage);
+							return;
+                        }
                         if (TextUtils.isEmpty(stationName)) {
-                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Translate gps number(" + gpsNumber + ")" + " failed. The result is empty.");
+                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN,
+									"Translate gps number(" + gpsNumber + ")" + " failed - staton name is null.");
                             return ;
                         }
                         stationLines.setName(stationName);
