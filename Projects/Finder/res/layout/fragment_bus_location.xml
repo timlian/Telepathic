@@ -1,22 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" >
 
     <com.baidu.mapapi.map.MapView
         android:id="@+id/bmapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true" />
-    
-    <ImageButton
+
+    <LinearLayout
         android:id="@+id/update_location"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="2dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/bus_location_update_selector" />
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="2dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:background="@android:drawable/btn_default">
+
+        <ImageView
+            android:id="@+id/update_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bus_location_update_selector" />
+    </LinearLayout>
 
 </RelativeLayout>
