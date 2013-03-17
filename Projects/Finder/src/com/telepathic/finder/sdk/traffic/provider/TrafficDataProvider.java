@@ -347,6 +347,11 @@ public class TrafficDataProvider extends ContentProvider {
 		case MATCH_KUAI_XIN_BUS_CARD:
 			affectedRows = db.delete(TABLE_KUAI_XIN_BUS_CARD, selection, selectionArgs);
 			break;
+		case MATCH_KUAI_XIN_BUS_STATION:
+			affectedRows = db.delete(TABLE_KUAI_XIN_BUS_STATION, selection, selectionArgs);
+			break;
+		default:
+			throw new UnsupportedOperationException("Can't delete uri: " + uri);
 		}
 		return affectedRows;
 	}
