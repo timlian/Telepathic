@@ -18,15 +18,16 @@ public class RequestExecutor {
     private static final String TAG = RequestExecutor.class.getSimpleName();
     private static final String TRAFFIC_SERVICE_URI = "http://client.10628106.com:4800/TrafficService.asmx";
 
-    private static final int CONNECTION_TIME_OUT = 1000 * 5;
-    private static final int MAX_RETRY_COUNT = 5;
+    private static final int ONE_SECOND = 1000;
+    private static final int CONNECITON_TIME_OUT[] = {5 * ONE_SECOND, 10 * ONE_SECOND,  20 * ONE_SECOND};
+    private static final int MAX_RETRY_COUNT = CONNECITON_TIME_OUT.length;
 
     public static void execute(RPCBaseRequest request, RequestCallback callback) {
         request.setCallback(callback);
         Object response = null;
         for (int count = 0; count < MAX_RETRY_COUNT; count++) {
             try {
-                response = sendRequest(request);
+                response = sendRequest(request, count);
                 break;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -40,6 +41,7 @@ public class RequestExecutor {
         }
     }
 
+    // performance test version
     public static void execute(Context context, RPCBaseRequest request, RequestCallback callback) {
         ContentResolver resolver = context.getContentResolver();
         request.setCallback(callback);
@@ -54,7 +56,7 @@ public class RequestExecutor {
             long interval = 0;
             try {
                 startTime = System.currentTimeMillis();
-                response = sendRequest(request);
+                response = sendRequest(request, count);
                 endTime = System.currentTimeMillis();
                 interval = endTime - startTime;
                 values.put(ITrafficData.KuaiXinData.NetworkPerformance.STATUS, "success");
@@ -78,14 +80,14 @@ public class RequestExecutor {
         }
     }
 
-    private static Object sendRequest(RPCBaseRequest request) throws IOException, XmlPullParserException {
+    private static Object sendRequest(RPCBaseRequest request, int retryCount) throws IOException, XmlPullParserException {
         SoapObject rpcMessage = request.getSoapMessage();
         Utils.debug(TAG, "Sent Request: " + rpcMessage.toString());
         SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(110);
         soapEnvelope.bodyOut = rpcMessage;
         soapEnvelope.dotNet  = true;
         soapEnvelope.setOutputSoapObject(rpcMessage);
-        HttpTransportSE localHttpTransportSE = new HttpTransportSE(TRAFFIC_SERVICE_URI, CONNECTION_TIME_OUT);
+        HttpTransportSE localHttpTransportSE = new HttpTransportSE(TRAFFIC_SERVICE_URI, CONNECITON_TIME_OUT[retryCount]);
         localHttpTransportSE.call(request.getSoapAction(), soapEnvelope);
         if (soapEnvelope.bodyIn == null) {
             throw new RuntimeException("Response is NULL.");

@@ -4,6 +4,7 @@ package com.telepathic.finder.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -453,8 +454,9 @@ public class BusLocationFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_cache:
-                // TODO: Need implement
                 Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                int rows = mDataCache.deleteAllBusLines();
+                Utils.debug(TAG, "deleted rows: " + rows);
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));
@@ -582,7 +584,7 @@ public class BusLocationFragment extends SherlockFragment {
 
     private Cursor queryBusLines(String lineNumber) {
         ContentResolver resolver = mActivity.getContentResolver();
-        String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC ";
+        String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC " + "LIMIT 0,30";
         String selection = null, selectionArgs[] = null;
         if (!TextUtils.isEmpty(lineNumber)) {
             selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + " LIKE ?";

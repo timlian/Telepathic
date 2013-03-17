@@ -322,8 +322,8 @@ public class BusCardRecordFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_cache:
-                // TODO: Need implement
                 Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                deleteAllBusCardRecords();
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));
@@ -612,6 +612,12 @@ public class BusCardRecordFragment extends SherlockFragment {
             ((ViewPager)container).addView(pageView.getView());
             return pageView.getView();
         }
+    }
+    
+    private void deleteAllBusCardRecords() {
+    	ContentResolver resolver = mActivity.getContentResolver();
+    	int rows = resolver.delete(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null, null);
+    	Utils.debug(TAG, "delete rows: " + rows);
     }
 
 }

@@ -236,8 +236,8 @@ public class BusStationFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_cache:
-                // TODO: Need implement
                 Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                deleteAllStations();
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));
@@ -484,5 +484,11 @@ public class BusStationFragment extends SherlockFragment {
             } while (cursor.moveToNext());
         }
         return stationLines;
+    }
+    
+    private void deleteAllStations() {
+    	ContentResolver resolver = mActivity.getContentResolver();
+    	int rows = resolver.delete(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, null, null);
+    	Utils.debug(TAG, "delete rows: " + rows);
     }
 }
