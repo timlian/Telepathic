@@ -169,7 +169,7 @@ public class TrafficManager {
                         int errorCode = translateRusult.getErrorCode();
                         if (errorCode != 0) {
                         	String errorMessage = translateRusult.getErrorMessage();
-							notifyFailure(listener, IErrorCode.ERROR_UNKNOWN,
+							notifyFailure(listener, errorCode,
 									"Translate gps number(" + gpsNumber + ")"
 											+ " failed - errorCode: " + errorCode + ", description: " + errorMessage);
 							return;
