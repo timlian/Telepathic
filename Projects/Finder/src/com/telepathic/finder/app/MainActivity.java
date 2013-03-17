@@ -38,9 +38,9 @@ public class MainActivity extends SherlockFragmentActivity {
         mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
 
-        addTab(getString(R.string.bus_location), BusLocationFragment.class, R.drawable.ic_tab_location);
-        addTab(getString(R.string.card_records), BusCardRecordFragment.class, R.drawable.ic_tab_card);
-        addTab(getString(R.string.bus_stations), BusStationFragment.class, R.drawable.ic_tab_station);
+        addTab(getString(R.string.bus_location), BusLocationFragment.class, R.drawable.ic_tab_location_selector);
+        addTab(getString(R.string.card_records), BusCardRecordFragment.class, R.drawable.ic_tab_card_selector);
+        addTab(getString(R.string.bus_stations), BusStationFragment.class, R.drawable.ic_tab_station_selector);
 
     }
 
