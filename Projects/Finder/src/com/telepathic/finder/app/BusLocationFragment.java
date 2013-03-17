@@ -582,7 +582,7 @@ public class BusLocationFragment extends SherlockFragment {
 
     private Cursor queryBusLines(String lineNumber) {
         ContentResolver resolver = mActivity.getContentResolver();
-        String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC ";
+        String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC " + "LIMIT 0,30";
         String selection = null, selectionArgs[] = null;
         if (!TextUtils.isEmpty(lineNumber)) {
             selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + " LIKE ?";
