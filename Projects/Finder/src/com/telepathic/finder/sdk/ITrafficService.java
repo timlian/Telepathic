@@ -41,7 +41,7 @@ public interface ITrafficService {
      *
      * @param gpsNumber The gps number of bus station.
      */
-    void getBusStationLines(String gpsNumber);
+    void getBusStationLines(String gpsNumber, ICompletionListener listener);
     /**
      * Shut down the traffic service.
      */

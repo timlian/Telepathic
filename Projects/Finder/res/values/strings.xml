@@ -29,7 +29,6 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="default_city">成都</string>
-    <string name="invalid_input_hint">请输入正确的公交车路线号码</string>
     <string name="no_item_in_db">no  item</string>
     <string name="starting_time">Starting time: <xliff:g id="starting_time" example="6:00">%1$s</xliff:g></string>
     <string name="ending_time">Ending time: <xliff:g id="ending_time" example="21:00">%1$s</xliff:g></string>
@@ -37,7 +36,6 @@
     <string name="confirm_exit_message">Do you want to exit?</string>
 
     <!-- consumer record retrieve -->
-    <string name="card_id_error_notice">Please enter the correct parameter</string>
     <string name="line_number">公交路线:</string>
     <string name="bus_number">车辆编号:</string>
     <string name="consumer_count">消费次数: <xliff:g id="consumer_count" example="2">%1$s</xliff:g></string>
@@ -80,10 +78,17 @@
     <string name="error_result_not_found">未找到搜索结果</string>
     <string name="error_route_addr">路线搜索起点或终点有歧义</string>
     
-    <!-- Toast error messages -->
+    <!-- Toast generic error messages -->
+    <string name="invalid_line_number">Invalid bus line number.</string>
+    <string name="invalid_card_number">Invalid bus car number.</string>
+    <string name="invalid_gps_number">Invalid bus statin gps number.</string>
+            
+    <!-- Toast network error messages -->
     <string name="search_bus_line_failed">Search bus line failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
-    <string name="search_bus_route_failed">Search bus route failed.</string>
-    <string name="get_bus_card_records_failed">Get bus card record failed.</string>
+    <string name="search_bus_route_failed">Search bus route failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
+    <string name="get_bus_card_records_failed">Get bus card record failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
+    <string name="get_bus_station_lines_failed">Get bus station lines failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
+
     
     <!-- App description -->
     <string name="app_description">Finder is an app help you to find the location of bus in Chengdu. It also supply to query IC card consumption records by card number, and query bus station infomation by station GPS number.&lt;br/>&lt;br/>If you get any questions, Please contact us by Email&lt;br/>telepathic.ltd@gmail.com&lt;br/>&lt;br/>Thanks for using this app!</string>

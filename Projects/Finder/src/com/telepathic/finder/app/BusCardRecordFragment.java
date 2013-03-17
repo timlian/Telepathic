@@ -356,7 +356,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                     Utils.hideSoftKeyboard(mActivity.getApplicationContext(), mSearchView);
                     mTrafficService.getBusCardRecords(cardNumber, 30);
                 } else {
-                    Toast.makeText(mActivity, R.string.card_id_error_notice, Toast.LENGTH_SHORT)
+                    Toast.makeText(mActivity, R.string.invalid_card_number, Toast.LENGTH_SHORT)
                     .show();
                 }
                 return true;
