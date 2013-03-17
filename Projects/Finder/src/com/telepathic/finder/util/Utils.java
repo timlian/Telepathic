@@ -37,7 +37,7 @@ public class Utils {
 
     private static final boolean DEBUG = true;
 
-    private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([aAbBcCdD])?";
+    private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([a-zA-Z])?";
 
     private static final String BUS_CARD_NUM_EXPRESSION = "\\d{8}";
 

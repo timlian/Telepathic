@@ -13,6 +13,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.search.MKPoiInfo;
@@ -160,11 +161,13 @@ public class TrafficManager {
                         translateTask.startTask();
                         translateTask.waitTaskDone();
                         TaskResult<String> translateRusult = translateTask.getTaskResult();
-                        String stationName = null;
-                        if (translateRusult != null) {
-                            stationName = translateRusult.getResult();
-                        }
-                        if (stationName == null || stationName.equals("")) {
+                        if (translateRusult == null) {
+                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception:  TranslateToStationTask result is null.");
+                        	return ;
+                        } 
+                        String stationName = translateRusult.getResult();
+                        if (TextUtils.isEmpty(stationName)) {
+                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Translate gps number(" + gpsNumber + ")" + " failed. The result is empty.");
                             return ;
                         }
                         stationLines.setName(stationName);
@@ -200,13 +203,17 @@ public class TrafficManager {
                                 }
                             });
                             getDirectionTask.startTask();
-
+                            final String lineNo = lineNumber;
                             final GetBusLineTask getLineTask = new GetBusLineTask(lineNumber);
                             getLineTask.setCallback(new Runnable() {
                                 @Override
                                 public void run() {
                                     synchronized (stationLines) {
-                                        stationLines.addBusLine(getLineTask.getTaskResult().getResult());
+                                    	if (getLineTask.getTaskResult().getErrorCode() == 0) {
+                                    		stationLines.addBusLine(getLineTask.getTaskResult().getResult());
+                                    	} else {
+                                    		Utils.debug(TAG, "Get bus line " + lineNo + " failed: " + getLineTask.getTaskResult().getErrorCode() + ", " + getLineTask.getTaskResult().getErrorMessage());
+                                    	}
                                     }
                                     latch.countDown();
                                 }

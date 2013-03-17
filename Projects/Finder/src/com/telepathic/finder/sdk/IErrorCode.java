@@ -15,6 +15,9 @@ public interface IErrorCode {
 	
 	public static int ERROR_ROUTE_ADDR = 4;
 	
+	// Kuai xin error code definition
+	public static int ERROR_GPS_NUMBER_NOT_PRESENT = 700;
+	
 	// Generic error code definition
 	public static int ERROR_UNKNOWN = -1;
 	
