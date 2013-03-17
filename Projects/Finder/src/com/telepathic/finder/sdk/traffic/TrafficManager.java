@@ -217,11 +217,11 @@ public class TrafficManager {
                         latch.await();
 
                         // Notify the get bus station lines operation finished.
-                        Message msg = Message.obtain();
-                        msg.arg1 = ITrafficeMessage.GET_BUS_STATION_LINES_DONE;
-                        msg.arg2 = 0;
-                        msg.obj = stationLines;
-                        mMessageHandler.sendMessage(msg);
+//                        Message msg = Message.obtain();
+//                        msg.arg1 = ITrafficeMessage.GET_BUS_STATION_LINES_DONE;
+//                        msg.arg2 = 0;
+//                        msg.obj = stationLines;
+//                        mMessageHandler.sendMessage(msg);
                         // store the data
                         long startTime = System.currentTimeMillis();
                         mTrafficStore.store(stationLines);

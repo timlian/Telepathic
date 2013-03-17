@@ -489,7 +489,7 @@ public class BusLocationFragment extends SherlockFragment {
                     showDialog(BUS_LINE_SEARCH_DLG);
                     searchBusLine(city, lineNumber);
                 } else {
-                    Toast.makeText(mActivity, R.string.invalid_input_hint, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mActivity, R.string.invalid_line_number, Toast.LENGTH_LONG).show();
                 }
                 return true;
             }

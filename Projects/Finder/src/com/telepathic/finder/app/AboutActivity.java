@@ -35,6 +35,9 @@ public class AboutActivity extends SherlockActivity {
         TextView tvDescription = (TextView)findViewById(R.id.description);
         tvDescription.setText(Html.fromHtml(getResources().getString(R.string.app_description)));
 
+        TextView tvCopyright = (TextView)findViewById(R.id.copyright);
+        tvCopyright.setText(Html.fromHtml(getResources().getString(R.string.copyright)));
+
     }
 
     @Override
