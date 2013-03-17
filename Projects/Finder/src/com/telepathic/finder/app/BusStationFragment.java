@@ -441,7 +441,6 @@ public class BusStationFragment extends SherlockFragment {
         }
         Cursor cursor = resolver.query(KuaiXinData.BusStation.CONTENT_URI, BUS_STATIONS_PROJECTION,
                 selection, selectionArgs, sortOrder);
-        Utils.printCursorContent(TAG, cursor);
         return cursor;
     }
 
@@ -460,7 +459,6 @@ public class BusStationFragment extends SherlockFragment {
     private KXBusStationLines getStationLines(String gpsNumber) {
         KXBusStationLines stationLines = null;
         Cursor cursor = mStationsLinesCursor;
-        Utils.printCursorContent(TAG, cursor);
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 if (gpsNumber.equals(cursor.getString(IDX_GPS_NUMBER))) {
