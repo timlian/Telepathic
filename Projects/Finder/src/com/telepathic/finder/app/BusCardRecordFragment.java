@@ -417,7 +417,6 @@ public class BusCardRecordFragment extends SherlockFragment {
         }
         Cursor cursor = resolver.query(ITrafficData.KuaiXinData.BusCard.CONTENT_URI,
                 CARD_RECORDS_HISTORY, selection, selectionArgs, sortOrder);
-        Utils.printCursorContent(TAG, cursor);
         return cursor;
     }
 
