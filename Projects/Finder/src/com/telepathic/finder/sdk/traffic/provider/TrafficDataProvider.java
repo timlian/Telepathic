@@ -344,6 +344,9 @@ public class TrafficDataProvider extends ContentProvider {
 		case MATCH_BAI_DU_BUS_LINE:
 			affectedRows = db.delete(TABLE_BAI_DU_BUS_LINE, selection, selectionArgs);
 			break;
+		case MATCH_KUAI_XIN_BUS_CARD:
+			affectedRows = db.delete(TABLE_KUAI_XIN_BUS_CARD, selection, selectionArgs);
+			break;
 		}
 		return affectedRows;
 	}
