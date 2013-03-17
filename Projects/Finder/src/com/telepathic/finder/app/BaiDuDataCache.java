@@ -232,8 +232,8 @@ public class BaiDuDataCache {
     private Cursor queryBusRoutePoints(String routeUid) {
         String selection = ITrafficData.BaiDuData.BusRoute.UID + "=?";
         String[] args = new String[]{ routeUid };
-        Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI_WITH_POINT, BUS_ROUTE_POINT_PROJECTION, selection, args, null);
-        Utils.printCursorContent("Test", cursor);
+        String sortOrder = ITrafficData.BaiDuData.BusRoutePoint.INDEX + " ASC ";
+        Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusRoute.CONTENT_URI_WITH_POINT, BUS_ROUTE_POINT_PROJECTION, selection, args, sortOrder);
         return cursor;
     }
     

@@ -8,7 +8,7 @@
     <string name="title_activity_bus_station">BusStationActivity</string>
     <string name="title_activity_about">关于</string>
     <string name="version">版本: <xliff:g id="version" example="1.0">%1$s</xliff:g></string>
-    <string name="copyright">Copyright ©2012–2013 All Rights Reserved.</string>
+    <string name="copyright">Copyright ©2012–2013 Telepathic. All Rights Reserved.</string>
 
     <!-- Tab name -->
     <string name="bus_location">公交车位置</string>
