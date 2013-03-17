@@ -8,7 +8,7 @@
     <string name="title_activity_bus_station">BusStationActivity</string>
     <string name="title_activity_about">关于</string>
     <string name="version">版本: <xliff:g id="version" example="1.0">%1$s</xliff:g></string>
-    <string name="copyright">Copyright ©2012–2013 Telepathic. All Rights Reserved.</string>
+    <string name="copyright">Copyright ©2012–2013 Telepathic Ltd.&lt;br/>All Rights Reserved.</string>
 
     <!-- Tab name -->
     <string name="bus_location">公交车位置</string>
@@ -82,9 +82,9 @@
     <!-- Toast messages -->
     <string name="search_bus_line_failed">获取公交线路信息失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>
     <string name="search_bus_route_failed">获取公交路线信息失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>
-    <string name="get_bus_card_records_failed">攻取公交卡消息记录失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>
+    <string name="get_bus_card_records_failed">获取公交卡消息记录失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>
 
     <!-- App description -->
-    <string name="app_description">成都公交可以帮助你查询成都市内公交车辆的位置。它还提供了根据公交卡号查询公交卡消费记录和根据GPS编号查找公交站台信息的功能。&lt;br/>&lt;br/>如果有任何问题，请联系我们。&lt;br/>&lt;br/>感谢您使用此应用！</string>
+    <string name="app_description">成都公交可以帮助你查询成都市内公交车辆的位置。它还提供了根据公交卡号查询公交卡消费记录和根据GPS编号查找公交站台信息的功能。&lt;br/>&lt;br/>如果有任何问题，请通过电子邮件联系我们&lt;br/>telepathic.ltd@gmail.com&lt;br/>&lt;br/>感谢您使用此应用！</string>
 
 </resources>

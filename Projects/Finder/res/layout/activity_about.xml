@@ -11,8 +11,8 @@
         android:layout_height="80dp"
         android:layout_alignParentTop="true"
         android:layout_gravity="center"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/icon" />
 
     <TextView
@@ -48,13 +48,14 @@
         android:layout_height="match_parent"
         android:layout_above="@id/copyright"
         android:layout_below="@id/version"
-        android:layout_margin="20dp" >
+        android:layout_margin="10dp" >
 
         <TextView
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:autoLink="email"
             android:text="@string/app_description" />
     </ScrollView>
 
