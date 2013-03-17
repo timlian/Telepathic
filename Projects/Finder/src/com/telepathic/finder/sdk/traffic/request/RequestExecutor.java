@@ -18,7 +18,8 @@ public class RequestExecutor {
     private static final String TAG = RequestExecutor.class.getSimpleName();
     private static final String TRAFFIC_SERVICE_URI = "http://client.10628106.com:4800/TrafficService.asmx";
 
-    private static final int CONNECITON_TIME_OUT[] = {5, 10, 20};
+    private static final int ONE_SECOND = 1000;
+    private static final int CONNECITON_TIME_OUT[] = {5 * ONE_SECOND, 10 * ONE_SECOND,  20 * ONE_SECOND};
     private static final int MAX_RETRY_COUNT = CONNECITON_TIME_OUT.length;
 
     public static void execute(RPCBaseRequest request, RequestCallback callback) {
