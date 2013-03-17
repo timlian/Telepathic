@@ -82,8 +82,9 @@
     
     <!-- Toast error messages -->
     <string name="search_bus_line_failed">Search bus line failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
-    <string name="search_bus_route_failed">Search bus route failed.</string>
-    <string name="get_bus_card_records_failed">Get bus card record failed.</string>
+    <string name="search_bus_route_failed">Search bus route failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
+    <string name="get_bus_card_records_failed">Get bus card record failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
+    <string name="get_bus_station_lines_failed">Get bus station lines failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
     
     <!-- App description -->
     <string name="app_description">Finder is an app help you to find the location of bus in Chengdu. It also supply to query IC card consumption records by card number, and query bus station infomation by station GPS number.&lt;br/>&lt;br/>If you get any questions, Please contact us.&lt;br/>&lt;br/>Thanks for using this app!</string>

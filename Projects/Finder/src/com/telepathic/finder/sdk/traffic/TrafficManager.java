@@ -148,10 +148,7 @@ public class TrafficManager {
         }
 
         @Override
-        public void getBusStationLines(final String gpsNumber) {
-            if (mExecutorService.isShutdown()) {
-                mExecutorService = Executors.newCachedThreadPool();
-            }
+        public void getBusStationLines(final String gpsNumber, final ICompletionListener listener) {
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -230,6 +227,7 @@ public class TrafficManager {
                         mTrafficStore.store(stationLines);
                         long endTime = System.currentTimeMillis();
                         Utils.debug(TAG, "store consume time: " + String.valueOf(endTime - startTime) + " in ms");
+                        notifySuccess(listener, stationLines);
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "getBusStationLines is interrupted.");
                     }

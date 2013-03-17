@@ -43,6 +43,7 @@ import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
+import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
@@ -455,6 +456,11 @@ public class BusStationFragment extends SherlockFragment {
             }
         }
     }
+    
+    private void showStationLines(KXBusStationLines lines) {
+    	mStationLines = lines;
+    	initBusLines(mStationLines);
+    }
 
     private KXBusStationLines getStationLines(String gpsNumber) {
         KXBusStationLines stationLines = null;
@@ -482,6 +488,28 @@ public class BusStationFragment extends SherlockFragment {
             } while (cursor.moveToNext());
         }
         return stationLines;
+    }
+    
+    private void getBusStationLines(String gpsNumber) {
+    	mTrafficService.getBusStationLines(gpsNumber, new ICompletionListener() {
+			
+			@Override
+			public void onSuccess(Object result) {
+				KXBusStationLines lines = (KXBusStationLines) result;
+				if (lines != null) {
+					showStationLines(lines);
+				}
+			}
+			
+			@Override
+			public void onFailure(int errorCode, String errorText) {
+				Utils.debug(TAG, "get bus station lines failed: " + errorText);
+                String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
+                String description = getString(R.string.search_bus_line_failed, reason);
+                Toast.makeText(mActivity, description, Toast.LENGTH_SHORT).show();
+				
+			}
+		});
     }
     
     private void deleteAllStations() {
