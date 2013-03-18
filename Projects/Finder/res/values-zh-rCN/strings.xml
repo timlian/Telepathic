@@ -36,6 +36,7 @@
     <string name="confirm_exit_message">是否退出应用程序?</string>
     <string name="confirm_clean_cache_title">清空历史记录</string>
     <string name="confirm_clean_cache_message">你确定要清空历史记录吗?</string>
+    <string name="gps_number">GPS编号 : <xliff:g id="gps_number" example="50001">%1$s</xliff:g></string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>

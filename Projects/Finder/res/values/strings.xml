@@ -36,6 +36,7 @@
     <string name="confirm_exit_message">Do you want to exit?</string>
     <string name="confirm_clean_cache_title">Clear cache</string>
     <string name="confirm_clean_cache_message">Are you sure to clear the cached data?</string>
+    <string name="gps_number">GPS number : <xliff:g id="gps_number" example="50001">%1$s</xliff:g></string>
 
     <!-- consumer record retrieve -->
     <string name="line_number">公交路线:</string>

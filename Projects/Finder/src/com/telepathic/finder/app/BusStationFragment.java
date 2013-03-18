@@ -60,6 +60,8 @@ public class BusStationFragment extends SherlockFragment {
 
     private TextView mTvStationName;
 
+    private TextView mTvStationGpsNumber;
+
     private LinearLayout mLlNoItem;
 
     private RelativeLayout mLlStationInfo;
@@ -105,6 +107,7 @@ public class BusStationFragment extends SherlockFragment {
     private void setupView() {
         mLlBusLines = (LinearLayout)getView().findViewById(R.id.bus_line_list);
         mTvStationName = (TextView)getView().findViewById(R.id.bus_station_name);
+        mTvStationGpsNumber = (TextView)getView().findViewById(R.id.bus_station_gps_number);
         mLlNoItem = (LinearLayout)getView().findViewById(R.id.no_item_tips);
         mLlStationInfo = (RelativeLayout)getView().findViewById(R.id.station_info);
         mWaitingDialog = createWaitingDialog();
@@ -112,6 +115,8 @@ public class BusStationFragment extends SherlockFragment {
 
     private void showStationLines(KXBusStationLines stationLines) {
         mTvStationName.setText(stationLines.getName());
+        mTvStationGpsNumber.setText(mActivity.getString(R.string.gps_number,
+                stationLines.getGpsNumber()));
         if (stationLines.getAllBusLines().size() > 0) {
             mLlBusLines.removeAllViews();
             DisplayMetrics dm = new DisplayMetrics();
@@ -211,7 +216,6 @@ public class BusStationFragment extends SherlockFragment {
                 String gpsNumber = keyword;
                 if (Utils.isValidGpsNumber(gpsNumber)) {
                     Utils.hideSoftKeyboard(mActivity.getApplicationContext(), mSearchView);
-                    mWaitingDialog.show();
                     searchStationLines(gpsNumber);
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_gps_number, Toast.LENGTH_SHORT)
@@ -342,6 +346,7 @@ public class BusStationFragment extends SherlockFragment {
             showStationLines(stationLines);
             return;
         }
+        mWaitingDialog.show();
         mTrafficService.getBusStationLines(gpsNumber, new ICompletionListener() {
             @Override
             public void onSuccess(Object result) {
