@@ -25,6 +25,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/bus_location_update_selector" />
+        <ProgressBar
+            android:id="@+id/progress_circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="24dp"
+            android:minWidth="24dp"
+            android:minHeight="24dp"
+            android:maxHeight="24dp"
+            android:indeterminateDrawable="@drawable/progress_circle"
+            android:visibility="gone"
+            />
     </LinearLayout>
 
 </RelativeLayout>

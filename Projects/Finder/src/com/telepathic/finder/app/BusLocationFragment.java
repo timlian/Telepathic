@@ -25,10 +25,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
-import android.view.animation.RotateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -76,6 +76,7 @@ public class BusLocationFragment extends SherlockFragment {
     private MapView mMapView;
     private LinearLayout mUpdateLocation;
     private ImageView mUpdateIcon;
+    private ProgressBar mProgress;
     private BMapManager mMapManager;
     private MapController mMapController = null;
     private LocationClient mLocClient;
@@ -93,7 +94,6 @@ public class BusLocationFragment extends SherlockFragment {
     private IMessageHandler mGetBusLocationDoneHandler;
     private boolean mIsFirstUpdate = true;
     private BaiDuDataCache mDataCache;
-    private RotateAnimation mRotateAnimation;
 
     private static final String[] BUS_LINE_PROJECTION = {
         ITrafficData.BaiDuData.BusLine._ID,
@@ -108,11 +108,6 @@ public class BusLocationFragment extends SherlockFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mRotateAnimation = new RotateAnimation(0, 359, RotateAnimation.RELATIVE_TO_SELF, 0.5f,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
-        mRotateAnimation.setDuration(2000);
-        mRotateAnimation.setRepeatCount(RotateAnimation.INFINITE);
-        mRotateAnimation.setRepeatMode(RotateAnimation.RESTART);
     }
 
     @Override
@@ -136,13 +131,13 @@ public class BusLocationFragment extends SherlockFragment {
 
         mUpdateLocation = (LinearLayout)getView().findViewById(R.id.update_location);
         mUpdateIcon = (ImageView)getView().findViewById(R.id.update_icon);
+        mProgress = (ProgressBar)getView().findViewById(R.id.progress_circle);
         mUpdateLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getRouteLocation(mBusRoute, mBusRouteUid);
-                mUpdateIcon.setImageResource(R.drawable.progress_bar_circle);
-                mUpdateIcon.startAnimation(mRotateAnimation);
-                mRotateAnimation.start();
+                mUpdateIcon.setVisibility(View.GONE);
+                mProgress.setVisibility(View.VISIBLE);
                 mUpdateLocation.setEnabled(false);
                 mUpdateIcon.setEnabled(false);
             }
@@ -256,8 +251,8 @@ public class BusLocationFragment extends SherlockFragment {
                 mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity);
                 mUpdateLocation.setEnabled(true);
                 mUpdateIcon.setEnabled(true);
-                mRotateAnimation.cancel();
-                mUpdateIcon.setImageResource(R.drawable.bus_location_update_selector);
+                mUpdateIcon.setVisibility(View.VISIBLE);
+                mProgress.setVisibility(View.GONE);
             }
         };
         mMessageDispatcher.add(mGetBusLocationUpdateHandler);
