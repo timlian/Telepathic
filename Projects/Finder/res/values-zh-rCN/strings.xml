@@ -34,6 +34,8 @@
     <string name="ending_time">收车时间: <xliff:g id="ending_time" example="21:00">%1$s</xliff:g></string>
     <string name="confirm_exit_title">退出</string>
     <string name="confirm_exit_message">是否退出应用程序?</string>
+    <string name="confirm_clean_cache_title">清空历史记录</string>
+    <string name="confirm_clean_cache_message">你确定要清空历史记录吗?</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>
@@ -48,19 +50,6 @@
     <string name="release_to_refresh">释放刷新</string>
     <string name="pull_to_refresh">下拉刷新</string>
     <string name="refreshing">正在刷新…</string>
-
-    <!-- speech recognize notice -->
-    <string name="no_voice_search_title">Notice</string>
-    <string name="no_voice_search_msg">The speech recognize function need Google Voice Search to support, do you want to download it now?</string>
-    <string name="no_voice_search_cancel">Cancel</string>
-    <string name="no_voice_search_browser">From web</string>
-    <string name="no_voice_search_download">From market</string>
-    <string name="no_market_title">No App Store</string>
-    <string name="no_market_msg">You cellphone isn\'t install any app store to handle the request. Do you want to download it from browser?</string>
-    <string name="no_market_cancel">Cancel</string>
-    <string name="no_market_download">Download from browser</string>
-    <string name="speak_busline_number">Please speak out busline number</string>
-    <string name="no_matches_busline">No matches bus line</string>
 
     <!-- Toast messages -->
     <string name="start_get_location">开始获取车辆位置信息&#8230;</string>

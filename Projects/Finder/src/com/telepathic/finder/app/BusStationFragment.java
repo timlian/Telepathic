@@ -3,20 +3,25 @@ package com.telepathic.finder.app;
 
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
@@ -47,17 +52,24 @@ import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
 import com.telepathic.finder.util.Utils;
 
 public class BusStationFragment extends SherlockFragment {
-	private static final String TAG = "BusStationFragment";
-	
+    private static final String TAG = "BusStationFragment";
+
     private MainActivity mActivity;
 
     private LinearLayout mLlBusLines;
+
     private TextView mTvStationName;
+
     private LinearLayout mLlNoItem;
+
     private RelativeLayout mLlStationInfo;
+
     private ITrafficService mTrafficService;
+
     private ProgressDialog mWaitingDialog;
+
     private SearchView mSearchView;
+
     private KuaiXinDataCache mDataCache;
 
     @Override
@@ -76,7 +88,7 @@ public class BusStationFragment extends SherlockFragment {
         super.onActivityCreated(savedInstanceState);
         mActivity = (MainActivity)getSherlockActivity();
         if (mDataCache == null) {
-        	mDataCache = new KuaiXinDataCache(mActivity);
+            mDataCache = new KuaiXinDataCache(mActivity);
         }
         setupView();
         FinderApplication app = (FinderApplication)mActivity.getApplication();
@@ -146,15 +158,28 @@ public class BusStationFragment extends SherlockFragment {
         holder.tvBusNumber.setText(busLine.getLineNumber());
         holder.tvStartingTime.setText(getString(R.string.starting_time, busRoute.getStartTime()));
         holder.tvEndingTime.setText(getString(R.string.ending_time, busRoute.getEndTime()));
-        holder.lvStationNameList.setAdapter(new StationsAdapter(busRoute.getStations(), stationLines.getName()));
+        holder.lvStationNameList.setAdapter(new StationsAdapter(busRoute.getStations(),
+                stationLines.getName()));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_cache:
-                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                deleteAllStations();
+                Builder builder = new AlertDialog.Builder(mActivity);
+                builder.setTitle(R.string.confirm_clean_cache_title)
+                        .setMessage(R.string.confirm_clean_cache_message)
+                        .setPositiveButton(android.R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                                        deleteAllStations();
+                                        getSuggestions(""); // reset the
+                                                            // suggestions
+                                    }
+                                }).setNegativeButton(android.R.string.cancel, null);
+                builder.create().show();
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));
@@ -171,8 +196,10 @@ public class BusStationFragment extends SherlockFragment {
 
         // Get the SearchView and set the searchable configuration
         mSearchView = (SearchView)menu.findItem(R.id.search_bus_station).getActionView();
-        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity().getComponentName());
+        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(
+                Context.SEARCH_SERVICE);
+        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity()
+                .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.station_number_hint));
         mSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -187,7 +214,8 @@ public class BusStationFragment extends SherlockFragment {
                     mWaitingDialog.show();
                     searchStationLines(gpsNumber);
                 } else {
-                    Toast.makeText(mActivity, R.string.invalid_gps_number, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, R.string.invalid_gps_number, Toast.LENGTH_SHORT)
+                            .show();
                 }
                 return true;
             }
@@ -197,16 +225,7 @@ public class BusStationFragment extends SherlockFragment {
                 if (mActivity == null) {
                     return false;
                 }
-                Cursor cursor = mDataCache.queryBusStations(newText);
-                String[] from = new String[] {
-                        KuaiXinData.BusStation.GPS_NUMBER, KuaiXinData.BusStation.NAME
-                };
-                int[] to = new int[] {
-                        R.id.station_gps_number, R.id.station_name
-                };
-                SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
-                        R.layout.station_gps_number_item, cursor, from, to, 0);
-                mSearchView.setSuggestionsAdapter(adapter);
+                getSuggestions(newText);
                 return true;
             }
         });
@@ -226,11 +245,35 @@ public class BusStationFragment extends SherlockFragment {
                 return true;
             }
         });
+        mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                String queryText = mSearchView.getQuery().toString();
+                if (hasFocus && !TextUtils.isEmpty(queryText)) {
+                    getSuggestions(queryText);
+                    mSearchView.setQuery(queryText, false);
+                }
+            }
+        });
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void getSuggestions(String queryText) {
+        Cursor cursor = mDataCache.queryBusStations(queryText);
+        String[] from = new String[] {
+                KuaiXinData.BusStation.GPS_NUMBER, KuaiXinData.BusStation.NAME
+        };
+        int[] to = new int[] {
+                R.id.station_gps_number, R.id.station_name
+        };
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
+                R.layout.station_gps_number_item, cursor, from, to, 0);
+        mSearchView.setSuggestionsAdapter(adapter);
     }
 
     private class StationsAdapter extends BaseAdapter {
         private List<String> mBusStations;
+
         private String mCurStationName;
 
         public StationsAdapter(List<String> busStations, String curStationName) {
@@ -294,42 +337,42 @@ public class BusStationFragment extends SherlockFragment {
     }
 
     private void searchStationLines(String gpsNumber) {
-    	KXBusStationLines stationLines = mDataCache.getStationLines(gpsNumber);
-    	if (stationLines != null) {
-    		showStationLines(stationLines);
-    		return ;
-    	}
-    	mTrafficService.getBusStationLines(gpsNumber, new ICompletionListener() {
-			@Override
-			public void onSuccess(Object result) {
-				mTvStationName.requestFocusFromTouch();
-				dismissWaittingDialog();
-				KXBusStationLines lines = (KXBusStationLines) result;
-				if (lines != null) {
-					showStationLines(lines);
-				}
-			}
-			
-			@Override
-			public void onFailure(int errorCode, String errorText) {
-				dismissWaittingDialog();
-				Utils.debug(TAG, "get bus station lines failed: " + errorText);
+        KXBusStationLines stationLines = mDataCache.getStationLines(gpsNumber);
+        if (stationLines != null) {
+            showStationLines(stationLines);
+            return;
+        }
+        mTrafficService.getBusStationLines(gpsNumber, new ICompletionListener() {
+            @Override
+            public void onSuccess(Object result) {
+                mTvStationName.requestFocusFromTouch();
+                dismissWaittingDialog();
+                KXBusStationLines lines = (KXBusStationLines)result;
+                if (lines != null) {
+                    showStationLines(lines);
+                }
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorText) {
+                dismissWaittingDialog();
+                Utils.debug(TAG, "get bus station lines failed: " + errorText);
                 String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
                 String description = getString(R.string.get_bus_card_records_failed, reason);
                 Toast.makeText(mActivity, description, Toast.LENGTH_SHORT).show();
-			}
-		});
+            }
+        });
     }
-    
+
     private void deleteAllStations() {
-    	ContentResolver resolver = mActivity.getContentResolver();
-    	int rows = resolver.delete(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, null, null);
-    	Utils.debug(TAG, "delete rows: " + rows);
+        ContentResolver resolver = mActivity.getContentResolver();
+        int rows = resolver.delete(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, null, null);
+        Utils.debug(TAG, "delete rows: " + rows);
     }
-    
+
     private void dismissWaittingDialog() {
         if (mWaitingDialog != null && mWaitingDialog.isShowing()) {
-        	mWaitingDialog.dismiss();
+            mWaitingDialog.dismiss();
         }
     }
 }

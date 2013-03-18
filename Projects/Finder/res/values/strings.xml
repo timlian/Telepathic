@@ -34,6 +34,8 @@
     <string name="ending_time">Ending time: <xliff:g id="ending_time" example="21:00">%1$s</xliff:g></string>
     <string name="confirm_exit_title">Exit</string>
     <string name="confirm_exit_message">Do you want to exit?</string>
+    <string name="confirm_clean_cache_title">Clear cache</string>
+    <string name="confirm_clean_cache_message">Are you sure to clear the cached data?</string>
 
     <!-- consumer record retrieve -->
     <string name="line_number">公交路线:</string>
@@ -47,19 +49,6 @@
     <string name="release_to_refresh">Release to refresh</string>
     <string name="pull_to_refresh">Pull down to refresh</string>
     <string name="refreshing">Refreshing…</string>
-
-    <!-- speech recognize notice -->
-    <string name="no_voice_search_title">Notice</string>
-    <string name="no_voice_search_msg">The speech recognize function need Google Voice Search to support, do you want to download it now?</string>
-    <string name="no_voice_search_cancel">Cancel</string>
-    <string name="no_voice_search_browser">From web</string>
-    <string name="no_voice_search_download">From market</string>
-    <string name="no_market_title">No App Store</string>
-    <string name="no_market_msg">You cellphone isn\'t install any app store to handle the request. Do you want to download it from browser?</string>
-    <string name="no_market_cancel">Cancel</string>
-    <string name="no_market_download">Download from browser</string>
-    <string name="speak_busline_number">Please speak out busline number</string>
-    <string name="no_matches_busline">No matches bus line</string>
 
     <!-- Toast messages -->
     <string name="start_get_location">start to get the bus location&#8230;</string>

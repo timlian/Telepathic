@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -29,6 +32,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
@@ -101,7 +105,7 @@ public class BusCardRecordFragment extends SherlockFragment {
     private MessageDispatcher mMessageDispatcher;
 
     private static final String[] CARD_RECORDS_HISTORY = {
-        ITrafficData.KuaiXinData.BusCard._ID, ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
+            ITrafficData.KuaiXinData.BusCard._ID, ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
     };
 
     private IMessageHandler mMessageHandler = new IMessageHandler() {
@@ -322,8 +326,20 @@ public class BusCardRecordFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_cache:
-                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                deleteAllBusCardRecords();
+                Builder builder = new AlertDialog.Builder(mActivity);
+                builder.setTitle(R.string.confirm_clean_cache_title)
+                        .setMessage(R.string.confirm_clean_cache_message)
+                        .setPositiveButton(android.R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                                        deleteAllBusCardRecords();
+                                        getSuggestions(""); // reset the
+                                                            // suggestions
+                                    }
+                                }).setNegativeButton(android.R.string.cancel, null);
+                builder.create().show();
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));
@@ -340,8 +356,10 @@ public class BusCardRecordFragment extends SherlockFragment {
 
         // Get the SearchView and set the searchable configuration
         mSearchView = (SearchView)menu.findItem(R.id.search_card_record).getActionView();
-        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity().getComponentName());
+        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(
+                Context.SEARCH_SERVICE);
+        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity()
+                .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.ic_card_hint));
         mSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -357,7 +375,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                     mTrafficService.getBusCardRecords(cardNumber, 30);
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_card_number, Toast.LENGTH_SHORT)
-                    .show();
+                            .show();
                 }
                 return true;
             }
@@ -367,16 +385,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                 if (mActivity == null) {
                     return false;
                 }
-                Cursor cursor = queryBusCardID(newText);
-                String[] from = new String[] {
-                        ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
-                };
-                int[] to = new int[] {
-                        android.R.id.text1
-                };
-                SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
-                        android.R.layout.simple_list_item_1, cursor, from, to, 0);
-                mSearchView.setSuggestionsAdapter(adapter);
+                getSuggestions(newText);
                 return true;
             }
         });
@@ -397,7 +406,30 @@ public class BusCardRecordFragment extends SherlockFragment {
                 return true;
             }
         });
+        mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                String queryText = mSearchView.getQuery().toString();
+                if (hasFocus && !TextUtils.isEmpty(queryText)) {
+                    getSuggestions(queryText);
+                    mSearchView.setQuery(queryText, false);
+                }
+            }
+        });
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void getSuggestions(String queryText) {
+        Cursor cursor = queryBusCardID(queryText);
+        String[] from = new String[] {
+            ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
+        };
+        int[] to = new int[] {
+            android.R.id.text1
+        };
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
+                android.R.layout.simple_list_item_1, cursor, from, to, 0);
+        mSearchView.setSuggestionsAdapter(adapter);
     }
 
     private static int getLoaderId() {
@@ -409,10 +441,10 @@ public class BusCardRecordFragment extends SherlockFragment {
         String sortOrder = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " ASC ";
         String selection = null;
         String[] selectionArgs = null;
-        if(!TextUtils.isEmpty(keywords)){
+        if (!TextUtils.isEmpty(keywords)) {
             selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + " LIKE ?";
             selectionArgs = new String[] {
-                    keywords + "%"
+                keywords + "%"
             };
         }
         Cursor cursor = resolver.query(ITrafficData.KuaiXinData.BusCard.CONTENT_URI,
@@ -612,11 +644,11 @@ public class BusCardRecordFragment extends SherlockFragment {
             return pageView.getView();
         }
     }
-    
+
     private void deleteAllBusCardRecords() {
-    	ContentResolver resolver = mActivity.getContentResolver();
-    	int rows = resolver.delete(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null, null);
-    	Utils.debug(TAG, "delete rows: " + rows);
+        ContentResolver resolver = mActivity.getContentResolver();
+        int rows = resolver.delete(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null, null);
+        Utils.debug(TAG, "delete rows: " + rows);
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -12,6 +13,7 @@ import android.app.SearchableInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -68,40 +70,65 @@ public class BusLocationFragment extends SherlockFragment {
     private static final String TAG = BusLocationFragment.class.getSimpleName();
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
+
     private static final int BUS_LINE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 1;
+
+    private static final int CLEAN_CACHE_CONFIRM_DLG = CUSTOM_DIALOG_ID_START + 2;
+
     private static final int MAP_ZOOM_LEVEL = 14;
 
     private MainActivity mActivity;
+
     private SearchView mSearchView;
+
     private MapView mMapView;
+
     private LinearLayout mUpdateLocation;
+
     private ImageView mUpdateIcon;
+
     private ProgressBar mProgress;
+
     private BMapManager mMapManager;
+
     private MapController mMapController = null;
+
     private LocationClient mLocClient;
+
     private LocationData mLocData = null;
+
     private CustomItemizedOverlay mBusLocationOverlay;
 
     private MyLocationOverlay mLocationOverlay; // 定位图层
+
     private MyLocationListenner mLocationListener;
+
     private ITrafficService mTrafficService;
+
     private MessageDispatcher mMessageDispatcher;
+
     private MKRoute mBusRoute;
+
     private String mBusRouteUid;
+
     private Dialog mDialog;
+
     private IMessageHandler mGetBusLocationUpdateHandler;
+
     private IMessageHandler mGetBusLocationDoneHandler;
+
     private boolean mIsFirstUpdate = true;
+
     private BaiDuDataCache mDataCache;
 
     private static final String[] BUS_LINE_PROJECTION = {
-        ITrafficData.BaiDuData.BusLine._ID,
-        ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
-        ITrafficData.BaiDuData.BusLine.START_STATION,
-        ITrafficData.BaiDuData.BusLine.END_STATION
+            ITrafficData.BaiDuData.BusLine._ID, ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
+            ITrafficData.BaiDuData.BusLine.START_STATION,
+            ITrafficData.BaiDuData.BusLine.END_STATION
     };
+
     private static final int IDX_BUS_LINE_ID = 0;
+
     private static final int IDX_BUS_LINE_NUMBER = 1;
 
     @Override
@@ -119,7 +146,7 @@ public class BusLocationFragment extends SherlockFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mActivity = (MainActivity)getSherlockActivity();
-        mDataCache  = new BaiDuDataCache(mActivity);
+        mDataCache = new BaiDuDataCache(mActivity);
         // init map service
         FinderApplication app = (FinderApplication)mActivity.getApplication();
         mMapManager = app.getMapManager();
@@ -155,7 +182,13 @@ public class BusLocationFragment extends SherlockFragment {
         }
         if (mMapController == null) {
             mMapController = mMapView.getController();
-            GeoPoint point = new GeoPoint((int)(30.6633*1e6),(int)(104.0723*1e6));// Set the map center in Tianfu Square
+            GeoPoint point = new GeoPoint((int)(30.6633 * 1e6), (int)(104.0723 * 1e6));// Set
+                                                                                       // the
+                                                                                       // map
+                                                                                       // center
+                                                                                       // in
+                                                                                       // Tianfu
+                                                                                       // Square
             mMapController.setCenter(point);
             mMapController.setZoom(MAP_ZOOM_LEVEL);
             mMapController.enableClick(true);
@@ -177,8 +210,7 @@ public class BusLocationFragment extends SherlockFragment {
             mLocClient.start();
         }
 
-
-        if(mBusLocationOverlay == null) {
+        if (mBusLocationOverlay == null) {
             Drawable marker = getResources().getDrawable(R.drawable.bus_location_marker);
             marker.setBounds(0, 0, marker.getIntrinsicWidth(), marker.getIntrinsicHeight());
             /**
@@ -232,7 +264,8 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void handleMessage(Message msg) {
-                Toast.makeText(mActivity, getString(R.string.get_location_finished), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, getString(R.string.get_location_finished),
+                        Toast.LENGTH_SHORT).show();
                 mIsFirstUpdate = true;
                 if (msg.arg2 != 0) {
                     String errorMessage = (String)msg.obj;
@@ -326,6 +359,21 @@ public class BusLocationFragment extends SherlockFragment {
                 prgDlg.setOnCancelListener(null);
                 mDialog = prgDlg;
                 break;
+            case CLEAN_CACHE_CONFIRM_DLG:
+                Builder build = new AlertDialog.Builder(mActivity);
+                build.setTitle(R.string.confirm_clean_cache_title)
+                        .setMessage(R.string.confirm_clean_cache_message)
+                        .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                                int rows = mDataCache.deleteAllBusLines();
+                                Utils.debug(TAG, "deleted rows: " + rows);
+                                getSuggestions(""); // reset the suggestions
+                            }
+                        }).setNegativeButton(android.R.string.cancel, null);
+                mDialog = build.create();
+                break;
             default:
                 break;
         }
@@ -345,29 +393,29 @@ public class BusLocationFragment extends SherlockFragment {
         final String[] busRoutes = new String[routeCount];
         for (int idx = 0; idx < routeCount; idx++) {
             String firstStation = line.getRoute(idx).getFirstStation();
-            String lastStation  = line.getRoute(idx).getLastStation();
+            String lastStation = line.getRoute(idx).getLastStation();
             busRoutes[idx] = firstStation + " - " + lastStation;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         final String titleText = String.format(getResources().getString(R.string.select_bus_route),
                 line.getLineNumber());
         builder.setTitle(titleText).setSingleChoiceItems(busRoutes, 0, null)
-        .setOnCancelListener(null)
-        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-                final int selectedPosition = ((AlertDialog)dialog).getListView()
-                        .getCheckedItemPosition();
-                final BDBusRoute route = line.getRoute(selectedPosition);
-                searchBusRoute(route.getCity(), route.getUid());
-            }
-        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        }).create().show();
+                .setOnCancelListener(null)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                        final int selectedPosition = ((AlertDialog)dialog).getListView()
+                                .getCheckedItemPosition();
+                        final BDBusRoute route = line.getRoute(selectedPosition);
+                        searchBusRoute(route.getCity(), route.getUid());
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
     }
 
     private void searchBusLine(final String city, final String lineNumber) {
@@ -388,6 +436,7 @@ public class BusLocationFragment extends SherlockFragment {
                     mMapView.requestFocusFromTouch();
                 }
             }
+
             @Override
             public void onFailure(int errorCode, String errorText) {
                 Utils.debug(TAG, "Search bus line failed: " + errorText);
@@ -403,7 +452,7 @@ public class BusLocationFragment extends SherlockFragment {
         MKRoute route = mDataCache.getRoute(uid);
         if (route != null) {
             updateRoute(route, uid);
-            return ;
+            return;
         }
         mTrafficService.searchBusRoute(city, uid, new ICompletionListener() {
             @Override
@@ -413,6 +462,7 @@ public class BusLocationFragment extends SherlockFragment {
                     updateRoute(route, uid);
                 }
             }
+
             @Override
             public void onFailure(int errorCode, String errorText) {
                 Utils.debug(TAG, "Search bus route failed: " + errorText);
@@ -425,11 +475,12 @@ public class BusLocationFragment extends SherlockFragment {
 
     private void getRouteLocation(MKRoute route, String uid) {
         if (route == null) {
-            return ;
+            return;
         }
         String lineNumber = mDataCache.getRouteLineNumber(uid);
         if (Utils.isValidBusLineNumber(lineNumber)) {
-            Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT)
+                    .show();
             mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route));
         }
     }
@@ -469,9 +520,7 @@ public class BusLocationFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_cache:
-                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                int rows = mDataCache.deleteAllBusLines();
-                Utils.debug(TAG, "deleted rows: " + rows);
+                showDialog(CLEAN_CACHE_CONFIRM_DLG);
                 return true;
             case R.id.about:
                 startActivity(new Intent(mActivity, AboutActivity.class));
@@ -488,8 +537,10 @@ public class BusLocationFragment extends SherlockFragment {
 
         // Get the SearchView and set the searchable configuration
         mSearchView = (SearchView)menu.findItem(R.id.search_bus_location).getActionView();
-        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity().getComponentName());
+        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(
+                Context.SEARCH_SERVICE);
+        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity()
+                .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.bus_number_hint));
         mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -504,7 +555,8 @@ public class BusLocationFragment extends SherlockFragment {
                     showDialog(BUS_LINE_SEARCH_DLG);
                     searchBusLine(city, lineNumber);
                 } else {
-                    Toast.makeText(mActivity, R.string.invalid_line_number, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mActivity, R.string.invalid_line_number, Toast.LENGTH_LONG)
+                            .show();
                 }
                 return true;
             }
@@ -528,7 +580,8 @@ public class BusLocationFragment extends SherlockFragment {
             @Override
             public boolean onSuggestionClick(int position) {
                 Cursor cursor = (Cursor)mSearchView.getSuggestionsAdapter().getItem(position);
-                int suggestionIndex = cursor.getColumnIndex(ITrafficData.BaiDuData.BusLine.LINE_NUMBER);
+                int suggestionIndex = cursor
+                        .getColumnIndex(ITrafficData.BaiDuData.BusLine.LINE_NUMBER);
                 mSearchView.setQuery(cursor.getString(suggestionIndex), true);
                 return true;
             }
@@ -548,17 +601,16 @@ public class BusLocationFragment extends SherlockFragment {
 
     private void getSuggestions(String queryText) {
         Cursor cursor = queryBusLines(queryText);
-        String[] from = new String[]{
+        String[] from = new String[] {
                 ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
                 ITrafficData.BaiDuData.BusLine.START_STATION,
                 ITrafficData.BaiDuData.BusLine.END_STATION
         };
-        int[] to = new int[]{
-                R.id.line_number,
-                R.id.start_station,
-                R.id.end_station
+        int[] to = new int[] {
+                R.id.line_number, R.id.start_station, R.id.end_station
         };
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity, R.layout.bus_line_suggestion_item, cursor, from, to, 0);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
+                R.layout.bus_line_suggestion_item, cursor, from, to, 0);
         mSearchView.setSuggestionsAdapter(adapter);
     }
 
@@ -599,13 +651,17 @@ public class BusLocationFragment extends SherlockFragment {
 
     private Cursor queryBusLines(String lineNumber) {
         ContentResolver resolver = mActivity.getContentResolver();
-        String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC " + "LIMIT 0,30";
+        String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC "
+                + "LIMIT 0,30";
         String selection = null, selectionArgs[] = null;
         if (!TextUtils.isEmpty(lineNumber)) {
             selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + " LIKE ?";
-            selectionArgs = new String[]{ lineNumber + "%" };
+            selectionArgs = new String[] {
+                lineNumber + "%"
+            };
         }
-        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, selection, selectionArgs, sortOrder);
+        Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI,
+                BUS_LINE_PROJECTION, selection, selectionArgs, sortOrder);
         return cursor;
     }
 
