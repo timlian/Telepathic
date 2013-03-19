@@ -424,7 +424,7 @@ public class BusLocationFragment extends SherlockFragment {
         if (line != null) {
             dismissWaittingDialog();
             showBusLineDlg(line);
-            mMapView.requestFocusFromTouch();
+            mUpdateLocation.requestFocusFromTouch();
             return;
         }
         mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
@@ -434,7 +434,7 @@ public class BusLocationFragment extends SherlockFragment {
                 BDBusLine line = mDataCache.getBusLine(lineNumber);
                 if (line != null) {
                     showBusLineDlg(line);
-                    mMapView.requestFocusFromTouch();
+                    mUpdateLocation.requestFocusFromTouch();
                 }
             }
 
