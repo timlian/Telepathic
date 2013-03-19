@@ -1,14 +1,14 @@
 package com.telepathic.finder.sdk;
 
 public interface ICompletionListener {
-	/**
-	 * 
-	 * @param result
-	 */
+    /**
+     *
+     * @param result
+     */
     void onSuccess(Object result);
 
     /**
-     * 
+     *
      * @param errorCode
      * @param errorText
      */

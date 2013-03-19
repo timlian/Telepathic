@@ -150,33 +150,33 @@ public class TrafficStore {
             }
             // store internal points
             ArrayList<ArrayList<GeoPoint>> internalPointsArray = null;
-			try {
-				Class<?> routeClass = MKRoute.class;
-	            Field routeField = routeClass.getDeclaredField("a");
-				routeField.setAccessible(true);
-				internalPointsArray = (ArrayList<ArrayList<GeoPoint>>)routeField.get(route);
-			} catch (NoSuchFieldException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			if (internalPointsArray != null && internalPointsArray.size() > 0) {
-				for (int i = 0; i < internalPointsArray.size(); i++) {
-					ArrayList<GeoPoint>  internalPoints = internalPointsArray.get(i);
-		    		for(int j = 0; j < internalPoints.size(); j++) {
-		    			GeoPoint point = internalPoints.get(j);
-		    			ContentValues pointValues = new ContentValues();
-		    			pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.ROUTE_ID, routeId);
-		    			pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.INDEX, j);
-		    			pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.LATITUDE, point.getLatitudeE6());
-		    			pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.LONGITUDE, point.getLongitudeE6());
-		    			mContentResolver.insert(ITrafficData.BaiDuData.BusRoutePoint.CONTENT_URI, pointValues);
-		    		}
-				}
-			}
-			// update bus line last_update_time
+            try {
+                Class<?> routeClass = MKRoute.class;
+                Field routeField = routeClass.getDeclaredField("a");
+                routeField.setAccessible(true);
+                internalPointsArray = (ArrayList<ArrayList<GeoPoint>>)routeField.get(route);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            if (internalPointsArray != null && internalPointsArray.size() > 0) {
+                for (int i = 0; i < internalPointsArray.size(); i++) {
+                    ArrayList<GeoPoint>  internalPoints = internalPointsArray.get(i);
+                    for(int j = 0; j < internalPoints.size(); j++) {
+                        GeoPoint point = internalPoints.get(j);
+                        ContentValues pointValues = new ContentValues();
+                        pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.ROUTE_ID, routeId);
+                        pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.INDEX, j);
+                        pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.LATITUDE, point.getLatitudeE6());
+                        pointValues.put(ITrafficData.BaiDuData.BusRoutePoint.LONGITUDE, point.getLongitudeE6());
+                        mContentResolver.insert(ITrafficData.BaiDuData.BusRoutePoint.CONTENT_URI, pointValues);
+                    }
+                }
+            }
+            // update bus line last_update_time
             if (lineId > 0) {
                 ContentValues values = new ContentValues();
                 values.put(ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME, System.currentTimeMillis());

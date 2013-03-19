@@ -88,7 +88,7 @@ public class BusStationFragment extends SherlockFragment {
         mTrafficService = app.getTrafficService();
         KXBusStationLines stationLines = mDataCache.getLastStationLines();
         if (stationLines != null) {
-        	showStationLines(stationLines);
+            showStationLines(stationLines);
         }
     }
 
@@ -106,7 +106,7 @@ public class BusStationFragment extends SherlockFragment {
         mLlNoItem = (LinearLayout)getView().findViewById(R.id.no_item_tips);
         mLlStationInfo = (RelativeLayout)getView().findViewById(R.id.station_info);
         if (mWaitingDialog == null) {
-        	mWaitingDialog = createWaitingDialog();
+            mWaitingDialog = createWaitingDialog();
         }
     }
 

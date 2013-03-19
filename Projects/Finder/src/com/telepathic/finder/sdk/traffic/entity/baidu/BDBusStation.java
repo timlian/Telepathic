@@ -21,21 +21,21 @@ public class BDBusStation {
     }
 
     public BDBusStation() {
-    	
+
     }
-    
+
     public void setName(String name) {
-    	mName = name;
+        mName = name;
     }
-    
+
     public void setLatitude(String latitude) {
-    	mLatitude = latitude;
+        mLatitude = latitude;
     }
-    
+
     public void setLongitude(String longitude) {
-    	mLongitude = longitude;
+        mLongitude = longitude;
     }
-    
+
     public String getName() {
         return mName;
     }

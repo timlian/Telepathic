@@ -12,23 +12,23 @@
         android:textSize="20sp"
         android:text="501"
         />
-    <LinearLayout 
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         >
-        <TextView 
+        <TextView
             android:id="@+id/start_station"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="华阳客运站"
             />
-        <TextView 
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" ↔ "
             />
-        <TextView 
+        <TextView
             android:id="@+id/end_station"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -539,14 +539,14 @@ public class BusLocationFragment extends SherlockFragment {
         // Get the SearchView and set the searchable configuration
         mSearchView = (SearchView)menu.findItem(R.id.search_bus_location).getActionView();
         Utils.debug(TAG, mSearchView.getClass().getName());
-        
+
         SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(
                 Context.SEARCH_SERVICE);
         SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity()
                 .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.bus_number_hint));
-        
+
         mSearchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
@@ -599,19 +599,19 @@ public class BusLocationFragment extends SherlockFragment {
                 }
             }
         });
-        
+
         EditText searchEditText = null;
         try {
-	        ViewGroup view = (ViewGroup)mSearchView.getChildAt(0);
-	        view = (ViewGroup)view.getChildAt(2);
-	        view = (ViewGroup)view.getChildAt(1);
-	        searchEditText = (EditText) view.getChildAt(0);
+            ViewGroup view = (ViewGroup)mSearchView.getChildAt(0);
+            view = (ViewGroup)view.getChildAt(2);
+            view = (ViewGroup)view.getChildAt(1);
+            searchEditText = (EditText) view.getChildAt(0);
         } catch (Exception ex) {
-        	Utils.debug(TAG, "Find edit text from search view failed: " + ex.getMessage());
+            Utils.debug(TAG, "Find edit text from search view failed: " + ex.getMessage());
         }
         if (searchEditText != null) {
-        	searchEditText.setEms(10);
-	        searchEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+            searchEditText.setEms(10);
+            searchEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }

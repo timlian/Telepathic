@@ -419,7 +419,7 @@ public interface ITrafficData {
              */
             public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/com.telepathic.finder.provider.baiDuBusRouteStation";
         }
-        
+
         interface BusRoutePointColumns extends BaseColumns {
             /**
              * The bus route identification.
@@ -438,9 +438,9 @@ public interface ITrafficData {
              */
             String LONGITUDE = "longitude";
         }
-        
+
         class BusRoutePoint implements BusRoutePointColumns {
-        	 /**
+             /**
              * The content uri of this table
              */
             public static final Uri CONTENT_URI = Uri.parse("content://com.telepathic.finder.provider/baiDuBusRoutePoint");

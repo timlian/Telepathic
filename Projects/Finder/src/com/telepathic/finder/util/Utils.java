@@ -345,46 +345,46 @@ public class Utils {
         }
         return false;
     }
-    
-	public static String getErrorMessage(Resources res, int errorCode, String errorText) {
-		String retMessage = null;
-		switch (errorCode) {
-		case IErrorCode.ERROR_NO_NETWORK:
-			retMessage = res.getString(R.string.error_no_network);
-			break;
-		case IErrorCode.ERROR_UNKNOWN:
-			retMessage = res.getString(R.string.error_unknown);
-			break;
-		case IErrorCode.ERROR_NO_DATA:
-			retMessage = res.getString(R.string.error_no_data);
-			break;
-		case IErrorCode.ERROR_LOCATION_FAILED:
-			retMessage = res.getString(R.string.error_location_falied);
-			break;
-		case IErrorCode.ERROR_NETWORK_CONNECT:
-			retMessage = res.getString(R.string.error_network_connect);
-			break;
-		case IErrorCode.ERROR_NETWORK_DATA:
-			retMessage = res.getString(R.string.error_network_data);
-			break;
-		case IErrorCode.ERROR_PERMISSION_DENIED:
-			retMessage = res.getString(R.string.error_permission_denied);
-			break;
-		case IErrorCode.ERROR_RESULT_NOT_FOUND:
-			retMessage = res.getString(R.string.error_result_not_found);
-			break;
-		case IErrorCode.ERROR_ROUTE_ADDR:
-			retMessage = res.getString(R.string.error_route_addr);
-			break;
-		case IErrorCode.ERROR_GPS_NUMBER_NOT_PRESENT:
-			retMessage = res.getString(R.string.error_gps_number_not_present);
-			break;
-		default:
-			Logger.logTrace(String.valueOf(errorCode) + ": " + errorText);
-			retMessage = errorText;
-			break;
-		}
-		return retMessage;
-	}
+
+    public static String getErrorMessage(Resources res, int errorCode, String errorText) {
+        String retMessage = null;
+        switch (errorCode) {
+        case IErrorCode.ERROR_NO_NETWORK:
+            retMessage = res.getString(R.string.error_no_network);
+            break;
+        case IErrorCode.ERROR_UNKNOWN:
+            retMessage = res.getString(R.string.error_unknown);
+            break;
+        case IErrorCode.ERROR_NO_DATA:
+            retMessage = res.getString(R.string.error_no_data);
+            break;
+        case IErrorCode.ERROR_LOCATION_FAILED:
+            retMessage = res.getString(R.string.error_location_falied);
+            break;
+        case IErrorCode.ERROR_NETWORK_CONNECT:
+            retMessage = res.getString(R.string.error_network_connect);
+            break;
+        case IErrorCode.ERROR_NETWORK_DATA:
+            retMessage = res.getString(R.string.error_network_data);
+            break;
+        case IErrorCode.ERROR_PERMISSION_DENIED:
+            retMessage = res.getString(R.string.error_permission_denied);
+            break;
+        case IErrorCode.ERROR_RESULT_NOT_FOUND:
+            retMessage = res.getString(R.string.error_result_not_found);
+            break;
+        case IErrorCode.ERROR_ROUTE_ADDR:
+            retMessage = res.getString(R.string.error_route_addr);
+            break;
+        case IErrorCode.ERROR_GPS_NUMBER_NOT_PRESENT:
+            retMessage = res.getString(R.string.error_gps_number_not_present);
+            break;
+        default:
+            Logger.logTrace(String.valueOf(errorCode) + ": " + errorText);
+            retMessage = errorText;
+            break;
+        }
+        return retMessage;
+    }
 
 }

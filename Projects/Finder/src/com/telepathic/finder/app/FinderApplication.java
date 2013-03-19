@@ -18,10 +18,10 @@ import com.telepathic.finder.util.Logger;
 import com.telepathic.finder.util.Utils;
 
 public class FinderApplication extends Application {
-	private static final String TAG = FinderApplication.class.getName();
-	
-	private static final String MAIN_PROCESS_NAME = "com.telepathic.finder";
-	
+    private static final String TAG = FinderApplication.class.getName();
+
+    private static final String MAIN_PROCESS_NAME = "com.telepathic.finder";
+
     static FinderApplication mApp;
 
     private BMapManager mBMapManager = null;
@@ -53,21 +53,21 @@ public class FinderApplication extends Application {
 
     @Override
     public void onCreate() {
-    	if (MAIN_PROCESS_NAME.equals(getCurrentProcessName())) {
-    		//setUncatchedExceptionHandler();
-    		mApp = this;
-	        mBMapManager = new BMapManager(this);
-	        boolean isSuccess = mBMapManager.init(this.mStrKey, new MyGeneralListener());
-	        Handler msgHandler = mMessageDispatcher.getMessageHandler(getMainLooper());
-	        mTrafficManager = TrafficManager.getTrafficManager(mBMapManager, getApplicationContext(), msgHandler);
-	        // 初始化地图sdk成功，设置定位监听时间
-	        if (isSuccess) {
-	            // mBMapManager.getLocationManager().setNotifyInternal(10, 5);
-	        } else {
-	            // 地图sdk初始化失败，不能使用sdk
-	        }
-    	}
-       
+        if (MAIN_PROCESS_NAME.equals(getCurrentProcessName())) {
+            //setUncatchedExceptionHandler();
+            mApp = this;
+            mBMapManager = new BMapManager(this);
+            boolean isSuccess = mBMapManager.init(this.mStrKey, new MyGeneralListener());
+            Handler msgHandler = mMessageDispatcher.getMessageHandler(getMainLooper());
+            mTrafficManager = TrafficManager.getTrafficManager(mBMapManager, getApplicationContext(), msgHandler);
+            // 初始化地图sdk成功，设置定位监听时间
+            if (isSuccess) {
+                // mBMapManager.getLocationManager().setNotifyInternal(10, 5);
+            } else {
+                // 地图sdk初始化失败，不能使用sdk
+            }
+        }
+
         super.onCreate();
     }
 
@@ -94,14 +94,14 @@ public class FinderApplication extends Application {
     }
 
     private void setUncatchedExceptionHandler() {
-    	Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable ex) {
-				Logger.logTrace(thread, ex);
-			}
-		});
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                Logger.logTrace(thread, ex);
+            }
+        });
     }
-    
+
     private String getCurrentProcessName() {
         int pid = android.os.Process.myPid();
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -112,5 +112,5 @@ public class FinderApplication extends Application {
         }
         return null;
     }
-    
+
 }

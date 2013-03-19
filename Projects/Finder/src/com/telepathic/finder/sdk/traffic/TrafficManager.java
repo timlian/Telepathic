@@ -72,34 +72,34 @@ public class TrafficManager {
 
         @Override
         public void searchBusLine(final String city, final String lineNumber, final ICompletionListener listener) {
-        	// The creation of search bus line task must be in the thread, which has looper. 
-        	final SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
+            // The creation of search bus line task must be in the thread, which has looper.
+            final SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                    	if (!Utils.hasActiveNetwork(mContext)) {
-                    		notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No networking.");
-                    	}
+                        if (!Utils.hasActiveNetwork(mContext)) {
+                            notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No networking.");
+                        }
                         searchTask.startTask();
                         searchTask.waitTaskDone();
-                        
+
                         TaskResult<ArrayList<MKPoiInfo>> taskResult = searchTask.getTaskResult();
                         if (taskResult != null) {
-                        	int errorCode = taskResult.getErrorCode();
-                        	if (errorCode != 0) {
-                        		notifyFailure(listener, errorCode, taskResult.getErrorMessage());
-                        	} else {
-	                        	ArrayList<MKPoiInfo> line = taskResult.getResult();
-	                        	 if (line != null && line.size() > 0) {
-	                                mTrafficStore.store(lineNumber, line);
-	                                notifySuccess(listener, null);
-	                            } else {
-	                            	notifyFailure(listener, IErrorCode.ERROR_NO_DATA, "No bus line info.");
-	                            }
-                        	}
+                            int errorCode = taskResult.getErrorCode();
+                            if (errorCode != 0) {
+                                notifyFailure(listener, errorCode, taskResult.getErrorMessage());
+                            } else {
+                                ArrayList<MKPoiInfo> line = taskResult.getResult();
+                                 if (line != null && line.size() > 0) {
+                                    mTrafficStore.store(lineNumber, line);
+                                    notifySuccess(listener, null);
+                                } else {
+                                    notifyFailure(listener, IErrorCode.ERROR_NO_DATA, "No bus line info.");
+                                }
+                            }
                         } else {
-                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the search bus line task result is null.");
+                            notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the search bus line task result is null.");
                         }
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "searchBusLine is interrupted.");
@@ -111,34 +111,34 @@ public class TrafficManager {
 
         @Override
         public void searchBusRoute(final String city, final String routeUid, final ICompletionListener listener) {
-        	// The creation of search bus route task must be in the thread, which has looper. 
+            // The creation of search bus route task must be in the thread, which has looper.
             final SearchBusRouteTask searchTask = new SearchBusRouteTask(mMapManager, city, routeUid);
             mExecutorService.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                    	if (!Utils.hasActiveNetwork(mContext)) {
-                    		notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No networking.");
-                    	}
+                        if (!Utils.hasActiveNetwork(mContext)) {
+                            notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No networking.");
+                        }
                         searchTask.startTask();
                         searchTask.waitTaskDone();
                         TaskResult<MKRoute> taskResult = searchTask.getTaskResult();
                         if (taskResult != null) {
-                        	int errorCode = taskResult.getErrorCode();
-                        	if (errorCode != 0) {
-                        		notifyFailure(listener, errorCode, taskResult.getErrorMessage());
-                        	} else {
-                        		MKRoute route = taskResult.getResult();
-                        		if (route != null) {
-        	                        // store the bus route info.
-        	                        mTrafficStore.store(routeUid, taskResult.getResult());
-        	                        notifySuccess(listener, route);
-                        		} else {
-                        			notifyFailure(listener, IErrorCode.ERROR_NO_DATA, "No bus route info.");
-                        		}
-                        	}
+                            int errorCode = taskResult.getErrorCode();
+                            if (errorCode != 0) {
+                                notifyFailure(listener, errorCode, taskResult.getErrorMessage());
+                            } else {
+                                MKRoute route = taskResult.getResult();
+                                if (route != null) {
+                                    // store the bus route info.
+                                    mTrafficStore.store(routeUid, taskResult.getResult());
+                                    notifySuccess(listener, route);
+                                } else {
+                                    notifyFailure(listener, IErrorCode.ERROR_NO_DATA, "No bus route info.");
+                                }
+                            }
                         } else {
-                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the search bus route task result is null.");
+                            notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the search bus route task result is null.");
                         }
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "searchBusRoute is interrupted.");
@@ -162,21 +162,21 @@ public class TrafficManager {
                         translateTask.waitTaskDone();
                         TaskResult<String> translateRusult = translateTask.getTaskResult();
                         if (translateRusult == null) {
-                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception:  TranslateToStationTask result is null.");
-                        	return ;
-                        } 
+                            notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception:  TranslateToStationTask result is null.");
+                            return ;
+                        }
                         String stationName = translateRusult.getResult();
                         int errorCode = translateRusult.getErrorCode();
                         if (errorCode != 0) {
-                        	String errorMessage = translateRusult.getErrorMessage();
-							notifyFailure(listener, errorCode,
-									"Translate gps number(" + gpsNumber + ")"
-											+ " failed - errorCode: " + errorCode + ", description: " + errorMessage);
-							return;
+                            String errorMessage = translateRusult.getErrorMessage();
+                            notifyFailure(listener, errorCode,
+                                    "Translate gps number(" + gpsNumber + ")"
+                                            + " failed - errorCode: " + errorCode + ", description: " + errorMessage);
+                            return;
                         }
                         if (TextUtils.isEmpty(stationName)) {
-                        	notifyFailure(listener, IErrorCode.ERROR_UNKNOWN,
-									"Translate gps number(" + gpsNumber + ")" + " failed - staton name is null.");
+                            notifyFailure(listener, IErrorCode.ERROR_UNKNOWN,
+                                    "Translate gps number(" + gpsNumber + ")" + " failed - staton name is null.");
                             return ;
                         }
                         stationLines.setName(stationName);
@@ -218,11 +218,11 @@ public class TrafficManager {
                                 @Override
                                 public void run() {
                                     synchronized (stationLines) {
-                                    	if (getLineTask.getTaskResult().getErrorCode() == 0) {
-                                    		stationLines.addBusLine(getLineTask.getTaskResult().getResult());
-                                    	} else {
-                                    		Utils.debug(TAG, "Get bus line " + lineNo + " failed: " + getLineTask.getTaskResult().getErrorCode() + ", " + getLineTask.getTaskResult().getErrorMessage());
-                                    	}
+                                        if (getLineTask.getTaskResult().getErrorCode() == 0) {
+                                            stationLines.addBusLine(getLineTask.getTaskResult().getResult());
+                                        } else {
+                                            Utils.debug(TAG, "Get bus line " + lineNo + " failed: " + getLineTask.getTaskResult().getErrorCode() + ", " + getLineTask.getTaskResult().getErrorMessage());
+                                        }
                                     }
                                     latch.countDown();
                                 }
@@ -356,27 +356,27 @@ public class TrafficManager {
             }
         }
     }
-    
+
     private void notifySuccess(final ICompletionListener listener, final Object result) {
-    	if (listener != null) {
-    		mMessageHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					listener.onSuccess(result);
-				}
-			});
-    	}
+        if (listener != null) {
+            mMessageHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    listener.onSuccess(result);
+                }
+            });
+        }
     }
-    
+
     private void notifyFailure(final ICompletionListener listener, final int errorCode, final String errorText) {
-    	if (listener != null) {
-    		mMessageHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					listener.onFailure(errorCode, errorText);
-				}
-			});
-    	}
+        if (listener != null) {
+            mMessageHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    listener.onFailure(errorCode, errorText);
+                }
+            });
+        }
     }
 
 }

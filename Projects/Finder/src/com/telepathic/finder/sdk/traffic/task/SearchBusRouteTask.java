@@ -42,10 +42,10 @@ public class SearchBusRouteTask extends BaseTask<MKRoute>{
         @Override
         public void onGetBusDetailResult(MKBusLineResult result, int error) {
            // String busLine = Utils.parseBusLineNumber(result.getBusName()).get(0);
-        	MKRoute route = null;
-        	if (error == 0 && result != null) {
-        		route = result.getBusRoute();
-        	}
+            MKRoute route = null;
+            if (error == 0 && result != null) {
+                route = result.getBusRoute();
+            }
             TaskResult<MKRoute> taskResult = new TaskResult<MKRoute>();
             taskResult.setErrorCode(error);
             taskResult.setResult(route);

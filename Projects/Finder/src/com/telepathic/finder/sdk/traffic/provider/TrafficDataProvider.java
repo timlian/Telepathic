@@ -62,7 +62,7 @@ public class TrafficDataProvider extends ContentProvider {
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusRouteStation", MATCH_KUAI_XIN_BUS_ROUTE_STATION);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinBusStationLines", MATCH_KUAI_XIN_BUS_STATION_LINES);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "kuaiXinPerformance", MATCH_KUAI_XIN_PERFORMANCE);
-        
+
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusLine", MATCH_BAI_DU_BUS_LINE);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusLineWithBusRoute", MATCH_BD_LINE_JOIN_ROUTE);
         sUriMatcher.addURI(ITrafficData.AUTHORITY, "baiDuBusRoute", MATCH_BAI_DU_BUS_ROUTE);
@@ -89,17 +89,17 @@ public class TrafficDataProvider extends ContentProvider {
             TABLE_BAI_DU_BUS_LINE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE + " ON "
             + "(" + TABLE_BAI_DU_BUS_LINE + "." + BaiDuData.BusLine._ID + "=" + BaiDuData.BusRoute.LINE_ID + ")";
 
-    private static final String BD_ROUTE_JOIN_STATION = 
-    		TABLE_BAI_DU_BUS_ROUTE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE_STATION + " ON "
-    		+ "(" + TABLE_BAI_DU_BUS_ROUTE + "." + BaiDuData.BusRoute._ID + "=" + BaiDuData.BusRouteStation.ROUTE_ID + ")"
-    		+ " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_STATION + " ON "
-    		+ "(" + BaiDuData.BusRouteStation.STATION_ID + "=" + TABLE_BAI_DU_BUS_STATION + "." +BaiDuData.BusStation._ID + ")";
-    
-    private static final String BD_ROUTE_JOIN_POINT = 
-    		TABLE_BAI_DU_BUS_ROUTE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE_POINT + " ON "
-    		+ "(" + TABLE_BAI_DU_BUS_ROUTE + "." + BaiDuData.BusRoute._ID + "=" 
-    		+ TABLE_BAI_DU_BUS_ROUTE_POINT + "." + BaiDuData.BusRoutePoint.ROUTE_ID + ")";
-    
+    private static final String BD_ROUTE_JOIN_STATION =
+            TABLE_BAI_DU_BUS_ROUTE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE_STATION + " ON "
+            + "(" + TABLE_BAI_DU_BUS_ROUTE + "." + BaiDuData.BusRoute._ID + "=" + BaiDuData.BusRouteStation.ROUTE_ID + ")"
+            + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_STATION + " ON "
+            + "(" + BaiDuData.BusRouteStation.STATION_ID + "=" + TABLE_BAI_DU_BUS_STATION + "." +BaiDuData.BusStation._ID + ")";
+
+    private static final String BD_ROUTE_JOIN_POINT =
+            TABLE_BAI_DU_BUS_ROUTE + " LEFT OUTER JOIN " + TABLE_BAI_DU_BUS_ROUTE_POINT + " ON "
+            + "(" + TABLE_BAI_DU_BUS_ROUTE + "." + BaiDuData.BusRoute._ID + "="
+            + TABLE_BAI_DU_BUS_ROUTE_POINT + "." + BaiDuData.BusRoutePoint.ROUTE_ID + ")";
+
 
     private DbHelper mDBHelper;
 
@@ -145,8 +145,8 @@ public class TrafficDataProvider extends ContentProvider {
             tableName = TABLE_BAI_DU_BUS_ROUTE;
             break;
         case MATCH_BD_ROUTE_JOIN_STATION:
-        	tableName = BD_ROUTE_JOIN_STATION;
-        	break;
+            tableName = BD_ROUTE_JOIN_STATION;
+            break;
         case MATCH_BAI_DU_BUS_STATION:
             tableName = TABLE_BAI_DU_BUS_STATION;
             break;
@@ -154,8 +154,8 @@ public class TrafficDataProvider extends ContentProvider {
             tableName = TABLE_BAI_DU_BUS_ROUTE_STATION;
             break;
         case MATCH_BD_ROUTE_JOIN_POINT:
-        	tableName = BD_ROUTE_JOIN_POINT;
-        	break;
+            tableName = BD_ROUTE_JOIN_POINT;
+            break;
         default:
             throw new IllegalArgumentException("query() - Unknown uri: " + uri);
         }
@@ -324,8 +324,8 @@ public class TrafficDataProvider extends ContentProvider {
             tableName = TABLE_BAI_DU_BUS_ROUTE_STATION;
             break;
         case MATCH_BD_ROUTE_POINT:
-        	tableName = TABLE_BAI_DU_BUS_ROUTE_POINT;
-        	break;
+            tableName = TABLE_BAI_DU_BUS_ROUTE_POINT;
+            break;
         default:
             throw new UnsupportedOperationException("Can't insert into uri: " + uri);
         }
@@ -337,24 +337,24 @@ public class TrafficDataProvider extends ContentProvider {
 
 
     @Override
-	public synchronized int delete(Uri uri, String selection, String[] selectionArgs) {
-    	int affectedRows = 0;
-    	SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		switch (sUriMatcher.match(uri)) {
-		case MATCH_BAI_DU_BUS_LINE:
-			affectedRows = db.delete(TABLE_BAI_DU_BUS_LINE, selection, selectionArgs);
-			break;
-		case MATCH_KUAI_XIN_BUS_CARD:
-			affectedRows = db.delete(TABLE_KUAI_XIN_BUS_CARD, selection, selectionArgs);
-			break;
-		case MATCH_KUAI_XIN_BUS_STATION:
-			affectedRows = db.delete(TABLE_KUAI_XIN_BUS_STATION, selection, selectionArgs);
-			break;
-		default:
-			throw new UnsupportedOperationException("Can't delete uri: " + uri);
-		}
-		return affectedRows;
-	}
+    public synchronized int delete(Uri uri, String selection, String[] selectionArgs) {
+        int affectedRows = 0;
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        switch (sUriMatcher.match(uri)) {
+        case MATCH_BAI_DU_BUS_LINE:
+            affectedRows = db.delete(TABLE_BAI_DU_BUS_LINE, selection, selectionArgs);
+            break;
+        case MATCH_KUAI_XIN_BUS_CARD:
+            affectedRows = db.delete(TABLE_KUAI_XIN_BUS_CARD, selection, selectionArgs);
+            break;
+        case MATCH_KUAI_XIN_BUS_STATION:
+            affectedRows = db.delete(TABLE_KUAI_XIN_BUS_STATION, selection, selectionArgs);
+            break;
+        default:
+            throw new UnsupportedOperationException("Can't delete uri: " + uri);
+        }
+        return affectedRows;
+    }
 
     @Override
     public synchronized int update(Uri uri, ContentValues values, String selection,
@@ -503,7 +503,7 @@ public class TrafficDataProvider extends ContentProvider {
                     + "REFERENCES " + TABLE_BAI_DU_BUS_STATION + "(" + BaiDuData.BusStationColumns._ID + ") ON DELETE CASCADE, "
                     + "UNIQUE (" + BaiDuData.BusRouteStationColumns.ROUTE_ID + ", "
                     + BaiDuData.BusRouteStationColumns.STATION_ID + " )"+ " )");
-            
+
             db.execSQL("CREATE TABLE " + TABLE_BAI_DU_BUS_ROUTE_POINT + " ("
                     + BaiDuData.BusRoutePoint._ID + " INTEGER PRIMARY KEY, "
                     + BaiDuData.BusRoutePoint.ROUTE_ID + " INTEGER, "
