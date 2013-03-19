@@ -612,6 +612,8 @@ public class BusLocationFragment extends SherlockFragment {
         if (searchEditText != null) {
             searchEditText.setEms(10);
             searchEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+        } else {
+        	mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
