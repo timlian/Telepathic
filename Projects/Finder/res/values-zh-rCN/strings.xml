@@ -11,15 +11,15 @@
     <string name="copyright">Copyright ©2012–2013 Telepathic Ltd.&lt;br/>All Rights Reserved.</string>
 
     <!-- Tab name -->
-    <string name="bus_location">公交车位置</string>
-    <string name="card_records">公交卡消费记录</string>
-    <string name="bus_stations">公交站台信息</string>
+    <string name="bus_location">车辆位置</string>
+    <string name="card_records">消费记录</string>
+    <string name="bus_stations">站台信息</string>
     <string name="menu_settings">设置</string>
     <string name="map_not_ready">地图尚未加载完成</string>
     <string name="find">查询</string>
     <string name="clear_cache">清空历史记录</string>
     <string name="bus_number_hint">公交线路号</string>
-    <string name="ic_card_hint">公交卡号(8位数字)</string>
+    <string name="ic_card_hint">卡号</string>
     <string name="station_number_hint">GPS编号</string>
     <string name="find_bus_route">正在查询公交路线信息, 请稍等&#8230;</string>
     <string name="find_ic_card_records">正在查询公交卡信息, 请稍等&#8230;</string>
@@ -53,8 +53,8 @@
     <string name="refreshing">正在刷新…</string>
 
     <!-- Toast messages -->
-    <string name="start_get_location">开始获取车辆位置信息&#8230;</string>
-    <string name="get_location_finished">获取车辆位置信息完毕。</string>
+    <string name="start_get_location">开始获取车辆位置</string>
+    <string name="get_location_finished">获取车辆位置完毕</string>
     
     <!--Generic Error messages -->
     <string name="error_unknown">未知错误</string>

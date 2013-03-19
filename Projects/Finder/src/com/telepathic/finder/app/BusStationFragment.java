@@ -95,6 +95,10 @@ public class BusStationFragment extends SherlockFragment {
         setupView();
         FinderApplication app = (FinderApplication)mActivity.getApplication();
         mTrafficService = app.getTrafficService();
+        KXBusStationLines stationLines = mDataCache.getLastStationLines();
+        if (stationLines != null) {
+        	showStationLines(stationLines);
+        }
     }
 
     @Override

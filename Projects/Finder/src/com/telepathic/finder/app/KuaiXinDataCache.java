@@ -48,6 +48,23 @@ public class KuaiXinDataCache {
 		mContentResolver = context.getContentResolver();
 	}
 	
+	public KXBusStationLines getLastStationLines() {
+		String lastGpsNumber = null;
+		Cursor cursor = queryLastStation();
+		if (cursor != null && cursor.moveToFirst()) {
+			try {
+				lastGpsNumber = cursor.getString(cursor.getColumnIndex(KuaiXinData.BusStation.GPS_NUMBER));
+			} finally {
+				cursor.close();
+			}
+		}
+		KXBusStationLines stationLines = null;
+		if (!TextUtils.isEmpty(lastGpsNumber)) {
+			stationLines = getStationLines(lastGpsNumber);
+		}
+		return stationLines;
+	}
+	
 	public KXBusStationLines getStationLines(String gpsNumber) {
         KXBusStationLines stationLines = null;
         Cursor cursor = queryBusStationLines(gpsNumber);
@@ -90,6 +107,12 @@ public class KuaiXinDataCache {
         Cursor cursor = mContentResolver.query(KuaiXinData.BusStation.CONTENT_URI, BUS_STATION_PROJECTION,
                 selection, selectionArgs, sortOrder.toString());
         return cursor;
+    }
+    
+    private Cursor queryLastStation() {
+	    String sortOrder = ITrafficData.KuaiXinData.BusStation.LAST_UPDATE_TIME + " DESC LIMIT 0,1";
+		Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, BUS_STATION_PROJECTION, null, null, sortOrder);
+		return cursor;
     }
     
     private Cursor queryBusStationLines(String gpsNumber) {

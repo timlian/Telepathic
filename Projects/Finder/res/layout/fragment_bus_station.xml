@@ -48,6 +48,7 @@
                 android:id="@+id/bus_station_gps_number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textStyle="bold"
                 android:gravity="center" />
         </LinearLayout>
 
