@@ -55,23 +55,14 @@ public class BusStationFragment extends SherlockFragment {
     private static final String TAG = "BusStationFragment";
 
     private MainActivity mActivity;
-
     private LinearLayout mLlBusLines;
-
     private TextView mTvStationName;
-
     private TextView mTvStationGpsNumber;
-
     private LinearLayout mLlNoItem;
-
     private RelativeLayout mLlStationInfo;
-
     private ITrafficService mTrafficService;
-
     private ProgressDialog mWaitingDialog;
-
     private SearchView mSearchView;
-
     private KuaiXinDataCache mDataCache;
 
     @Override
@@ -114,13 +105,15 @@ public class BusStationFragment extends SherlockFragment {
         mTvStationGpsNumber = (TextView)getView().findViewById(R.id.bus_station_gps_number);
         mLlNoItem = (LinearLayout)getView().findViewById(R.id.no_item_tips);
         mLlStationInfo = (RelativeLayout)getView().findViewById(R.id.station_info);
-        mWaitingDialog = createWaitingDialog();
+        if (mWaitingDialog == null) {
+        	mWaitingDialog = createWaitingDialog();
+        }
     }
 
     private void showStationLines(KXBusStationLines stationLines) {
         mTvStationName.setText(stationLines.getName());
-        mTvStationGpsNumber.setText(mActivity.getString(R.string.gps_number,
-                stationLines.getGpsNumber()));
+        String gpsNumber = mActivity.getString(R.string.gps_number, stationLines.getGpsNumber());
+        mTvStationGpsNumber.setText(gpsNumber);
         if (stationLines.getAllBusLines().size() > 0) {
             mLlBusLines.removeAllViews();
             DisplayMetrics dm = new DisplayMetrics();
@@ -177,8 +170,8 @@ public class BusStationFragment extends SherlockFragment {
             case R.id.clear_cache:
                 Builder builder = new AlertDialog.Builder(mActivity);
                 builder.setTitle(R.string.confirm_clean_cache_title)
-                        .setMessage(R.string.confirm_clean_cache_message)
-                        .setPositiveButton(android.R.string.ok,
+                        .setMessage(R.string.confirm_clean_bus_station_cache)
+                        .setPositiveButton(R.string.ok,
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -187,7 +180,7 @@ public class BusStationFragment extends SherlockFragment {
                                         getSuggestions(""); // reset the
                                                             // suggestions
                                     }
-                                }).setNegativeButton(android.R.string.cancel, null);
+                                }).setNegativeButton(R.string.cancel, null);
                 builder.create().show();
                 return true;
             case R.id.about:

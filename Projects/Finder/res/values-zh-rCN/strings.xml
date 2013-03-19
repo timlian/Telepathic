@@ -25,7 +25,7 @@
     <string name="find_ic_card_records">正在查询公交卡信息, 请稍等&#8230;</string>
     <string name="find_station_information">正在查询公交站台信息, 请稍等&#8230;</string>
     <string name="select_bus_route">请选择%s路行驶方向</string>
-    <string name="ok">确认</string>
+    <string name="ok">继续</string>
     <string name="cancel">取消</string>
     <string name="default_city">成都</string>
     <string name="invalid_input_hint">请输入正确的公交车路线号码</string>
@@ -35,7 +35,9 @@
     <string name="confirm_exit_title">退出</string>
     <string name="confirm_exit_message">是否退出应用程序?</string>
     <string name="confirm_clean_cache_title">清空历史记录</string>
-    <string name="confirm_clean_cache_message">你确定要清空历史记录吗?</string>
+    <string name="confirm_clean_bus_line_cache">该操作将删除已查询公交线路信息, 是否继续 ?</string>
+    <string name="confirm_clean_bus_card_cache">该操作将删除已查询公交卡消费记录信息, 是否继续?</string>
+    <string name="confirm_clean_bus_station_cache">该操作将删除已查询公交站台信息, 是否继续?</string>
     <string name="gps_number">GPS编号 : <xliff:g id="gps_number" example="50001">%1$s</xliff:g></string>
 
     <!-- consumer record retrieve -->

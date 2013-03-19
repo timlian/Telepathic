@@ -35,7 +35,9 @@
     <string name="confirm_exit_title">Exit</string>
     <string name="confirm_exit_message">Do you want to exit?</string>
     <string name="confirm_clean_cache_title">Clear cache</string>
-    <string name="confirm_clean_cache_message">Are you sure to clear the cached data?</string>
+    <string name="confirm_clean_bus_line_cache">Do you want to clear the cached bus lines ?</string>
+    <string name="confirm_clean_bus_card_cache">Do you want to clear the cached bus card consumption ?</string>
+    <string name="confirm_clean_bus_station_cache">Do you want to clear the cached bus stations ?</string>
     <string name="gps_number">GPS number : <xliff:g id="gps_number" example="50001">%1$s</xliff:g></string>
 
     <!-- consumer record retrieve -->

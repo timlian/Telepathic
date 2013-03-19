@@ -362,8 +362,8 @@ public class BusLocationFragment extends SherlockFragment {
             case CLEAN_CACHE_CONFIRM_DLG:
                 Builder build = new AlertDialog.Builder(mActivity);
                 build.setTitle(R.string.confirm_clean_cache_title)
-                        .setMessage(R.string.confirm_clean_cache_message)
-                        .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                        .setMessage(R.string.confirm_clean_bus_line_cache)
+                        .setPositiveButton(R.string.ok, new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Utils.copyAppDatabaseFiles(mActivity.getPackageName());
@@ -371,7 +371,7 @@ public class BusLocationFragment extends SherlockFragment {
                                 Utils.debug(TAG, "deleted rows: " + rows);
                                 getSuggestions(""); // reset the suggestions
                             }
-                        }).setNegativeButton(android.R.string.cancel, null);
+                        }).setNegativeButton(R.string.cancel, null);
                 mDialog = build.create();
                 break;
             default:

@@ -328,8 +328,8 @@ public class BusCardRecordFragment extends SherlockFragment {
             case R.id.clear_cache:
                 Builder builder = new AlertDialog.Builder(mActivity);
                 builder.setTitle(R.string.confirm_clean_cache_title)
-                        .setMessage(R.string.confirm_clean_cache_message)
-                        .setPositiveButton(android.R.string.ok,
+                        .setMessage(R.string.confirm_clean_bus_card_cache)
+                        .setPositiveButton(R.string.ok,
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -338,7 +338,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                                         getSuggestions(""); // reset the
                                                             // suggestions
                                     }
-                                }).setNegativeButton(android.R.string.cancel, null);
+                                }).setNegativeButton(R.string.cancel, null);
                 builder.create().show();
                 return true;
             case R.id.about:
