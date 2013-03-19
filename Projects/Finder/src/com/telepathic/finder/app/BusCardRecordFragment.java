@@ -36,6 +36,7 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -329,16 +330,15 @@ public class BusCardRecordFragment extends SherlockFragment {
                 Builder builder = new AlertDialog.Builder(mActivity);
                 builder.setTitle(R.string.confirm_clean_cache_title)
                         .setMessage(R.string.confirm_clean_bus_card_cache)
-                        .setPositiveButton(R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                                        deleteAllBusCardRecords();
-                                        getSuggestions(""); // reset the
-                                                            // suggestions
-                                    }
-                                }).setNegativeButton(R.string.cancel, null);
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                                deleteAllBusCardRecords();
+                                getSuggestions(""); // reset the
+                                                    // suggestions
+                            }
+                        }).setNegativeButton(R.string.cancel, null);
                 builder.create().show();
                 return true;
             case R.id.about:
@@ -406,16 +406,30 @@ public class BusCardRecordFragment extends SherlockFragment {
                 return true;
             }
         });
-        mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                String queryText = mSearchView.getQuery().toString();
-                if (hasFocus && !TextUtils.isEmpty(queryText)) {
-                    getSuggestions(queryText);
-                    mSearchView.setQuery(queryText, false);
+        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.abs__search_src_text);
+        if (searchEditText != null) {
+            searchEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    String queryText = mSearchView.getQuery().toString();
+                    if (hasFocus) {
+                        getSuggestions(queryText);
+                        mSearchView.setQuery(queryText, false);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    String queryText = mSearchView.getQuery().toString();
+                    if (hasFocus) {
+                        getSuggestions(queryText);
+                        mSearchView.setQuery(queryText, false);
+                    }
+                }
+            });
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
