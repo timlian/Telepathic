@@ -19,6 +19,7 @@
     <string name="map_not_ready">Map is not ready yet</string>
     <string name="find">Find</string>
     <string name="clear_cache">Clear cache</string>
+    <string name="delete_card">Delete card</string>
     <string name="bus_number_hint">Bus line number</string>
     <string name="ic_card_hint">IC card number</string>
     <string name="station_number_hint">Station GPS number</string>
@@ -40,6 +41,7 @@
     <string name="confirm_clean_bus_card_cache">Do you want to clear the cached bus card consumption ?</string>
     <string name="confirm_clean_bus_station_cache">Do you want to clear the cached bus stations ?</string>
     <string name="gps_number">GPS number : <xliff:g id="gps_number" example="50001">%1$s</xliff:g></string>
+    <string name="delete_complete">Complete</string>
 
     <!-- consumer record retrieve -->
     <string name="line_number">公交路线:</string>
