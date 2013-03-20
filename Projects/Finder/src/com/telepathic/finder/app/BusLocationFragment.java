@@ -364,7 +364,7 @@ public class BusLocationFragment extends SherlockFragment {
                 Builder build = new AlertDialog.Builder(mActivity);
                 build.setTitle(R.string.confirm_clean_cache_title)
                         .setMessage(R.string.confirm_clean_bus_line_cache)
-                        .setPositiveButton(R.string.ok, new OnClickListener() {
+                        .setPositiveButton(R.string.confirm, new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Utils.copyAppDatabaseFiles(mActivity.getPackageName());

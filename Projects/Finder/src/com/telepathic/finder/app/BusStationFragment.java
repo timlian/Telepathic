@@ -180,7 +180,7 @@ public class BusStationFragment extends SherlockFragment {
                 Builder builder = new AlertDialog.Builder(mActivity);
                 builder.setTitle(R.string.confirm_clean_cache_title)
                         .setMessage(R.string.confirm_clean_bus_station_cache)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Utils.copyAppDatabaseFiles(mActivity.getPackageName());

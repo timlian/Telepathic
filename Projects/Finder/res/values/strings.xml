@@ -28,6 +28,7 @@
     <string name="select_bus_route">请选择%s路行驶方向</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="confirm">Continue</string>
     <string name="default_city">成都</string>
     <string name="no_item_in_db">no  item</string>
     <string name="starting_time">Starting time: <xliff:g id="starting_time" example="6:00">%1$s</xliff:g></string>
