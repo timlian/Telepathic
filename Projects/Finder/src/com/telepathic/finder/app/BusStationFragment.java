@@ -17,7 +17,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -55,14 +55,23 @@ public class BusStationFragment extends SherlockFragment {
     private static final String TAG = "BusStationFragment";
 
     private MainActivity mActivity;
+
     private LinearLayout mLlBusLines;
+
     private TextView mTvStationName;
+
     private TextView mTvStationGpsNumber;
+
     private LinearLayout mLlNoItem;
+
     private RelativeLayout mLlStationInfo;
+
     private ITrafficService mTrafficService;
+
     private ProgressDialog mWaitingDialog;
+
     private SearchView mSearchView;
+
     private KuaiXinDataCache mDataCache;
 
     @Override
@@ -171,16 +180,15 @@ public class BusStationFragment extends SherlockFragment {
                 Builder builder = new AlertDialog.Builder(mActivity);
                 builder.setTitle(R.string.confirm_clean_cache_title)
                         .setMessage(R.string.confirm_clean_bus_station_cache)
-                        .setPositiveButton(R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                                        deleteAllStations();
-                                        getSuggestions(""); // reset the
-                                                            // suggestions
-                                    }
-                                }).setNegativeButton(R.string.cancel, null);
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                                deleteAllStations();
+                                getSuggestions(""); // reset the
+                                                    // suggestions
+                            }
+                        }).setNegativeButton(R.string.cancel, null);
                 builder.create().show();
                 return true;
             case R.id.about:
@@ -246,16 +254,30 @@ public class BusStationFragment extends SherlockFragment {
                 return true;
             }
         });
-        mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                String queryText = mSearchView.getQuery().toString();
-                if (hasFocus && !TextUtils.isEmpty(queryText)) {
-                    getSuggestions(queryText);
-                    mSearchView.setQuery(queryText, false);
+        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.abs__search_src_text);
+        if (searchEditText != null) {
+            searchEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    String queryText = mSearchView.getQuery().toString();
+                    if (hasFocus) {
+                        getSuggestions(queryText);
+                        mSearchView.setQuery(queryText, false);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    String queryText = mSearchView.getQuery().toString();
+                    if (hasFocus) {
+                        getSuggestions(queryText);
+                        mSearchView.setQuery(queryText, false);
+                    }
+                }
+            });
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -424,7 +424,7 @@ public class BusLocationFragment extends SherlockFragment {
         if (line != null) {
             dismissWaittingDialog();
             showBusLineDlg(line);
-            mMapView.requestFocusFromTouch();
+            mUpdateLocation.requestFocusFromTouch();
             return;
         }
         mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
@@ -434,7 +434,7 @@ public class BusLocationFragment extends SherlockFragment {
                 BDBusLine line = mDataCache.getBusLine(lineNumber);
                 if (line != null) {
                     showBusLineDlg(line);
-                    mMapView.requestFocusFromTouch();
+                    mUpdateLocation.requestFocusFromTouch();
                 }
             }
 
@@ -589,31 +589,33 @@ public class BusLocationFragment extends SherlockFragment {
                 return true;
             }
         });
-        mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                String queryText = mSearchView.getQuery().toString();
-                if (hasFocus && !TextUtils.isEmpty(queryText)) {
-                    getSuggestions(queryText);
-                    mSearchView.setQuery(queryText, false);
-                }
-            }
-        });
 
-        EditText searchEditText = null;
-        try {
-            ViewGroup view = (ViewGroup)mSearchView.getChildAt(0);
-            view = (ViewGroup)view.getChildAt(2);
-            view = (ViewGroup)view.getChildAt(1);
-            searchEditText = (EditText) view.getChildAt(0);
-        } catch (Exception ex) {
-            Utils.debug(TAG, "Find edit text from search view failed: " + ex.getMessage());
-        }
+        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.abs__search_src_text);
         if (searchEditText != null) {
             searchEditText.setEms(10);
             searchEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+            searchEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    String queryText = mSearchView.getQuery().toString();
+                    if (hasFocus) {
+                        getSuggestions(queryText);
+                        mSearchView.setQuery(queryText, false);
+                    }
+                }
+            });
         } else {
-        	mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
+            mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
+            mSearchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    String queryText = mSearchView.getQuery().toString();
+                    if (hasFocus) {
+                        getSuggestions(queryText);
+                        mSearchView.setQuery(queryText, false);
+                    }
+                }
+            });
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
