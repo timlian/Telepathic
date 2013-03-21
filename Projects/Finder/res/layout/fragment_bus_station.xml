@@ -15,7 +15,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/no_item_in_db" />
+            android:text="@string/no_bus_station_lines" 
+            android:textSize="18sp"/>
     </LinearLayout>
 
     <RelativeLayout
