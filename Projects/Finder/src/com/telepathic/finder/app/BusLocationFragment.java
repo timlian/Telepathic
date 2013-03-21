@@ -106,6 +106,7 @@ public class BusLocationFragment extends SherlockFragment {
         ITrafficData.BaiDuData.BusLine.END_STATION
     };
 
+    //Called when the fragment has been associated with the activity
     @Override
     public void onAttach(Activity activity) {
         Utils.debug(TAG, "onAttach: " + activity.getClass().getName());
@@ -125,12 +126,14 @@ public class BusLocationFragment extends SherlockFragment {
         setHasOptionsMenu(true);
     }
 
+    //Called to create the view hierarchy associated with the fragment.
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         Utils.debug(TAG, "onCreateView: " + Utils.formatTime(new Date(System.currentTimeMillis())));
         return inflater.inflate(R.layout.fragment_bus_location, container, false);
     }
 
+    //Called when the activity's onCreate() method has returned.
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Utils.debug(TAG, "onActivityCreated: " + Utils.formatTime(new Date(System.currentTimeMillis())));
@@ -325,6 +328,19 @@ public class BusLocationFragment extends SherlockFragment {
         mLocClient.requestLocation();
         mMapView.onResume();
         super.onResume();
+    }
+    
+    //Called when the view hierarchy associated with the fragment is being removed.
+    @Override
+    public void onDestroyView() {
+    	super.onDestroyView();
+    }
+    
+    //Called when the fragment is being disassociated from the activity.
+    @Override
+    public void onDetach() {
+    	// TODO Auto-generated method stub
+    	super.onDetach();
     }
 
     private void showDialog(int id) {
