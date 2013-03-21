@@ -174,7 +174,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             CursorLoader loader = null;
             if (mBusCardLoaderId == id) {
-                loader = new CursorLoader(mActivity.getContext(),
+                loader = new CursorLoader(mActivity,
                         ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null, null, null, null);
             }
             return loader;
@@ -482,7 +482,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         private LayoutInflater mInflater;
 
         public ConsumerRecordAdapter(Cursor c) {
-            super(mActivity.getContext(), c, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+            super(mActivity, c, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
             mInflater = mActivity.getLayoutInflater();
         }
 
@@ -583,7 +583,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                     String selection = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=" + "\'"
                             + cardNumber + "\'";
                     String sortOrder = ITrafficData.KuaiXinData.ConsumerRecord.DATE + " DESC";
-                    loader = new CursorLoader(mActivity.getContext(),
+                    loader = new CursorLoader(mActivity,
                             ITrafficData.KuaiXinData.ConsumerRecord.CONTENT_URI, null, selection,
                             null, sortOrder);
                 }

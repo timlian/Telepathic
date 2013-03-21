@@ -26,7 +26,7 @@
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
-        android:normalScreens="false"
+        android:normalScreens="true"
         android:resizeable="true"
         android:smallScreens="true" />
 

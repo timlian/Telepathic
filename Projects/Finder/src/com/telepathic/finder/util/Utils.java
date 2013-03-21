@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.provider.ContactsContract.Contacts.Data;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -48,6 +49,8 @@ public class Utils {
     public static final String CARD_ID_CACHE = "card_id_cache";
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+    private static final SimpleDateFormat HIGH_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSSS");
 
     private Utils() {
     }
@@ -162,6 +165,10 @@ public class Utils {
         return DATE_FORMAT.format(date);
     }
 
+    public static String formatTime(Date date) {
+    	return HIGH_DATE_FORMAT.format(date);
+    }
+    
     /**
      * Copy the application database files to external storage
      */

@@ -4,16 +4,70 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <FrameLayout
-        android:id="@android:id/tabcontent"
+	<FrameLayout 
+	    android:id="@+id/fragment_container"
+	    android:layout_width="match_parent"
+	    android:layout_height="0dip"
+	    android:layout_weight="1">
+	    
+	</FrameLayout> 
+	
+    <LinearLayout
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1" />
-
-    <android.support.v4.app.FragmentTabHost
-        android:id="@android:id/tabhost"
-        android:background="@drawable/abs__ab_bottom_solid_light_holo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+        android:orientation="horizontal">
+        
+        <LinearLayout 
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            
+            <ImageView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textColor="@android:color/white"
+                android:onClick="navigateToLocation"
+                android:background="@drawable/ic_tab_location_selector"
+                android:layout_gravity="center_horizontal">
+            </ImageView>
+            
+        </LinearLayout>
+        
+         <LinearLayout 
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            
+            <ImageView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textColor="@android:color/white"
+                android:onClick="navigateToCardInfo"
+                android:background="@drawable/ic_tab_card_selector"
+                android:layout_gravity="center_horizontal">
+            </ImageView>
+            
+        </LinearLayout>
+        
+        <LinearLayout 
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            
+            <ImageView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textColor="@android:color/white"
+                android:onClick="navigateToStationLines"
+                android:background="@drawable/ic_tab_station_selector"
+                android:layout_gravity="center_horizontal">
+            </ImageView>
+            
+        </LinearLayout>
+            
+    </LinearLayout>
+    
 </LinearLayout>
