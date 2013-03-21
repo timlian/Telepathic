@@ -32,7 +32,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -99,13 +98,6 @@ public class BusStationFragment extends SherlockFragment {
         if (stationLines != null) {
             showStationLines(stationLines);
         }
-    }
-
-    @Override
-    public void onStart() {
-        ActionBar actionBar = getSherlockActivity().getSupportActionBar();
-        actionBar.setTitle(R.string.bus_stations);
-        super.onStart();
     }
 
     private void setupView() {
@@ -179,16 +171,16 @@ public class BusStationFragment extends SherlockFragment {
             case R.id.clear_cache:
                 Builder builder = new AlertDialog.Builder(mActivity);
                 builder.setTitle(R.string.confirm_clean_cache_title)
-                        .setMessage(R.string.confirm_clean_bus_station_cache)
-                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                                deleteAllStations();
-                                getSuggestions(""); // reset the
-                                                    // suggestions
-                            }
-                        }).setNegativeButton(R.string.cancel, null);
+                .setMessage(R.string.confirm_clean_bus_station_cache)
+                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                        deleteAllStations();
+                        getSuggestions(""); // reset the
+                        // suggestions
+                    }
+                }).setNegativeButton(R.string.cancel, null);
                 builder.create().show();
                 return true;
             case R.id.about:
@@ -224,7 +216,7 @@ public class BusStationFragment extends SherlockFragment {
                     searchStationLines(gpsNumber);
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_gps_number, Toast.LENGTH_SHORT)
-                            .show();
+                    .show();
                 }
                 return true;
             }

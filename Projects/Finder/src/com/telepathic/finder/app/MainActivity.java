@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.telepathic.finder.R;
 import com.telepathic.finder.util.Utils;
@@ -23,6 +24,8 @@ public class MainActivity extends SherlockFragmentActivity {
     private static final String TAG_STATION_LINES_FRAGMENT = "stationLines";
 
     private LinearLayout mTabLocation, mTabCard, mTabStation;
+
+    private ActionBar mActionBar;
 
     private Dialog mExitDialog;
 
@@ -53,8 +56,15 @@ public class MainActivity extends SherlockFragmentActivity {
         mTabLocation.setSelected(true);
     }
 
+    @Override
+    protected void onStart() {
+        mActionBar = getSupportActionBar();
+        super.onStart();
+    }
+
     public void navigateToLocation(View v) {
         setSelected(v);
+        mActionBar.setTitle(R.string.bus_location);
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
         Fragment fragment1 = mFragmentManager.findFragmentByTag(TAG_LOCATION_FRAGMENT);
         Fragment fragment2 = mFragmentManager.findFragmentByTag(TAG_CARD_INFO_FRAGMENT);
@@ -68,6 +78,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
     public void navigateToCardInfo(View v) {
         setSelected(v);
+        mActionBar.setTitle(R.string.card_records);
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
         Fragment fragment1 = mFragmentManager.findFragmentByTag(TAG_LOCATION_FRAGMENT);
         Fragment fragment2 = mFragmentManager.findFragmentByTag(TAG_CARD_INFO_FRAGMENT);
@@ -81,6 +92,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
     public void navigateToStationLines(View v) {
         setSelected(v);
+        mActionBar.setTitle(R.string.bus_stations);
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
         Fragment fragment1 = mFragmentManager.findFragmentByTag(TAG_LOCATION_FRAGMENT);
         Fragment fragment2 = mFragmentManager.findFragmentByTag(TAG_CARD_INFO_FRAGMENT);
@@ -115,14 +127,10 @@ public class MainActivity extends SherlockFragmentActivity {
 
     @Override
     public void onBackPressed() {
-        if (mFragmentManager.getBackStackEntryCount() > 0) {
-            super.onBackPressed();
-        } else {
-            if (mExitDialog == null) {
-                mExitDialog = createDialog();
-            }
-            mExitDialog.show();
+        if (mExitDialog == null) {
+            mExitDialog = createDialog();
         }
+        mExitDialog.show();
     }
 
     private void debugStackEntry() {
