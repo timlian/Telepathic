@@ -71,29 +71,49 @@ public class BusLocationFragment extends SherlockFragment {
     private static final String TAG = BusLocationFragment.class.getSimpleName();
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
+
     private static final int BUS_LINE_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 1;
+
     private static final int CLEAN_CACHE_CONFIRM_DLG = CUSTOM_DIALOG_ID_START + 2;
+
     private static final int MAP_ZOOM_LEVEL = 14;
 
     private MainActivity mActivity;
+
     private SearchView mSearchView;
+
     private MapView mMapView;
+
     private LinearLayout mUpdateLocation;
+
     private ImageView mUpdateIcon;
+
     private ProgressBar mProgress;
+
     private MapController mMapController = null;
+
     private LocationClient mLocClient;
+
     private LocationData mLocData = null;
+
     private CustomItemizedOverlay mBusLocationOverlay;
+
     private MyLocationOverlay mLocationOverlay; // 定位图层
+
     private MyLocationListenner mLocationListener;
+
     private ITrafficService mTrafficService;
+
     private MessageDispatcher mMessageDispatcher;
+
     private MKRoute mBusRoute;
+
     private String mBusRouteUid;
+
     private Dialog mDialog;
 
     private IMessageHandler mGetBusLocationUpdateHandler;
+
     private IMessageHandler mGetBusLocationDoneHandler;
 
     private boolean mIsFirstUpdate = true;
@@ -101,12 +121,12 @@ public class BusLocationFragment extends SherlockFragment {
     private BaiDuDataCache mDataCache;
 
     private static final String[] BUS_LINE_PROJECTION = {
-        ITrafficData.BaiDuData.BusLine._ID, ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
-        ITrafficData.BaiDuData.BusLine.START_STATION,
-        ITrafficData.BaiDuData.BusLine.END_STATION
+            ITrafficData.BaiDuData.BusLine._ID, ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
+            ITrafficData.BaiDuData.BusLine.START_STATION,
+            ITrafficData.BaiDuData.BusLine.END_STATION
     };
 
-    //Called when the fragment has been associated with the activity
+    // Called when the fragment has been associated with the activity
     @Override
     public void onAttach(Activity activity) {
         Utils.debug(TAG, "onAttach: " + activity.getClass().getName());
@@ -126,17 +146,19 @@ public class BusLocationFragment extends SherlockFragment {
         setHasOptionsMenu(true);
     }
 
-    //Called to create the view hierarchy associated with the fragment.
+    // Called to create the view hierarchy associated with the fragment.
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+            Bundle savedInstanceState) {
         Utils.debug(TAG, "onCreateView: " + Utils.formatTime(new Date(System.currentTimeMillis())));
         return inflater.inflate(R.layout.fragment_bus_location, container, false);
     }
 
-    //Called when the activity's onCreate() method has returned.
+    // Called when the activity's onCreate() method has returned.
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Utils.debug(TAG, "onActivityCreated: " + Utils.formatTime(new Date(System.currentTimeMillis())));
+        Utils.debug(TAG,
+                "onActivityCreated: " + Utils.formatTime(new Date(System.currentTimeMillis())));
         mUpdateLocation = (LinearLayout)getView().findViewById(R.id.update_location);
         mUpdateIcon = (ImageView)getView().findViewById(R.id.update_icon);
         mProgress = (ProgressBar)getView().findViewById(R.id.progress_circle);
@@ -329,18 +351,19 @@ public class BusLocationFragment extends SherlockFragment {
         mMapView.onResume();
         super.onResume();
     }
-    
-    //Called when the view hierarchy associated with the fragment is being removed.
+
+    // Called when the view hierarchy associated with the fragment is being
+    // removed.
     @Override
     public void onDestroyView() {
-    	super.onDestroyView();
+        super.onDestroyView();
     }
-    
-    //Called when the fragment is being disassociated from the activity.
+
+    // Called when the fragment is being disassociated from the activity.
     @Override
     public void onDetach() {
-    	// TODO Auto-generated method stub
-    	super.onDetach();
+        // TODO Auto-generated method stub
+        super.onDetach();
     }
 
     private void showDialog(int id) {
@@ -357,16 +380,16 @@ public class BusLocationFragment extends SherlockFragment {
             case CLEAN_CACHE_CONFIRM_DLG:
                 Builder build = new AlertDialog.Builder(mActivity);
                 build.setTitle(R.string.confirm_clean_cache_title)
-                .setMessage(R.string.confirm_clean_bus_line_cache)
-                .setPositiveButton(R.string.confirm, new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                        int rows = mDataCache.deleteAllBusLines();
-                        Utils.debug(TAG, "deleted rows: " + rows);
-                        getSuggestions(""); // reset the suggestions
-                    }
-                }).setNegativeButton(R.string.cancel, null);
+                        .setMessage(R.string.confirm_clean_bus_line_cache)
+                        .setPositiveButton(R.string.confirm, new OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                                int rows = mDataCache.deleteAllBusLines();
+                                Utils.debug(TAG, "deleted rows: " + rows);
+                                getSuggestions(""); // reset the suggestions
+                            }
+                        }).setNegativeButton(R.string.cancel, null);
                 mDialog = build.create();
                 break;
             default:
@@ -395,22 +418,22 @@ public class BusLocationFragment extends SherlockFragment {
         final String titleText = String.format(getResources().getString(R.string.select_bus_route),
                 line.getLineNumber());
         builder.setTitle(titleText).setSingleChoiceItems(busRoutes, 0, null)
-        .setOnCancelListener(null)
-        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-                final int selectedPosition = ((AlertDialog)dialog).getListView()
-                        .getCheckedItemPosition();
-                final BDBusRoute route = line.getRoute(selectedPosition);
-                searchBusRoute(route.getCity(), route.getUid());
-            }
-        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        }).create().show();
+                .setOnCancelListener(null)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                        final int selectedPosition = ((AlertDialog)dialog).getListView()
+                                .getCheckedItemPosition();
+                        final BDBusRoute route = line.getRoute(selectedPosition);
+                        searchBusRoute(route.getCity(), route.getUid());
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
     }
 
     private void searchBusLine(final String city, final String lineNumber) {
@@ -418,7 +441,7 @@ public class BusLocationFragment extends SherlockFragment {
         if (line != null) {
             dismissWaittingDialog();
             showBusLineDlg(line);
-            mUpdateLocation.requestFocusFromTouch();
+            mMapView.requestFocusFromTouch();
             return;
         }
         mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
@@ -428,7 +451,7 @@ public class BusLocationFragment extends SherlockFragment {
                 BDBusLine line = mDataCache.getBusLine(lineNumber);
                 if (line != null) {
                     showBusLineDlg(line);
-                    mUpdateLocation.requestFocusFromTouch();
+                    mMapView.requestFocusFromTouch();
                 }
             }
 
@@ -475,7 +498,7 @@ public class BusLocationFragment extends SherlockFragment {
         String lineNumber = mDataCache.getRouteLineNumber(uid);
         if (Utils.isValidBusLineNumber(lineNumber)) {
             Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT)
-            .show();
+                    .show();
             mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route));
         }
     }
@@ -527,7 +550,8 @@ public class BusLocationFragment extends SherlockFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Utils.debug(TAG, "onCreateOptionsMenu: " + Utils.formatTime(new Date(System.currentTimeMillis())));
+        Utils.debug(TAG,
+                "onCreateOptionsMenu: " + Utils.formatTime(new Date(System.currentTimeMillis())));
         // Inflate the options menu from XML
         inflater.inflate(R.menu.menu_bus_location, menu);
 
@@ -553,7 +577,7 @@ public class BusLocationFragment extends SherlockFragment {
                     searchBusLine(city, lineNumber);
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_line_number, Toast.LENGTH_LONG)
-                    .show();
+                            .show();
                 }
                 return true;
             }
@@ -672,7 +696,7 @@ public class BusLocationFragment extends SherlockFragment {
         if (!TextUtils.isEmpty(lineNumber)) {
             selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + " LIKE ?";
             selectionArgs = new String[] {
-                    lineNumber + "%"
+                lineNumber + "%"
             };
         }
         Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI,

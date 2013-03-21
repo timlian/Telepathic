@@ -128,7 +128,7 @@ public class BusStationFragment extends SherlockFragment {
             }
             mLlNoItem.setVisibility(View.GONE);
             mLlStationInfo.setVisibility(View.VISIBLE);
-            mTvStationName.requestFocusFromTouch();
+            mLlStationInfo.requestFocusFromTouch();
         }
     }
 
@@ -171,16 +171,16 @@ public class BusStationFragment extends SherlockFragment {
             case R.id.clear_cache:
                 Builder builder = new AlertDialog.Builder(mActivity);
                 builder.setTitle(R.string.confirm_clean_cache_title)
-                .setMessage(R.string.confirm_clean_bus_station_cache)
-                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                        deleteAllStations();
-                        getSuggestions(""); // reset the
-                        // suggestions
-                    }
-                }).setNegativeButton(R.string.cancel, null);
+                        .setMessage(R.string.confirm_clean_bus_station_cache)
+                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                                deleteAllStations();
+                                getSuggestions(""); // reset the
+                                // suggestions
+                            }
+                        }).setNegativeButton(R.string.cancel, null);
                 builder.create().show();
                 return true;
             case R.id.about:
@@ -216,7 +216,7 @@ public class BusStationFragment extends SherlockFragment {
                     searchStationLines(gpsNumber);
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_gps_number, Toast.LENGTH_SHORT)
-                    .show();
+                            .show();
                 }
                 return true;
             }
@@ -361,7 +361,7 @@ public class BusStationFragment extends SherlockFragment {
         mTrafficService.getBusStationLines(gpsNumber, new ICompletionListener() {
             @Override
             public void onSuccess(Object result) {
-                mTvStationName.requestFocusFromTouch();
+                mLlStationInfo.requestFocusFromTouch();
                 dismissWaittingDialog();
                 KXBusStationLines lines = (KXBusStationLines)result;
                 if (lines != null) {
