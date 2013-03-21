@@ -104,6 +104,7 @@ public class TrafficStore {
                 line.put(ITrafficData.BaiDuData.BusLine.END_STATION, lastStation);
                 line.put(ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME, System.currentTimeMillis());
                 Uri uri = mContentResolver.insert(ITrafficData.BaiDuData.BusLine.CONTENT_URI, line);
+                mContentResolver.notifyChange(ITrafficData.BaiDuData.BusLine.CONTENT_URI, null);
                 lineId = Long.parseLong(uri.getLastPathSegment());
                 isFirstRoute = false;
             }
@@ -192,6 +193,7 @@ public class TrafficStore {
         station.put(KuaiXinData.BusStation.GPS_NUMBER, stationLines.getGpsNumber());
         station.put(KuaiXinData.BusStation.LAST_UPDATE_TIME, System.currentTimeMillis());
         Uri uri = mContentResolver.insert(KuaiXinData.BusStation.CONTENT_URI, station);
+        mContentResolver.notifyChange(KuaiXinData.BusStation.CONTENT_URI, null);
         long stationId = Long.parseLong(uri.getLastPathSegment());
         for(KXBusLine busLine : stationLines.getAllBusLines()) {
             for(KXBusRoute busRoute : busLine.getAllRoutes()) {

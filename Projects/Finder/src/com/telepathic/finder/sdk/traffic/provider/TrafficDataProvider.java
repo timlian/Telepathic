@@ -1,6 +1,5 @@
 package com.telepathic.finder.sdk.traffic.provider;
 
-import android.R.integer;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;

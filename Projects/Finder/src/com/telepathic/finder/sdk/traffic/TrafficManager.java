@@ -9,9 +9,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
 import android.text.TextUtils;
 
@@ -46,6 +50,22 @@ public class TrafficManager {
     private ExecutorService mExecutorService;
     private BMapManager mMapManager;
     private TrafficConfig mTrafficConfig;
+    private ContentObserver mContentObserver;
+    private ContentResolver mContentResolver;
+    
+    private static final int MAX_LINE_COUNT = 10;
+    private static final int MAX_STATION_COUNT = 10;
+    
+    private static final String[] BUS_LINE_PROJECTION = {
+        ITrafficData.BaiDuData.BusLine._ID
+    };
+    private static final int IDX_BUS_LIND_ID = 0;
+    
+    private static final String[] BUS_STATION_PROJECTION = {
+        ITrafficData.KuaiXinData.BusStation._ID
+    };
+    private static final int IDX_BUS_STATION_ID = 0;
+    
 
     private TrafficManager(BMapManager manager, Context appContext, Handler msgHandler) {
         mContext = appContext;
@@ -54,6 +74,10 @@ public class TrafficManager {
         mExecutorService = Executors.newCachedThreadPool();
         mTrafficStore =  new TrafficStore(mContext, mExecutorService);
         mTrafficConfig = new TrafficConfig();
+        mContentObserver = new MyContentObserver(null);
+        mContentResolver = mContext.getContentResolver();
+        mContentResolver.registerContentObserver(ITrafficData.BaiDuData.BusLine.CONTENT_URI, false, mContentObserver);
+        mContentResolver.registerContentObserver(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, false, mContentObserver);
     }
 
     public static synchronized TrafficManager getTrafficManager(BMapManager manager,
@@ -376,6 +400,73 @@ public class TrafficManager {
                     listener.onFailure(errorCode, errorText);
                 }
             });
+        }
+    }
+    
+    private class MyContentObserver extends ContentObserver {
+
+		public MyContentObserver(Handler handler) {
+			super(null);
+		}
+		
+		@Override
+		public void onChange(boolean selfChange) {
+			Utils.debug(TAG, "MyContentObserver get called: " + selfChange);
+		}
+		
+		@Override
+		public void onChange(boolean selfChange, Uri uri) {
+			Utils.debug(TAG, "MyContentObserver get called: " + selfChange + ", uri: " + uri);
+			if (ITrafficData.BaiDuData.BusLine.CONTENT_URI.equals(uri)) {
+				deleteObsoleteBusLines();
+			}
+			if (ITrafficData.KuaiXinData.BusStation.CONTENT_URI.equals(uri)) {
+				deleteObsoleteBusStations();
+			}
+		}
+    }
+    
+    private void deleteObsoleteBusLines() {
+        String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC ";
+        Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, null, null, sortOrder);
+        ArrayList<String> lineIds = null;
+        if (cursor != null && cursor.moveToFirst()) {
+        	lineIds = new ArrayList<String>();
+        	try {
+    			for(int pos = MAX_LINE_COUNT; cursor.moveToPosition(pos); pos++) {
+    				lineIds.add(cursor.getString(IDX_BUS_LIND_ID));
+    			}
+        	} finally {
+        		cursor.close();
+        	}
+        }
+        if (lineIds != null && lineIds.size() > 0) {
+        	String selection = ITrafficData.BaiDuData.BusLine._ID + "=?";
+        	for(String id : lineIds) {
+        		mContentResolver.delete(ITrafficData.BaiDuData.BusLine.CONTENT_URI, selection, new String[]{id});
+        	}
+        }
+    }
+    
+    private void deleteObsoleteBusStations() {
+        String sortOrder = ITrafficData.KuaiXinData.BusStation.LAST_UPDATE_TIME + " DESC ";
+        Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, BUS_STATION_PROJECTION, null, null, sortOrder);
+        ArrayList<String> stationIds = null;
+        if (cursor != null && cursor.moveToFirst()) {
+        	stationIds = new ArrayList<String>();
+        	try {
+    			for(int pos = MAX_STATION_COUNT; cursor.moveToPosition(pos); pos++) {
+    				stationIds.add(cursor.getString(IDX_BUS_STATION_ID));
+    			}
+        	} finally {
+        		cursor.close();
+        	}
+        }
+        if (stationIds != null && stationIds.size() > 0) {
+        	String selection = ITrafficData.KuaiXinData.BusStation._ID + "=?";
+        	for(String id : stationIds) {
+        		mContentResolver.delete(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, selection, new String[]{id});
+        	}
         }
     }
 
