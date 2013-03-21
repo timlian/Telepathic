@@ -23,9 +23,6 @@ public class MainActivity extends SherlockFragmentActivity {
     
     private Dialog mExitDialog;
     
-    private Fragment mLocationFragment = new BusLocationFragment();
-    private Fragment mCardFragment = new BusCardRecordFragment();
-    private Fragment mStationFragment = new BusStationFragment();
     private FragmentManager mFragmentManager;
     
     @Override
@@ -33,39 +30,53 @@ public class MainActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mFragmentManager = getSupportFragmentManager();
-        
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment_container, mLocationFragment);
-        fragmentTransaction.commit();
+        Fragment locationFragment = new BusLocationFragment();
+        Fragment cardFragment = new BusCardRecordFragment();
+        Fragment stationFragment = new BusStationFragment();
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        transaction.add(R.id.fragment_container, stationFragment, TAG_STATION_LINES_FRAGMENT);
+        transaction.add(R.id.fragment_container, cardFragment, TAG_CARD_INFO_FRAGMENT);
+        transaction.add(R.id.fragment_container, locationFragment, TAG_LOCATION_FRAGMENT);
+        transaction.hide(cardFragment);
+        transaction.hide(stationFragment);
+        transaction.show(locationFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     public void navigateToLocation(View v) {
     	FragmentTransaction transaction = mFragmentManager.beginTransaction();
-        transaction.replace(R.id.fragment_container, mLocationFragment);
+    	Fragment fragment1 = mFragmentManager.findFragmentByTag(TAG_LOCATION_FRAGMENT);
+    	Fragment fragment2 = mFragmentManager.findFragmentByTag(TAG_CARD_INFO_FRAGMENT);
+    	Fragment fragment3 = mFragmentManager.findFragmentByTag(TAG_STATION_LINES_FRAGMENT);
+    	transaction.hide(fragment2);
+        transaction.hide(fragment3);
+        transaction.show(fragment1);
         transaction.addToBackStack(TAG_LOCATION_FRAGMENT);
         transaction.commit();
     }
     
     public void navigateToCardInfo(View v) {
-    	View mapView = mLocationFragment.getView();
-		if (mapView != null) {
-			mapView.setVisibility(View.INVISIBLE);
-		}
-        FragmentTransaction transaction = mFragmentManager.beginTransaction();
-        transaction.replace(R.id.fragment_container, mCardFragment);
-        transaction.addToBackStack(TAG_CARD_INFO_FRAGMENT);
+    	FragmentTransaction transaction = mFragmentManager.beginTransaction();
+    	Fragment fragment1 = mFragmentManager.findFragmentByTag(TAG_LOCATION_FRAGMENT);
+    	Fragment fragment2 = mFragmentManager.findFragmentByTag(TAG_CARD_INFO_FRAGMENT);
+    	Fragment fragment3 = mFragmentManager.findFragmentByTag(TAG_STATION_LINES_FRAGMENT);
+    	transaction.hide(fragment1);
+        transaction.hide(fragment3);
+        transaction.show(fragment2);
+        transaction.addToBackStack(TAG_LOCATION_FRAGMENT);
         transaction.commit();
     }
     
     public void navigateToStationLines(View v) {
-    	View mapView = mLocationFragment.getView();
-		if (mapView != null) {
-			mapView.setVisibility(View.INVISIBLE);
-		}
-        FragmentTransaction transaction = mFragmentManager.beginTransaction();
-        transaction.replace(R.id.fragment_container, mStationFragment);
-        transaction.addToBackStack(TAG_STATION_LINES_FRAGMENT);
+    	FragmentTransaction transaction = mFragmentManager.beginTransaction();
+    	Fragment fragment1 = mFragmentManager.findFragmentByTag(TAG_LOCATION_FRAGMENT);
+    	Fragment fragment2 = mFragmentManager.findFragmentByTag(TAG_CARD_INFO_FRAGMENT);
+    	Fragment fragment3 = mFragmentManager.findFragmentByTag(TAG_STATION_LINES_FRAGMENT);
+    	transaction.hide(fragment1);
+        transaction.hide(fragment2);
+        transaction.show(fragment3);
+        transaction.addToBackStack(TAG_LOCATION_FRAGMENT);
         transaction.commit();
     }
     
