@@ -362,9 +362,11 @@ public class BusCardRecordFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_card:
-                isDeleteMode = true;
-                initTab(mBusCards);
-                mBtnDeleteComplete.setVisibility(View.VISIBLE);
+                if (mBusCards != null && mBusCards.size() > 0) {
+                    isDeleteMode = true;
+                    initTab(mBusCards);
+                    mBtnDeleteComplete.setVisibility(View.VISIBLE);
+                }
                 return true;
             case R.id.clear_cache:
                 Builder builder = new AlertDialog.Builder(mActivity);
