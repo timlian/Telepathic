@@ -36,7 +36,9 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -104,6 +106,10 @@ public class BusCardRecordFragment extends SherlockFragment {
     private ProgressDialog mWaitingDialog;
 
     private MessageDispatcher mMessageDispatcher;
+
+    private Button mBtnDeleteComplete;
+
+    private boolean isDeleteMode = false;
 
     private static final String[] CARD_RECORDS_HISTORY = {
             ITrafficData.KuaiXinData.BusCard._ID, ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
@@ -214,7 +220,16 @@ public class BusCardRecordFragment extends SherlockFragment {
                 mViewPagerAdapter = new BusCardPageAdapter();
                 mViewPager.setAdapter(mViewPagerAdapter);
                 initTab(mBusCards);
+                if (isDeleteMode) {
+                    mBtnDeleteComplete.setVisibility(View.VISIBLE);
+                } else {
+                    mBtnDeleteComplete.setVisibility(View.GONE);
+                }
             } else {
+                if (isDeleteMode) {
+                    isDeleteMode = false;
+                    mBtnDeleteComplete.setVisibility(View.GONE);
+                }
                 mNoItemTips.setVisibility(View.VISIBLE);
                 mConsumptionDetail.setVisibility(View.GONE);
             }
@@ -235,6 +250,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         mViewPagerTabView.clear();
         mTabContent.removeAllViews();
         for (int i = 0; i < busCards.size(); i++) {
+            final String card_number = busCards.get(i).getCardNumber();
             View tabView = mActivity.getLayoutInflater().inflate(R.layout.card_id_item, null);
             tabView.setId(i);
             tabView.setOnClickListener(new OnClickListener() {
@@ -250,9 +266,21 @@ public class BusCardRecordFragment extends SherlockFragment {
                 }
             });
             TextView tv = (TextView)tabView.findViewById(R.id.card_id);
-            tv.setLayoutParams(new LinearLayout.LayoutParams(screenWidth / TAB_COUNT,
+            tv.setLayoutParams(new FrameLayout.LayoutParams(screenWidth / TAB_COUNT,
                     LayoutParams.WRAP_CONTENT));
-            tv.setText(busCards.get(i).getCardNumber());
+            tv.setText(card_number);
+            ImageView iv = (ImageView)tabView.findViewById(R.id.delete_card);
+            iv.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteBusCardRecordsByNumber(card_number);
+                }
+            });
+            if (isDeleteMode) {
+                iv.setVisibility(View.VISIBLE);
+            } else {
+                iv.setVisibility(View.GONE);
+            }
             mViewPagerTabView.add(tabView);
             mTabContent.addView(tabView);
         }
@@ -262,6 +290,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         }
         final float curLeftDistance = mScreenWidth * 0 / TAB_COUNT;
         mViewPagerTab.smoothScrollTo((int)curLeftDistance, 0);
+        mViewPager.setCurrentItem(0);
     }
 
     private ProgressDialog createWaitingDialog() {
@@ -310,6 +339,15 @@ public class BusCardRecordFragment extends SherlockFragment {
 
             }
         });
+        mBtnDeleteComplete = (Button)getView().findViewById(R.id.delete_complete);
+        mBtnDeleteComplete.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isDeleteMode = false;
+                mBtnDeleteComplete.setVisibility(View.GONE);
+                initTab(mBusCards);
+            }
+        });
         mViewPagerTab = (HorizontalScrollView)getView().findViewById(R.id.viewpager_tab);
         mTabContent = (LinearLayout)getView().findViewById(R.id.tabcontent);
         mWaitingDialog = createWaitingDialog();
@@ -326,6 +364,11 @@ public class BusCardRecordFragment extends SherlockFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.delete_card:
+                isDeleteMode = true;
+                initTab(mBusCards);
+                mBtnDeleteComplete.setVisibility(View.VISIBLE);
+                return true;
             case R.id.clear_cache:
                 Builder builder = new AlertDialog.Builder(mActivity);
                 builder.setTitle(R.string.confirm_clean_cache_title)
@@ -663,6 +706,19 @@ public class BusCardRecordFragment extends SherlockFragment {
         ContentResolver resolver = mActivity.getContentResolver();
         int rows = resolver.delete(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null, null);
         Utils.debug(TAG, "delete rows: " + rows);
+    }
+
+    private void deleteBusCardRecordsByNumber(String number) {
+        ContentResolver resolver = mActivity.getContentResolver();
+        String where = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=?";
+        String[] selectionArgs = new String[] {
+            number
+        };
+        int row = resolver.delete(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, where,
+                selectionArgs);
+        if (row != -1) {
+            resolver.notifyChange(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null);
+        }
     }
 
 }

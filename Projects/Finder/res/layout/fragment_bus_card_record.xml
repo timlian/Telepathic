@@ -16,6 +16,14 @@
             android:text="@string/no_item_in_db" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/delete_complete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:visibility="gone"
+        android:text="@string/delete_complete" />
+
     <RelativeLayout
         android:id="@+id/consumption_detail"
         android:layout_width="fill_parent"

@@ -18,6 +18,7 @@
     <string name="map_not_ready">地图尚未加载完成</string>
     <string name="find">查询</string>
     <string name="clear_cache">清空历史记录</string>
+    <string name="delete_card">删除公交卡</string>
     <string name="bus_number_hint">公交线路号</string>
     <string name="ic_card_hint">卡号</string>
     <string name="station_number_hint">GPS编号</string>
@@ -40,6 +41,7 @@
     <string name="confirm_clean_bus_card_cache">该操作将删除已查询公交卡消费记录信息, 是否继续?</string>
     <string name="confirm_clean_bus_station_cache">该操作将删除已查询公交站台信息, 是否继续?</string>
     <string name="gps_number">GPS编号 : <xliff:g id="gps_number" example="50001">%1$s</xliff:g></string>
+    <string name="delete_complete">完成</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>
