@@ -30,9 +30,6 @@ public class MainActivity extends SherlockFragmentActivity {
     private Dialog mExitDialog;
     
     private FragmentManager mFragmentManager;
-    private Fragment mLocationFragment = new BusLocationFragment();
-    private Fragment mCardRecordsFragment = new BusCardRecordFragment();
-    private Fragment mStationLinesFragment = new BusStationFragment();
     
     private ArrayList<SwitchHandler> mSwitchHandlers = new ArrayList<SwitchHandler>();
 
@@ -111,16 +108,18 @@ public class MainActivity extends SherlockFragmentActivity {
 			@Override
 			public void onSwitch(String tag) {
 				FragmentTransaction transaction = mFragmentManager.beginTransaction();
+				Fragment locationFragment = mFragmentManager.findFragmentByTag(TAG_LOCATION_FRAGMENT);
 				if (TAG_LOCATION_FRAGMENT.equals(tag)) {
-					if (!mLocationFragment.isAdded()) {
-		    			transaction.add(R.id.fragment_container, mLocationFragment, TAG_LOCATION_FRAGMENT);
-		    		} else {
-		    			transaction.show(mLocationFragment);
-		    		}
+					if (locationFragment == null) {
+						locationFragment = new BusLocationFragment();
+						transaction.add(R.id.fragment_container, locationFragment, TAG_LOCATION_FRAGMENT);
+					} else {
+						transaction.show(locationFragment);
+					}
 				} else {
-					if (mLocationFragment.isAdded()) {
-		    			transaction.hide(mLocationFragment);
-		    		} 
+					if (locationFragment != null) {
+						transaction.hide(locationFragment);
+					}
 				}
 				transaction.commit();
 			}
@@ -130,16 +129,18 @@ public class MainActivity extends SherlockFragmentActivity {
 			@Override
 			public void onSwitch(String tag) {
 				FragmentTransaction transaction = mFragmentManager.beginTransaction();
+				Fragment cardRecordsFragment = mFragmentManager.findFragmentByTag(TAG_CARD_INFO_FRAGMENT);
 				if (TAG_CARD_INFO_FRAGMENT.equals(tag)) {
-					if (!mCardRecordsFragment.isAdded()) {
-		    			transaction.add(R.id.fragment_container, mCardRecordsFragment, TAG_LOCATION_FRAGMENT);
-		    		} else {
-		    			transaction.show(mCardRecordsFragment);
-		    		}
+					if (cardRecordsFragment == null) {
+						cardRecordsFragment = new BusCardRecordFragment();
+						transaction.add(R.id.fragment_container, cardRecordsFragment, TAG_CARD_INFO_FRAGMENT);
+					} else {
+						transaction.show(cardRecordsFragment);
+					}
 				} else {
-					if (mCardRecordsFragment.isAdded()) {
-		    			transaction.hide(mCardRecordsFragment);
-		    		} 
+					if (cardRecordsFragment != null) {
+						transaction.hide(cardRecordsFragment);
+					}
 				}
 				transaction.commit();
 			}
@@ -149,16 +150,18 @@ public class MainActivity extends SherlockFragmentActivity {
 			@Override
 			public void onSwitch(String tag) {
 				FragmentTransaction transaction = mFragmentManager.beginTransaction();
+				Fragment stationLinesFragment = mFragmentManager.findFragmentByTag(TAG_STATION_LINES_FRAGMENT);
 				if (TAG_STATION_LINES_FRAGMENT.equals(tag)) {
-					if (!mStationLinesFragment.isAdded()) {
-		    			transaction.add(R.id.fragment_container, mStationLinesFragment, TAG_LOCATION_FRAGMENT);
-		    		} else {
-		    			transaction.show(mStationLinesFragment);
-		    		}
+					if (stationLinesFragment == null) {
+						stationLinesFragment = new BusStationFragment();
+						transaction.add(R.id.fragment_container, stationLinesFragment, TAG_STATION_LINES_FRAGMENT);
+					} else {
+						transaction.show(stationLinesFragment);
+					}
 				} else {
-					if (mStationLinesFragment.isAdded()) {
-		    			transaction.hide(mStationLinesFragment);
-		    		} 
+					if (stationLinesFragment != null) {
+						transaction.hide(stationLinesFragment);
+					}
 				}
 				transaction.commit();
 			}
