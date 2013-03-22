@@ -50,7 +50,8 @@ public class TrafficManager {
     private ExecutorService mExecutorService;
     private BMapManager mMapManager;
     private TrafficConfig mTrafficConfig;
-    private ContentObserver mContentObserver;
+    private BusLineObserver mBusLineObserver;
+    private BusStationObserver mBusStationObserver;
     private ContentResolver mContentResolver;
     
     private static final int MAX_LINE_COUNT = 10;
@@ -74,10 +75,11 @@ public class TrafficManager {
         mExecutorService = Executors.newCachedThreadPool();
         mTrafficStore =  new TrafficStore(mContext, mExecutorService);
         mTrafficConfig = new TrafficConfig();
-        mContentObserver = new MyContentObserver(null);
+        mBusLineObserver = new BusLineObserver();
+        mBusStationObserver = new BusStationObserver();
         mContentResolver = mContext.getContentResolver();
-        mContentResolver.registerContentObserver(ITrafficData.BaiDuData.BusLine.CONTENT_URI, false, mContentObserver);
-        mContentResolver.registerContentObserver(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, false, mContentObserver);
+        mContentResolver.registerContentObserver(ITrafficData.BaiDuData.BusLine.CONTENT_URI, false, mBusLineObserver);
+        mContentResolver.registerContentObserver(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, false, mBusStationObserver);
     }
 
     public static synchronized TrafficManager getTrafficManager(BMapManager manager,
@@ -403,26 +405,28 @@ public class TrafficManager {
         }
     }
     
-    private class MyContentObserver extends ContentObserver {
+    private class BusLineObserver extends ContentObserver {
 
-		public MyContentObserver(Handler handler) {
+		public BusLineObserver() {
 			super(null);
 		}
 		
 		@Override
 		public void onChange(boolean selfChange) {
-			Utils.debug(TAG, "MyContentObserver get called: " + selfChange);
+			Utils.debug(TAG, "BusLineObserver get called: " + selfChange);
+			deleteObsoleteBusLines();
+		}
+    }
+    
+    private class BusStationObserver extends ContentObserver {
+    	public BusStationObserver() {
+			super(null);
 		}
 		
 		@Override
-		public void onChange(boolean selfChange, Uri uri) {
-			Utils.debug(TAG, "MyContentObserver get called: " + selfChange + ", uri: " + uri);
-			if (ITrafficData.BaiDuData.BusLine.CONTENT_URI.equals(uri)) {
-				deleteObsoleteBusLines();
-			}
-			if (ITrafficData.KuaiXinData.BusStation.CONTENT_URI.equals(uri)) {
-				deleteObsoleteBusStations();
-			}
+		public void onChange(boolean selfChange) {
+			Utils.debug(TAG, "BusStationObserver get called: " + selfChange);
+			deleteObsoleteBusStations();
 		}
     }
     
