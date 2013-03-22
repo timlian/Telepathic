@@ -598,8 +598,10 @@ public class BusCardRecordFragment extends SherlockFragment {
             mResidualCount = (TextView)mRootView.findViewById(R.id.residual_count_text);
             mResidualAmount = (TextView)mRootView.findViewById(R.id.residual_amount_text);
             mRecordList = (DropRefreshListView)mRootView.findViewById(R.id.consumer_record_list);
-            mResidualCount.setText(getString(R.string.residual_count, mCard.getResidualCount()));
-            mResidualAmount.setText(getString(R.string.residual_amount, mCard.getResidualAmount()));
+            String count = TextUtils.isEmpty(mCard.getResidualCount())?"0":mCard.getResidualCount();
+            String amount = TextUtils.isEmpty(mCard.getResidualAmount())?"0":mCard.getResidualAmount();
+            mResidualCount.setText(getString(R.string.residual_count, count));
+            mResidualAmount.setText(getString(R.string.residual_amount, amount));
             mLoaderId = getLoaderId();
             startLoadRecords();
         }
