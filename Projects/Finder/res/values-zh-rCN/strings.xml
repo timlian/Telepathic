@@ -78,6 +78,7 @@
 
     <!-- Kuai xin error message definition -->
     <string name="error_gps_number_not_present">GPS编号不存在</string>
+    <string name="error_station_name_not_present">站名不存在</string>
 
     <!-- Toast generic error messages -->
     <string name="invalid_line_number">无效的公交路线号</string>

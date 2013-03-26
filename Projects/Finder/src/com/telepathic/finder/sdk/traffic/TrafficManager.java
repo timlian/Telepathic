@@ -15,7 +15,6 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
-import android.text.StaticLayout;
 import android.util.Log;
 
 import com.baidu.mapapi.BMapManager;
@@ -28,8 +27,8 @@ import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
-import com.telepathic.finder.sdk.traffic.request.GetBusStationLinesRequest.StationLines;
 import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest.Station;
 import com.telepathic.finder.sdk.traffic.request.GetBusTransferRouteRequest;
 import com.telepathic.finder.sdk.traffic.request.GetStationNameRequest;
@@ -193,7 +192,7 @@ public class TrafficManager {
                             errorCode = IErrorCode.ERROR_NO_NETWORK;
                         }
                     	// retrieve station lines from server
-                    	List<StationLines> tempList = null;
+                    	List<KXStationLines> tempList = null;
                     	if (errorCode == 0) {
                     		GetBusStationLinesTask task = new GetBusStationLinesTask(stationName);
                     		task.startTask();
@@ -209,11 +208,11 @@ public class TrafficManager {
                     			errorText = task.getTaskResult().getErrorMessage();
                     		}
                     	}
-                    	final List<StationLines> stationList = tempList;
+                    	final List<KXStationLines> stationList = tempList;
                     	// retrieve the bus lines related to the specified station.
                     	if (errorCode == 0) {
                     		ArrayList<String> lineNumbers = new ArrayList<String>();
-                    		for(StationLines station : stationList) {
+                    		for(KXStationLines station : stationList) {
                     			for(String lineNo : station.getLines()) {
                     				if (!lineNumbers.contains(lineNo)) {
                     					lineNumbers.add(lineNo);
@@ -256,13 +255,13 @@ public class TrafficManager {
                     	// corrected 
                     	Utils.debug(TAG, "start get direction.");
                     	int count = 0;
-            			for(StationLines station : stationList) {
-            				count += station.getLines().size();
+            			for(KXStationLines station : stationList) {
+            				count += station.getLines().length;
             			}
             			
             			final CountDownLatch lineDirectionLatch = new CountDownLatch(count);
             			final Object lock = new Object();
-            			for(StationLines station : stationList) {
+            			for(KXStationLines station : stationList) {
             				final String gpsNumber = station.getGpsNumber();
             				for(String lineNumber : station.getLines()) {
             					 final TranslateToStationTask task = new TranslateToStationTask(lineNumber, gpsNumber);
@@ -487,17 +486,17 @@ public class TrafficManager {
 			});
 		}
 		
-		private int getDirections(final List<StationLines> stationList) throws InterruptedException {
+		private int getDirections(final List<KXStationLines> stationList) throws InterruptedException {
 			int count = 0;
-			for(StationLines station : stationList) {
-				count += station.getLines().size();
+			for(KXStationLines station : stationList) {
+				count += station.getLines().length;
 			}
 			if (count == 0) {
 				return IErrorCode.ERROR_UNKNOWN;
 			}
 			final CountDownLatch lineDirectionLatch = new CountDownLatch(count);
 			final int result = 0;
-			for(StationLines station : stationList) {
+			for(KXStationLines station : stationList) {
 				String gpsNumber = station.getGpsNumber();
 				for(String lineNumber : station.getLines()) {
 					 final TranslateToStationTask task = new TranslateToStationTask(lineNumber, gpsNumber);
@@ -532,7 +531,7 @@ public class TrafficManager {
 			return result;
 		}
 		
-		private void setDirection(List<StationLines> stationList, Station station) {
+		private void setDirection(List<KXStationLines> stationList, Station station) {
 			for(int idx = 0; idx < stationList.size(); idx++) {
 				String gpsNumber = stationList.get(idx).getGpsNumber();
 				if (gpsNumber.equals(station.getGpsNumber())) {

@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import android.R.integer;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,13 +20,12 @@ import com.baidu.mapapi.search.MKStep;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord;
-import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
-import com.telepathic.finder.sdk.traffic.request.GetBusStationLinesRequest.StationLines;
 import com.telepathic.finder.util.Utils;
 
 public class TrafficStore {
@@ -245,8 +243,8 @@ public class TrafficStore {
         }
     }
     
-    public void store(List<StationLines> stationList) {
-    	for(StationLines station : stationList) {
+    public void store(List<KXStationLines> stationList) {
+    	for(KXStationLines station : stationList) {
     		ContentValues stationValues = new ContentValues();
     		stationValues.put(KuaiXinData.BusStation.NAME, station.getName());
     		stationValues.put(KuaiXinData.BusStation.GPS_NUMBER, station.getGpsNumber());

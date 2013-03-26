@@ -389,6 +389,9 @@ public class Utils {
         case IErrorCode.ERROR_GPS_NUMBER_NOT_PRESENT:
             retMessage = res.getString(R.string.error_gps_number_not_present);
             break;
+        case IErrorCode.ERROR_STATION_NAME_NOT_PRESENT:
+        	retMessage = res.getString(R.string.error_station_name_not_present);
+        	break;
         default:
             Logger.logTrace(String.valueOf(errorCode) + ": " + errorText);
             retMessage = errorText;

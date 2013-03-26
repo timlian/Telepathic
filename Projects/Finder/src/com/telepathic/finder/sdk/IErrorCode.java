@@ -1,6 +1,5 @@
 package com.telepathic.finder.sdk;
 
-import android.R.integer;
 
 public interface IErrorCode {
 
@@ -21,6 +20,8 @@ public interface IErrorCode {
     public static int ERROR_GPS_NUMBER_NOT_PRESENT = 700;
     
     public static int ERROR_LINE_NUMBER_NOT_PRESENT = 400;
+    
+    public static int ERROR_STATION_NAME_NOT_PRESENT = 402;
 
     // Generic error code definition
     public static int ERROR_UNKNOWN = -1;
