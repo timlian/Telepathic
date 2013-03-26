@@ -14,6 +14,7 @@
     <string name="bus_location">车辆位置</string>
     <string name="card_records">消费记录</string>
     <string name="bus_stations">站台信息</string>
+    <string name="bus_transfer">公交换乘</string>
     <string name="menu_settings">设置</string>
     <string name="map_not_ready">地图尚未加载完成</string>
     <string name="find">查询</string>
@@ -43,6 +44,8 @@
     <string name="confirm_clean_bus_station_cache">该操作将删除已查询公交站台信息, 是否继续?</string>
     <string name="gps_number">GPS编号 : <xliff:g id="gps_number" example="50001">%1$s</xliff:g></string>
     <string name="delete_complete">完成</string>
+    <string name="start_station_hint">起点站</string>
+    <string name="end_station_hint">终点站</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>
