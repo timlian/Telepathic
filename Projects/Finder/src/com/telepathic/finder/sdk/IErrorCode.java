@@ -1,5 +1,7 @@
 package com.telepathic.finder.sdk;
 
+import android.R.integer;
+
 public interface IErrorCode {
 
     // Bai du error code definition
@@ -17,6 +19,8 @@ public interface IErrorCode {
 
     // Kuai xin error code definition
     public static int ERROR_GPS_NUMBER_NOT_PRESENT = 700;
+    
+    public static int ERROR_LINE_NUMBER_NOT_PRESENT = 400;
 
     // Generic error code definition
     public static int ERROR_UNKNOWN = -1;
@@ -24,5 +28,7 @@ public interface IErrorCode {
     public static int ERROR_NO_NETWORK = -2;
 
     public static int ERROR_NO_VALID_DATA = -3;
+    
+    public static int ERROR_TIME_OUT = -4;
 
 }

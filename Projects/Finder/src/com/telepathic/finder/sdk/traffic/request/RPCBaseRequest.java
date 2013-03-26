@@ -87,11 +87,14 @@ public abstract class RPCBaseRequest {
     public void onResponse(Object result) {
         if (result instanceof SoapObject) {
             process((SoapObject)result);
-        } else if (result instanceof SoapFault) {
-
-        } else {
-            throw new RuntimeException("Unknown Exception!!!");
+        }  else {
+        	handleError(IErrorCode.ERROR_NO_VALID_DATA, "no valid response");
         }
+//        else if (result instanceof SoapFault) {
+//
+//        } else {
+//            throw new RuntimeException("Unknown Exception!!!");
+//        }
     }
 
     private void process(SoapObject result) {

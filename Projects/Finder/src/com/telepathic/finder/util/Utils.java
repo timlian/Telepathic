@@ -365,6 +365,9 @@ public class Utils {
         case IErrorCode.ERROR_NO_VALID_DATA:
             retMessage = res.getString(R.string.error_no_data);
             break;
+        case IErrorCode.ERROR_TIME_OUT:
+        	retMessage = res.getString(R.string.error_time_out);
+        	break;
         case IErrorCode.ERROR_LOCATION_FAILED:
             retMessage = res.getString(R.string.error_location_falied);
             break;

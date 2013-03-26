@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2013 Telepathic LTD. All Rights Reserved.
  *
- * * Author: Tim Lian
+ * * Status: Pass
  */
 package com.telepathic.finder.sdk.traffic.request;
 
@@ -32,15 +32,12 @@ public class GetBusLineRequest extends RPCBaseRequest {
 
     @Override
     void handleError(int errorCode, String errorMessage) {
-        mCallback.onError(errorCode, errorMessage);
+    	if (mCallback != null) {
+    		mCallback.onError(errorCode, errorMessage);
+    	}
     }
 
-    /*
-     * Line route response data entry example:
-     *
-     * {lineName=111; departureTime=06:00; closeOffTime=22:00; type=锟斤拷锟斤拷; stations=锟斤拷锟斤拷站锟桔合斤拷通锟斤拷纽站,盛锟斤拷一路锟斤拷站,锟斤拷锟斤拷锟斤拷锟秸�桐锟斤拷锟斤拷小锟斤拷站,锟斤拷锟斤拷路站,锟较撅拷锟斤拷路站,锟较撅拷锟斤拷路站,锟较撅拷锟斤拷路锟斤拷站,锟较撅拷锟斤拷路锟斤拷业路锟斤拷站,锟斤拷业路锟斤拷锟斤拷路锟斤拷锟斤拷站,锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷站,锟斤拷锟斤拷路锟斤拷锟侥讹拷站,锟斤拷锟斤拷楼站,锟斤拷锟斤拷路锟斤拷一锟斤拷锟斤拷站,锟斤拷锟斤拷锟斤拷锟秸�锟斤拷锟斤拷路锟斤拷锟斤拷路锟斤拷站,锟斤拷水锟斤拷站,锟斤拷锟斤拷路锟斤拷一锟斤拷站,锟斤拷锟斤拷路锟解华锟斤拷锟斤拷锟秸�锟铰筹拷锟斤拷路锟斤拷站,锟斤拷锟斤拷路锟斤拷站,锟斤拷锟斤拷路锟斤拷站,锟斤拷锟斤拷锟斤拷锟斤拷站,锟斤拷锟斤拷锟斤拷锟斤拷站,锟斤拷锟斤拷小锟斤拷站,锟斤拷路同锟斤拷路锟斤拷站,锟斤拷路站,锟斤拷路锟斤拷站,锟斤拷路锟斤拷犀锟斤拷锟斤拷锟脚讹拷站,锟斤拷锟斤拷路站,锟竭家达拷站,锟斤拷锟脚达拷站,锟竭硷拷小锟斤拷站; stationAliases= , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ; code=200; msg=锟缴癸拷; }
-     *
-     */
+    // Response can not be null.
     @Override
     void handleResponse(SoapObject newDataSet) {
         KXBusLine busLine = new KXBusLine(mLineNumber);

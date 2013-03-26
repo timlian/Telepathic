@@ -30,15 +30,15 @@ public class RequestExecutor {
                 response = sendRequest(request, count);
                 break;
             } catch (Exception e) {
-                e.printStackTrace();
+                Utils.debug(TAG, "send request " + request.getName() + " failed. - " + e.getMessage());
             }
         }
         if (response != null) {
             Utils.debug(TAG,"Received Response: " + response.toString());
-            request.onResponse(response);
         } else {
-            Utils.debug(TAG, "Send request:" + request + " failed.");
+            Utils.debug(TAG, "Send request: " + request.getName() + " failed.");
         }
+        request.onResponse(response);
     }
 
     // performance test version

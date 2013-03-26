@@ -65,6 +65,7 @@
     <string name="error_unknown">Unknown Error</string>
     <string name="error_no_network">No Network</string>
     <string name="error_no_data">No Data</string>
+    <string name="error_time_out">time out</string>
 
     <!-- Baidu map error message definition -->
     <string name="error_location_falied">定位失败</string>
