@@ -53,7 +53,7 @@ public class FinderApplication extends Application {
     @Override
     public void onCreate() {
         if (MAIN_PROCESS_NAME.equals(getCurrentProcessName())) {
-            setUncatchedExceptionHandler();
+            //setUncatchedExceptionHandler();
             mApp = this;
             mBMapManager = new BMapManager(this);
             boolean isSuccess = mBMapManager.init(this.mStrKey, new MyGeneralListener());

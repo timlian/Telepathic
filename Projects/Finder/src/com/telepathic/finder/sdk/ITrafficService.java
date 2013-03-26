@@ -43,7 +43,22 @@ public interface ITrafficService {
      */
     void getBusStationLines(String gpsNumber, ICompletionListener listener);
     /**
+     * 
+     * @param source
+     * @param detination
+     * @param listener
+     */
+    void getBusTransferRoute(String source, String detination, ICompletionListener listener);
+    /**
+     * 
+     * @param query
+     * @param listener
+     */
+    void queryStationName(String query, ICompletionListener listener);
+    
+    /**
      * Shut down the traffic service.
      */
     void shutDown();
+    
 }

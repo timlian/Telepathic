@@ -30,7 +30,7 @@ public class TaskResult<Result> {
         mErrorMessage = errorMessage;
     }
 
-    public Result getResult() {
+    public Result getContent() {
         return mResult;
     }
 

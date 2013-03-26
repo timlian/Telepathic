@@ -362,7 +362,7 @@ public class Utils {
         case IErrorCode.ERROR_UNKNOWN:
             retMessage = res.getString(R.string.error_unknown);
             break;
-        case IErrorCode.ERROR_NO_DATA:
+        case IErrorCode.ERROR_NO_VALID_DATA:
             retMessage = res.getString(R.string.error_no_data);
             break;
         case IErrorCode.ERROR_LOCATION_FAILED:

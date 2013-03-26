@@ -5,25 +5,24 @@ import java.util.List;
 import com.telepathic.finder.sdk.traffic.request.GetBusStationLinesRequest;
 import com.telepathic.finder.sdk.traffic.request.RequestCallback;
 import com.telepathic.finder.sdk.traffic.request.RequestExecutor;
+import com.telepathic.finder.sdk.traffic.request.GetBusStationLinesRequest.StationLines;
 
-public class GetBusStationLinesTask extends BaseTask<List<String>> {
+public class GetBusStationLinesTask extends BaseTask<List<StationLines>> {
     private final String mStationName;
-    private final String mGpsNumber;
 
-    public GetBusStationLinesTask(String stationName, String gpsNumber) {
+    public GetBusStationLinesTask(String stationName) {
         super("GetBusStationLinesTask");
         mStationName = stationName;
-        mGpsNumber = gpsNumber;
     }
 
     @Override
     protected void doWork() {
-        GetBusStationLinesRequest request = new GetBusStationLinesRequest(mStationName, mGpsNumber);
-        final TaskResult<List<String>> taskResult = new TaskResult<List<String>>();
+        GetBusStationLinesRequest request = new GetBusStationLinesRequest(mStationName);
+        final TaskResult<List<StationLines>> taskResult = new TaskResult<List<StationLines>>();
         RequestExecutor.execute(request, new RequestCallback() {
             @Override
             public void onSuccess(Object result) {
-                taskResult.setResult((List<String>)result);
+                taskResult.setResult((List<StationLines>)result);
                 setTaskResult(taskResult);
             }
 

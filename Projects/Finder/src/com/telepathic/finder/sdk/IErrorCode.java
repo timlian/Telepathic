@@ -23,6 +23,6 @@ public interface IErrorCode {
 
     public static int ERROR_NO_NETWORK = -2;
 
-    public static int ERROR_NO_DATA = -3;
+    public static int ERROR_NO_VALID_DATA = -3;
 
 }

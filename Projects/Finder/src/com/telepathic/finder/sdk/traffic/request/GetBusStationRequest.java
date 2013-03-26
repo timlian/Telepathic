@@ -2,6 +2,8 @@ package com.telepathic.finder.sdk.traffic.request;
 
 import org.ksoap2.serialization.SoapObject;
 
+import com.telepathic.finder.util.Utils;
+
 import android.text.TextUtils;
 
 public class GetBusStationRequest extends RPCBaseRequest {
@@ -12,7 +14,37 @@ public class GetBusStationRequest extends RPCBaseRequest {
     private static final String KEY_DIRECTION = "direction";
 
     private String mLineNumber;
+    private String mGpsNumber;
 
+    public static class Station {
+    	private String mLineNumber;
+    	private String mName;
+    	private String mGpsNumber;
+    	private String mDirection;
+    	
+    	private Station(String lineNumber, String name, String gpsNumber, String direction) {
+    		mLineNumber = lineNumber;
+    		mName = name;
+    		mGpsNumber = gpsNumber;
+    		mDirection = direction;
+    	}
+    	
+    	public String getName() {
+    		return mName;
+    	}
+    	
+    	public String getGpsNumber() {
+    		return mGpsNumber;
+    	}
+    	
+    	public String getDirection() {
+    		return mDirection;
+    	}
+    	
+    	public String getLineNumber() {
+    		return mLineNumber;
+    	}
+    }
     /** Request example
      *
      * translateToStation{gps=50022; } or translateToStation{busNum=102; gps=50022; }
@@ -20,6 +52,7 @@ public class GetBusStationRequest extends RPCBaseRequest {
     public GetBusStationRequest(String lineNumber, String gpsNumber) {
         super(REQUEST_NAME);
         mLineNumber = lineNumber;
+        mGpsNumber = gpsNumber;
         if (!TextUtils.isEmpty(lineNumber)) {
             addParameter(KEY_BUS_NUMBER, lineNumber);
         }
@@ -28,7 +61,9 @@ public class GetBusStationRequest extends RPCBaseRequest {
 
     @Override
     protected void handleError(int errorCode, String errorMessage) {
-        mCallback.onError(errorCode, errorMessage);
+    	if (mCallback != null) {
+    		mCallback.onError(errorCode, errorMessage);
+    	}
     }
 
     /**
@@ -41,21 +76,18 @@ public class GetBusStationRequest extends RPCBaseRequest {
     @Override
     protected void handleResponse(SoapObject newDataSet) {
         if(newDataSet.getPropertyCount() > 0) {
-            StringBuilder result = new StringBuilder();
             SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
-            if (!TextUtils.isEmpty(mLineNumber)) {
-                result.append(mLineNumber);
-                result.append(",");
-            }
-            result.append(firstDataEntry.getPrimitivePropertyAsString(KEY_STATION_NAME));
+            String name = firstDataEntry.getPrimitivePropertyAsString(KEY_STATION_NAME);
+            String direction = null;
             try {
-                String direction = firstDataEntry.getPrimitivePropertyAsString(KEY_DIRECTION);
-                result.append(",");
-                result.append(direction);
+                direction = firstDataEntry.getPrimitivePropertyAsString(KEY_DIRECTION);
             } catch (RuntimeException e) {
                 // ignore
             }
-            mCallback.onSuccess(result.toString());
+            Station station = new Station(mLineNumber, name, mGpsNumber, direction);
+            if (mCallback != null) {
+            	mCallback.onSuccess(station);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 
 package com.telepathic.finder.app;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -13,10 +14,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -204,7 +207,7 @@ public class BusStationFragment extends SherlockFragment {
                 .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.station_number_hint));
-        mSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
         mSearchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
@@ -273,7 +276,7 @@ public class BusStationFragment extends SherlockFragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void getSuggestions(String queryText) {
+    private void getSuggestions2(String queryText) {
         Cursor cursor = mDataCache.queryBusStations(queryText);
         String[] from = new String[] {
                 KuaiXinData.BusStation.GPS_NUMBER, KuaiXinData.BusStation.NAME
@@ -284,6 +287,43 @@ public class BusStationFragment extends SherlockFragment {
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
                 R.layout.station_gps_number_item, cursor, from, to, 0);
         mSearchView.setSuggestionsAdapter(adapter);
+    }
+    
+    private void getSuggestions(String queryText) {
+    	if (!TextUtils.isEmpty(queryText)) {
+    		mTrafficService.queryStationName(queryText, new ICompletionListener() {
+				
+				@Override
+				public void onSuccess(Object result) {
+					ArrayList<String> stationNames = (ArrayList<String>) result;
+					String[] columnNames = {"_id", "gps_number", "name"};
+					MatrixCursor cursor = new MatrixCursor(columnNames);
+					String[] suggestionEntry = new String[3];
+					for(int i = 0; i < stationNames.size(); i++) {
+						suggestionEntry[0] = String.valueOf(i);
+						suggestionEntry[1] = "fake";
+						suggestionEntry[2] = stationNames.get(i);
+						cursor.addRow(suggestionEntry);
+					}
+					  String[] from = new String[] {
+				                KuaiXinData.BusStation.GPS_NUMBER, KuaiXinData.BusStation.NAME
+				        };
+				        int[] to = new int[] {
+				                R.id.station_gps_number, R.id.station_name
+				        };
+					SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
+			                R.layout.station_gps_number_item, cursor, from, to, 0);
+			        mSearchView.setSuggestionsAdapter(adapter);
+				}
+				
+				@Override
+				public void onFailure(int errorCode, String errorText) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+    	}
+    	
     }
 
     private class StationsAdapter extends BaseAdapter {

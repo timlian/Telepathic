@@ -4,6 +4,8 @@ import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 
+import com.telepathic.finder.sdk.IErrorCode;
+
 public abstract class RPCBaseRequest {
 
     private static final String NAMESPACE = "http://tempuri.org/";
@@ -110,6 +112,8 @@ public abstract class RPCBaseRequest {
                     if (NO_ERROR == errorCode) {
                         if (isValidDataEntry(firstDataEntry)) {
                             handleResponse(dataSet);
+                        } else {
+                        	handleError(IErrorCode.ERROR_NO_VALID_DATA, "no valid data");
                         }
                     } else {
                         handleError(errorCode, errorMessage);
