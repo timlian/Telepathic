@@ -1,7 +1,6 @@
 
 package com.telepathic.finder.sdk.traffic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -10,14 +9,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import android.R.integer;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
+import android.text.StaticLayout;
 import android.util.Log;
 
 import com.baidu.mapapi.BMapManager;
@@ -29,17 +27,14 @@ import com.telepathic.finder.sdk.IErrorCode;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
-import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
-import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
-import com.telepathic.finder.sdk.traffic.request.GetBusStationLinesRequest;
+import com.telepathic.finder.sdk.traffic.request.GetBusStationLinesRequest.StationLines;
+import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest.Station;
 import com.telepathic.finder.sdk.traffic.request.GetBusTransferRouteRequest;
 import com.telepathic.finder.sdk.traffic.request.GetStationNameRequest;
 import com.telepathic.finder.sdk.traffic.request.RequestCallback;
 import com.telepathic.finder.sdk.traffic.request.RequestExecutor;
-import com.telepathic.finder.sdk.traffic.request.GetBusStationLinesRequest.StationLines;
-import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest.Station;
 import com.telepathic.finder.sdk.traffic.task.GetBusCardRecordsTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLineTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLocationTask;
@@ -198,15 +193,15 @@ public class TrafficManager {
                             errorCode = IErrorCode.ERROR_NO_NETWORK;
                         }
                     	// retrieve station lines from server
-                    	List<StationLines> stationList = null;
+                    	List<StationLines> tempList = null;
                     	if (errorCode == 0) {
                     		GetBusStationLinesTask task = new GetBusStationLinesTask(stationName);
                     		task.startTask();
                     		task.waitTaskDone();
                     		errorCode = task.getTaskResult().getErrorCode();
                     		if (errorCode == 0) {
-                    			stationList = task.getTaskResult().getContent();
-                    			if (stationList == null || stationList.size() == 0) {
+                    			tempList = task.getTaskResult().getContent();
+                    			if (tempList == null || tempList.size() == 0) {
                     				errorCode = IErrorCode.ERROR_NO_VALID_DATA;
                     				errorText = "no valid data";
                     			}
@@ -214,7 +209,7 @@ public class TrafficManager {
                     			errorText = task.getTaskResult().getErrorMessage();
                     		}
                     	}
-                    	
+                    	final List<StationLines> stationList = tempList;
                     	// retrieve the bus lines related to the specified station.
                     	if (errorCode == 0) {
                     		ArrayList<String> lineNumbers = new ArrayList<String>();
@@ -260,7 +255,48 @@ public class TrafficManager {
                     	Utils.debug(TAG, "Error code: " + errorCode);
                     	// corrected 
                     	Utils.debug(TAG, "start get direction.");
-                    	getDirections(stationList);
+                    	int count = 0;
+            			for(StationLines station : stationList) {
+            				count += station.getLines().size();
+            			}
+            			
+            			final CountDownLatch lineDirectionLatch = new CountDownLatch(count);
+            			final Object lock = new Object();
+            			for(StationLines station : stationList) {
+            				final String gpsNumber = station.getGpsNumber();
+            				for(String lineNumber : station.getLines()) {
+            					 final TranslateToStationTask task = new TranslateToStationTask(lineNumber, gpsNumber);
+            					 task.setCallback(new Runnable() {
+            	                     @Override
+            						public void run() {
+            	                    	 synchronized (lock) {
+            	                    		try {
+	            								Utils.debug(TAG, "Thead " + Thread.currentThread().getId() + " enter critical section.");
+	            								int errorCode = task.getTaskResult().getErrorCode();
+	            								if (errorCode == 0) {
+	            									Station station = task.getTaskResult().getContent();
+	            									if (station != null) {
+	            										for(int idx = 0; idx < stationList.size(); idx++) {
+	            											String gpsNumber = stationList.get(idx).getGpsNumber();
+	            											if (gpsNumber.equals(station.getGpsNumber())) {
+	            												stationList.get(idx).setDirection(station.getLineNumber(), station.getDirection());
+	            											}
+	            										}
+	            									}
+	            								} 
+	            								Utils.debug(TAG, "Thead " + Thread.currentThread().getId() + " leave critical section.");
+	            								lineDirectionLatch.countDown();
+            	                    		} catch (Exception e) {
+            	                    			e.printStackTrace();
+            	                    		}
+            	                    	 }
+            	                     }
+            					});
+            	                task.startTask();
+            				}
+            			}
+            			lineDirectionLatch.await();
+            			
                     	Utils.debug(TAG, "finished get direction.");
                     	mTrafficStore.store(stationList);
                     	if (errorCode == 0) {
@@ -427,10 +463,10 @@ public class TrafficManager {
 						});
 					} else {
 						ArrayList<String> stationNames = null;
-						String selection = ITrafficData.KuaiXinData.BusStation.NAME + " LIKE %?%";
-                    	String[] selectionArgs = new String[]{query};
+						String selection = ITrafficData.KuaiXinData.BusStation.NAME + " LIKE \'%" + query + "%\'";
+                    	//String[] selectionArgs = new String[]{query};
                     	String sortOrder = ITrafficData.KuaiXinData.BusStation.LAST_UPDATE_TIME + " DESC ";
-                    	Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, BUS_STATION_PROJECTION, selection, selectionArgs, sortOrder);
+                    	Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, BUS_STATION_PROJECTION, selection, null, sortOrder);
                     	if (cursor != null) {
                     		try {
                     			stationNames = new ArrayList<String>();
@@ -467,29 +503,29 @@ public class TrafficManager {
 					 final TranslateToStationTask task = new TranslateToStationTask(lineNumber, gpsNumber);
 					 task.setCallback(new Runnable() {
 	                     @Override
-	                     public void run() {
-	                    	 synchronized (stationList) {
-	                    	lineDirectionLatch.countDown();
-							Utils.debug("Tim", "get called####1");
-							int errorCode = task.getTaskResult().getErrorCode();
-							if (errorCode == 0) {
-								Station station = task.getTaskResult().getContent();
-								if (station != null) {
-									setDirection(stationList, station);
+						public void run() {
+							synchronized (stationList) {
+								Utils.debug(TAG, "Eneter: "+ Thread.currentThread());
+								lineDirectionLatch.countDown();
+								int errorCode = task.getTaskResult().getErrorCode();
+								if (errorCode == 0) {
+									Station station = task.getTaskResult().getContent();
+									if (station != null) {
+										setDirection(stationList, station);
+									}
+								} else {
+									String errorMessage = task.getTaskResult().getErrorMessage();
+									Log.d(TAG, "get bus line direction falied: errorCode = "
+													+ errorCode
+													+ ", caused by "
+													+ errorMessage);
 								}
-							} else {
-								String errorMessage = task.getTaskResult()
-										.getErrorMessage();
-								Log.d(TAG,
-										"get bus line direction falied: errorCode = "
-												+ errorCode + ", caused by "
-												+ errorMessage);
+								Utils.debug("Tim", "Received response####1: ");
+								Utils.debug(TAG, "Leave: "+ Thread.currentThread());
 							}
-							Utils.debug("Tim", "get called####2");
-							Utils.debug("Tim", "Received response####1: ");
-	                     }}
-	                 });
-	                 task.startTask();
+						}
+					});
+	                task.startTask();
 				}
 			}
 			lineDirectionLatch.await();

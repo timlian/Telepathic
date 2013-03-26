@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2013 Telepathic LTD. All Rights Reserved.
+ *
+ * * Author: Tim Lian
+ */
 package com.telepathic.finder.sdk.traffic.request;
 
 import org.ksoap2.serialization.SoapObject;

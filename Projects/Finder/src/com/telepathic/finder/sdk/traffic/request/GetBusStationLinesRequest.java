@@ -24,14 +24,14 @@ public class GetBusStationLinesRequest extends RPCBaseRequest {
     	private String mName;
     	private String mGpsNumber;
     	private List<String> mLines;
-    	private List<String> mDirections;
+    	private String[] mDirections;
     	private List<Integer> mIndices;
     	
     	private StationLines(String name, String gpsNumber, List<String> lines) {
     		mName = name;
     		mGpsNumber = gpsNumber;
     		mLines = lines;
-    		mDirections = new ArrayList<String>();
+    		mDirections = new String[lines.size()];
     	}
     	
     	public String getGpsNumber() {
@@ -45,7 +45,7 @@ public class GetBusStationLinesRequest extends RPCBaseRequest {
     	public void setDirection(String lineNumber, String direction) {
     		int index = find(lineNumber);
     		if (index != -1) {
-    			mDirections.add(index, direction);
+    			mDirections[index] = direction;
     		}
     	}
     	
@@ -69,7 +69,7 @@ public class GetBusStationLinesRequest extends RPCBaseRequest {
     		String direction = null;
     		int index = find(lineNumber);
     		if (index != -1) {
-    			direction = mDirections.get(index);
+    			direction = mDirections[index];
     		}
     		return direction;
     	}

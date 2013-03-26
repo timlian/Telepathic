@@ -213,14 +213,14 @@ public class BusStationFragment extends SherlockFragment {
 
             @Override
             public boolean onQueryTextSubmit(String keyword) {
-                String gpsNumber = keyword;
-                if (Utils.isValidGpsNumber(gpsNumber)) {
+                String gpsNumber = "新会展中心公交站";
+                //if (Utils.isValidGpsNumber(gpsNumber)) {
                     Utils.hideSoftKeyboard(mActivity.getApplicationContext(), mSearchView);
                     searchStationLines(gpsNumber);
-                } else {
-                    Toast.makeText(mActivity, R.string.invalid_gps_number, Toast.LENGTH_SHORT)
-                            .show();
-                }
+//                } else {
+//                    Toast.makeText(mActivity, R.string.invalid_gps_number, Toast.LENGTH_SHORT)
+//                            .show();
+//                }
                 return true;
             }
 
@@ -392,12 +392,12 @@ public class BusStationFragment extends SherlockFragment {
     }
 
     private void searchStationLines(String gpsNumber) {
-        KXBusStationLines stationLines = mDataCache.getStationLines(gpsNumber);
-        if (stationLines != null) {
-            showStationLines(stationLines);
-            return;
-        }
-        mWaitingDialog.show();
+//        KXBusStationLines stationLines = mDataCache.getStationLines(gpsNumber);
+//        if (stationLines != null) {
+//            showStationLines(stationLines);
+//            return;
+//        }
+       // mWaitingDialog.show();
         mTrafficService.getBusStationLines(gpsNumber, new ICompletionListener() {
             @Override
             public void onSuccess(Object result) {
