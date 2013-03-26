@@ -68,6 +68,7 @@
     <string name="error_unknown">Unknown Error</string>
     <string name="error_no_network">No Network</string>
     <string name="error_no_data">No Data</string>
+    <string name="error_time_out">time out</string>
 
     <!-- Baidu map error message definition -->
     <string name="error_location_falied">定位失败</string>
@@ -79,6 +80,7 @@
 
     <!-- Kuai xin error message definition -->
     <string name="error_gps_number_not_present">The GPS number is not present.</string>
+    <string name="error_station_name_not_present">The station name is not present.</string>
 
     <!-- Toast generic error messages -->
     <string name="invalid_line_number">Invalid bus line number.</string>

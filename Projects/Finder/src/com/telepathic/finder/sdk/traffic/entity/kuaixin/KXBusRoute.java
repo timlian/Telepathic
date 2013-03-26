@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import android.R.interpolator;
-
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
 
 public class KXBusRoute {
@@ -79,5 +77,4 @@ public class KXBusRoute {
         }
         return index;
     }
-
 }
