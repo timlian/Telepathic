@@ -17,7 +17,16 @@ public class GetBusStationLinesRequestTest extends ApplicationTestCase<FinderApp
 	private static final String TAG = "GetBusStationLinesRequestTest";
 	private FinderApplication mApp = null;
 	private ITrafficService mTrafficService = null;
-	private ArrayList<KXStationLines> mExpectedData = new ArrayList<KXStationLines>();
+
+	private static final String[] EXPECTED_GPS_NUMBERS = {
+		"50022",
+		"50023"
+		};
+	
+	private static final String[][] EXPECTED_LINES = {
+		{"298", "84", "102", "115", "118"},
+		{"118", "298", "115", "102", "84"}
+		};
 	
 	public GetBusStationLinesRequestTest(Class<FinderApplication> applicationClass) {
 		super(applicationClass);
@@ -33,10 +42,6 @@ public class GetBusStationLinesRequestTest extends ApplicationTestCase<FinderApp
 		createApplication();
 		mApp = getApplication();
 		mTrafficService = mApp.getTrafficService();
-		KXStationLines stationLines1 = new KXStationLines("新会展中心公交站","50022", "298,84,102,115,118".split(","));
-		KXStationLines stationLines2 = new KXStationLines("新会展中心公交站","50023", "118,298,115,102,84".split(","));
-		mExpectedData.add(stationLines1);
-		mExpectedData.add(stationLines2);
 	}
 
 	public void test_retrieveStationLines1() {
@@ -48,10 +53,14 @@ public class GetBusStationLinesRequestTest extends ApplicationTestCase<FinderApp
 				ArrayList<KXStationLines> stationList = (ArrayList<KXStationLines>)result;
 				assertNotNull(stationList);
 				assertEquals(2, stationList.size());
-				KXStationLines firstStation = stationList.get(0);
-				assertNotNull(firstStation);
-				assertEquals("50022", firstStation.getGpsNumber());
-				assertEquals("50023", stationList.get(1).getGpsNumber());
+				for(int i = 0; i < stationList.size(); i++) {
+					assertEquals(EXPECTED_GPS_NUMBERS[i], stationList.get(i).getGpsNumber());
+					String[] lines = stationList.get(i).getLines();
+					assertEquals(EXPECTED_LINES[i].length, lines.length);
+					for (int j = 0; j < lines.length; j++) {
+						assertEquals(EXPECTED_LINES[i][j], lines[j]);
+					}
+				}
 			}
 			
 			@Override
