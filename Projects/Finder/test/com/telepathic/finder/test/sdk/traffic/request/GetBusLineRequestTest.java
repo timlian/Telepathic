@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.telepathic.finder.app.FinderApplication;
 import com.telepathic.finder.sdk.IErrorCode;
-import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
@@ -19,23 +18,12 @@ public class GetBusLineRequestTest extends ApplicationTestCase<FinderApplication
 	private static final String DOWN_STATIONS = "新会展中心公交站,天府软件园东侧站,天华路站,新会展中心南侧站,新会展中心东侧站,新会展北侧世纪城路口站,科华南路锦悦东路站,科华南路锦城大道口站,污水处理厂站,科华南路府城大道口站,濯锦北路站,科华南路北站,科华中路南站,桂溪公交站,科华路二环路口站,章灵寺站,磨子村站,旅游村街站,胜利村站";
 	private static final String CIRCLE_STATIONS = "火车北站公交站西,人民北路二段北站,人民北路二段站,人民北路站,西北桥站,一环路九里堤路口西站,沙湾站,西门车站,抚琴小区站,青羊小区站,省医院站,青羊宫站,一环路大石路口南站,一环路菊乐路口站,高升桥站,一环路高升桥东路口站,一环路南四段站,衣冠庙站,九如村站,一环路南二段站,磨子桥站,红瓦寺站,九眼桥北站,牛王庙路口站,水碾河站,一环路玉双路口北站,一环路东三段站,一环路新鸿路口北站,一环路建设路口北站,一环路东一段站,一环路北四段站,梁家巷站,一环路北三段站,人民北路站,火车北站公交站";
 	
-	private FinderApplication mApp = null;
-	private ITrafficService mTrafficService = null;
-	
 	public GetBusLineRequestTest(Class<FinderApplication> applicationClass) {
 		super(applicationClass);
 	}
 
 	public GetBusLineRequestTest() {
 		super(FinderApplication.class);
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		createApplication();
-		mApp = getApplication();
-		mTrafficService = mApp.getTrafficService();
 	}
 
 	public void test_retrieve_bus_line1() {

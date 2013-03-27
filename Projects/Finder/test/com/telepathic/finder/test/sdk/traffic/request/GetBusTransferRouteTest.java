@@ -1,24 +1,23 @@
 package com.telepathic.finder.test.sdk.traffic.request;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import android.R.integer;
 import android.test.ApplicationTestCase;
 import android.util.Log;
 
 import com.telepathic.finder.app.FinderApplication;
-import com.telepathic.finder.sdk.ICompletionListener;
-import com.telepathic.finder.sdk.ITrafficService;
-import com.telepathic.finder.sdk.traffic.request.GetBusTransferRouteRequest.TransferProgram;
-import com.telepathic.finder.sdk.traffic.request.GetBusTransferRouteRequest.TransferProgram.ProgramStep;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXProgramStep;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXTransferProgram;
+import com.telepathic.finder.sdk.traffic.request.GetBusTransferRouteRequest;
+import com.telepathic.finder.sdk.traffic.request.RequestCallback;
+import com.telepathic.finder.sdk.traffic.request.RequestExecutor;
 
 public class GetBusTransferRouteTest extends ApplicationTestCase<FinderApplication> {
-
 	private static final String TAG = "GetBusTransferRouteTest";
 	
-	private FinderApplication mApp = null;
-	private ITrafficService mTrafficService = null;
-	private volatile boolean mIsDone;
-	private Object mLock = new Object();
+	private List<KXTransferProgram> mExpectedTransferPrograms = new ArrayList<KXTransferProgram>();
 	
 	public GetBusTransferRouteTest(Class<FinderApplication> applicationClass) {
 		super(applicationClass);
@@ -27,56 +26,47 @@ public class GetBusTransferRouteTest extends ApplicationTestCase<FinderApplicati
 	public GetBusTransferRouteTest() {
 		super(FinderApplication.class);
 	}
-
+	
 	@Override
 	protected void setUp() throws Exception {
+		KXTransferProgram transferProgram = new KXTransferProgram("1", "1");
+		KXProgramStep step1 = new KXProgramStep("新会展中心公交站", "胜利村站", "102");
+		KXProgramStep step2 = new KXProgramStep("胜利村站", "新南门汽车站", "102");
+		transferProgram.addStep(step1);
+		transferProgram.addStep(step2);
 		super.setUp();
-		createApplication();
-		mApp = getApplication();
-		mTrafficService = mApp.getTrafficService();
 	}
 	
 	public void test_get_bus_transfer_route() {
-		mTrafficService.getBusTransferRoute("新会展中心公交站", "新南门汽车站", new ICompletionListener() {
-			
+		GetBusTransferRouteRequest request = new GetBusTransferRouteRequest("新会展中心公交站", "新南门汽车站");
+		RequestExecutor.execute(request, new RequestCallback() {
 			@Override
 			public void onSuccess(Object result) {
-				ArrayList<TransferProgram> programs = (ArrayList<TransferProgram>)result;
-				assertEquals(8, programs.size());
-				Log.d(TAG, "方案总数： " + programs.size());
-				for(TransferProgram program : programs) {
-					Log.d(TAG, "方案 " + program.getProgramId() + " : ");
-					for(ProgramStep step : program.getSteps()) {
-						Log.d(TAG, "步骤： " + step.getSource() + ", " + step.getDestination() + ", " + step.getLineName());
+				ArrayList<KXTransferProgram> transferPrograms = (ArrayList<KXTransferProgram>)result;
+				assertNotNull(transferPrograms);
+				assertEquals(8, transferPrograms.size());
+				for(int i = 0; i < mExpectedTransferPrograms.size(); i++) {
+					KXTransferProgram transferProgram = mExpectedTransferPrograms.get(i);
+					assertEquals(transferProgram.getProgramId(), transferPrograms.get(i).getProgramId());
+					assertEquals(transferProgram.getTransferTime(), transferPrograms.get(i).getTransferTime());
+					assertEquals(transferProgram.getSteps().size(), transferPrograms.get(i).getSteps().size());
+					List<KXProgramStep> expectedSteps = transferProgram.getSteps();
+					List<KXProgramStep> actualSteps = transferPrograms.get(i).getSteps();
+					for(int j = 0 ; j < transferProgram.getSteps().size(); j++) {
+						assertEquals(expectedSteps.get(j).getSource(), actualSteps.get(j).getSource());
+						assertEquals(expectedSteps.get(j).getDestination(), actualSteps.get(j).getDestination());
+						assertEquals(expectedSteps.get(j).getLineName(), actualSteps.get(j).getLineName());
 					}
 				}
-				notifyDone();
 			}
 			
 			@Override
-			public void onFailure(int errorCode, String errorText) {
-				notifyDone();
+			public void onError(int errorCode, String errorMessage) {
+				Log.d(TAG, "Get bus transfer route failed: error = " + errorCode + ", caused by " + errorMessage);
+				assertTrue(false);
 			}
 		});
-		waitResponse();
+		
 	}
 	
-	private void waitResponse() {
-		synchronized (mLock) {
-			try {
-				while(!mIsDone) {
-					mLock.wait();
-				}
-			} catch (InterruptedException e) {
-				Log.d(TAG, "Exception: " + e.getMessage());
-			}
-		}
-	}
-	
-	private void notifyDone() {
-		synchronized (mLock) {
-			mIsDone = true;
-			mLock.notifyAll();
-		}
-	}
 }

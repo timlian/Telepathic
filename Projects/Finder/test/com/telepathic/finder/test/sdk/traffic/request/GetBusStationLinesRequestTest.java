@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.telepathic.finder.app.FinderApplication;
 import com.telepathic.finder.sdk.IErrorCode;
-import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXStationLines;
 import com.telepathic.finder.sdk.traffic.request.GetBusStationLinesRequest;
 import com.telepathic.finder.sdk.traffic.request.RequestCallback;
@@ -15,18 +14,8 @@ import com.telepathic.finder.sdk.traffic.request.RequestExecutor;
 
 public class GetBusStationLinesRequestTest extends ApplicationTestCase<FinderApplication> {
 	private static final String TAG = "GetBusStationLinesRequestTest";
-	private FinderApplication mApp = null;
-	private ITrafficService mTrafficService = null;
-
-	private static final String[] EXPECTED_GPS_NUMBERS = {
-		"50022",
-		"50023"
-		};
 	
-	private static final String[][] EXPECTED_LINES = {
-		{"298", "84", "102", "115", "118"},
-		{"118", "298", "115", "102", "84"}
-		};
+	private ArrayList<KXStationLines> mExpectedStationLines = new ArrayList<KXStationLines>();
 	
 	public GetBusStationLinesRequestTest(Class<FinderApplication> applicationClass) {
 		super(applicationClass);
@@ -38,12 +27,15 @@ public class GetBusStationLinesRequestTest extends ApplicationTestCase<FinderApp
 
 	@Override
 	protected void setUp() throws Exception {
+		String[] lines1 = {"298", "84", "102", "115", "118"};
+		String[] lines2 = {"118", "298", "115", "102", "84"};
+		KXStationLines stationLines1 = new KXStationLines("新会展中心公交站", "50022", lines1);
+		KXStationLines stationLines2 = new KXStationLines("新会展中心公交站", "50023", lines2);
+		mExpectedStationLines.add(stationLines1);
+		mExpectedStationLines.add(stationLines2);
 		super.setUp();
-		createApplication();
-		mApp = getApplication();
-		mTrafficService = mApp.getTrafficService();
 	}
-
+	
 	public void test_retrieveStationLines1() {
 		
 		GetBusStationLinesRequest request = new GetBusStationLinesRequest("新会展中心公交站");
@@ -52,13 +44,15 @@ public class GetBusStationLinesRequestTest extends ApplicationTestCase<FinderApp
 			public void onSuccess(Object result) {
 				ArrayList<KXStationLines> stationList = (ArrayList<KXStationLines>)result;
 				assertNotNull(stationList);
-				assertEquals(2, stationList.size());
-				for(int i = 0; i < stationList.size(); i++) {
-					assertEquals(EXPECTED_GPS_NUMBERS[i], stationList.get(i).getGpsNumber());
-					String[] lines = stationList.get(i).getLines();
-					assertEquals(EXPECTED_LINES[i].length, lines.length);
-					for (int j = 0; j < lines.length; j++) {
-						assertEquals(EXPECTED_LINES[i][j], lines[j]);
+				assertEquals(mExpectedStationLines.size(), stationList.size());
+				for(int i = 0; i < mExpectedStationLines.size(); i++) {
+					assertEquals(mExpectedStationLines.get(i).getName(), stationList.get(i).getName());
+					assertEquals(mExpectedStationLines.get(i).getGpsNumber(), stationList.get(i).getGpsNumber());
+					String[] expectedLines = mExpectedStationLines.get(i).getLines();
+					String[] actualLines = stationList.get(i).getLines();
+					assertEquals(expectedLines.length, actualLines.length);
+					for(int j = 0; j < expectedLines.length; j++) {
+						assertEquals(expectedLines[j], actualLines[j]);
 					}
 				}
 			}

@@ -2,8 +2,6 @@ package com.telepathic.finder.sdk.traffic.request;
 
 import org.ksoap2.serialization.SoapObject;
 
-import com.telepathic.finder.util.Utils;
-
 import android.text.TextUtils;
 
 public class GetBusStationRequest extends RPCBaseRequest {
@@ -22,7 +20,7 @@ public class GetBusStationRequest extends RPCBaseRequest {
     	private String mGpsNumber;
     	private String mDirection;
     	
-    	private Station(String lineNumber, String name, String gpsNumber, String direction) {
+    	public Station(String lineNumber, String name, String gpsNumber, String direction) {
     		mLineNumber = lineNumber;
     		mName = name;
     		mGpsNumber = gpsNumber;

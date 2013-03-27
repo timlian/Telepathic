@@ -1,17 +1,14 @@
 package com.telepathic.finder.sdk.traffic.request;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.ksoap2.serialization.SoapObject;
 
-import android.util.Log;
-
-import com.telepathic.finder.sdk.traffic.request.GetBusTransferRouteRequest.TransferProgram.ProgramStep;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXProgramStep;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXTransferProgram;
 
 public class GetBusTransferRouteRequest extends RPCBaseRequest {
-	private static final String TAG = "GetBusTransferRouteRequest";
 	private static final String METHOD_NAME = "getBusTransferRoute";
 	private static final String KEY_STARTING = "starting";
 	private static final String KEY_DESTINATION = "destination";
@@ -21,58 +18,7 @@ public class GetBusTransferRouteRequest extends RPCBaseRequest {
 	private static final String KEY_LINE_NAME = "lineName";
 	
 	
-	public static class TransferProgram {
-		
-		public static class ProgramStep {
-			private String mSource;
-			private String mDestination;
-			private String mLineName;
-			
-			public ProgramStep(String source, String destination, String lineName) {
-				mSource = source;
-				mDestination = destination;
-				mLineName = lineName;
-			}
-			
-			public String getSource() {
-				return mSource;
-			}
-			
-			public String getDestination() {
-				return mDestination;
-			}
-			
-			public String getLineName() {
-				return mLineName;
-			}
-		}
-		
-		private String mProgramId;
-		private String mTransferTime;
-		private List<ProgramStep> mSteps;
-		
-		public TransferProgram(String programId, String transferTime) {
-			mProgramId = programId;
-			mTransferTime = transferTime;
-			mSteps = new ArrayList<ProgramStep>();
-		}
-		
-		public String getProgramId() {
-			return mProgramId;
-		}
-		
-		public String getTransferTime() {
-			return mTransferTime;
-		}
-		
-		public List<ProgramStep> getSteps() {
-			return Collections.unmodifiableList(mSteps);
-		}
-		
-		public void addStep(ProgramStep step) {
-			mSteps.add(step);
-		}
-	}
+	
 	public GetBusTransferRouteRequest(String source, String destination) {
 		super(METHOD_NAME);
 		addParameter(KEY_STARTING, source);
@@ -88,12 +34,12 @@ public class GetBusTransferRouteRequest extends RPCBaseRequest {
 
 	@Override
 	void handleResponse(SoapObject dataSet) {
-		List<TransferProgram> transferPrograms = new ArrayList<TransferProgram>();
+		List<KXTransferProgram> transferPrograms = new ArrayList<KXTransferProgram>();
 		if (dataSet != null && dataSet.getPropertyCount() > 1) {
 			SoapObject dataEntry = null;
 			String preProgramId = null, curProgramId = null;
 			boolean isNewProgram = false;
-			TransferProgram transferProgram = null;
+			KXTransferProgram transferProgram = null;
 			for(int i = 0; i < dataSet.getPropertyCount(); i++) {
 				dataEntry = (SoapObject)dataSet.getProperty(i);
 				curProgramId = dataEntry.getPrimitivePropertyAsString(KEY_PROGRAM);
@@ -104,13 +50,13 @@ public class GetBusTransferRouteRequest extends RPCBaseRequest {
 				}
 				if (isNewProgram) {
 					String transferTime = dataEntry.getPrimitivePropertyAsString(KEY_TRANSFER_TIME);
-					transferProgram = new TransferProgram(curProgramId, transferTime);
+					transferProgram = new KXTransferProgram(curProgramId, transferTime);
 					transferPrograms.add(transferProgram);
 				}
 				String source = dataEntry.getPrimitivePropertyAsString(KEY_STARTING);
 				String destination = dataEntry.getPrimitivePropertyAsString(KEY_DESTINATION);
 				String lineName = dataEntry.getPrimitivePropertyAsString(KEY_LINE_NAME);
-				ProgramStep programStep = new ProgramStep(source, destination, lineName);
+				KXProgramStep programStep = new KXProgramStep(source, destination, lineName);
 				transferProgram.addStep(programStep);
 				preProgramId = curProgramId;
 			}
