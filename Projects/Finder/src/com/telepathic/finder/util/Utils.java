@@ -17,21 +17,20 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.telepathic.finder.sdk.IErrorCode;
-import com.telepathic.finder.R;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
-import android.provider.ContactsContract.Contacts.Data;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import com.telepathic.finder.R;
+import com.telepathic.finder.sdk.IErrorCode;
 
 public class Utils {
     private static final String TAG = Utils.class.getSimpleName();

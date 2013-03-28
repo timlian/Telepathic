@@ -60,6 +60,7 @@ import com.baidu.platform.comapi.basestruct.GeoPoint;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ICompletionListener;
+import com.telepathic.finder.sdk.ILocationListener;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
@@ -499,7 +500,20 @@ public class BusLocationFragment extends SherlockFragment {
         if (Utils.isValidBusLineNumber(lineNumber)) {
             Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT)
                     .show();
-            mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route));
+            mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route), new ILocationListener() {
+				
+				@Override
+				public void onUpdate(int distance) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void done() {
+					// TODO Auto-generated method stub
+					
+				}
+			});
         }
     }
 

@@ -55,6 +55,7 @@ import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
+import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
@@ -414,7 +415,20 @@ public class BusCardRecordFragment extends SherlockFragment {
                 if (Utils.isValidBusCardNumber(cardNumber)) {
                     mWaitingDialog.show();
                     Utils.hideSoftKeyboard(mActivity.getApplicationContext(), mSearchView);
-                    mTrafficService.getBusCardRecords(cardNumber, 30);
+                    mTrafficService.getBusCardRecords(cardNumber, 30, new ICompletionListener() {
+						
+						@Override
+						public void onSuccess(Object result) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void onFailure(int errorCode, String errorText) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_card_number, Toast.LENGTH_SHORT)
                     .show();
@@ -645,7 +659,20 @@ public class BusCardRecordFragment extends SherlockFragment {
                             public void onRefresh() {
                                 String cardNumber = mCard.getCardNumber();
                                 if (Utils.isValidBusCardNumber(cardNumber)) {
-                                    mTrafficService.getBusCardRecords(cardNumber, 30);
+                                    mTrafficService.getBusCardRecords(cardNumber, 30, new ICompletionListener() {
+										
+										@Override
+										public void onSuccess(Object result) {
+											// TODO Auto-generated method stub
+											
+										}
+										
+										@Override
+										public void onFailure(int errorCode, String errorText) {
+											// TODO Auto-generated method stub
+											
+										}
+									});
                                 } else {
                                     Toast.makeText(mActivity, R.string.card_id_error_notice,
                                             Toast.LENGTH_SHORT).show();

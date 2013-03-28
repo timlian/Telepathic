@@ -10,7 +10,7 @@ import com.baidu.mapapi.search.MKTransitRouteResult;
 import com.baidu.mapapi.search.MKWalkingRouteResult;
 
 
-class MKSearchListenerImpl implements MKSearchListener {
+public class MKSearchListenerImpl implements MKSearchListener {
 
     @Override
     public void onGetAddrResult(MKAddrInfo arg0, int arg1) {

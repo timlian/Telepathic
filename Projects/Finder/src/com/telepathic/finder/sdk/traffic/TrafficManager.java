@@ -18,11 +18,11 @@ import android.os.Message;
 import android.util.Log;
 
 import com.baidu.mapapi.BMapManager;
-import com.baidu.mapapi.search.MKPoiInfo;
-import com.baidu.mapapi.search.MKRoute;
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.IErrorCode;
+import com.telepathic.finder.sdk.ILocationListener;
+import com.telepathic.finder.sdk.IQueryListener;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
@@ -38,8 +38,6 @@ import com.telepathic.finder.sdk.traffic.task.GetBusCardRecordsTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLineTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusLocationTask;
 import com.telepathic.finder.sdk.traffic.task.GetBusStationLinesTask;
-import com.telepathic.finder.sdk.traffic.task.SearchBusLineTask;
-import com.telepathic.finder.sdk.traffic.task.SearchBusRouteTask;
 import com.telepathic.finder.sdk.traffic.task.TaskResult;
 import com.telepathic.finder.sdk.traffic.task.TranslateToStationTask;
 import com.telepathic.finder.util.Utils;
@@ -51,7 +49,7 @@ public class TrafficManager {
     private TrafficStore mTrafficStore;
     private Handler mMessageHandler;
     private ExecutorService mExecutorService;
-    private BMapManager mMapManager;
+    private MapSearchHandler mMapSearchHandler;
     private TrafficConfig mTrafficConfig;
     private BusLineObserver mBusLineObserver;
     private BusStationObserver mBusStationObserver;
@@ -75,10 +73,10 @@ public class TrafficManager {
 
     private TrafficManager(BMapManager manager, Context appContext, Handler msgHandler) {
         mContext = appContext;
-        mMapManager = manager;
         mMessageHandler = msgHandler;
         mExecutorService = Executors.newCachedThreadPool();
         mTrafficStore =  new TrafficStore(mContext, mExecutorService);
+        mMapSearchHandler = new MapSearchHandler(manager, mTrafficStore);
         mTrafficConfig = new TrafficConfig();
         mBusLineObserver = new BusLineObserver();
         mBusStationObserver = new BusStationObserver();
@@ -102,81 +100,21 @@ public class TrafficManager {
     private class TrafficeService implements ITrafficService {
 
         @Override
-        public void searchBusLine(final String city, final String lineNumber, final ICompletionListener listener) {
-            // The creation of search bus line task must be in the thread, which has looper.
-            final SearchBusLineTask searchTask = new SearchBusLineTask(mMapManager, city, lineNumber);
-            mExecutorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (!Utils.hasActiveNetwork(mContext)) {
-                            notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No networking.");
-                        }
-                        searchTask.startTask();
-                        searchTask.waitTaskDone();
-
-                        TaskResult<ArrayList<MKPoiInfo>> taskResult = searchTask.getTaskResult();
-                        if (taskResult != null) {
-                            int errorCode = taskResult.getErrorCode();
-                            if (errorCode != 0) {
-                                notifyFailure(listener, errorCode, taskResult.getErrorMessage());
-                            } else {
-                                ArrayList<MKPoiInfo> line = taskResult.getContent();
-                                 if (line != null && line.size() > 0) {
-                                    mTrafficStore.store(lineNumber, line);
-                                    notifySuccess(listener, null);
-                                } else {
-                                    notifyFailure(listener, IErrorCode.ERROR_NO_VALID_DATA, "No bus line info.");
-                                }
-                            }
-                        } else {
-                            notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the search bus line task result is null.");
-                        }
-                    } catch (InterruptedException e) {
-                        Utils.debug(TAG, "searchBusLine is interrupted.");
-                    }
-                    Utils.debug(TAG, "searchBusLine(" + city + ", " + lineNumber + ") finished.");
-                }
-            });
+        public void searchBusLine(String city, String lineNumber, ICompletionListener listener) {
+            if (!Utils.hasActiveNetwork(mContext)) {
+                notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
+                return ;
+            }
+            mMapSearchHandler.searchBusLine(city, lineNumber, listener);
         }
 
         @Override
-        public void searchBusRoute(final String city, final String routeUid, final ICompletionListener listener) {
-            // The creation of search bus route task must be in the thread, which has looper.
-            final SearchBusRouteTask searchTask = new SearchBusRouteTask(mMapManager, city, routeUid);
-            mExecutorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (!Utils.hasActiveNetwork(mContext)) {
-                            notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No networking.");
-                        }
-                        searchTask.startTask();
-                        searchTask.waitTaskDone();
-                        TaskResult<MKRoute> taskResult = searchTask.getTaskResult();
-                        if (taskResult != null) {
-                            int errorCode = taskResult.getErrorCode();
-                            if (errorCode != 0) {
-                                notifyFailure(listener, errorCode, taskResult.getErrorMessage());
-                            } else {
-                                MKRoute route = taskResult.getContent();
-                                if (route != null) {
-                                    // store the bus route info.
-                                    mTrafficStore.store(routeUid, taskResult.getContent());
-                                    notifySuccess(listener, route);
-                                } else {
-                                    notifyFailure(listener, IErrorCode.ERROR_NO_VALID_DATA, "No bus route info.");
-                                }
-                            }
-                        } else {
-                            notifyFailure(listener, IErrorCode.ERROR_UNKNOWN, "Exception: the search bus route task result is null.");
-                        }
-                    } catch (InterruptedException e) {
-                        Utils.debug(TAG, "searchBusRoute is interrupted.");
-                    }
-                    Utils.debug(TAG, "searchBusRoute(" + city + ", " + routeUid + ") finished.");
-                }
-            });
+        public void searchBusRoute(String city, String routeUid, ICompletionListener listener) {
+        	if (!Utils.hasActiveNetwork(mContext)) {
+                notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
+                return ;
+            }
+            mMapSearchHandler.searchBusRoute(city, routeUid, listener);
         }
 
 
@@ -314,7 +252,7 @@ public class TrafficManager {
         }
             
         @Override
-        public void getBusCardRecords(final String cardNumber, final int count) {
+        public void getBusCardRecords(final String cardNumber, final int count, ICompletionListener listener) {
             if (mExecutorService.isShutdown()) {
                 mExecutorService = Executors.newCachedThreadPool();
             }
@@ -367,7 +305,7 @@ public class TrafficManager {
         }
 
         @Override
-        public void getBusLocation(final String lineNumber, final ArrayList<String> route) {
+        public void getBusLocation(final String lineNumber, final ArrayList<String> route, ILocationListener listener) {
             if (mExecutorService.isShutdown()) {
                 mExecutorService = Executors.newCachedThreadPool();
             }
@@ -442,7 +380,7 @@ public class TrafficManager {
             }
         }
 
-		@Override
+		//@Override
 		public void queryStationName(final String query, final ICompletionListener listener) {
 			mExecutorService.execute(new Runnable() {
 				@Override
@@ -540,6 +478,44 @@ public class TrafficManager {
 			}
 		}
 
+		@Override
+		public void queryBDLineNumber(String keyword, IQueryListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void queryCardNumber(String keyword, IQueryListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void translateToStationName(String gpsNumber,
+				ICompletionListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void queryGpsNumber(String keyword, IQueryListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void getBusLine(String lineNumber, ICompletionListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void queryKXLineNumber(String keyword, IQueryListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
     }
 
     private void notifySuccess(final ICompletionListener listener, final Object result) {
@@ -632,5 +608,7 @@ public class TrafficManager {
         	}
         }
     }
+    
+   
 
 }
