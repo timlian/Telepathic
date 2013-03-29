@@ -59,7 +59,7 @@ class MapSearchHandler {
         mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 			@Override
 			public boolean handleMessage(Message msg) {
-				onSearchTimeout(msg.arg1);
+				onSearchTimeout(msg.what);
 				return true;
 			}
 		});
@@ -95,7 +95,7 @@ class MapSearchHandler {
 			searchRequest.doSearch();
 			mIsSearching = true;
 			Message msg = Message.obtain();
-			msg.arg1 = searchRequest.getId();
+			msg.what = searchRequest.getId();
 			mHandler.sendMessageDelayed(msg, REQUEST_TIMEOUT);
 		} else {
 			Utils.debug(TAG, "map search finished - there is no search request.");
@@ -154,6 +154,7 @@ class MapSearchHandler {
 			Utils.debug(TAG, "handleBusLineSearchResult - there is no search request!");
 			return ;
 		}
+		removeTimeoutMessage(searchRequest.getId());
 		ICompletionListener listener = searchRequest.getListener();
 		String lineNumber = searchRequest.getLineNumber();
 		if (listener == null && TextUtils.isEmpty(lineNumber)) {
@@ -191,6 +192,7 @@ class MapSearchHandler {
 			Utils.debug(TAG, "handleBusRouteSearchResult - there is no search request!");
 			return ;
 		}
+		removeTimeoutMessage(searchRequest.getId());
 		ICompletionListener listener = searchRequest.getListener();
 		String routeUid = searchRequest.getRouteUid();
 		if (listener == null && TextUtils.isEmpty(routeUid)) {
@@ -234,6 +236,14 @@ class MapSearchHandler {
 			}
 		}
 		return searchRequest;
+	}
+	
+	private void removeTimeoutMessage(final int requestId) {
+		if (requestId <= 0) {
+			Utils.debug(TAG, "remove - invalid request id: " + requestId);
+			return ;
+		}
+		mHandler.removeMessages(requestId);
 	}
 	
 	private class BusLineSearchRequest extends SearchRequest {
