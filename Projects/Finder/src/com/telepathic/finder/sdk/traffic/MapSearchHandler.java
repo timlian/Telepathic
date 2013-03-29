@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2013 Telepathic LTD. All Rights Reserved.
+ *
+ */
 package com.telepathic.finder.sdk.traffic;
 
 import java.util.ArrayList;
@@ -21,7 +25,7 @@ import com.telepathic.finder.util.Utils;
 
 class MapSearchHandler {
 	private static final String TAG = "MapSearchHandler";
-	private static final int REQUEST_TIMEOUT = 15 * 1000;
+	private static final int REQUEST_TIMEOUT = 20 * 1000;
 	private static int REQUEST_ID = 0;
 	private MyMapSearchListener mMapSearchListener;
     private MKSearch mMapSearch;
