@@ -3,6 +3,9 @@ package com.telepathic.finder.sdk.traffic;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 
 import com.baidu.mapapi.BMapManager;
@@ -18,14 +21,34 @@ import com.telepathic.finder.util.Utils;
 
 class MapSearchHandler {
 	private static final String TAG = "MapSearchHandler";
+	private static final int REQUEST_TIMEOUT = 15 * 1000;
+	private static int REQUEST_ID = 0;
 	private MyMapSearchListener mMapSearchListener;
     private MKSearch mMapSearch;
 	private TrafficStore mTrafficStore;
 	private CopyOnWriteArrayList<BusLineSearchRequest> mBusLineSearchRequests = new CopyOnWriteArrayList<BusLineSearchRequest>();
 	private CopyOnWriteArrayList<BusRouteSearchRequest> mBusRouteSearchRequests = new CopyOnWriteArrayList<BusRouteSearchRequest>();
+	private boolean mIsSearching;
+	private Handler mHandler;
 	
-	interface SearchRequest{
-		void doSearch();
+	abstract class SearchRequest{
+		private int mId;
+		private ICompletionListener mListener;
+		
+		SearchRequest(int id, ICompletionListener listener) {
+			mId = id;
+			mListener = listener;
+		}
+		
+		int getId() {
+			return mId;
+		}
+		
+		ICompletionListener getListener() {
+			return mListener;
+		}
+		
+		abstract void doSearch();
 	}
 	
 	MapSearchHandler(BMapManager manager, TrafficStore store) {
@@ -33,47 +56,93 @@ class MapSearchHandler {
         mMapSearchListener = new MyMapSearchListener();
         mMapSearch.init(manager, mMapSearchListener);
         mTrafficStore = store;
+        mHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+			@Override
+			public boolean handleMessage(Message msg) {
+				onSearchTimeout(msg.arg1);
+				return true;
+			}
+		});
 	}
 
 	void searchBusLine(String city, String lineNumber, ICompletionListener listener) {
-		mBusLineSearchRequests.add(new BusLineSearchRequest(city, lineNumber, listener));
-		doSearch();
+		mBusLineSearchRequests.add(new BusLineSearchRequest(++REQUEST_ID, listener, city, lineNumber));
+		if (!mIsSearching) {
+			doSearch();
+		} else {
+			Utils.debug(TAG, "searchBusLine - request is queued.");
+		}
 	}
 	
 	void searchBusRoute(String city, String routeUid, ICompletionListener listener) {
-		mBusRouteSearchRequests.add(new BusRouteSearchRequest(city, routeUid, listener));
-		doSearch();
+		mBusRouteSearchRequests.add(new BusRouteSearchRequest(++REQUEST_ID, listener, city, routeUid));
+		if (!mIsSearching) {
+			doSearch();
+		} else {
+			Utils.debug(TAG, "searchBusRoute - request is queued.");
+		}
 	}
 	
 	private void doSearch() {
+		SearchRequest searchRequest = null;
 		if (mBusLineSearchRequests.size() > 0) {
-			SearchRequest searchRequest = mBusLineSearchRequests.get(0);
-			searchRequest.doSearch();
-			Utils.debug(TAG, "start bus line search.");
-			return ;
+			searchRequest = mBusLineSearchRequests.get(0);
 		}
 		if (mBusRouteSearchRequests.size() > 0) {
-			SearchRequest searchRequest = mBusRouteSearchRequests.get(0);
-			searchRequest.doSearch();
-			Utils.debug(TAG, "start bus route search.");
-			return ;
+			searchRequest = mBusRouteSearchRequests.get(0);
 		}
-		Utils.debug(TAG, "doSearch - there is no search request.");
+		if (searchRequest != null) {
+			searchRequest.doSearch();
+			mIsSearching = true;
+			Message msg = Message.obtain();
+			msg.arg1 = searchRequest.getId();
+			mHandler.sendMessageDelayed(msg, REQUEST_TIMEOUT);
+		} else {
+			Utils.debug(TAG, "map search finished - there is no search request.");
+		}
 	}
 	
 	private class MyMapSearchListener extends MKSearchListenerImpl {
 		
 		@Override
 		public void onGetPoiResult(MKPoiResult res, int type, int error) {
-			handleBusLineSearchResult(res, type, error);
-			doSearch();
+			try {
+				handleBusLineSearchResult(res, type, error);
+			} catch (Exception e) {
+				Utils.debug(TAG, "onGetPoiResult - handle bus line search result crashed: " + e.getMessage());
+			} finally {
+				onSearchCompleted();
+			}
 		}
 
 		@Override
 		public void onGetBusDetailResult(MKBusLineResult result, int error) {
-			handleBusRouteSearchResult(result, error);
-			doSearch();
+			try {
+				handleBusRouteSearchResult(result, error);
+			} catch (Exception e) {
+				Utils.debug(TAG, "onGetBusDetailResult - handle bus route search result crashed: " + e.getMessage());
+			} finally {
+				onSearchCompleted();
+			}
 		}
+	}
+	
+	private void onSearchCompleted() {
+		mIsSearching = false;
+		doSearch();
+	}
+	
+	private void onSearchTimeout(int requestId) {
+		SearchRequest searchRequest = remove(requestId);
+		if (searchRequest != null) {
+			ICompletionListener listener = searchRequest.getListener();
+			if (listener != null) {
+				listener.onFailure(IErrorCode.ERROR_TIME_OUT, "map search timeout.");
+			}
+			Utils.debug(TAG, "onSearchTimeout - search request timeout, requestId: " + requestId);
+		}
+		mIsSearching = false;
+		doSearch();
 	}
 	
 	private void handleBusLineSearchResult(MKPoiResult res, int type, int error) {
@@ -144,15 +213,37 @@ class MapSearchHandler {
 		listener.onSuccess(route);
 	}
 	
-	private class BusLineSearchRequest implements SearchRequest {
+	private SearchRequest remove(final int requestId) {
+		if (requestId <= 0) {
+			Utils.debug(TAG, "remove - invalid request id: " + requestId);
+			return null;
+		}
+		SearchRequest searchRequest = null;
+		for(int i = 0 ; i < mBusLineSearchRequests.size(); i++) {
+			if (mBusLineSearchRequests.get(i).getId() == requestId) {
+				searchRequest = mBusLineSearchRequests.remove(i);
+				break;
+			}
+		}
+		if (searchRequest == null) {
+			for(int i = 0; i < mBusRouteSearchRequests.size(); i++) {
+				if (mBusRouteSearchRequests.get(i).getId() ==  requestId) {
+					searchRequest = mBusRouteSearchRequests.remove(i);
+					break;
+				}
+			}
+		}
+		return searchRequest;
+	}
+	
+	private class BusLineSearchRequest extends SearchRequest {
 		private String mCity;
 		private String mLineNumber;
-		private ICompletionListener mListener;
 		
-		BusLineSearchRequest(String city, String lineNumber, ICompletionListener listener) {
+		BusLineSearchRequest(int id, ICompletionListener listener, String city, String lineNumber) {
+			super(id, listener);
 			mCity = city;
 			mLineNumber = lineNumber;
-			mListener = listener;
 		}
 		
 		@Override
@@ -163,21 +254,16 @@ class MapSearchHandler {
 		public String getLineNumber() {
 			return mLineNumber;
 		}
-		
-		public ICompletionListener getListener() {
-			return mListener;
-		}
 	}
 	
-	private class BusRouteSearchRequest implements SearchRequest {
+	private class BusRouteSearchRequest extends SearchRequest {
 		private String mCity;
 		private String mRouteUid;
-		private ICompletionListener mListener;
 		
-		BusRouteSearchRequest(String city, String routeUid, ICompletionListener listener) {
+		BusRouteSearchRequest(int id, ICompletionListener listener, String city, String routeUid) {
+			super(id, listener);
 			mCity = city;
 			mRouteUid = routeUid;
-			mListener = listener;
 		}
 		
 		@Override
@@ -187,10 +273,6 @@ class MapSearchHandler {
 		
 		public String getRouteUid() {
 			return mRouteUid;
-		}
-		
-		public ICompletionListener getListener() {
-			return mListener;
 		}
 	}
 	
