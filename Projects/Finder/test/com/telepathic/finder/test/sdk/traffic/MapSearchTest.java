@@ -58,7 +58,8 @@ public class MapSearchTest extends ApplicationTestCase<FinderApplication> {
 			
 			@Override
 			public void onFailure(int errorCode, String errorText) {
-				Log.d(TAG, "Failed");
+				assertEquals(0, errorCode);
+				Log.d(TAG, "searchBusLine failed, error = " + errorCode + ", " + errorText);
 				notifyDone();
 			}
 		});
