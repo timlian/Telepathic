@@ -27,9 +27,10 @@ import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStation;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
-import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest.Station;
+import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest;
 import com.telepathic.finder.sdk.traffic.request.GetBusTransferRouteRequest;
 import com.telepathic.finder.sdk.traffic.request.GetStationNameRequest;
 import com.telepathic.finder.sdk.traffic.request.RequestCallback;
@@ -211,7 +212,7 @@ public class TrafficManager {
 	            								Utils.debug(TAG, "Thead " + Thread.currentThread().getId() + " enter critical section.");
 	            								int errorCode = task.getTaskResult().getErrorCode();
 	            								if (errorCode == 0) {
-	            									Station station = task.getTaskResult().getContent();
+	            									KXBusStation station = task.getTaskResult().getContent();
 	            									if (station != null) {
 	            										for(int idx = 0; idx < stationList.size(); idx++) {
 	            											String gpsNumber = stationList.get(idx).getGpsNumber();
@@ -446,7 +447,7 @@ public class TrafficManager {
 								lineDirectionLatch.countDown();
 								int errorCode = task.getTaskResult().getErrorCode();
 								if (errorCode == 0) {
-									Station station = task.getTaskResult().getContent();
+									KXBusStation station = task.getTaskResult().getContent();
 									if (station != null) {
 										setDirection(stationList, station);
 									}
@@ -469,7 +470,7 @@ public class TrafficManager {
 			return result;
 		}
 		
-		private void setDirection(List<KXStationLines> stationList, Station station) {
+		private void setDirection(List<KXStationLines> stationList, KXBusStation station) {
 			for(int idx = 0; idx < stationList.size(); idx++) {
 				String gpsNumber = stationList.get(idx).getGpsNumber();
 				if (gpsNumber.equals(station.getGpsNumber())) {
@@ -491,10 +492,28 @@ public class TrafficManager {
 		}
 
 		@Override
-		public void translateToStationName(String gpsNumber,
-				ICompletionListener listener) {
-			// TODO Auto-generated method stub
-			
+		public void translateToStationName(final String gpsNumber, final ICompletionListener listener) {
+			if (!Utils.hasActiveNetwork(mContext)) {
+				notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
+				return;
+			}
+			mExecutorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					GetBusStationRequest request = new GetBusStationRequest(null, gpsNumber);
+					RequestExecutor.execute(request, new RequestCallback() {
+						@Override
+						public void onSuccess(Object result) {
+							notifySuccess(listener, result);
+						}
+						
+						@Override
+						public void onError(int errorCode, String errorMessage) {
+							notifyFailure(listener, errorCode, errorMessage);
+						}
+					});
+				}
+			});
 		}
 
 		@Override

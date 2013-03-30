@@ -3,7 +3,6 @@ package com.telepathic.finder.test.sdk.traffic.request;
 import java.util.ArrayList;
 
 import com.telepathic.finder.app.FinderApplication;
-import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest.Station;
 import com.telepathic.finder.sdk.traffic.request.GetStationNameRequest;
 import com.telepathic.finder.sdk.traffic.request.RequestCallback;
 import com.telepathic.finder.sdk.traffic.request.RequestExecutor;

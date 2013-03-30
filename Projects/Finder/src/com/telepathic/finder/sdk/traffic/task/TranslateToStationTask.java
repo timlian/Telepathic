@@ -1,11 +1,11 @@
 package com.telepathic.finder.sdk.traffic.task;
 
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStation;
 import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest;
 import com.telepathic.finder.sdk.traffic.request.RequestCallback;
 import com.telepathic.finder.sdk.traffic.request.RequestExecutor;
-import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest.Station;
 
-public class TranslateToStationTask extends BaseTask<Station> {
+public class TranslateToStationTask extends BaseTask<KXBusStation> {
     private final String mLineNumber;
     private final String mGpsNumber;
 
@@ -18,11 +18,11 @@ public class TranslateToStationTask extends BaseTask<Station> {
     @Override
     protected void doWork() {
         GetBusStationRequest request = new GetBusStationRequest(mLineNumber, mGpsNumber);
-        final TaskResult<Station> taskResult = new TaskResult<Station>();
+        final TaskResult<KXBusStation> taskResult = new TaskResult<KXBusStation>();
         RequestExecutor.execute(request, new RequestCallback() {
             @Override
             public void onSuccess(Object result) {
-                taskResult.setResult((Station)result);
+                taskResult.setResult((KXBusStation)result);
                 setTaskResult(taskResult);
             }
 

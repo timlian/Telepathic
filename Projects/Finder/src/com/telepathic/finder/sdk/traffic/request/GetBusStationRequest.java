@@ -2,6 +2,8 @@ package com.telepathic.finder.sdk.traffic.request;
 
 import org.ksoap2.serialization.SoapObject;
 
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStation;
+
 import android.text.TextUtils;
 
 public class GetBusStationRequest extends RPCBaseRequest {
@@ -14,35 +16,6 @@ public class GetBusStationRequest extends RPCBaseRequest {
     private String mLineNumber;
     private String mGpsNumber;
 
-    public static class Station {
-    	private String mLineNumber;
-    	private String mName;
-    	private String mGpsNumber;
-    	private String mDirection;
-    	
-    	public Station(String lineNumber, String name, String gpsNumber, String direction) {
-    		mLineNumber = lineNumber;
-    		mName = name;
-    		mGpsNumber = gpsNumber;
-    		mDirection = direction;
-    	}
-    	
-    	public String getName() {
-    		return mName;
-    	}
-    	
-    	public String getGpsNumber() {
-    		return mGpsNumber;
-    	}
-    	
-    	public String getDirection() {
-    		return mDirection;
-    	}
-    	
-    	public String getLineNumber() {
-    		return mLineNumber;
-    	}
-    }
     /** Request example
      *
      * translateToStation{gps=50022; } or translateToStation{busNum=102; gps=50022; }
@@ -73,19 +46,23 @@ public class GetBusStationRequest extends RPCBaseRequest {
     //{stationName=新会展中心公交站; alias=奇诺咖啡餐厅; direction=下行; code=200; msg=成功; }
     @Override
     protected void handleResponse(SoapObject newDataSet) {
+    	KXBusStation station = new KXBusStation();
+    	station.setLineNumber(mLineNumber);
+    	station.setGpsNumber(mGpsNumber);
         if(newDataSet.getPropertyCount() > 0) {
             SoapObject firstDataEntry = (SoapObject) newDataSet.getProperty(0);
             String name = firstDataEntry.getPrimitivePropertyAsString(KEY_STATION_NAME);
+            station.setName(name);
             String direction = null;
             try {
                 direction = firstDataEntry.getPrimitivePropertyAsString(KEY_DIRECTION);
             } catch (RuntimeException e) {
                 // ignore
             }
-            Station station = new Station(mLineNumber, name, mGpsNumber, direction);
-            if (mCallback != null) {
-            	mCallback.onSuccess(station);
-            }
+            station.setDirection(direction);
+        }
+        if (mCallback != null) {
+        	mCallback.onSuccess(station);
         }
     }
 }
