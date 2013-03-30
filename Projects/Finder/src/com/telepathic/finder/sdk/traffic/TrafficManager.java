@@ -27,9 +27,12 @@ import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStation;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
+import com.telepathic.finder.sdk.traffic.request.GetBusLineRequest;
 import com.telepathic.finder.sdk.traffic.request.GetBusStationRequest;
 import com.telepathic.finder.sdk.traffic.request.GetBusTransferRouteRequest;
 import com.telepathic.finder.sdk.traffic.request.GetStationNameRequest;
@@ -70,6 +73,19 @@ public class TrafficManager {
     };
     private static final int IDX_BUS_STATION_ID = 0;
     private static final int IDX_BUS_STATION_NAME = 1;
+    
+    private static final String[] KX_BUS_LINE_PROJECTION = {
+    	ITrafficData.KuaiXinData.BusRoute.LINE_NUMBER,
+    	ITrafficData.KuaiXinData.BusRoute.DIRECTION,
+    	ITrafficData.KuaiXinData.BusRoute.START_TIME,
+    	ITrafficData.KuaiXinData.BusRoute.END_TIME,
+    	ITrafficData.KuaiXinData.BusRoute.STATIONS
+    };
+    private static final int IDX_LINE_NUMBER = 0;
+    private static final int IDX_DIRECTION = 1;
+    private static final int IDX_START_TIME = 2;
+    private static final int IDX_END_TIME = 3;
+    private static final int IDX_STATIONS = 4;
     
 
     private TrafficManager(BMapManager manager, Context appContext, Handler msgHandler) {
@@ -523,9 +539,50 @@ public class TrafficManager {
 		}
 
 		@Override
-		public void getBusLine(String lineNumber, ICompletionListener listener) {
-			// TODO Auto-generated method stub
-			
+		public void getBusLine(final String lineNumber, final ICompletionListener listener) {
+			mExecutorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					KXBusLine busLine = new KXBusLine(lineNumber);
+					String selection = ITrafficData.KuaiXinData.BusRoute.LINE_NUMBER + "=?";
+					String selectionArgs[] = new String[]{lineNumber};
+					Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusRoute.CONTENT_URI, 
+							KX_BUS_LINE_PROJECTION, selection, selectionArgs, null);
+					if (cursor != null) {
+						try {
+							while (cursor.moveToNext()) {
+								KXBusRoute route = new KXBusRoute();
+								route.setStartTime(cursor.getString(IDX_START_TIME));
+								route.setEndTime(cursor.getString(IDX_END_TIME));
+								route.setDirection(Direction.fromString(cursor.getString(IDX_DIRECTION)));
+								route.setStations(cursor.getString(IDX_STATIONS).split(","));
+								busLine.addRoute(route);
+							}
+						} finally {
+							cursor.close();
+						}
+					}
+					if (busLine.getRouteCount() > 0) {
+						notifySuccess(listener, busLine);
+						return ;
+					}
+					if (!Utils.hasActiveNetwork(mContext)) {
+		                notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
+		                return ;
+		            }
+					GetBusLineRequest request = new GetBusLineRequest(lineNumber);
+					RequestExecutor.execute(request, new RequestCallback() {
+						@Override
+						public void onSuccess(Object result) {
+							notifySuccess(listener, result);
+						}
+						@Override
+						public void onError(int errorCode, String errorMessage) {
+							notifyFailure(listener, errorCode, errorMessage);
+						}
+					});
+				}
+			});
 		}
 
 		@Override

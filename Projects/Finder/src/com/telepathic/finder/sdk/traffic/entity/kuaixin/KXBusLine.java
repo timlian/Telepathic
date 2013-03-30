@@ -51,6 +51,10 @@ public class KXBusLine {
         return Collections.unmodifiableList(mRoutes);
     }
 
+    public int getRouteCount() {
+    	return mRoutes.size();
+    }
+    
     public KXBusRoute getRoute(Direction direction) {
         KXBusRoute retRoute = null;
         for(KXBusRoute route : mRoutes) {
