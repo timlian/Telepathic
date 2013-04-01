@@ -40,8 +40,6 @@ public class TranslateToStationNameTest extends ApplicationTestCase<FinderApplic
 				assertNotNull(station);
 				assertEquals("新会展中心公交站", station.getName());
 				assertEquals("50022", station.getGpsNumber());
-				assertNull(station.getLineNumber());
-				assertNull(station.getDirection());
 				notifyDone();
 			}
 			@Override

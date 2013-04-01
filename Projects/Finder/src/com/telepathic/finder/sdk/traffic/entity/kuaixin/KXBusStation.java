@@ -1,24 +1,16 @@
 package com.telepathic.finder.sdk.traffic.entity.kuaixin;
 
 public class KXBusStation {
-	private String mLineNumber;
 	private String mName;
 	private String mGpsNumber;
-	private String mDirection;
 	
-	public KXBusStation(String lineNumber, String name, String gpsNumber, String direction) {
-		mLineNumber = lineNumber;
+	public KXBusStation(String name, String gpsNumber) {
 		mName = name;
 		mGpsNumber = gpsNumber;
-		mDirection = direction;
 	}
 	
 	public KXBusStation() {
 		
-	}
-	
-	public void setLineNumber(String lineNumber) {
-		mLineNumber = lineNumber;
 	}
 	
 	public void setGpsNumber(String gpsNumber) {
@@ -29,10 +21,6 @@ public class KXBusStation {
 		mName = name;
 	}
 	
-	public void setDirection(String direction) {
-		mDirection = direction;
-	}
-	
 	public String getName() {
 		return mName;
 	}
@@ -41,12 +29,4 @@ public class KXBusStation {
 		return mGpsNumber;
 	}
 	
-	public String getDirection() {
-		return mDirection;
-	}
-	
-	public String getLineNumber() {
-		return mLineNumber;
-	}
-
 }

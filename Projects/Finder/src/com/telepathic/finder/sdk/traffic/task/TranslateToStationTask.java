@@ -17,7 +17,7 @@ public class TranslateToStationTask extends BaseTask<KXBusStation> {
 
     @Override
     protected void doWork() {
-        GetBusStationRequest request = new GetBusStationRequest(mLineNumber, mGpsNumber);
+        GetBusStationRequest request = new GetBusStationRequest(mGpsNumber);
         final TaskResult<KXBusStation> taskResult = new TaskResult<KXBusStation>();
         RequestExecutor.execute(request, new RequestCallback() {
             @Override

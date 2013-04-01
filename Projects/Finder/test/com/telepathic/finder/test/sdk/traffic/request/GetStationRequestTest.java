@@ -12,8 +12,7 @@ import com.telepathic.finder.sdk.traffic.request.RequestExecutor;
 public class GetStationRequestTest extends ApplicationTestCase<FinderApplication>{
 	private static final String TAG = "GetStationRequestTest";
 	
-	private KXBusStation mExpectedStaiton1;
-	private KXBusStation mExpectedStaiton2;
+	private KXBusStation mExpectedStaiton;
 	
 	public GetStationRequestTest(Class<FinderApplication> applicationClass) {
 		super(applicationClass);
@@ -25,42 +24,19 @@ public class GetStationRequestTest extends ApplicationTestCase<FinderApplication
 
 	@Override
 	protected void setUp() throws Exception {
-		mExpectedStaiton1 = new KXBusStation("102", "新会展中心公交站", "50023", "上行");
-		mExpectedStaiton2 = new KXBusStation(null, "新会展中心公交站", "50023", null);
+		mExpectedStaiton = new KXBusStation("新会展中心公交站", "50023");
 		super.setUp();
 	}
 	
 	public void test_retrieveStation1() {
-		GetBusStationRequest request = new GetBusStationRequest("102", "50023");
+		GetBusStationRequest request = new GetBusStationRequest("50023");
 		RequestExecutor.execute(request, new RequestCallback() {
 			@Override
 			public void onSuccess(Object result) {
 				KXBusStation station = (KXBusStation)result;
 				assertNotNull(station);
-				assertEquals(mExpectedStaiton1.getLineNumber(), station.getLineNumber());
-				assertEquals(mExpectedStaiton1.getGpsNumber(), station.getGpsNumber());
-				assertEquals(mExpectedStaiton1.getName(), station.getName());
-				assertEquals(mExpectedStaiton1.getDirection(), station.getDirection());
-			}
-			
-			@Override
-			public void onError(int errorCode, String errorMessage) {
-				Log.d(TAG, "Retrieve station name failed: error = " + errorCode + ", caused by " + errorMessage);
-				assertTrue(false);
-			}
-		});
-	}
-	
-	public void test_retrieveStation2() {
-		GetBusStationRequest request = new GetBusStationRequest(null, "50023");
-		RequestExecutor.execute(request, new RequestCallback() {
-			@Override
-			public void onSuccess(Object result) {
-				KXBusStation station = (KXBusStation)result;
-				assertEquals(mExpectedStaiton2.getLineNumber(), station.getLineNumber());
-				assertEquals(mExpectedStaiton2.getGpsNumber(), station.getGpsNumber());
-				assertEquals(mExpectedStaiton2.getName(), station.getName());
-				assertEquals(mExpectedStaiton2.getDirection(), station.getDirection());
+				assertEquals(mExpectedStaiton.getGpsNumber(), station.getGpsNumber());
+				assertEquals(mExpectedStaiton.getName(), station.getName());
 			}
 			
 			@Override

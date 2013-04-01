@@ -46,7 +46,7 @@ public class GetBusLocationRequest extends RPCBaseRequest {
 	        location.setDistance(distance);
     	}
         if (mCallback != null) {
-        	mCallback.onSuccess(location);
+        	mCallback.onSuccess(location.getDistance());
         }
     }
 }
