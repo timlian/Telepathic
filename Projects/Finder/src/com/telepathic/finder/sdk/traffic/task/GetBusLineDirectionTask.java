@@ -1,9 +1,7 @@
 package com.telepathic.finder.sdk.traffic.task;
 
-import java.util.List;
 
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLineDirection;
-import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXStationLines;
 import com.telepathic.finder.sdk.traffic.request.GetBusLineDirectionRequest;
 import com.telepathic.finder.sdk.traffic.request.RequestCallback;
 import com.telepathic.finder.sdk.traffic.request.RequestExecutor;
