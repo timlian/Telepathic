@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/search_bus_line"
+        android:actionViewClass="com.actionbarsherlock.widget.SearchView"
+        android:icon="@drawable/ic_menu_search_holo_light"
+        android:showAsAction="always|collapseActionView|withText"
+        android:title="@string/find"/>
+    <item
+        android:id="@+id/about"
+        android:showAsAction="never"
+        android:title="@string/title_activity_about" />
+
+</menu>

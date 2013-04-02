@@ -84,6 +84,23 @@
                 android:src="@drawable/ic_tab_station_selector" >
             </ImageView>
         </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/tab_bus_line"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/tab_host_spec_sector"
+            android:onClick="navigateToBusLine"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_tab_card_selector" >
+            </ImageView>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

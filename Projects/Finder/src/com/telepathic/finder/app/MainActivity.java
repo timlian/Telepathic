@@ -23,11 +23,13 @@ public class MainActivity extends SherlockFragmentActivity {
     private static final String TAG_CARD_INFO_FRAGMENT     = "cardInfo";
     private static final String TAG_STATION_LINES_FRAGMENT = "stationLines";
     private static final String TAG_TRANSFER_FRAGMENT      = "Transfer";
+    private static final String TAG_BUS_LINE_FRAGMENT      = "busLine";
 
     private LinearLayout mTabLocation;
     private LinearLayout mTabCard;
     private LinearLayout mTabStation;
     private LinearLayout mTabTransfer;
+    private LinearLayout mTabBusLine;
     private ActionBar mActionBar;
     private Dialog mExitDialog;
 
@@ -46,6 +48,7 @@ public class MainActivity extends SherlockFragmentActivity {
         mTabCard = (LinearLayout)findViewById(R.id.tab_card);
         mTabStation = (LinearLayout)findViewById(R.id.tab_station);
         mTabTransfer = (LinearLayout)findViewById(R.id.tab_transfer);
+        mTabBusLine = (LinearLayout)findViewById(R.id.tab_bus_line);
 
         initSwitchHandlers();
         navigateToLocation(mTabLocation);
@@ -75,6 +78,12 @@ public class MainActivity extends SherlockFragmentActivity {
         showFragment(TAG_TRANSFER_FRAGMENT);
     }
 
+    public void navigateToBusLine(View v) {
+        setSelected(v);
+        mActionBar.setTitle(R.string.bus_line);
+        showFragment(TAG_BUS_LINE_FRAGMENT);
+    }
+
     private Dialog createDialog() {
         Builder exitDlgBuilder = new Builder(this)
         .setTitle(R.string.confirm_exit_title)
@@ -94,6 +103,7 @@ public class MainActivity extends SherlockFragmentActivity {
         mTabCard.setSelected(false);
         mTabStation.setSelected(false);
         mTabTransfer.setSelected(false);
+        mTabBusLine.setSelected(false);
         v.setSelected(true);
     }
 
@@ -186,6 +196,27 @@ public class MainActivity extends SherlockFragmentActivity {
                     if (transferFragment == null) {
                         transferFragment = new BusTransferFragment();
                         transaction.add(R.id.fragment_container, transferFragment, TAG_TRANSFER_FRAGMENT);
+                    } else {
+                        transaction.show(transferFragment);
+                    }
+                } else {
+                    if (transferFragment != null) {
+                        transaction.hide(transferFragment);
+                    }
+                }
+                transaction.commit();
+            }
+        });
+
+        mSwitchHandlers.add(new SwitchHandler() {
+            @Override
+            public void onSwitch(String tag) {
+                FragmentTransaction transaction = mFragmentManager.beginTransaction();
+                Fragment transferFragment = mFragmentManager.findFragmentByTag(TAG_BUS_LINE_FRAGMENT);
+                if (TAG_BUS_LINE_FRAGMENT.equals(tag)) {
+                    if (transferFragment == null) {
+                        transferFragment = new BusLineFragment();
+                        transaction.add(R.id.fragment_container, transferFragment, TAG_BUS_LINE_FRAGMENT);
                     } else {
                         transaction.show(transferFragment);
                     }
