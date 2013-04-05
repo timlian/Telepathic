@@ -11,6 +11,7 @@ import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -135,6 +137,13 @@ public class BusLineFragment extends SherlockFragment {
                 return true;
             }
         });
+        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.abs__search_src_text);
+        if (searchEditText != null) {
+            searchEditText.setEms(10);
+            searchEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+        } else {
+            mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
