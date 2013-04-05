@@ -27,6 +27,7 @@
     <string name="find_bus_route">正在查询公交路线信息, 请稍等&#8230;</string>
     <string name="find_ic_card_records">正在查询公交卡信息, 请稍等&#8230;</string>
     <string name="find_station_information">正在查询公交站台信息, 请稍等&#8230;</string>
+    <string name="find_transfer_information">正在查询公交换乘信息, 请稍等&#8230;</string>
     <string name="select_bus_route">请选择%s路行驶方向</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
@@ -48,6 +49,9 @@
     <string name="delete_complete">完成</string>
     <string name="start_station_hint">起点站</string>
     <string name="end_station_hint">终点站</string>
+    <string name="no_station_name_tips">请输入站点名称</string>
+    <string name="transfer_scheme_title"><xliff:g id="scheme_id" example="1">%1$s</xliff:g>. 换乘<xliff:g id="times" example="1">%2$s</xliff:g>次 <xliff:g id="transfer_bus" example="501→112">%3$s</xliff:g></string>
+    <string name="transfer_scheme_detail">从<xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g>乘坐<xliff:g id="bus_number" example="501">%2$s</xliff:g>路到达<xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>
@@ -93,6 +97,7 @@
     <!-- Toast network messages -->
     <string name="search_bus_line_failed">获取公交线路信息失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>
     <string name="search_bus_route_failed">获取公交路线信息失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>
+    <string name="get_bus_transfer_failed">获取公交换乘信息失败: <xliff:g id="failed_reason">%1$s</xliff:g></string>
     <string name="get_bus_card_records_failed">获取公交卡消息记录失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>
     <string name="get_bus_station_lines_failed">获取公交站台信息失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>
 

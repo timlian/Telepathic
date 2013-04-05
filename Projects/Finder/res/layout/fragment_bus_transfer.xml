@@ -23,17 +23,49 @@
             android:layout_toLeftOf="@id/query_transfer"
             android:orientation="vertical" >
 
-            <AutoCompleteTextView
-                android:id="@+id/start_station"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/start_station_hint" />
+                android:layout_height="wrap_content" >
 
-            <AutoCompleteTextView
-                android:id="@+id/end_station"
+                <AutoCompleteTextView
+                    android:id="@+id/start_station"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/start_station_hint" />
+
+                <ProgressBar
+                    android:visibility="gone"
+                    android:id="@+id/start_station_progressbar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/end_station_hint" />
+                android:layout_height="wrap_content" >
+
+                <AutoCompleteTextView
+                    android:id="@+id/end_station"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/end_station_hint" />
+
+                <ProgressBar
+                    android:visibility="gone"
+                    android:id="@+id/end_station_progressbar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dp" />
+            </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
 

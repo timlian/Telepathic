@@ -17,6 +17,7 @@
     <string name="bus_stations">Bus Stations</string>
     <string name="bus_transfer">Bus Transfer</string>
     <string name="bus_line">Bus Line</string>
+
     <string name="menu_settings">Settings</string>
     <string name="map_not_ready">Map is not ready yet</string>
     <string name="find">Find</string>
@@ -28,6 +29,7 @@
     <string name="find_bus_route">Finding bus route, please wait.</string>
     <string name="find_ic_card_records">Finding ic card records, please wait.</string>
     <string name="find_station_information">Finding bus station information, please wait.</string>
+    <string name="find_transfer_information">Finding bus transfer information, please wait.</string>
     <string name="select_bus_route">请选择%s路行驶方向</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -49,6 +51,10 @@
     <string name="start_station_hint">Start station</string>
     <string name="end_station_hint">End station</string>
     <string name="start_end_stations"><xliff:g id="start_station" example="华阳客运站">%1$s</xliff:g> ↔ <xliff:g id="start_station" example="桂溪公交站">%2$s</xliff:g></string>
+    <string name="no_station_name_tips">Please input the station name</string>
+    <string name="transfer_scheme_title"><xliff:g id="scheme_id" example="1">%1$s</xliff:g>. Transfer <xliff:g id="times" example="1">%2$s</xliff:g> time(s) <xliff:g id="transfer_bus" example="501→112">%3$s</xliff:g></string>
+    <string name="transfer_scheme_detail">Take bus <xliff:g id="bus_number" example="501">%2$s</xliff:g> from <xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g> to <xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
+    <string name="transfer_arrow">→</string>
 
     <!-- consumer record retrieve -->
     <string name="line_number">公交路线:</string>
@@ -93,6 +99,7 @@
     <!-- Toast network error messages -->
     <string name="search_bus_line_failed">Search bus line failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
     <string name="search_bus_route_failed">Search bus route failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
+    <string name="get_bus_transfer_failed">Get bus transfer failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
     <string name="get_bus_card_records_failed">Get bus card record failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
     <string name="get_bus_station_lines_failed">Get bus station lines failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
 

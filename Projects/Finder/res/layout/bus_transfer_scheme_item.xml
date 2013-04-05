@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <TextView
+        android:id="@+id/transfer_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1. 换乘1次  501→112"
+        android:textColor="#0099CC"
+        />
+    <TextView
+        android:id="@+id/transfer_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp"
+        android:text="从华阳绕城路口站乘坐501到达火车南站&lt;br/>从火车南站乘坐112到达十里店站"
+        />
+
+</LinearLayout>
