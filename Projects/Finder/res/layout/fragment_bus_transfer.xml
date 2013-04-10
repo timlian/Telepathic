@@ -4,75 +4,83 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal" >
-
-        <ImageButton
-            android:id="@+id/query_transfer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_menu_search_holo_light" />
+        android:background="#004A80"
+        android:paddingBottom="6dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="6dp" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/query_transfer"
+            android:background="@drawable/bg_blank_edit_text"
             android:orientation="vertical" >
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp" >
 
                 <AutoCompleteTextView
                     android:id="@+id/start_station"
-                    android:singleLine="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/start_station_hint" />
+                    android:background="@drawable/bg_bus_start_station_edit_text"
+                    android:hint="@string/start_station_hint"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black" />
 
                 <ProgressBar
-                    android:visibility="gone"
                     android:id="@+id/start_station_progressbar"
                     style="?android:attr/progressBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="5dp" />
+                    android:layout_marginRight="5dp"
+                    android:visibility="gone" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp" >
 
                 <AutoCompleteTextView
                     android:id="@+id/end_station"
-                    android:singleLine="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/end_station_hint" />
+                    android:background="@drawable/bg_bus_end_station_edit_text"
+                    android:hint="@string/end_station_hint"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black" />
 
                 <ProgressBar
-                    android:visibility="gone"
                     android:id="@+id/end_station_progressbar"
                     style="?android:attr/progressBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="5dp" />
+                    android:layout_marginRight="5dp"
+                    android:visibility="gone" />
             </RelativeLayout>
         </LinearLayout>
-    </RelativeLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#0099CC" />
 
     <ListView
         android:id="@+id/transfer_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:listSelector="@android:color/transparent" >
     </ListView>
 
 </LinearLayout>

@@ -1,10 +1,12 @@
 package com.telepathic.finder.app;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,7 +21,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -27,6 +30,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.ITrafficService;
@@ -35,10 +41,13 @@ import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXTransferProgram;
 import com.telepathic.finder.util.Utils;
 
 public class BusTransferFragment extends SherlockFragment {
+    private static final String TAG = BusTransferFragment.class.getSimpleName();
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
 
     private static final int BUS_TRANSFER_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 1;
+
+    private static final String STATION_NAME_SUFFIX = "站";
 
     private MainActivity mActivity;
 
@@ -47,8 +56,6 @@ public class BusTransferFragment extends SherlockFragment {
     private AutoCompleteTextView mEndStation;
 
     private ListView mTransferList;
-
-    private ImageButton mBtnQueryTransfer;
 
     private ITrafficService mTrafficService;
 
@@ -80,6 +87,31 @@ public class BusTransferFragment extends SherlockFragment {
         setupView();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Utils.debug(TAG,
+                "onCreateOptionsMenu: " + Utils.formatTime(new Date(System.currentTimeMillis())));
+        // Inflate the options menu from XML
+        inflater.inflate(R.menu.menu_bus_transfer, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.get_bus_transfer:
+                String startStationName = mStartStation.getText().toString().trim();
+                String endStationName = mEndStation.getText().toString().trim();
+                getBusTransfer(startStationName, endStationName);
+                return true;
+            case R.id.about:
+                startActivity(new Intent(mActivity, AboutActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void setupView() {
         mStartStation = (AutoCompleteTextView)getView().findViewById(R.id.start_station);
         mStartStation.setThreshold(2);
@@ -89,26 +121,30 @@ public class BusTransferFragment extends SherlockFragment {
         mEndStation.setThreshold(2);
         mEndStation.addTextChangedListener(new StationNameWatcher(mEndStation));
 
-        mBtnQueryTransfer = (ImageButton)getView().findViewById(R.id.query_transfer);
-        mBtnQueryTransfer.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String startStationName = mStartStation.getText().toString().trim();
-                String endStationName = mEndStation.getText().toString().trim();
-                if (TextUtils.isEmpty(startStationName) || TextUtils.isEmpty(endStationName)) {
-                    Toast.makeText(mActivity, R.string.no_station_name_tips, Toast.LENGTH_SHORT).show();
-                } else {
-                    showDialog(BUS_TRANSFER_SEARCH_DLG);
-                    getBusTransferRoute(startStationName, endStationName);
-                    Utils.hideSoftKeyboard(mActivity, mEndStation);
-                }
-            }
-        });
-
         mTransferList = (ListView)getView().findViewById(R.id.transfer_list);
 
         mStartStationProgressBar = (ProgressBar)getView().findViewById(R.id.start_station_progressbar);
         mEndStationProgressBar = (ProgressBar)getView().findViewById(R.id.end_station_progressbar);
+    }
+
+    private void getBusTransfer(String startStationName, String endStationName) {
+        if (TextUtils.isEmpty(startStationName) || TextUtils.isEmpty(endStationName)) {
+            Toast.makeText(mActivity, R.string.no_station_name_tips, Toast.LENGTH_SHORT).show();
+        } else {
+            showDialog(BUS_TRANSFER_SEARCH_DLG);
+            getBusTransferRoute(completeStationName(startStationName), completeStationName(endStationName));
+            Utils.hideSoftKeyboard(mActivity, mEndStation);
+        }
+    }
+
+    private String completeStationName(String station) {
+        String stationName;
+        if (station.endsWith(STATION_NAME_SUFFIX)) {
+            stationName = station;
+        } else {
+            stationName = station + STATION_NAME_SUFFIX;
+        }
+        return stationName;
     }
 
     private void getBusTransferRoute(String startStation, String endStation) {
@@ -351,8 +387,15 @@ public class BusTransferFragment extends SherlockFragment {
 
         private ArrayList<KXTransferProgram> mTransferList;
 
+        private ArrayList<View> mItemViewList = new ArrayList<View>();
+
+        private boolean init = true;
+
         public TransferSchemeAdapter(ArrayList<KXTransferProgram> transferList) {
             mTransferList = transferList;
+            for(int i = 0; i < transferList.size(); i++) {
+                mItemViewList.add(null);
+            }
         }
 
         @Override
@@ -373,43 +416,79 @@ public class BusTransferFragment extends SherlockFragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             KXTransferProgram program = mTransferList.get(position);
-            if (convertView == null) {
-                convertView = mActivity.getLayoutInflater().inflate(R.layout.bus_transfer_scheme_item, null);
+            View itemView = mItemViewList.get(position);
+            if (itemView == null){
+                itemView = mActivity.getLayoutInflater().inflate(R.layout.bus_transfer_scheme_item, null);
                 TransferProgramHolder holder = new TransferProgramHolder();
-                holder.mTransferTitle = (TextView)convertView.findViewById(R.id.transfer_title);
-                holder.mTransferDetail = (TextView)convertView.findViewById(R.id.transfer_detail);
-                convertView.setTag(holder);
+                holder.mTransferId = (TextView)itemView.findViewById(R.id.transfer_id);
+                holder.mTransferTitle = (TextView)itemView.findViewById(R.id.transfer_title);
+                holder.mExtend = (ImageView)itemView.findViewById(R.id.transfer_extend);
+                holder.mTransferContent = (LinearLayout)itemView.findViewById(R.id.transfer_content);
+                holder.mTransferStart = (TextView)itemView.findViewById(R.id.transfer_start_station);
+                holder.mTransferStepsLayout = (LinearLayout)itemView.findViewById(R.id.transfer_steps);
+                holder.mTransferEnd = (TextView)itemView.findViewById(R.id.transfer_end_station);
+                itemView.setTag(holder);
+                mItemViewList.set(position, itemView);
             }
-            bindView(program, convertView);
-            return convertView;
+            bindView(program, itemView, position);
+            return itemView;
         }
 
-        private void bindView(KXTransferProgram program, View view) {
-            TransferProgramHolder holder = (TransferProgramHolder)view.getTag();
+        private void bindView(KXTransferProgram program, View view, int position) {
+            final TransferProgramHolder holder = (TransferProgramHolder)view.getTag();
             String id = program.getProgramId();
             String transferCount = program.getTransferTime();
             StringBuilder transferInfo = new StringBuilder();
-            StringBuilder transferDetail = new StringBuilder();
             List<KXProgramStep> steps = program.getSteps();
+            holder.mTransferStepsLayout.removeAllViews();
             for (int i=0; i < steps.size(); i++) {
                 KXProgramStep step = steps.get(i);
                 if (i == 0) {
                     transferInfo.append(step.getLineName());
-                    transferDetail.append(mActivity.getString(R.string.transfer_scheme_detail, step.getSource(), step.getLineName(), step.getDestination()));
                 } else {
                     transferInfo.append(mActivity.getResources().getString(R.string.transfer_arrow) + step.getLineName());
-                    transferDetail.append("<br/>" + mActivity.getString(R.string.transfer_scheme_detail, step.getSource(), step.getLineName(), step.getDestination()));
                 }
+                View transferStepView = mActivity.getLayoutInflater().inflate(R.layout.transfer_step_item, null);
+                TextView stepInfo = (TextView)transferStepView.findViewById(R.id.transfer_step);
+                String stepContent = mActivity.getString(R.string.transfer_step_content, step.getLineName(), step.getDestination());
+                stepInfo.setText(Html.fromHtml(stepContent));
+                holder.mTransferStepsLayout.addView(transferStepView);
             }
-            String title = mActivity.getString(R.string.transfer_scheme_title, id, transferCount, transferInfo.toString());
-            String detail = transferDetail.toString();
+            String title = mActivity.getString(R.string.transfer_scheme_title, transferCount, transferInfo.toString());
+            holder.mTransferId.setText(id);
             holder.mTransferTitle.setText(title);
-            holder.mTransferDetail.setText(Html.fromHtml(detail));
+            holder.mTransferStart.setText(steps.get(0).getSource());
+            holder.mTransferEnd.setText(steps.get(steps.size()-1).getDestination());
+
+            holder.mExtend.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    if (holder.mTransferContent.getVisibility() == View.GONE) {
+                        holder.mTransferContent.setVisibility(View.VISIBLE);
+                        holder.mExtend.setImageResource(R.drawable.contract_arrow);
+                    } else if (holder.mTransferContent.getVisibility() == View.VISIBLE) {
+                        holder.mTransferContent.setVisibility(View.GONE);
+                        holder.mExtend.setImageResource(R.drawable.extend_arrow);
+                    }
+                }
+            });
+
+            if (init && position == 0) {
+                init = false;
+                holder.mTransferContent.setVisibility(View.VISIBLE);
+                holder.mExtend.setImageResource(R.drawable.contract_arrow);
+            }
         }
 
         private class TransferProgramHolder {
+            TextView mTransferId;
             TextView mTransferTitle;
-            TextView mTransferDetail;
+            ImageView mExtend;
+            LinearLayout mTransferContent;
+            TextView mTransferStart;
+            LinearLayout mTransferStepsLayout;
+            TextView mTransferEnd;
         }
     }
 

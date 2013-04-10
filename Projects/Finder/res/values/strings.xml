@@ -52,7 +52,8 @@
     <string name="end_station_hint">End station</string>
     <string name="start_end_stations"><xliff:g id="start_station" example="华阳客运站">%1$s</xliff:g> ↔ <xliff:g id="start_station" example="桂溪公交站">%2$s</xliff:g></string>
     <string name="no_station_name_tips">Please input the station name</string>
-    <string name="transfer_scheme_title"><xliff:g id="scheme_id" example="1">%1$s</xliff:g>. Transfer <xliff:g id="times" example="1">%2$s</xliff:g> time(s) <xliff:g id="transfer_bus" example="501→112">%3$s</xliff:g></string>
+    <string name="transfer_scheme_title">Transfer <xliff:g id="times" example="1">%1$s</xliff:g> time(s) <xliff:g id="transfer_bus" example="501→112">%2$s</xliff:g></string>
+    <string name="transfer_step_content">Take &lt;font color="#0099CC">bus <xliff:g id="line" example="501">%1$s</xliff:g>&lt;/font> to &lt;font color="#0099CC"><xliff:g id="end_station" example="火车南站">%2$s</xliff:g>&lt;/font></string>
     <string name="transfer_scheme_detail">Take bus <xliff:g id="bus_number" example="501">%2$s</xliff:g> from <xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g> to <xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
     <string name="transfer_arrow">→</string>
 
