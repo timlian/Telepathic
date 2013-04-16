@@ -61,8 +61,6 @@ public class BusStationFragment extends SherlockFragment {
 
     private static final String FAKE_GPS_NUMBER = "fake";
 
-    private static final String STATION_NAME_SUFFIX = "站";
-
     private MainActivity mActivity;
 
     private LinearLayout mLlBusLines;
@@ -360,16 +358,6 @@ public class BusStationFragment extends SherlockFragment {
         }
     }
 
-    private String completeStationName(String station) {
-        String stationName;
-        if (station.endsWith(STATION_NAME_SUFFIX)) {
-            stationName = station;
-        } else {
-            stationName = station + STATION_NAME_SUFFIX;
-        }
-        return stationName;
-    }
-
     private class StationsAdapter extends BaseAdapter {
         private List<String> mBusStations;
 
@@ -443,7 +431,7 @@ public class BusStationFragment extends SherlockFragment {
                 return;
             }
         } else {
-            stationNameOrGpsNumber = completeStationName(stationNameOrGpsNumber);
+            stationNameOrGpsNumber = Utils.completeStationName(stationNameOrGpsNumber);
         }
         mWaitingDialog.show();
         mTrafficService.getBusStationLines(stationNameOrGpsNumber, new ICompletionListener() {

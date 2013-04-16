@@ -37,7 +37,7 @@ public class Utils {
 
     private static final boolean DEBUG = true;
 
-    private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([a-zA-Z])?";
+    private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([a-zA-Z])?|([k|K])\\d{1,3}";
 
     private static final String BUS_CARD_NUM_EXPRESSION = "\\d{8}";
 
@@ -45,10 +45,12 @@ public class Utils {
 
     private static final String START_WITH_ZERO_EXPRESSION = "^0+";
 
+    private static final String STATION_NAME_SUFFIX = "站";
+
     public static final String CARD_ID_CACHE = "card_id_cache";
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    
+
     private static final SimpleDateFormat HIGH_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSSS");
 
     private Utils() {
@@ -165,9 +167,20 @@ public class Utils {
     }
 
     public static String formatTime(Date date) {
-    	return HIGH_DATE_FORMAT.format(date);
+        return HIGH_DATE_FORMAT.format(date);
     }
-    
+
+
+    public static String completeStationName(String station) {
+        String stationName;
+        if (station.endsWith(STATION_NAME_SUFFIX)) {
+            stationName = station;
+        } else {
+            stationName = station + STATION_NAME_SUFFIX;
+        }
+        return stationName;
+    }
+
     /**
      * Copy the application database files to external storage
      */
@@ -355,46 +368,46 @@ public class Utils {
     public static String getErrorMessage(Resources res, int errorCode, String errorText) {
         String retMessage = null;
         switch (errorCode) {
-        case IErrorCode.ERROR_NO_NETWORK:
-            retMessage = res.getString(R.string.error_no_network);
-            break;
-        case IErrorCode.ERROR_UNKNOWN:
-            retMessage = res.getString(R.string.error_unknown);
-            break;
-        case IErrorCode.ERROR_NO_VALID_DATA:
-            retMessage = res.getString(R.string.error_no_data);
-            break;
-        case IErrorCode.ERROR_TIME_OUT:
-        	retMessage = res.getString(R.string.error_time_out);
-        	break;
-        case IErrorCode.ERROR_LOCATION_FAILED:
-            retMessage = res.getString(R.string.error_location_falied);
-            break;
-        case IErrorCode.ERROR_NETWORK_CONNECT:
-            retMessage = res.getString(R.string.error_network_connect);
-            break;
-        case IErrorCode.ERROR_NETWORK_DATA:
-            retMessage = res.getString(R.string.error_network_data);
-            break;
-        case IErrorCode.ERROR_PERMISSION_DENIED:
-            retMessage = res.getString(R.string.error_permission_denied);
-            break;
-        case IErrorCode.ERROR_RESULT_NOT_FOUND:
-            retMessage = res.getString(R.string.error_result_not_found);
-            break;
-        case IErrorCode.ERROR_ROUTE_ADDR:
-            retMessage = res.getString(R.string.error_route_addr);
-            break;
-        case IErrorCode.ERROR_GPS_NUMBER_NOT_PRESENT:
-            retMessage = res.getString(R.string.error_gps_number_not_present);
-            break;
-        case IErrorCode.ERROR_STATION_NAME_NOT_PRESENT:
-        	retMessage = res.getString(R.string.error_station_name_not_present);
-        	break;
-        default:
-            Logger.logTrace(String.valueOf(errorCode) + ": " + errorText);
-            retMessage = errorText;
-            break;
+            case IErrorCode.ERROR_NO_NETWORK:
+                retMessage = res.getString(R.string.error_no_network);
+                break;
+            case IErrorCode.ERROR_UNKNOWN:
+                retMessage = res.getString(R.string.error_unknown);
+                break;
+            case IErrorCode.ERROR_NO_VALID_DATA:
+                retMessage = res.getString(R.string.error_no_data);
+                break;
+            case IErrorCode.ERROR_TIME_OUT:
+                retMessage = res.getString(R.string.error_time_out);
+                break;
+            case IErrorCode.ERROR_LOCATION_FAILED:
+                retMessage = res.getString(R.string.error_location_falied);
+                break;
+            case IErrorCode.ERROR_NETWORK_CONNECT:
+                retMessage = res.getString(R.string.error_network_connect);
+                break;
+            case IErrorCode.ERROR_NETWORK_DATA:
+                retMessage = res.getString(R.string.error_network_data);
+                break;
+            case IErrorCode.ERROR_PERMISSION_DENIED:
+                retMessage = res.getString(R.string.error_permission_denied);
+                break;
+            case IErrorCode.ERROR_RESULT_NOT_FOUND:
+                retMessage = res.getString(R.string.error_result_not_found);
+                break;
+            case IErrorCode.ERROR_ROUTE_ADDR:
+                retMessage = res.getString(R.string.error_route_addr);
+                break;
+            case IErrorCode.ERROR_GPS_NUMBER_NOT_PRESENT:
+                retMessage = res.getString(R.string.error_gps_number_not_present);
+                break;
+            case IErrorCode.ERROR_STATION_NAME_NOT_PRESENT:
+                retMessage = res.getString(R.string.error_station_name_not_present);
+                break;
+            default:
+                Logger.logTrace(String.valueOf(errorCode) + ": " + errorText);
+                retMessage = errorText;
+                break;
         }
         return retMessage;
     }

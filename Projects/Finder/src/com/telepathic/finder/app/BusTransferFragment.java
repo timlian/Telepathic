@@ -47,8 +47,6 @@ public class BusTransferFragment extends SherlockFragment {
 
     private static final int BUS_TRANSFER_SEARCH_DLG = CUSTOM_DIALOG_ID_START + 1;
 
-    private static final String STATION_NAME_SUFFIX = "站";
-
     private MainActivity mActivity;
 
     private AutoCompleteTextView mStartStation;
@@ -132,19 +130,9 @@ public class BusTransferFragment extends SherlockFragment {
             Toast.makeText(mActivity, R.string.no_station_name_tips, Toast.LENGTH_SHORT).show();
         } else {
             showDialog(BUS_TRANSFER_SEARCH_DLG);
-            getBusTransferRoute(completeStationName(startStationName), completeStationName(endStationName));
+            getBusTransferRoute(Utils.completeStationName(startStationName), Utils.completeStationName(endStationName));
             Utils.hideSoftKeyboard(mActivity, mEndStation);
         }
-    }
-
-    private String completeStationName(String station) {
-        String stationName;
-        if (station.endsWith(STATION_NAME_SUFFIX)) {
-            stationName = station;
-        } else {
-            stationName = station + STATION_NAME_SUFFIX;
-        }
-        return stationName;
     }
 
     private void getBusTransferRoute(String startStation, String endStation) {
