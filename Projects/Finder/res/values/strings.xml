@@ -56,6 +56,7 @@
     <string name="transfer_step_content">Take &lt;font color="#0099CC">bus <xliff:g id="line" example="501">%1$s</xliff:g>&lt;/font> to &lt;font color="#0099CC"><xliff:g id="end_station" example="火车南站">%2$s</xliff:g>&lt;/font></string>
     <string name="transfer_scheme_detail">Take bus <xliff:g id="bus_number" example="501">%2$s</xliff:g> from <xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g> to <xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
     <string name="transfer_arrow">→</string>
+    <string name="select_a_station">Please select a station by GPS number</string>
 
     <!-- consumer record retrieve -->
     <string name="line_number">公交路线:</string>

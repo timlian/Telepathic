@@ -57,35 +57,35 @@ public class TrafficManager {
     private BusLineObserver mBusLineObserver;
     private BusStationObserver mBusStationObserver;
     private ContentResolver mContentResolver;
-    
+
     private static final int MAX_LINE_COUNT = 10;
     private static final int MAX_STATION_COUNT = 10;
-    
+
     private static final String[] BUS_LINE_PROJECTION = {
         ITrafficData.BaiDuData.BusLine._ID
     };
     private static final int IDX_BUS_LIND_ID = 0;
-    
+
     private static final String[] BUS_STATION_PROJECTION = {
         ITrafficData.KuaiXinData.BusStation._ID,
         ITrafficData.KuaiXinData.BusStation.NAME
     };
     private static final int IDX_BUS_STATION_ID = 0;
     private static final int IDX_BUS_STATION_NAME = 1;
-    
+
     private static final String[] KX_BUS_LINE_PROJECTION = {
-    	ITrafficData.KuaiXinData.BusRoute.LINE_NUMBER,
-    	ITrafficData.KuaiXinData.BusRoute.DIRECTION,
-    	ITrafficData.KuaiXinData.BusRoute.START_TIME,
-    	ITrafficData.KuaiXinData.BusRoute.END_TIME,
-    	ITrafficData.KuaiXinData.BusRoute.STATIONS
+        ITrafficData.KuaiXinData.BusRoute.LINE_NUMBER,
+        ITrafficData.KuaiXinData.BusRoute.DIRECTION,
+        ITrafficData.KuaiXinData.BusRoute.START_TIME,
+        ITrafficData.KuaiXinData.BusRoute.END_TIME,
+        ITrafficData.KuaiXinData.BusRoute.STATIONS
     };
     private static final int IDX_LINE_NUMBER = 0;
     private static final int IDX_DIRECTION = 1;
     private static final int IDX_START_TIME = 2;
     private static final int IDX_END_TIME = 3;
     private static final int IDX_STATIONS = 4;
-    
+
 
     private TrafficManager(BMapManager manager, Context appContext, Handler msgHandler) {
         mContext = appContext;
@@ -126,7 +126,7 @@ public class TrafficManager {
 
         @Override
         public void searchBusRoute(String city, String routeUid, ICompletionListener listener) {
-        	if (!Utils.hasActiveNetwork(mContext)) {
+            if (!Utils.hasActiveNetwork(mContext)) {
                 notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
                 return ;
             }
@@ -140,122 +140,124 @@ public class TrafficManager {
                 @Override
                 public void run() {
                     try {
-                    	int errorCode = 0;
-                    	String errorText = "";
-                    	if (!Utils.hasActiveNetwork(mContext)) {
+                        int errorCode = 0;
+                        String errorText = "";
+                        if (!Utils.hasActiveNetwork(mContext)) {
                             errorCode = IErrorCode.ERROR_NO_NETWORK;
                         }
-                    	// retrieve station lines from server
-                    	List<KXStationLines> tempList = null;
-                    	if (errorCode == 0) {
-                    		GetBusStationLinesTask task = new GetBusStationLinesTask(stationName);
-                    		task.startTask();
-                    		task.waitTaskDone();
-                    		errorCode = task.getTaskResult().getErrorCode();
-                    		if (errorCode == 0) {
-                    			tempList = task.getTaskResult().getContent();
-                    			if (tempList == null || tempList.size() == 0) {
-                    				errorCode = IErrorCode.ERROR_NO_VALID_DATA;
-                    				errorText = "no valid data";
-                    			}
-                    		} else {
-                    			errorText = task.getTaskResult().getErrorMessage();
-                    		}
-                    	}
-                    	final List<KXStationLines> stationList = tempList;
-                    	// retrieve the bus lines related to the specified station.
-                    	if (errorCode == 0) {
-                    		ArrayList<String> lineNumbers = new ArrayList<String>();
-                    		for(KXStationLines station : stationList) {
-                    			for(String lineNo : station.getLines()) {
-                    				if (!lineNumbers.contains(lineNo)) {
-                    					lineNumbers.add(lineNo);
-                    				}
-                    			}
-                    		}
-                    		if (lineNumbers.size() == 0) {
-                    			errorCode = IErrorCode.ERROR_UNKNOWN;
-                    			errorText = "line number is empty!!!";
-                    		}
-							if (errorCode == 0) {
-								final CountDownLatch busLineLatch = new CountDownLatch(lineNumbers.size());
-								final int error = 0;
-								final String text = "";
-								for (String lineNumber : lineNumbers) {
-									final GetBusLineTask getLineTask = new GetBusLineTask(lineNumber);
-									getLineTask.setCallback(new Runnable() {
-										@Override
-										public void run() {
-										int	error = getLineTask.getTaskResult().getErrorCode();
-											if (error == 0) {
-												KXBusLine line = getLineTask.getTaskResult().getContent();
-												if (line != null) {
-													mTrafficStore.store(line);
-											} else {
-												//text = getLineTask.getTaskResult().getErrorMessage();
-											}
-											busLineLatch.countDown();
-										}
-									}});
-									getLineTask.startTask();
-								}
-								busLineLatch.await();
-								errorCode = error;
-								errorText = text;
-							}
-                    	}
-                    	
-                    	Utils.debug(TAG, "Error code: " + errorCode);
-                    	// corrected 
-                    	Utils.debug(TAG, "start get direction.");
-                    	int count = 0;
-            			for(KXStationLines station : stationList) {
-            				count += station.getLines().length;
-            			}
-            			
-            			final CountDownLatch lineDirectionLatch = new CountDownLatch(count);
-            			final Object lock = new Object();
-            			for(KXStationLines station : stationList) {
-            				final String gpsNumber = station.getGpsNumber();
-            				for(String lineNumber : station.getLines()) {
-            					 final GetBusLineDirectionTask task = new GetBusLineDirectionTask(lineNumber, gpsNumber);
-            					 task.setCallback(new Runnable() {
-            	                     @Override
-            						public void run() {
-            	                    	 synchronized (lock) {
-            	                    		try {
-	            								Utils.debug(TAG, "Thead " + Thread.currentThread().getId() + " enter critical section.");
-	            								int errorCode = task.getTaskResult().getErrorCode();
-	            								if (errorCode == 0) {
-	            									KXBusLineDirection lineDirection = task.getTaskResult().getContent();
-	            									if (lineDirection != null) {
-	            										for(int idx = 0; idx < stationList.size(); idx++) {
-	            											stationList.get(idx).setDirection(lineDirection.getLineNumber(), 
-	            													lineDirection.getDirection());
-	            										}
-	            									}
-	            								} 
-	            								Utils.debug(TAG, "Thead " + Thread.currentThread().getId() + " leave critical section.");
-	            								lineDirectionLatch.countDown();
-            	                    		} catch (Exception e) {
-            	                    			e.printStackTrace();
-            	                    		}
-            	                    	 }
-            	                     }
-            					});
-            	                task.startTask();
-            				}
-            			}
-            			lineDirectionLatch.await();
-            			
-                    	Utils.debug(TAG, "finished get direction.");
-                    	mTrafficStore.store(stationList);
-                    	if (errorCode == 0) {
-                    		notifySuccess(listener, null);
-                    	} else {
-                    		notifyFailure(listener, errorCode, errorText);
-                    	}
-                    	
+                        // retrieve station lines from server
+                        List<KXStationLines> tempList = null;
+                        if (errorCode == 0) {
+                            GetBusStationLinesTask task = new GetBusStationLinesTask(stationName);
+                            task.startTask();
+                            task.waitTaskDone();
+                            errorCode = task.getTaskResult().getErrorCode();
+                            if (errorCode == 0) {
+                                tempList = task.getTaskResult().getContent();
+                                if (tempList == null || tempList.size() == 0) {
+                                    errorCode = IErrorCode.ERROR_NO_VALID_DATA;
+                                    errorText = "no valid data";
+                                }
+                            } else {
+                                errorText = task.getTaskResult().getErrorMessage();
+                            }
+                        }
+                        final List<KXStationLines> stationList = tempList;
+                        // retrieve the bus lines related to the specified station.
+                        if (errorCode == 0) {
+                            ArrayList<String> lineNumbers = new ArrayList<String>();
+                            for(KXStationLines station : stationList) {
+                                for(String lineNo : station.getLines()) {
+                                    if (!lineNumbers.contains(lineNo)) {
+                                        lineNumbers.add(lineNo);
+                                    }
+                                }
+                            }
+                            if (lineNumbers.size() == 0) {
+                                errorCode = IErrorCode.ERROR_UNKNOWN;
+                                errorText = "line number is empty!!!";
+                            }
+                            if (errorCode == 0) {
+                                final CountDownLatch busLineLatch = new CountDownLatch(lineNumbers.size());
+                                final int error = 0;
+                                final String text = "";
+                                for (String lineNumber : lineNumbers) {
+                                    final GetBusLineTask getLineTask = new GetBusLineTask(lineNumber);
+                                    getLineTask.setCallback(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            int	error = getLineTask.getTaskResult().getErrorCode();
+                                            if (error == 0) {
+                                                KXBusLine line = getLineTask.getTaskResult().getContent();
+                                                if (line != null) {
+                                                    mTrafficStore.store(line);
+                                                } else {
+                                                    //text = getLineTask.getTaskResult().getErrorMessage();
+                                                }
+                                                busLineLatch.countDown();
+                                            }
+                                        }});
+                                    getLineTask.startTask();
+                                }
+                                busLineLatch.await();
+                                errorCode = error;
+                                errorText = text;
+                            }
+                        }
+
+                        Utils.debug(TAG, "Error code: " + errorCode);
+                        // corrected
+                        Utils.debug(TAG, "start get direction.");
+                        if (stationList != null && stationList.size() > 0) {
+                            int count = 0;
+                            for(KXStationLines station : stationList) {
+                                count += station.getLines().length;
+                            }
+
+                            final CountDownLatch lineDirectionLatch = new CountDownLatch(count);
+                            final Object lock = new Object();
+                            for(KXStationLines station : stationList) {
+                                final String gpsNumber = station.getGpsNumber();
+                                for(String lineNumber : station.getLines()) {
+                                    final GetBusLineDirectionTask task = new GetBusLineDirectionTask(lineNumber, gpsNumber);
+                                    task.setCallback(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            synchronized (lock) {
+                                                try {
+                                                    Utils.debug(TAG, "Thead " + Thread.currentThread().getId() + " enter critical section.");
+                                                    int errorCode = task.getTaskResult().getErrorCode();
+                                                    if (errorCode == 0) {
+                                                        KXBusLineDirection lineDirection = task.getTaskResult().getContent();
+                                                        if (lineDirection != null) {
+                                                            for(int idx = 0; idx < stationList.size(); idx++) {
+                                                                stationList.get(idx).setDirection(lineDirection.getLineNumber(),
+                                                                        lineDirection.getDirection());
+                                                            }
+                                                        }
+                                                    }
+                                                    Utils.debug(TAG, "Thead " + Thread.currentThread().getId() + " leave critical section.");
+                                                    lineDirectionLatch.countDown();
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                    });
+                                    task.startTask();
+                                }
+                            }
+                            lineDirectionLatch.await();
+
+                            Utils.debug(TAG, "finished get direction.");
+                            mTrafficStore.store(stationList);
+                        }
+                        if (errorCode == 0) {
+                            notifySuccess(listener, stationList);
+                        } else {
+                            notifyFailure(listener, errorCode, errorText);
+                        }
+
                     } catch (InterruptedException e) {
                         Utils.debug(TAG, "getBusStationLines is interrupted.");
                     }
@@ -264,7 +266,7 @@ public class TrafficManager {
             });
 
         }
-            
+
         @Override
         public void getBusCardRecords(final String cardNumber, final int count, ICompletionListener listener) {
             if (mExecutorService.isShutdown()) {
@@ -362,31 +364,31 @@ public class TrafficManager {
         }
 
         @Override
-		public void getBusTransferRoute(final String source, final String destination, final ICompletionListener listener) {
-			mExecutorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					if (!Utils.hasActiveNetwork(mContext)) {
-						notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "no network.");
-						return ;
-					}
-					GetBusTransferRouteRequest request = new GetBusTransferRouteRequest(source, destination);
-					RequestExecutor.execute(request, new RequestCallback() {
-						@Override
-						public void onSuccess(Object result) {
-							notifySuccess(listener, result);
-						}
-						
-						@Override
-						public void onError(int errorCode, String errorMessage) {
-							notifyFailure(listener, errorCode, errorMessage);
-						}
-					});
-				}
-			});
-			
-		}
-        
+        public void getBusTransferRoute(final String source, final String destination, final ICompletionListener listener) {
+            mExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (!Utils.hasActiveNetwork(mContext)) {
+                        notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "no network.");
+                        return ;
+                    }
+                    GetBusTransferRouteRequest request = new GetBusTransferRouteRequest(source, destination);
+                    RequestExecutor.execute(request, new RequestCallback() {
+                        @Override
+                        public void onSuccess(Object result) {
+                            notifySuccess(listener, result);
+                        }
+
+                        @Override
+                        public void onError(int errorCode, String errorMessage) {
+                            notifyFailure(listener, errorCode, errorMessage);
+                        }
+                    });
+                }
+            });
+
+        }
+
         @Override
         public void shutDown() {
             if (mExecutorService != null) {
@@ -394,145 +396,146 @@ public class TrafficManager {
             }
         }
 
-		//@Override
-		public void queryStationName(final String query, final ICompletionListener listener) {
-			mExecutorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					if (Utils.hasActiveNetwork(mContext)) {
-						GetStationNameRequest request = new GetStationNameRequest(query);
-						RequestExecutor.execute(request, new RequestCallback() {
-							@Override
-							public void onSuccess(Object result) {
-								notifySuccess(listener, result);
-							}
-							
-							@Override
-							public void onError(int errorCode, String errorMessage) {
-								notifyFailure(listener, errorCode, errorMessage);
-							}
-						});
-					} else {
-						ArrayList<String> stationNames = null;
-						String selection = ITrafficData.KuaiXinData.BusStation.NAME + " LIKE \'%" + query + "%\'";
-                    	//String[] selectionArgs = new String[]{query};
-                    	String sortOrder = ITrafficData.KuaiXinData.BusStation.LAST_UPDATE_TIME + " DESC ";
-                    	Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, BUS_STATION_PROJECTION, selection, null, sortOrder);
-                    	if (cursor != null) {
-                    		try {
-                    			stationNames = new ArrayList<String>();
-                    			while(cursor.moveToNext()) {
-                    				stationNames.add(cursor.getString(IDX_BUS_STATION_NAME));
-                    			}
-                    		} finally {
-                    			cursor.close();
-                    		}
-                    	}
-                    	if (stationNames != null && stationNames.size() > 0) {
-                    		notifySuccess(listener, stationNames);
-                    	} else {
-                    		notifyFailure(listener, IErrorCode.ERROR_NO_VALID_DATA, "no valid data");
-                    	}
-					}
-				}
-			});
-		}
-		
-		@Override
-		public void queryBDLineNumber(String keyword, IQueryListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
+        //@Override
+        @Override
+        public void queryStationName(final String query, final ICompletionListener listener) {
+            mExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (Utils.hasActiveNetwork(mContext)) {
+                        GetStationNameRequest request = new GetStationNameRequest(query);
+                        RequestExecutor.execute(request, new RequestCallback() {
+                            @Override
+                            public void onSuccess(Object result) {
+                                notifySuccess(listener, result);
+                            }
 
-		@Override
-		public void queryCardNumber(String keyword, IQueryListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
+                            @Override
+                            public void onError(int errorCode, String errorMessage) {
+                                notifyFailure(listener, errorCode, errorMessage);
+                            }
+                        });
+                    } else {
+                        ArrayList<String> stationNames = null;
+                        String selection = ITrafficData.KuaiXinData.BusStation.NAME + " LIKE \'%" + query + "%\'";
+                        //String[] selectionArgs = new String[]{query};
+                        String sortOrder = ITrafficData.KuaiXinData.BusStation.LAST_UPDATE_TIME + " DESC ";
+                        Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, BUS_STATION_PROJECTION, selection, null, sortOrder);
+                        if (cursor != null) {
+                            try {
+                                stationNames = new ArrayList<String>();
+                                while(cursor.moveToNext()) {
+                                    stationNames.add(cursor.getString(IDX_BUS_STATION_NAME));
+                                }
+                            } finally {
+                                cursor.close();
+                            }
+                        }
+                        if (stationNames != null && stationNames.size() > 0) {
+                            notifySuccess(listener, stationNames);
+                        } else {
+                            notifyFailure(listener, IErrorCode.ERROR_NO_VALID_DATA, "no valid data");
+                        }
+                    }
+                }
+            });
+        }
 
-		@Override
-		public void translateToStationName(final String gpsNumber, final ICompletionListener listener) {
-			if (!Utils.hasActiveNetwork(mContext)) {
-				notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
-				return;
-			}
-			mExecutorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					GetBusStationRequest request = new GetBusStationRequest(gpsNumber);
-					RequestExecutor.execute(request, new RequestCallback() {
-						@Override
-						public void onSuccess(Object result) {
-							notifySuccess(listener, result);
-						}
-						
-						@Override
-						public void onError(int errorCode, String errorMessage) {
-							notifyFailure(listener, errorCode, errorMessage);
-						}
-					});
-				}
-			});
-		}
+        @Override
+        public void queryBDLineNumber(String keyword, IQueryListener listener) {
+            // TODO Auto-generated method stub
 
-		@Override
-		public void queryGpsNumber(String keyword, IQueryListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
+        }
 
-		@Override
-		public void getBusLine(final String lineNumber, final ICompletionListener listener) {
-			mExecutorService.execute(new Runnable() {
-				@Override
-				public void run() {
-					KXBusLine busLine = new KXBusLine(lineNumber);
-					String selection = ITrafficData.KuaiXinData.BusRoute.LINE_NUMBER + "=?";
-					String selectionArgs[] = new String[]{lineNumber};
-					Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusRoute.CONTENT_URI, 
-							KX_BUS_LINE_PROJECTION, selection, selectionArgs, null);
-					if (cursor != null) {
-						try {
-							while (cursor.moveToNext()) {
-								KXBusRoute route = new KXBusRoute();
-								route.setStartTime(cursor.getString(IDX_START_TIME));
-								route.setEndTime(cursor.getString(IDX_END_TIME));
-								route.setDirection(Direction.fromString(cursor.getString(IDX_DIRECTION)));
-								route.setStations(cursor.getString(IDX_STATIONS).split(","));
-								busLine.addRoute(route);
-							}
-						} finally {
-							cursor.close();
-						}
-					}
-					if (busLine.getRouteCount() > 0) {
-						notifySuccess(listener, busLine);
-						return ;
-					}
-					if (!Utils.hasActiveNetwork(mContext)) {
-		                notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
-		                return ;
-		            }
-					GetBusLineRequest request = new GetBusLineRequest(lineNumber);
-					RequestExecutor.execute(request, new RequestCallback() {
-						@Override
-						public void onSuccess(Object result) {
-							notifySuccess(listener, result);
-						}
-						@Override
-						public void onError(int errorCode, String errorMessage) {
-							notifyFailure(listener, errorCode, errorMessage);
-						}
-					});
-				}
-			});
-		}
+        @Override
+        public void queryCardNumber(String keyword, IQueryListener listener) {
+            // TODO Auto-generated method stub
 
-		@Override
-		public void queryKXLineNumber(String keyword, IQueryListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
+        }
+
+        @Override
+        public void translateToStationName(final String gpsNumber, final ICompletionListener listener) {
+            if (!Utils.hasActiveNetwork(mContext)) {
+                notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
+                return;
+            }
+            mExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    GetBusStationRequest request = new GetBusStationRequest(gpsNumber);
+                    RequestExecutor.execute(request, new RequestCallback() {
+                        @Override
+                        public void onSuccess(Object result) {
+                            notifySuccess(listener, result);
+                        }
+
+                        @Override
+                        public void onError(int errorCode, String errorMessage) {
+                            notifyFailure(listener, errorCode, errorMessage);
+                        }
+                    });
+                }
+            });
+        }
+
+        @Override
+        public void queryGpsNumber(String keyword, IQueryListener listener) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void getBusLine(final String lineNumber, final ICompletionListener listener) {
+            mExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    KXBusLine busLine = new KXBusLine(lineNumber);
+                    String selection = ITrafficData.KuaiXinData.BusRoute.LINE_NUMBER + "=?";
+                    String selectionArgs[] = new String[]{lineNumber};
+                    Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusRoute.CONTENT_URI,
+                            KX_BUS_LINE_PROJECTION, selection, selectionArgs, null);
+                    if (cursor != null) {
+                        try {
+                            while (cursor.moveToNext()) {
+                                KXBusRoute route = new KXBusRoute();
+                                route.setStartTime(cursor.getString(IDX_START_TIME));
+                                route.setEndTime(cursor.getString(IDX_END_TIME));
+                                route.setDirection(Direction.fromString(cursor.getString(IDX_DIRECTION)));
+                                route.setStations(cursor.getString(IDX_STATIONS).split(","));
+                                busLine.addRoute(route);
+                            }
+                        } finally {
+                            cursor.close();
+                        }
+                    }
+                    if (busLine.getRouteCount() > 0) {
+                        notifySuccess(listener, busLine);
+                        return ;
+                    }
+                    if (!Utils.hasActiveNetwork(mContext)) {
+                        notifyFailure(listener, IErrorCode.ERROR_NO_NETWORK, "No network.");
+                        return ;
+                    }
+                    GetBusLineRequest request = new GetBusLineRequest(lineNumber);
+                    RequestExecutor.execute(request, new RequestCallback() {
+                        @Override
+                        public void onSuccess(Object result) {
+                            notifySuccess(listener, result);
+                        }
+                        @Override
+                        public void onError(int errorCode, String errorMessage) {
+                            notifyFailure(listener, errorCode, errorMessage);
+                        }
+                    });
+                }
+            });
+        }
+
+        @Override
+        public void queryKXLineNumber(String keyword, IQueryListener listener) {
+            // TODO Auto-generated method stub
+
+        }
 
 
     }
@@ -558,76 +561,76 @@ public class TrafficManager {
             });
         }
     }
-    
+
     private class BusLineObserver extends ContentObserver {
 
-		public BusLineObserver() {
-			super(null);
-		}
-		
-		@Override
-		public void onChange(boolean selfChange) {
-			Utils.debug(TAG, "BusLineObserver get called: " + selfChange);
-			deleteObsoleteBusLines();
-		}
+        public BusLineObserver() {
+            super(null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            Utils.debug(TAG, "BusLineObserver get called: " + selfChange);
+            deleteObsoleteBusLines();
+        }
     }
-    
+
     private class BusStationObserver extends ContentObserver {
-    	public BusStationObserver() {
-			super(null);
-		}
-		
-		@Override
-		public void onChange(boolean selfChange) {
-			Utils.debug(TAG, "BusStationObserver get called: " + selfChange);
-			deleteObsoleteBusStations();
-		}
+        public BusStationObserver() {
+            super(null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            Utils.debug(TAG, "BusStationObserver get called: " + selfChange);
+            deleteObsoleteBusStations();
+        }
     }
-    
+
     private void deleteObsoleteBusLines() {
         String sortOrder = ITrafficData.BaiDuData.BusLine.LAST_UPDATE_TIME + " DESC ";
         Cursor cursor = mContentResolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI, BUS_LINE_PROJECTION, null, null, sortOrder);
         ArrayList<String> lineIds = null;
         if (cursor != null && cursor.moveToFirst()) {
-        	lineIds = new ArrayList<String>();
-        	try {
-    			for(int pos = MAX_LINE_COUNT; cursor.moveToPosition(pos); pos++) {
-    				lineIds.add(cursor.getString(IDX_BUS_LIND_ID));
-    			}
-        	} finally {
-        		cursor.close();
-        	}
+            lineIds = new ArrayList<String>();
+            try {
+                for(int pos = MAX_LINE_COUNT; cursor.moveToPosition(pos); pos++) {
+                    lineIds.add(cursor.getString(IDX_BUS_LIND_ID));
+                }
+            } finally {
+                cursor.close();
+            }
         }
         if (lineIds != null && lineIds.size() > 0) {
-        	String selection = ITrafficData.BaiDuData.BusLine._ID + "=?";
-        	for(String id : lineIds) {
-        		mContentResolver.delete(ITrafficData.BaiDuData.BusLine.CONTENT_URI, selection, new String[]{id});
-        	}
+            String selection = ITrafficData.BaiDuData.BusLine._ID + "=?";
+            for(String id : lineIds) {
+                mContentResolver.delete(ITrafficData.BaiDuData.BusLine.CONTENT_URI, selection, new String[]{id});
+            }
         }
     }
-    
+
     private void deleteObsoleteBusStations() {
         String sortOrder = ITrafficData.KuaiXinData.BusStation.LAST_UPDATE_TIME + " DESC ";
         Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, BUS_STATION_PROJECTION, null, null, sortOrder);
         ArrayList<String> stationIds = null;
         if (cursor != null && cursor.moveToFirst()) {
-        	stationIds = new ArrayList<String>();
-        	try {
-    			for(int pos = MAX_STATION_COUNT; cursor.moveToPosition(pos); pos++) {
-    				stationIds.add(cursor.getString(IDX_BUS_STATION_ID));
-    			}
-        	} finally {
-        		cursor.close();
-        	}
+            stationIds = new ArrayList<String>();
+            try {
+                for(int pos = MAX_STATION_COUNT; cursor.moveToPosition(pos); pos++) {
+                    stationIds.add(cursor.getString(IDX_BUS_STATION_ID));
+                }
+            } finally {
+                cursor.close();
+            }
         }
         if (stationIds != null && stationIds.size() > 0) {
-        	String selection = ITrafficData.KuaiXinData.BusStation._ID + "=?";
-        	for(String id : stationIds) {
-        		mContentResolver.delete(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, selection, new String[]{id});
-        	}
+            String selection = ITrafficData.KuaiXinData.BusStation._ID + "=?";
+            for(String id : stationIds) {
+                mContentResolver.delete(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, selection, new String[]{id});
+            }
         }
     }
-    
-   
+
+
 
 }

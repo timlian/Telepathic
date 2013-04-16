@@ -53,6 +53,7 @@
     <string name="transfer_scheme_title">换乘<xliff:g id="times" example="1">%1$s</xliff:g>次 <xliff:g id="transfer_bus" example="501→112">%2$s</xliff:g></string>
     <string name="transfer_step_content">乘坐&lt;font color="#0099CC"><xliff:g id="line" example="501">%1$s</xliff:g>路&lt;/font>, 在&lt;font color="#0099CC"><xliff:g id="end_station" example="火车南站">%2$s</xliff:g>&lt;/font>下车</string>
     <string name="transfer_scheme_detail">从<xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g>乘坐<xliff:g id="bus_number" example="501">%2$s</xliff:g>路到达<xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
+    <string name="select_a_station">请按照GPS编号选择一个站台</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>
