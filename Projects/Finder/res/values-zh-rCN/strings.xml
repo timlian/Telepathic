@@ -54,6 +54,7 @@
     <string name="transfer_step_content">乘坐&lt;font color="#0099CC"><xliff:g id="line" example="501">%1$s</xliff:g>路&lt;/font>, 在&lt;font color="#0099CC"><xliff:g id="end_station" example="火车南站">%2$s</xliff:g>&lt;/font>下车</string>
     <string name="transfer_scheme_detail">从<xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g>乘坐<xliff:g id="bus_number" example="501">%2$s</xliff:g>路到达<xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
     <string name="select_a_station">请按照GPS编号选择一个站台</string>
+    <string name="unknown">未知</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>
@@ -95,6 +96,7 @@
     <string name="invalid_line_number">无效的公交路线号</string>
     <string name="invalid_card_number">无效的公交卡号</string>
     <string name="invalid_gps_number">无效的公交站GPS号</string>
+    <string name="station_line_data_error">线路信息异常，请清空历史记录并重试</string>
 
     <!-- Toast network messages -->
     <string name="search_bus_line_failed">获取公交线路信息失败：<xliff:g id="failed_reason">%1$s</xliff:g></string>

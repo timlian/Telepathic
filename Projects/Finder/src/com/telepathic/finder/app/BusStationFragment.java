@@ -59,6 +59,10 @@ public class BusStationFragment extends SherlockFragment {
 
     private static final String NUMBER_EXPRESSION = "\\d+";
 
+    private static final String FAKE_GPS_NUMBER = "fake";
+
+    private static final String STATION_NAME_SUFFIX = "站";
+
     private MainActivity mActivity;
 
     private LinearLayout mLlBusLines;
@@ -167,10 +171,16 @@ public class BusStationFragment extends SherlockFragment {
         KXBusRoute busRoute = busLine.getRoute(lineDirection);
         BusInfoHolder holder = (BusInfoHolder)view.getTag();
         holder.tvBusNumber.setText(busLine.getLineNumber());
-        holder.tvStartingTime.setText(getString(R.string.starting_time, busRoute.getStartTime()));
-        holder.tvEndingTime.setText(getString(R.string.ending_time, busRoute.getEndTime()));
-        holder.lvStationNameList.setAdapter(new StationsAdapter(busRoute.getStations(),
-                stationLines.getName()));
+        if (busRoute != null) {
+            holder.tvStartingTime.setText(getString(R.string.starting_time, busRoute.getStartTime()));
+            holder.tvEndingTime.setText(getString(R.string.ending_time, busRoute.getEndTime()));
+            holder.lvStationNameList.setAdapter(new StationsAdapter(busRoute.getStations(),
+                    stationLines.getName()));
+        } else {
+            holder.tvStartingTime.setText(getString(R.string.starting_time, getString(R.string.unknown)));
+            holder.tvEndingTime.setText(getString(R.string.ending_time, getString(R.string.unknown)));
+            Toast.makeText(mActivity, R.string.station_line_data_error, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -185,7 +195,7 @@ public class BusStationFragment extends SherlockFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         Utils.copyAppDatabaseFiles(mActivity.getPackageName());
                         deleteAllStations();
-                        getSuggestions(""); // reset the
+                        getSuggestions2(""); // reset the
                         // suggestions
                     }
                 }).setNegativeButton(R.string.cancel, null);
@@ -237,7 +247,11 @@ public class BusStationFragment extends SherlockFragment {
                 if (mActivity == null) {
                     return false;
                 }
-                getSuggestions(newText);
+                if (isNumber(newText) || newText.equals("")) {
+                    getSuggestions2(newText);
+                } else {
+                    getSuggestions(newText);
+                }
                 return true;
             }
         });
@@ -251,9 +265,14 @@ public class BusStationFragment extends SherlockFragment {
             @Override
             public boolean onSuggestionClick(int position) {
                 Cursor cursor = (Cursor)mSearchView.getSuggestionsAdapter().getItem(position);
-                int suggestionIndex = cursor.getColumnIndex(KuaiXinData.BusStation.NAME);
+                int gpsNumberIndex = cursor.getColumnIndex(KuaiXinData.BusStation.GPS_NUMBER);
+                int stationNameIndex = cursor.getColumnIndex(KuaiXinData.BusStation.NAME);
 
-                mSearchView.setQuery(cursor.getString(suggestionIndex), true);
+                String query = cursor.getString(gpsNumberIndex);
+                if (query.equals(FAKE_GPS_NUMBER)) {
+                    query = cursor.getString(stationNameIndex);
+                }
+                mSearchView.setQuery(query, true);
                 return true;
             }
         });
@@ -264,7 +283,6 @@ public class BusStationFragment extends SherlockFragment {
                 public void onFocusChange(View v, boolean hasFocus) {
                     String queryText = mSearchView.getQuery().toString();
                     if (hasFocus) {
-                        getSuggestions(queryText);
                         mSearchView.setQuery(queryText, false);
                     }
                 }
@@ -275,7 +293,6 @@ public class BusStationFragment extends SherlockFragment {
                 public void onFocusChange(View v, boolean hasFocus) {
                     String queryText = mSearchView.getQuery().toString();
                     if (hasFocus) {
-                        getSuggestions(queryText);
                         mSearchView.setQuery(queryText, false);
                     }
                 }
@@ -297,8 +314,8 @@ public class BusStationFragment extends SherlockFragment {
         mSearchView.setSuggestionsAdapter(adapter);
     }
 
-    private void getSuggestions(String queryText) {
-        if (!TextUtils.isEmpty(queryText)) {
+    private void getSuggestions(final String queryText) {
+        if (!TextUtils.isEmpty(queryText) && queryText.length() >= 2) {
             mTrafficService.queryStationName(queryText, new ICompletionListener() {
 
                 @Override
@@ -309,19 +326,20 @@ public class BusStationFragment extends SherlockFragment {
                     String[] suggestionEntry = new String[3];
                     for(int i = 0; i < stationNames.size(); i++) {
                         suggestionEntry[0] = String.valueOf(i);
-                        suggestionEntry[1] = "fake";
+                        suggestionEntry[1] = FAKE_GPS_NUMBER;
                         suggestionEntry[2] = stationNames.get(i);
                         cursor.addRow(suggestionEntry);
                     }
                     String[] from = new String[] {
-                            KuaiXinData.BusStation.GPS_NUMBER, KuaiXinData.BusStation.NAME
+                            KuaiXinData.BusStation.NAME
                     };
                     int[] to = new int[] {
-                            R.id.station_gps_number, R.id.station_name
+                            R.id.station_name
                     };
                     SimpleCursorAdapter adapter = new SimpleCursorAdapter(mActivity,
-                            R.layout.station_gps_number_item, cursor, from, to, 0);
+                            R.layout.station_name_item, cursor, from, to, 0);
                     mSearchView.setSuggestionsAdapter(adapter);
+                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -340,6 +358,16 @@ public class BusStationFragment extends SherlockFragment {
         } else {
             return false;
         }
+    }
+
+    private String completeStationName(String station) {
+        String stationName;
+        if (station.endsWith(STATION_NAME_SUFFIX)) {
+            stationName = station;
+        } else {
+            stationName = station + STATION_NAME_SUFFIX;
+        }
+        return stationName;
     }
 
     private class StationsAdapter extends BaseAdapter {
@@ -414,6 +442,8 @@ public class BusStationFragment extends SherlockFragment {
                 showStationLines(stationLines);
                 return;
             }
+        } else {
+            stationNameOrGpsNumber = completeStationName(stationNameOrGpsNumber);
         }
         mWaitingDialog.show();
         mTrafficService.getBusStationLines(stationNameOrGpsNumber, new ICompletionListener() {

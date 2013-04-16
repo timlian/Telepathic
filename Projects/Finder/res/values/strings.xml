@@ -57,6 +57,7 @@
     <string name="transfer_scheme_detail">Take bus <xliff:g id="bus_number" example="501">%2$s</xliff:g> from <xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g> to <xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
     <string name="transfer_arrow">→</string>
     <string name="select_a_station">Please select a station by GPS number</string>
+    <string name="unknown">unknown</string>
 
     <!-- consumer record retrieve -->
     <string name="line_number">公交路线:</string>
@@ -97,6 +98,7 @@
     <string name="invalid_line_number">Invalid bus line number.</string>
     <string name="invalid_card_number">Invalid bus car number.</string>
     <string name="invalid_gps_number">Invalid bus statin gps number.</string>
+    <string name="station_line_data_error">The bus line information error, please clear cache and try again.</string>
 
     <!-- Toast network error messages -->
     <string name="search_bus_line_failed">Search bus line failed: <xliff:g id="failed_reason">%1$s</xliff:g></string>
