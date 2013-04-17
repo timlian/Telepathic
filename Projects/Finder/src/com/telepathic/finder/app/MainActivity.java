@@ -13,6 +13,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import cn.domob.android.ads.DomobAdView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -28,6 +30,8 @@ public class MainActivity extends SherlockFragmentActivity {
     private static final String TAG_STATION_LINES_FRAGMENT = "stationLines";
     private static final String TAG_TRANSFER_FRAGMENT      = "Transfer";
     private static final String TAG_BUS_LINE_FRAGMENT      = "busLine";
+
+    private RelativeLayout mAdContainer;
 
     private LinearLayout mTabLocation;
     private LinearLayout mTabCard;
@@ -55,7 +59,15 @@ public class MainActivity extends SherlockFragmentActivity {
         mTabBusLine = (LinearLayout)findViewById(R.id.tab_bus_line);
 
         initSwitchHandlers();
+        setupAdView();
         navigateToLocation(mTabLocation);
+    }
+
+    private void setupAdView() {
+        mAdContainer = (RelativeLayout)findViewById(R.id.ad_container);
+        DomobAdView adView320x50 = new DomobAdView(this, getString(R.string.publisher_id), DomobAdView.INLINE_SIZE_320X50);
+        adView320x50.setKeyword("traffic");
+        mAdContainer.addView(adView320x50);
     }
 
     public void navigateToLocation(View v) {

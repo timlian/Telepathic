@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ActionBarSherlock4.2.0"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs/domob_android_sdk.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
