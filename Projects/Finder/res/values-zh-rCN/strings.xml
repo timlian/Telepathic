@@ -23,7 +23,7 @@
     <string name="delete_card">删除公交卡</string>
     <string name="bus_number_hint">公交线路号</string>
     <string name="ic_card_hint">卡号</string>
-    <string name="station_number_hint">GPS编号</string>
+    <string name="station_number_hint">GPS编号或站台名称</string>
     <string name="find_bus_route">正在查询公交路线信息, 请稍等&#8230;</string>
     <string name="find_ic_card_records">正在查询公交卡信息, 请稍等&#8230;</string>
     <string name="find_station_information">正在查询公交站台信息, 请稍等&#8230;</string>
