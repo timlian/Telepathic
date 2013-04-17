@@ -101,6 +101,7 @@ public class BusLineFragment extends SherlockFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         Utils.debug(TAG,
                 "onCreateOptionsMenu: " + Utils.formatTime(new Date(System.currentTimeMillis())));
         // Inflate the options menu from XML

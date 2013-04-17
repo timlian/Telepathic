@@ -122,9 +122,9 @@ public class BusLocationFragment extends SherlockFragment {
     private BaiDuDataCache mDataCache;
 
     private static final String[] BUS_LINE_PROJECTION = {
-            ITrafficData.BaiDuData.BusLine._ID, ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
-            ITrafficData.BaiDuData.BusLine.START_STATION,
-            ITrafficData.BaiDuData.BusLine.END_STATION
+        ITrafficData.BaiDuData.BusLine._ID, ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
+        ITrafficData.BaiDuData.BusLine.START_STATION,
+        ITrafficData.BaiDuData.BusLine.END_STATION
     };
 
     // Called when the fragment has been associated with the activity
@@ -381,16 +381,16 @@ public class BusLocationFragment extends SherlockFragment {
             case CLEAN_CACHE_CONFIRM_DLG:
                 Builder build = new AlertDialog.Builder(mActivity);
                 build.setTitle(R.string.confirm_clean_cache_title)
-                        .setMessage(R.string.confirm_clean_bus_line_cache)
-                        .setPositiveButton(R.string.confirm, new OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Utils.copyAppDatabaseFiles(mActivity.getPackageName());
-                                int rows = mDataCache.deleteAllBusLines();
-                                Utils.debug(TAG, "deleted rows: " + rows);
-                                getSuggestions(""); // reset the suggestions
-                            }
-                        }).setNegativeButton(R.string.cancel, null);
+                .setMessage(R.string.confirm_clean_bus_line_cache)
+                .setPositiveButton(R.string.confirm, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Utils.copyAppDatabaseFiles(mActivity.getPackageName());
+                        int rows = mDataCache.deleteAllBusLines();
+                        Utils.debug(TAG, "deleted rows: " + rows);
+                        getSuggestions(""); // reset the suggestions
+                    }
+                }).setNegativeButton(R.string.cancel, null);
                 mDialog = build.create();
                 break;
             default:
@@ -419,22 +419,22 @@ public class BusLocationFragment extends SherlockFragment {
         final String titleText = String.format(getResources().getString(R.string.select_bus_route),
                 line.getLineNumber());
         builder.setTitle(titleText).setSingleChoiceItems(busRoutes, 0, null)
-                .setOnCancelListener(null)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                        final int selectedPosition = ((AlertDialog)dialog).getListView()
-                                .getCheckedItemPosition();
-                        final BDBusRoute route = line.getRoute(selectedPosition);
-                        searchBusRoute(route.getCity(), route.getUid());
-                    }
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-                }).create().show();
+        .setOnCancelListener(null)
+        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+                final int selectedPosition = ((AlertDialog)dialog).getListView()
+                        .getCheckedItemPosition();
+                final BDBusRoute route = line.getRoute(selectedPosition);
+                searchBusRoute(route.getCity(), route.getUid());
+            }
+        }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        }).create().show();
     }
 
     private void searchBusLine(final String city, final String lineNumber) {
@@ -499,21 +499,21 @@ public class BusLocationFragment extends SherlockFragment {
         String lineNumber = mDataCache.getRouteLineNumber(uid);
         if (Utils.isValidBusLineNumber(lineNumber)) {
             Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT)
-                    .show();
+            .show();
             mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route), new ILocationListener() {
-				
-				@Override
-				public void onUpdate(int distance) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-				@Override
-				public void done() {
-					// TODO Auto-generated method stub
-					
-				}
-			});
+
+                @Override
+                public void onUpdate(int distance) {
+                    // TODO Auto-generated method stub
+
+                }
+
+                @Override
+                public void done() {
+                    // TODO Auto-generated method stub
+
+                }
+            });
         }
     }
 
@@ -564,6 +564,7 @@ public class BusLocationFragment extends SherlockFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         Utils.debug(TAG,
                 "onCreateOptionsMenu: " + Utils.formatTime(new Date(System.currentTimeMillis())));
         // Inflate the options menu from XML
@@ -591,7 +592,7 @@ public class BusLocationFragment extends SherlockFragment {
                     searchBusLine(city, lineNumber);
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_line_number, Toast.LENGTH_LONG)
-                            .show();
+                    .show();
                 }
                 return true;
             }
@@ -710,7 +711,7 @@ public class BusLocationFragment extends SherlockFragment {
         if (!TextUtils.isEmpty(lineNumber)) {
             selection = ITrafficData.BaiDuData.BusLine.LINE_NUMBER + " LIKE ?";
             selectionArgs = new String[] {
-                lineNumber + "%"
+                    lineNumber + "%"
             };
         }
         Cursor cursor = resolver.query(ITrafficData.BaiDuData.BusLine.CONTENT_URI,

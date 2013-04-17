@@ -209,6 +209,7 @@ public class BusStationFragment extends SherlockFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         // Inflate the options menu from XML
         inflater.inflate(R.menu.menu_bus_station, menu);
 

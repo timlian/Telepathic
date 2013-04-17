@@ -394,6 +394,7 @@ public class BusCardRecordFragment extends SherlockFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         // Inflate the options menu from XML
         inflater.inflate(R.menu.menu_card_record, menu);
 
@@ -416,19 +417,19 @@ public class BusCardRecordFragment extends SherlockFragment {
                     mWaitingDialog.show();
                     Utils.hideSoftKeyboard(mActivity.getApplicationContext(), mSearchView);
                     mTrafficService.getBusCardRecords(cardNumber, 30, new ICompletionListener() {
-						
-						@Override
-						public void onSuccess(Object result) {
-							// TODO Auto-generated method stub
-							
-						}
-						
-						@Override
-						public void onFailure(int errorCode, String errorText) {
-							// TODO Auto-generated method stub
-							
-						}
-					});
+
+                        @Override
+                        public void onSuccess(Object result) {
+                            // TODO Auto-generated method stub
+
+                        }
+
+                        @Override
+                        public void onFailure(int errorCode, String errorText) {
+                            // TODO Auto-generated method stub
+
+                        }
+                    });
                 } else {
                     Toast.makeText(mActivity, R.string.invalid_card_number, Toast.LENGTH_SHORT)
                     .show();
@@ -660,19 +661,19 @@ public class BusCardRecordFragment extends SherlockFragment {
                                 String cardNumber = mCard.getCardNumber();
                                 if (Utils.isValidBusCardNumber(cardNumber)) {
                                     mTrafficService.getBusCardRecords(cardNumber, 30, new ICompletionListener() {
-										
-										@Override
-										public void onSuccess(Object result) {
-											// TODO Auto-generated method stub
-											
-										}
-										
-										@Override
-										public void onFailure(int errorCode, String errorText) {
-											// TODO Auto-generated method stub
-											
-										}
-									});
+
+                                        @Override
+                                        public void onSuccess(Object result) {
+                                            // TODO Auto-generated method stub
+
+                                        }
+
+                                        @Override
+                                        public void onFailure(int errorCode, String errorText) {
+                                            // TODO Auto-generated method stub
+
+                                        }
+                                    });
                                 } else {
                                     Toast.makeText(mActivity, R.string.card_id_error_notice,
                                             Toast.LENGTH_SHORT).show();
