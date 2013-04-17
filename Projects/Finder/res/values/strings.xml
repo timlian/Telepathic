@@ -38,6 +38,7 @@
     <string name="cancel">Cancel</string>
     <string name="confirm">Continue</string>
     <string name="default_city">成都</string>
+    <string name="invalid_input_hint">Please Input the correct bus number</string>
     <string name="no_bus_card_records">No bus card records</string>
     <string name="no_bus_station_lines">No bus station lines</string>
     <string name="no_bus_lines">No bus lines</string>
@@ -63,6 +64,7 @@
     <string name="unknown">unknown</string>
 
     <!-- consumer record retrieve -->
+    <string name="card_id_error_notice">请输入正确的公交卡号</string>
     <string name="line_number">公交路线:</string>
     <string name="bus_number">车辆编号:</string>
     <string name="consumer_count">消费次数: <xliff:g id="consumer_count" example="2">%1$s</xliff:g></string>
@@ -112,6 +114,6 @@
 
 
     <!-- App description -->
-    <string name="app_description">Finder is an app help you to find the location of bus in Chengdu. It also supply to query IC card consumption records by card number, and query bus station infomation by station GPS number.&lt;br/>&lt;br/>If you get any questions, Please contact us by Email&lt;br/>telepathic.ltd@gmail.com&lt;br/>&lt;br/>Thanks for using this app!</string>
+    <string name="app_description">Finder is an app help you to find the location of bus in Chengdu. It also supply to query IC card consumption records by card number, and query bus station information by station GPS number.&lt;br/>&lt;br/>If you get any questions, Please contact us by Email&lt;br/>telepathic.ltd@gmail.com&lt;br/>&lt;br/>Thanks for using this app!</string>
 
 </resources>
