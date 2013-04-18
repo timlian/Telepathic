@@ -43,6 +43,7 @@
         android:targetPackage="com.telepathic.finder" />
 
     <application
+        android:debuggable="false"
         android:name="com.telepathic.finder.app.FinderApplication"
         android:allowBackup="true"
         android:icon="@drawable/icon"
