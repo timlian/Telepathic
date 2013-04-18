@@ -12,9 +12,31 @@
 
 # Add any project specific keep options here:
 
+-ignorewarnings
+-libraryjars libs/baidumapapi_v2_0_0.jar
+-libraryjars libs/domob_android_sdk.jar
+-libraryjars libs/ksoap2-android-assembly-3.0.0-RC.4-jar-with-dependencies.jar
+-libraryjars libs/locSDK_3.1.jar
+-libraryjars ../ActionBarSherlock4.2.0/libs/android-support-v4.jar
+
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep class com.baidu.** {
+    *;
+}
+
+-keep class com.actionbarsherlock.** {
+    public *;
+}
+
+-keep class org.xmlpull.v1.** {
+    public *;
+}
+
+-keep class vi.com.gdi.** {
+    public *;
+}

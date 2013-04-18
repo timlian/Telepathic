@@ -35,7 +35,7 @@ import com.telepathic.finder.sdk.IErrorCode;
 public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([a-zA-Z])?|([k|K])\\d{1,3}";
 

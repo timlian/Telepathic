@@ -7,6 +7,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.Html;
 import android.widget.TextView;
+import cn.domob.android.ads.DomobUpdater;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -38,6 +39,8 @@ public class AboutActivity extends SherlockActivity {
         TextView tvCopyright = (TextView)findViewById(R.id.copyright);
         tvCopyright.setText(Html.fromHtml(getResources().getString(R.string.copyright)));
 
+        // Use Domob SDK to check update
+        DomobUpdater.checkUpdate(AboutActivity.this, getString(R.string.publisher_id));
     }
 
     @Override

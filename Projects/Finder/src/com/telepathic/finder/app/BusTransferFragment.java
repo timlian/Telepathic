@@ -443,7 +443,12 @@ public class BusTransferFragment extends SherlockFragment {
                 stepInfo.setText(Html.fromHtml(stepContent));
                 holder.mTransferStepsLayout.addView(transferStepView);
             }
-            String title = mActivity.getString(R.string.transfer_scheme_title, transferCount, transferInfo.toString());
+            String title;
+            if (transferCount.equals("0")) {
+                title = getString(R.string.direct_title, transferInfo.toString());
+            } else {
+                title = getString(R.string.transfer_scheme_title, transferCount, transferInfo.toString());
+            }
             holder.mTransferId.setText(id);
             holder.mTransferTitle.setText(title);
             holder.mTransferStart.setText(steps.get(0).getSource());
