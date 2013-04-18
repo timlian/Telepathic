@@ -10,6 +10,9 @@
     <string name="title_activity_about">About</string>
     <string name="version">Version: <xliff:g id="version" example="1.0">%1$s</xliff:g></string>
     <string name="copyright">Copyright ©2012–2013 Telepathic Ltd.&lt;br/>All Rights Reserved.</string>
+    
+    <!-- Domob ad publisher id -->
+    <string name="publisher_id">56OJzuCIuNVkpCXsnR</string>
 
     <!-- Tab name -->
     <string name="bus_location">Map Location</string>
@@ -35,6 +38,7 @@
     <string name="cancel">Cancel</string>
     <string name="confirm">Continue</string>
     <string name="default_city">成都</string>
+    <string name="invalid_input_hint">Please Input the correct bus number</string>
     <string name="no_bus_card_records">No bus card records</string>
     <string name="no_bus_station_lines">No bus station lines</string>
     <string name="no_bus_lines">No bus lines</string>
@@ -53,6 +57,7 @@
     <string name="start_end_stations"><xliff:g id="start_station" example="华阳客运站">%1$s</xliff:g> ↔ <xliff:g id="start_station" example="桂溪公交站">%2$s</xliff:g></string>
     <string name="no_station_name_tips">Please input the station name</string>
     <string name="transfer_scheme_title">Transfer <xliff:g id="times" example="1">%1$s</xliff:g> time(s) <xliff:g id="transfer_bus" example="501→112">%2$s</xliff:g></string>
+    <string name="direct_title">Direct <xliff:g id="transfer_bus" example="501">%1$s</xliff:g></string>
     <string name="transfer_step_content">Take &lt;font color="#0099CC">bus <xliff:g id="line" example="501">%1$s</xliff:g>&lt;/font> to &lt;font color="#0099CC"><xliff:g id="end_station" example="火车南站">%2$s</xliff:g>&lt;/font></string>
     <string name="transfer_scheme_detail">Take bus <xliff:g id="bus_number" example="501">%2$s</xliff:g> from <xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g> to <xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
     <string name="transfer_arrow">→</string>
@@ -60,6 +65,7 @@
     <string name="unknown">unknown</string>
 
     <!-- consumer record retrieve -->
+    <string name="card_id_error_notice">请输入正确的公交卡号</string>
     <string name="line_number">公交路线:</string>
     <string name="bus_number">车辆编号:</string>
     <string name="consumer_count">消费次数: <xliff:g id="consumer_count" example="2">%1$s</xliff:g></string>
@@ -109,6 +115,6 @@
 
 
     <!-- App description -->
-    <string name="app_description">Finder is an app help you to find the location of bus in Chengdu. It also supply to query IC card consumption records by card number, and query bus station infomation by station GPS number.&lt;br/>&lt;br/>If you get any questions, Please contact us by Email&lt;br/>telepathic.ltd@gmail.com&lt;br/>&lt;br/>Thanks for using this app!</string>
+    <string name="app_description">Finder is an app help you to find the location of bus in Chengdu. It also supply to query IC card consumption records by card number, and query bus station information by station GPS number.&lt;br/>&lt;br/>If you get any questions, Please contact us by Email&lt;br/>telepathic.ltd@gmail.com&lt;br/>&lt;br/>Thanks for using this app!</string>
 
 </resources>

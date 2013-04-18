@@ -43,6 +43,10 @@
         <uses-library android:name="android.test.runner" />
 
         <activity
+            android:name="cn.domob.android.ads.DomobActivity"
+            android:theme="@android:style/Theme.Translucent" >
+        </activity>
+        <activity
             android:name="com.telepathic.finder.app.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar" >
@@ -60,15 +64,17 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                      android:resource="@xml/searchable"/>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name="com.telepathic.finder.app.AboutActivity"
-            android:theme="@style/Theme.Sherlock.Light"
-            android:screenOrientation="portrait"
+            android:label="@string/title_activity_about"
             android:launchMode="singleTask"
-            android:label="@string/title_activity_about" >
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Sherlock.Light" >
         </activity>
         <activity
             android:name="com.telepathic.finder.app.BusLocationActivity"
@@ -101,7 +107,6 @@
             android:grantUriPermissions="true"
             android:multiprocess="false" >
         </provider>
-
     </application>
 
 </manifest>
