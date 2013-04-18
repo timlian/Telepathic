@@ -9,6 +9,14 @@
         android:targetSdkVersion="14" >
     </uses-sdk>
 
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
     <permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
 
     <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
@@ -58,8 +66,8 @@
         </activity>
         <activity
             android:name="com.telepathic.finder.app.MainActivity"
-            android:screenOrientation="portrait"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Sherlock.Light" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
