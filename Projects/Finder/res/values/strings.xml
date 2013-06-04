@@ -13,6 +13,7 @@
     
     <!-- Domob ad publisher id -->
     <string name="publisher_id">56OJzuCIuNVkpCXsnR</string>
+    <string name="InlinePPID">16TLmNLoApF1iY2BA8B19FRk</string>
 
     <!-- Tab name -->
     <string name="bus_location">Map Location</string>

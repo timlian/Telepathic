@@ -7,6 +7,7 @@ import android.os.Handler;
 
 import com.baidu.mapapi.BMapManager;
 import com.telepathic.finder.R;
+import com.umeng.analytics.MobclickAgent;
 
 public class SplashActivity extends Activity {
 
@@ -15,12 +16,13 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MobclickAgent.onError(this);
         setContentView(R.layout.splash_view);
         // New Handler to start the HomeActivity and close this SplashActivity after some seconds.
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {
-            	Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+                Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(mainIntent);
                 finish();
             }
@@ -28,7 +30,19 @@ public class SplashActivity extends Activity {
         // init map service
         BMapManager mapManager = ((FinderApplication)getApplication()).getMapManager();
         if (mapManager != null) {
-        	mapManager.start();
+            mapManager.start();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
     }
 }

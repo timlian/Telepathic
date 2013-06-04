@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -14,6 +15,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import cn.domob.android.ads.DomobAdEventListener;
+import cn.domob.android.ads.DomobAdManager.ErrorCode;
 import cn.domob.android.ads.DomobAdView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -22,6 +25,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.telepathic.finder.R;
+import com.umeng.analytics.MobclickAgent;
 
 public class MainActivity extends SherlockFragmentActivity {
 
@@ -65,7 +69,51 @@ public class MainActivity extends SherlockFragmentActivity {
 
     private void setupAdView() {
         mAdContainer = (RelativeLayout)findViewById(R.id.ad_container);
-        DomobAdView adView320x50 = new DomobAdView(this, getString(R.string.publisher_id), DomobAdView.INLINE_SIZE_320X50);
+        DomobAdView adView320x50 = new DomobAdView(this, getString(R.string.publisher_id), getString(R.string.InlinePPID), DomobAdView.INLINE_SIZE_320X50);
+        adView320x50.setAdEventListener(new DomobAdEventListener() {
+
+            @Override
+            public void onDomobLeaveApplication(DomobAdView arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onDomobAdReturned(DomobAdView arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public Context onDomobAdRequiresCurrentContext() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public void onDomobAdOverlayPresented(DomobAdView arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onDomobAdOverlayDismissed(DomobAdView arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onDomobAdFailed(DomobAdView arg0, ErrorCode arg1) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onDomobAdClicked(DomobAdView arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
         adView320x50.setKeyword("traffic");
         mAdContainer.addView(adView320x50);
     }
@@ -269,6 +317,18 @@ public class MainActivity extends SherlockFragmentActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
     }
 
 }
