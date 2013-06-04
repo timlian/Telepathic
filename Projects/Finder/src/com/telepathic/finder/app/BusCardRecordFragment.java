@@ -621,6 +621,14 @@ public class BusCardRecordFragment extends SherlockFragment {
             startLoadRecords();
         }
 
+        public void refreshPageView(BusCard card) {
+            mCard = card;
+            String count = TextUtils.isEmpty(mCard.getResidualCount())?"0":mCard.getResidualCount();
+            String amount = TextUtils.isEmpty(mCard.getResidualAmount())?"0":mCard.getResidualAmount();
+            mResidualCount.setText(getString(R.string.residual_count, count));
+            mResidualAmount.setText(getString(R.string.residual_amount, amount));
+        }
+
         public String getCardNumber() {
             return mCard.getCardNumber();
         }
@@ -725,6 +733,8 @@ public class BusCardRecordFragment extends SherlockFragment {
             if (pageView == null) {
                 pageView = new BusCardPageView(mBusCards.get(position));
                 mPageViews.add(position, pageView);
+            } else {
+                pageView.refreshPageView(mBusCards.get(position));
             }
             ((ViewPager)container).addView(pageView.getView());
             return pageView.getView();
