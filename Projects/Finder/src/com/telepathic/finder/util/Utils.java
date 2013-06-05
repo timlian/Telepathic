@@ -23,6 +23,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -363,6 +364,13 @@ public class Utils {
             return info.isAvailable();
         }
         return false;
+    }
+
+    public static String getPhoneNumber(Context context) {
+        String phoneNumber = "";
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        phoneNumber = tm.getLine1Number();
+        return phoneNumber;
     }
 
     public static String getErrorMessage(Resources res, int errorCode, String errorText) {

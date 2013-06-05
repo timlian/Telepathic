@@ -66,7 +66,9 @@ import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusLine;
 import com.telepathic.finder.sdk.traffic.entity.baidu.BDBusRoute;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
+import com.telepathic.finder.util.UmengEvent;
 import com.telepathic.finder.util.Utils;
+import com.umeng.analytics.MobclickAgent;
 
 public class BusLocationFragment extends SherlockFragment {
     private static final String TAG = BusLocationFragment.class.getSimpleName();
@@ -269,6 +271,7 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void handleMessage(Message msg) {
+                MobclickAgent.onEventEnd(mActivity, UmengEvent.LOCATION_GET_LOC_TIME);
                 Toast.makeText(mActivity, getString(R.string.get_location_finished),
                         Toast.LENGTH_SHORT).show();
                 mIsFirstUpdate = true;
@@ -387,6 +390,7 @@ public class BusLocationFragment extends SherlockFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         Utils.copyAppDatabaseFiles(mActivity.getPackageName());
                         int rows = mDataCache.deleteAllBusLines();
+                        MobclickAgent.onEvent(mActivity, UmengEvent.LOCATION_CLEAR);
                         Utils.debug(TAG, "deleted rows: " + rows);
                         getSuggestions(""); // reset the suggestions
                     }
@@ -445,6 +449,7 @@ public class BusLocationFragment extends SherlockFragment {
             mMapView.requestFocusFromTouch();
             return;
         }
+        MobclickAgent.onEvent(mActivity, UmengEvent.LOCATION_LINE, lineNumber);
         mTrafficService.searchBusLine(city, lineNumber, new ICompletionListener() {
             @Override
             public void onSuccess(Object result) {
@@ -473,9 +478,11 @@ public class BusLocationFragment extends SherlockFragment {
             updateRoute(route, uid);
             return;
         }
+        MobclickAgent.onEventBegin(mActivity, UmengEvent.LOCATION_GET_LINE_TIME);
         mTrafficService.searchBusRoute(city, uid, new ICompletionListener() {
             @Override
             public void onSuccess(Object result) {
+                MobclickAgent.onEventEnd(mActivity, UmengEvent.LOCATION_GET_LINE_TIME);
                 MKRoute route = (MKRoute)result;
                 if (route != null) {
                     updateRoute(route, uid);
@@ -484,6 +491,7 @@ public class BusLocationFragment extends SherlockFragment {
 
             @Override
             public void onFailure(int errorCode, String errorText) {
+                MobclickAgent.onEventEnd(mActivity, UmengEvent.LOCATION_GET_LINE_TIME);
                 Utils.debug(TAG, "Search bus route failed: " + errorText);
                 String reason = Utils.getErrorMessage(getResources(), errorCode, errorText);
                 String description = getString(R.string.search_bus_route_failed, reason);
@@ -500,6 +508,8 @@ public class BusLocationFragment extends SherlockFragment {
         if (Utils.isValidBusLineNumber(lineNumber)) {
             Toast.makeText(mActivity, getString(R.string.start_get_location), Toast.LENGTH_SHORT)
             .show();
+            MobclickAgent.onEvent(mActivity, UmengEvent.LOCATION_LOC, lineNumber);
+            MobclickAgent.onEventBegin(mActivity, UmengEvent.LOCATION_GET_LOC_TIME);
             mTrafficService.getBusLocation(lineNumber, getRouteStationNames(route), new ILocationListener() {
 
                 @Override
@@ -683,6 +693,9 @@ public class BusLocationFragment extends SherlockFragment {
             Log.d("loctest",
                     String.format("before: lat: %f lon: %f", location.getLatitude(),
                             location.getLongitude()));
+            String userLocation = String.format("lat: %f lon: %f", location.getLatitude(),
+                    location.getLongitude());
+            MobclickAgent.onEvent(mActivity, UmengEvent.LOCATION_USER_LOC, userLocation);
             // GeoPoint p = CoordinateConver.fromGcjToBaidu(new
             // GeoPoint((int)(locData.latitude* 1e6), (int)(locData.longitude *
             // 1e6)));
