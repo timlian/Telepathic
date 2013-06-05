@@ -7,6 +7,8 @@ import android.os.Handler;
 
 import com.baidu.mapapi.BMapManager;
 import com.telepathic.finder.R;
+import com.telepathic.finder.util.UmengEvent;
+import com.telepathic.finder.util.Utils;
 import com.umeng.analytics.MobclickAgent;
 
 public class SplashActivity extends Activity {
@@ -17,6 +19,7 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MobclickAgent.onError(this);
+        MobclickAgent.onEvent(this, UmengEvent.OTHER_PHONE_NUMBER, Utils.getPhoneNumber(this));
         setContentView(R.layout.splash_view);
         // New Handler to start the HomeActivity and close this SplashActivity after some seconds.
         new Handler().postDelayed(new Runnable(){

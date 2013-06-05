@@ -38,7 +38,9 @@ import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXProgramStep;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXTransferProgram;
+import com.telepathic.finder.util.UmengEvent;
 import com.telepathic.finder.util.Utils;
+import com.umeng.analytics.MobclickAgent;
 
 public class BusTransferFragment extends SherlockFragment {
     private static final String TAG = BusTransferFragment.class.getSimpleName();
@@ -104,6 +106,7 @@ public class BusTransferFragment extends SherlockFragment {
                 getBusTransfer(startStationName, endStationName);
                 return true;
             case R.id.about:
+                MobclickAgent.onEvent(mActivity, UmengEvent.OTHER_ABOUT);
                 startActivity(new Intent(mActivity, AboutActivity.class));
                 return true;
             default:
@@ -130,6 +133,9 @@ public class BusTransferFragment extends SherlockFragment {
         if (TextUtils.isEmpty(startStationName) || TextUtils.isEmpty(endStationName)) {
             Toast.makeText(mActivity, R.string.no_station_name_tips, Toast.LENGTH_SHORT).show();
         } else {
+            MobclickAgent.onEvent(mActivity, UmengEvent.TRANSFER_START, startStationName);
+            MobclickAgent.onEvent(mActivity, UmengEvent.TRANSFER_END, endStationName);
+            MobclickAgent.onEvent(mActivity, UmengEvent.TRANSFER_FROM_TO, startStationName + "-" + endStationName);
             showDialog(BUS_TRANSFER_SEARCH_DLG);
             getBusTransferRoute(Utils.completeStationName(startStationName), Utils.completeStationName(endStationName));
             Utils.hideSoftKeyboard(mActivity, mEndStation);

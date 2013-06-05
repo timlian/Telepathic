@@ -37,7 +37,9 @@ import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.ITrafficService;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
+import com.telepathic.finder.util.UmengEvent;
 import com.telepathic.finder.util.Utils;
+import com.umeng.analytics.MobclickAgent;
 
 public class BusLineFragment extends SherlockFragment {
 
@@ -174,6 +176,7 @@ public class BusLineFragment extends SherlockFragment {
     }
 
     private void getBusLine(String lineNumber) {
+        MobclickAgent.onEvent(mActivity, UmengEvent.LINE_LINE, lineNumber);
         mTrafficService.getBusLine(lineNumber, new ICompletionListener() {
 
             @Override
@@ -311,6 +314,7 @@ public class BusLineFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.about:
+                MobclickAgent.onEvent(mActivity, UmengEvent.OTHER_ABOUT);
                 startActivity(new Intent(mActivity, AboutActivity.class));
                 return true;
             default:

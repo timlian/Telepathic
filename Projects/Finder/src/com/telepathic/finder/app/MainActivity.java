@@ -25,6 +25,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.telepathic.finder.R;
+import com.telepathic.finder.util.UmengEvent;
 import com.umeng.analytics.MobclickAgent;
 
 public class MainActivity extends SherlockFragmentActivity {
@@ -80,8 +81,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
             @Override
             public void onDomobAdReturned(DomobAdView arg0) {
-                // TODO Auto-generated method stub
-
+                MobclickAgent.onEvent(MainActivity.this, UmengEvent.OTHER_AD_SHOW);
             }
 
             @Override
@@ -110,8 +110,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
             @Override
             public void onDomobAdClicked(DomobAdView arg0) {
-                // TODO Auto-generated method stub
-
+                MobclickAgent.onEvent(MainActivity.this, UmengEvent.OTHER_AD_CLICK);
             }
         });
         adView320x50.setKeyword("traffic");

@@ -61,9 +61,11 @@ import com.telepathic.finder.sdk.ITrafficeMessage;
 import com.telepathic.finder.sdk.traffic.entity.BusCard;
 import com.telepathic.finder.sdk.traffic.entity.ConsumerRecord.ConsumerType;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
+import com.telepathic.finder.util.UmengEvent;
 import com.telepathic.finder.util.Utils;
 import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
+import com.umeng.analytics.MobclickAgent;
 
 public class BusCardRecordFragment extends SherlockFragment {
 
@@ -385,6 +387,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                 builder.create().show();
                 return true;
             case R.id.about:
+                MobclickAgent.onEvent(mActivity, UmengEvent.OTHER_ABOUT);
                 startActivity(new Intent(mActivity, AboutActivity.class));
                 return true;
             default:
@@ -416,6 +419,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                 if (Utils.isValidBusCardNumber(cardNumber)) {
                     mWaitingDialog.show();
                     Utils.hideSoftKeyboard(mActivity.getApplicationContext(), mSearchView);
+                    MobclickAgent.onEvent(mActivity, UmengEvent.CARD_NUMBER, cardNumber);
                     mTrafficService.getBusCardRecords(cardNumber, 30, new ICompletionListener() {
 
                         @Override
@@ -742,12 +746,14 @@ public class BusCardRecordFragment extends SherlockFragment {
     }
 
     private void deleteAllBusCardRecords() {
+        MobclickAgent.onEvent(mActivity, UmengEvent.CARD_CLEAR);
         ContentResolver resolver = mActivity.getContentResolver();
         int rows = resolver.delete(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null, null);
         Utils.debug(TAG, "delete rows: " + rows);
     }
 
     private void deleteBusCardRecordsByNumber(String number) {
+        MobclickAgent.onEvent(mActivity, UmengEvent.CARD_DEL_NUMBER, number);
         ContentResolver resolver = mActivity.getContentResolver();
         String where = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=?";
         String[] selectionArgs = new String[] {

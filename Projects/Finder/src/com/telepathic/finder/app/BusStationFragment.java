@@ -52,7 +52,9 @@ import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
 import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXStationLines;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
 import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
+import com.telepathic.finder.util.UmengEvent;
 import com.telepathic.finder.util.Utils;
+import com.umeng.analytics.MobclickAgent;
 
 public class BusStationFragment extends SherlockFragment {
     private static final String TAG = "BusStationFragment";
@@ -200,6 +202,7 @@ public class BusStationFragment extends SherlockFragment {
                 builder.create().show();
                 return true;
             case R.id.about:
+                MobclickAgent.onEvent(mActivity, UmengEvent.OTHER_ABOUT);
                 startActivity(new Intent(mActivity, AboutActivity.class));
                 return true;
             default:
@@ -426,6 +429,7 @@ public class BusStationFragment extends SherlockFragment {
 
     private void searchStationLines(String stationNameOrGpsNumber, boolean isGpsNumber) {
         if (isGpsNumber) {
+            MobclickAgent.onEvent(mActivity, UmengEvent.STATION_GPS_NUMBER, stationNameOrGpsNumber);
             KXBusStationLines stationLines = mDataCache.getStationLines(stationNameOrGpsNumber);
             if (stationLines != null) {
                 showStationLines(stationLines);
@@ -433,6 +437,7 @@ public class BusStationFragment extends SherlockFragment {
             }
         } else {
             stationNameOrGpsNumber = Utils.completeStationName(stationNameOrGpsNumber);
+            MobclickAgent.onEvent(mActivity, UmengEvent.STATION_NAME, stationNameOrGpsNumber);
         }
         mWaitingDialog.show();
         mTrafficService.getBusStationLines(stationNameOrGpsNumber, new ICompletionListener() {
@@ -499,6 +504,7 @@ public class BusStationFragment extends SherlockFragment {
     }
 
     private void deleteAllStations() {
+        MobclickAgent.onEvent(mActivity, UmengEvent.STATION_CLEAR);
         ContentResolver resolver = mActivity.getContentResolver();
         int rows = resolver.delete(ITrafficData.KuaiXinData.BusStation.CONTENT_URI, null, null);
         Utils.debug(TAG, "delete rows: " + rows);
