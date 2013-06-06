@@ -314,7 +314,6 @@ public class BusLineFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.about:
-                MobclickAgent.onEvent(mActivity, UmengEvent.OTHER_ABOUT);
                 startActivity(new Intent(mActivity, AboutActivity.class));
                 return true;
             default:

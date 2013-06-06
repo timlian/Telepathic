@@ -13,6 +13,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.telepathic.finder.R;
+import com.telepathic.finder.util.UmengEvent;
 import com.umeng.analytics.MobclickAgent;
 
 public class AboutActivity extends SherlockActivity {
@@ -20,6 +21,7 @@ public class AboutActivity extends SherlockActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MobclickAgent.onEvent(this, UmengEvent.OTHER_ABOUT);
         setContentView(R.layout.activity_about);
 
         try {

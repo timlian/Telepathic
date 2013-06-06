@@ -565,7 +565,6 @@ public class BusLocationFragment extends SherlockFragment {
                 showDialog(CLEAN_CACHE_CONFIRM_DLG);
                 return true;
             case R.id.about:
-                MobclickAgent.onEvent(mActivity, UmengEvent.OTHER_ABOUT);
                 startActivity(new Intent(mActivity, AboutActivity.class));
                 return true;
             default:

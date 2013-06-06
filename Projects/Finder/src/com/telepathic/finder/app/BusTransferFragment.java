@@ -106,7 +106,6 @@ public class BusTransferFragment extends SherlockFragment {
                 getBusTransfer(startStationName, endStationName);
                 return true;
             case R.id.about:
-                MobclickAgent.onEvent(mActivity, UmengEvent.OTHER_ABOUT);
                 startActivity(new Intent(mActivity, AboutActivity.class));
                 return true;
             default:

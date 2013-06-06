@@ -387,7 +387,6 @@ public class BusCardRecordFragment extends SherlockFragment {
                 builder.create().show();
                 return true;
             case R.id.about:
-                MobclickAgent.onEvent(mActivity, UmengEvent.OTHER_ABOUT);
                 startActivity(new Intent(mActivity, AboutActivity.class));
                 return true;
             default:
