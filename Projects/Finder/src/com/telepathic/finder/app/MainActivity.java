@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +19,7 @@ import android.widget.RelativeLayout;
 import cn.domob.android.ads.DomobAdEventListener;
 import cn.domob.android.ads.DomobAdManager.ErrorCode;
 import cn.domob.android.ads.DomobAdView;
+import cn.domob.android.ads.DomobUpdater;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -35,6 +37,8 @@ public class MainActivity extends SherlockFragmentActivity {
     private static final String TAG_STATION_LINES_FRAGMENT = "stationLines";
     private static final String TAG_TRANSFER_FRAGMENT      = "Transfer";
     private static final String TAG_BUS_LINE_FRAGMENT      = "busLine";
+
+    private static final String UMENG_PARAM_KEY = "NEED_UPDATE";
 
     private RelativeLayout mAdContainer;
 
@@ -66,6 +70,20 @@ public class MainActivity extends SherlockFragmentActivity {
         initSwitchHandlers();
         setupAdView();
         navigateToLocation(mTabLocation);
+
+        String needUpdate = MobclickAgent.getConfigParams(this, UMENG_PARAM_KEY);
+
+        if (needUpdate.equalsIgnoreCase(Boolean.toString(true))) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    // Use Domob SDK to check update
+                    DomobUpdater.checkUpdate(MainActivity.this, getString(R.string.publisher_id));
+                }
+            }, 3000);
+        }
     }
 
     private void setupAdView() {

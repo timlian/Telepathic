@@ -20,6 +20,7 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         MobclickAgent.onError(this);
         MobclickAgent.onEvent(this, UmengEvent.OTHER_PHONE_NUMBER, Utils.getPhoneNumber(this));
+        MobclickAgent.updateOnlineConfig(this);
         setContentView(R.layout.splash_view);
         // New Handler to start the HomeActivity and close this SplashActivity after some seconds.
         new Handler().postDelayed(new Runnable(){
