@@ -52,6 +52,8 @@ public class MainActivity extends SherlockFragmentActivity {
 
     private FragmentManager mFragmentManager;
 
+    private boolean mIsQuitApp = false;
+
     private ArrayList<SwitchHandler> mSwitchHandlers = new ArrayList<SwitchHandler>();
 
     @Override
@@ -172,7 +174,9 @@ public class MainActivity extends SherlockFragmentActivity {
         .setPositiveButton(android.R.string.ok, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                mIsQuitApp = true;
                 MainActivity.this.finish();
+                dialog.dismiss();
             }
         })
         .setNegativeButton(android.R.string.cancel, null);
@@ -340,7 +344,9 @@ public class MainActivity extends SherlockFragmentActivity {
     protected void onPause() {
         super.onPause();
         MobclickAgent.onPause(this);
-        overridePendingTransition(R.anim.push_right_in, R.anim.back_window_stay);
+        if (!mIsQuitApp) {
+            overridePendingTransition(R.anim.push_right_in, R.anim.back_window_stay);
+        }
     }
 
     @Override
