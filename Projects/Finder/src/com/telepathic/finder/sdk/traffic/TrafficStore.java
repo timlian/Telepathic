@@ -257,6 +257,9 @@ public class TrafficStore {
                 String direction = station.getDirection(lineNumber);
                 String selection = ITrafficData.KuaiXinData.BusRoute.LINE_NUMBER + "=? AND " +ITrafficData.KuaiXinData.BusRoute.DIRECTION + "=?";
                 String[] selectionArgs = new String[]{lineNumber, direction};
+                if (selectionArgs[0] == null || selectionArgs[1] == null) {
+                    break;
+                }
                 Cursor cursor = mContentResolver.query(ITrafficData.KuaiXinData.BusRoute.CONTENT_URI, BUS_ROUTE_PROJECTION, selection, selectionArgs, null);
                 if (cursor != null) {
                     try {

@@ -1,16 +1,16 @@
 package com.telepathic.finder.app;
 
-import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
-import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
-import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
-import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
-import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
+
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusLine.Direction;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusRoute;
+import com.telepathic.finder.sdk.traffic.entity.kuaixin.KXBusStationLines;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData;
+import com.telepathic.finder.sdk.traffic.provider.ITrafficData.KuaiXinData;
 
 public class KuaiXinDataCache {
     private static final String TAG = "KuaiXinDataCache";
@@ -82,7 +82,11 @@ public class KuaiXinDataCache {
                     KXBusRoute busRoute = new KXBusRoute();
                     busRoute.setStartTime(cursor.getString(IDX_START_TIME));
                     busRoute.setEndTime(cursor.getString(IDX_END_TIME));
-                    busRoute.setStations(cursor.getString(IDX_STATIONS).split(","));
+                    String stations = cursor.getString(IDX_STATIONS);
+                    if (stations == null) {
+                        break;
+                    }
+                    busRoute.setStations(stations.split(","));
                     busRoute.setDirection(direction);
                     busLine.addRoute(busRoute);
                     stationLines.addBusLine(busLine);
@@ -96,8 +100,8 @@ public class KuaiXinDataCache {
     public Cursor queryBusStations(String keyword) {
         StringBuilder sortOrder = new StringBuilder();
         sortOrder.append(KuaiXinData.BusStation.LAST_UPDATE_TIME + " DESC ")
-                 .append("LIMIT 0,")
-                 .append(MAX_RECENT_STATIONS);
+        .append("LIMIT 0,")
+        .append(MAX_RECENT_STATIONS);
         String selection = null;
         String[] selectionArgs = null;
         if(!TextUtils.isEmpty(keyword)){
