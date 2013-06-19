@@ -33,12 +33,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -47,6 +47,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -112,6 +113,10 @@ public class BusCardRecordFragment extends SherlockFragment {
     private Button mBtnDeleteComplete;
 
     private boolean isDeleteMode = false;
+
+    private ActionMode mDeleteMode;
+
+    private ArrayList<String> mDeleteCardsList = new ArrayList<String>();
 
     private static final String[] CARD_RECORDS_HISTORY = {
         ITrafficData.KuaiXinData.BusCard._ID, ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
@@ -243,6 +248,25 @@ public class BusCardRecordFragment extends SherlockFragment {
         }
     }
 
+    private void deleteModeSelected(final TextView tv, final String cardNumber){
+        mDeleteCardsList.add(cardNumber);
+        tv.setBackgroundResource(R.drawable.card_number_focused_holo_light);
+        tv.setPadding(0, Utils.dip2px(mActivity, 10), 0, Utils.dip2px(mActivity, 10));
+        if (!mDeleteCardsList.isEmpty()) {
+            mDeleteMode.setTitle(String.valueOf(mDeleteCardsList.size()));
+        }
+    }
+
+    private void deleteModeUnselected(final TextView tv, final String cardNumber){
+        mDeleteCardsList.remove(cardNumber);
+        tv.setBackgroundColor(Color.TRANSPARENT);
+        if (!mDeleteCardsList.isEmpty()) {
+            mDeleteMode.setTitle(String.valueOf(mDeleteCardsList.size()));
+        } else {
+            mDeleteMode.finish();
+        }
+    }
+
     private void initTab(ArrayList<BusCard> busCards) {
         final DisplayMetrics dm = new DisplayMetrics();
         mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -252,35 +276,61 @@ public class BusCardRecordFragment extends SherlockFragment {
         for (int i = 0; i < busCards.size(); i++) {
             final String card_number = busCards.get(i).getCardNumber();
             View tabView = mActivity.getLayoutInflater().inflate(R.layout.card_id_item, null);
+            final TextView tv = (TextView)tabView.findViewById(R.id.card_id);
             tabView.setId(i);
             tabView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    isClicked = true;
-                    int id = v.getId();
-                    for (int i = 0; i < mViewPagerTabView.size(); i++) {
-                        if (id == i) {
-                            mViewPager.setCurrentItem(i, true);
+                    if (!isDeleteMode) {
+                        isClicked = true;
+                        int id = v.getId();
+                        if (mViewPagerTabView.size() > id) {
+                            mViewPager.setCurrentItem(id, true);
+                        }
+                    } else {
+                        if (mDeleteCardsList.contains(card_number)) {
+                            deleteModeUnselected(tv, card_number);
+                        }else{
+                            deleteModeSelected(tv, card_number);
                         }
                     }
                 }
             });
-            TextView tv = (TextView)tabView.findViewById(R.id.card_id);
-            tv.setLayoutParams(new FrameLayout.LayoutParams(screenWidth / TAB_COUNT,
-                    LayoutParams.WRAP_CONTENT));
-            tv.setText(card_number);
-            ImageView iv = (ImageView)tabView.findViewById(R.id.delete_card);
-            iv.setOnClickListener(new OnClickListener() {
+            tabView.setOnLongClickListener(new OnLongClickListener() {
+
                 @Override
-                public void onClick(View v) {
-                    deleteBusCardRecordsByNumber(card_number);
+                public boolean onLongClick(View v) {
+                    if (mBusCards != null && mBusCards.size() > 0 && !isDeleteMode) {
+                        mDeleteMode = mActivity.startActionMode(new DeleteActionModeCallback());
+                        deleteModeSelected(tv, card_number);
+                    } else {
+                        if (mDeleteCardsList.contains(card_number)) {
+                            deleteModeUnselected(tv, card_number);
+                        }else{
+                            deleteModeSelected(tv, card_number);
+                        }
+                    }
+                    return true;
                 }
             });
-            if (isDeleteMode) {
-                iv.setVisibility(View.VISIBLE);
-            } else {
-                iv.setVisibility(View.GONE);
+            tv.setLayoutParams(new LinearLayout.LayoutParams(screenWidth / TAB_COUNT,
+                    LayoutParams.WRAP_CONTENT));
+            tv.setText(card_number);
+            if (isDeleteMode && i == 0) {
+                deleteModeSelected(tv, card_number);
             }
+            //            ImageView iv = (ImageView)tabView.findViewById(R.id.delete_card);
+            //            iv.setOnClickListener(new OnClickListener() {
+            //                @Override
+            //                public void onClick(View v) {
+            //                    deleteBusCardRecordsByNumber(card_number);
+            //                }
+            //            });
+            //            if (isDeleteMode) {
+            //                iv.setVisibility(View.VISIBLE);
+            //            } else {
+            //                iv.setVisibility(View.GONE);
+            //            }
             mViewPagerTabView.add(tabView);
             mTabContent.addView(tabView);
         }
@@ -365,10 +415,14 @@ public class BusCardRecordFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_card:
+                //                if (mBusCards != null && mBusCards.size() > 0) {
+                //                    isDeleteMode = true;
+                //                    initTab(mBusCards);
+                //                    mBtnDeleteComplete.setVisibility(View.VISIBLE);
+                //                }
                 if (mBusCards != null && mBusCards.size() > 0) {
-                    isDeleteMode = true;
+                    mDeleteMode = mActivity.startActionMode(new DeleteActionModeCallback());
                     initTab(mBusCards);
-                    mBtnDeleteComplete.setVisibility(View.VISIBLE);
                 }
                 return true;
             case R.id.clear_cache:
@@ -762,6 +816,40 @@ public class BusCardRecordFragment extends SherlockFragment {
                 selectionArgs);
         if (row != -1) {
             resolver.notifyChange(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null);
+        }
+    }
+
+    private final class DeleteActionModeCallback implements ActionMode.Callback {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.action_mode_delete_provider, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            isDeleteMode = true;
+            mDeleteCardsList.clear();
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch(item.getItemId()) {
+                case R.id.delete:
+                    mode.finish();
+                    break;
+            }
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            isDeleteMode = false;
+            mDeleteCardsList.clear();
+            initTab(mBusCards);
+            mDeleteMode = null;
         }
     }
 

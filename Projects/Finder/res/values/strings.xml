@@ -27,6 +27,7 @@
     <string name="find">Find</string>
     <string name="clear_cache">Clear cache</string>
     <string name="delete_card">Delete card</string>
+    <string name="delete">Delete</string>
     <string name="bus_number_hint">Bus line number</string>
     <string name="ic_card_hint">IC card number</string>
     <string name="station_number_hint">GPS number or Station name</string>

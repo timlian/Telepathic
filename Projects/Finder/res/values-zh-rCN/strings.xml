@@ -21,6 +21,7 @@
     <string name="find">查询</string>
     <string name="clear_cache">清空历史记录</string>
     <string name="delete_card">删除公交卡</string>
+    <string name="delete">删除</string>
     <string name="bus_number_hint">公交线路号</string>
     <string name="ic_card_hint">卡号</string>
     <string name="station_number_hint">GPS编号或站台名称</string>
