@@ -37,7 +37,6 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -109,8 +108,6 @@ public class BusCardRecordFragment extends SherlockFragment {
     private ProgressDialog mWaitingDialog;
 
     private MessageDispatcher mMessageDispatcher;
-
-    private Button mBtnDeleteComplete;
 
     private boolean isDeleteMode = false;
 
@@ -225,15 +222,9 @@ public class BusCardRecordFragment extends SherlockFragment {
                 mViewPagerAdapter = new BusCardPageAdapter();
                 mViewPager.setAdapter(mViewPagerAdapter);
                 initTab(mBusCards);
-                if (isDeleteMode) {
-                    mBtnDeleteComplete.setVisibility(View.VISIBLE);
-                } else {
-                    mBtnDeleteComplete.setVisibility(View.GONE);
-                }
             } else {
                 if (isDeleteMode) {
                     isDeleteMode = false;
-                    mBtnDeleteComplete.setVisibility(View.GONE);
                 }
                 mNoItemTips.setVisibility(View.VISIBLE);
                 mConsumptionDetail.setVisibility(View.GONE);
@@ -317,6 +308,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                     LayoutParams.WRAP_CONTENT));
             tv.setText(card_number);
             if (isDeleteMode && i == 0) {
+                mDeleteCardsList.clear();
                 deleteModeSelected(tv, card_number);
             }
             //            ImageView iv = (ImageView)tabView.findViewById(R.id.delete_card);
@@ -387,15 +379,6 @@ public class BusCardRecordFragment extends SherlockFragment {
             public void onPageScrollStateChanged(int state) {
                 // TODO Auto-generated method stub
 
-            }
-        });
-        mBtnDeleteComplete = (Button)getView().findViewById(R.id.delete_complete);
-        mBtnDeleteComplete.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isDeleteMode = false;
-                mBtnDeleteComplete.setVisibility(View.GONE);
-                initTab(mBusCards);
             }
         });
         mViewPagerTab = (HorizontalScrollView)getView().findViewById(R.id.viewpager_tab);
@@ -848,7 +831,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         public void onDestroyActionMode(ActionMode mode) {
             isDeleteMode = false;
             mDeleteCardsList.clear();
-            initTab(mBusCards);
+            initTab(mBusCards); // re-init tabs to make the tab display normally
             mDeleteMode = null;
         }
     }
