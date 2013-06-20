@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -129,9 +130,11 @@ public class BusCardRecordFragment extends SherlockFragment {
         @Override
         public void handleMessage(Message msg) {
             mWaitingDialog.cancel();
-            for (BusCardPageView page : mPageViews) {
-                page.mRecordList.onRefreshComplete();
-            }
+            //            for (BusCardPageView page : mPageViews) {
+            //                page.mRecordList.onRefreshComplete();
+            //            }
+            mViewPagerAdapter.notifyRefreshCompleted();
+
             mConsumptionDetail.requestFocusFromTouch();
             switch (msg.arg2) {
                 case ITrafficeMessage.GET_BUS_CARD_RECORDS_FAILED:
@@ -741,9 +744,26 @@ public class BusCardRecordFragment extends SherlockFragment {
 
     private class BusCardPageAdapter extends PagerAdapter {
 
+        private List<BusCardPageView> mPagerViewList;
+
+        public BusCardPageAdapter() {
+            mPagerViewList = new ArrayList<BusCardPageView>();
+            BusCardPageView pageView;
+            for (BusCard card : mBusCards) {
+                pageView = new BusCardPageView(card);
+                mPagerViewList.add(pageView);
+            }
+        }
+
+        public void notifyRefreshCompleted() {
+            for (BusCardPageView pageView : mPagerViewList) {
+                pageView.mRecordList.onRefreshComplete();
+            }
+        }
+
         @Override
         public int getCount() {
-            return mBusCards.size();
+            return mPagerViewList.size();
         }
 
         @Override
@@ -753,28 +773,14 @@ public class BusCardRecordFragment extends SherlockFragment {
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            ((ViewPager)container).removeView(mPageViews.get(position).getView());
+            //            ((ViewPager)container).removeView(mPageViews.get(position).getView());
+            container.removeView(mPagerViewList.get(position).getView());
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            BusCardPageView pageView = null;
-            if (mPageViews.size() > position) {
-                for (BusCardPageView pView : mPageViews) {
-                    if (pView.getCardNumber().equals(mBusCards.get(position).getCardNumber())) {
-                        pageView = pView;
-                        break;
-                    }
-                }
-            }
-            if (pageView == null) {
-                pageView = new BusCardPageView(mBusCards.get(position));
-                mPageViews.add(position, pageView);
-            } else {
-                pageView.refreshPageView(mBusCards.get(position));
-            }
-            ((ViewPager)container).addView(pageView.getView());
-            return pageView.getView();
+            container.addView(mPagerViewList.get(position).getView());
+            return mPagerViewList.get(position).getView();
         }
     }
 
