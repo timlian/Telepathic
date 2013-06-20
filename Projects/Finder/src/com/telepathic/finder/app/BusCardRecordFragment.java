@@ -4,6 +4,7 @@ package com.telepathic.finder.app;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -113,7 +114,7 @@ public class BusCardRecordFragment extends SherlockFragment {
 
     private ActionMode mDeleteMode;
 
-    private ArrayList<String> mDeleteCardsList = new ArrayList<String>();
+    private HashSet<String> mDeleteCardsHashSet = new HashSet<String>();
 
     private static final String[] CARD_RECORDS_HISTORY = {
         ITrafficData.KuaiXinData.BusCard._ID, ITrafficData.KuaiXinData.BusCard.CARD_NUMBER
@@ -240,19 +241,19 @@ public class BusCardRecordFragment extends SherlockFragment {
     }
 
     private void deleteModeSelected(final TextView tv, final String cardNumber){
-        mDeleteCardsList.add(cardNumber);
+        mDeleteCardsHashSet.add(cardNumber);
         tv.setBackgroundResource(R.drawable.card_number_focused_holo_light);
         tv.setPadding(0, Utils.dip2px(mActivity, 10), 0, Utils.dip2px(mActivity, 10));
-        if (!mDeleteCardsList.isEmpty()) {
-            mDeleteMode.setTitle(String.valueOf(mDeleteCardsList.size()));
+        if (!mDeleteCardsHashSet.isEmpty()) {
+            mDeleteMode.setTitle(String.valueOf(mDeleteCardsHashSet.size()));
         }
     }
 
     private void deleteModeUnselected(final TextView tv, final String cardNumber){
-        mDeleteCardsList.remove(cardNumber);
+        mDeleteCardsHashSet.remove(cardNumber);
         tv.setBackgroundColor(Color.TRANSPARENT);
-        if (!mDeleteCardsList.isEmpty()) {
-            mDeleteMode.setTitle(String.valueOf(mDeleteCardsList.size()));
+        if (!mDeleteCardsHashSet.isEmpty()) {
+            mDeleteMode.setTitle(String.valueOf(mDeleteCardsHashSet.size()));
         } else {
             mDeleteMode.finish();
         }
@@ -279,7 +280,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                             mViewPager.setCurrentItem(id, true);
                         }
                     } else {
-                        if (mDeleteCardsList.contains(card_number)) {
+                        if (mDeleteCardsHashSet.contains(card_number)) {
                             deleteModeUnselected(tv, card_number);
                         }else{
                             deleteModeSelected(tv, card_number);
@@ -295,7 +296,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                         mDeleteMode = mActivity.startActionMode(new DeleteActionModeCallback());
                         deleteModeSelected(tv, card_number);
                     } else {
-                        if (mDeleteCardsList.contains(card_number)) {
+                        if (mDeleteCardsHashSet.contains(card_number)) {
                             deleteModeUnselected(tv, card_number);
                         }else{
                             deleteModeSelected(tv, card_number);
@@ -307,9 +308,10 @@ public class BusCardRecordFragment extends SherlockFragment {
             tv.setLayoutParams(new LinearLayout.LayoutParams(screenWidth / TAB_COUNT,
                     LayoutParams.WRAP_CONTENT));
             tv.setText(card_number);
-            if (isDeleteMode && i == 0) {
-                mDeleteCardsList.clear();
-                deleteModeSelected(tv, card_number);
+            if (isDeleteMode) {
+                if ((i == 0 && mDeleteCardsHashSet.isEmpty()) || mDeleteCardsHashSet.contains(card_number)) {
+                    deleteModeSelected(tv, card_number);
+                }
             }
             //            ImageView iv = (ImageView)tabView.findViewById(R.id.delete_card);
             //            iv.setOnClickListener(new OnClickListener() {
@@ -398,14 +400,9 @@ public class BusCardRecordFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_card:
-                //                if (mBusCards != null && mBusCards.size() > 0) {
-                //                    isDeleteMode = true;
-                //                    initTab(mBusCards);
-                //                    mBtnDeleteComplete.setVisibility(View.VISIBLE);
-                //                }
                 if (mBusCards != null && mBusCards.size() > 0) {
                     mDeleteMode = mActivity.startActionMode(new DeleteActionModeCallback());
-                    initTab(mBusCards);
+                    initTab(mBusCards); // Init the card tab display delete mode
                 }
                 return true;
             case R.id.clear_cache:
@@ -788,7 +785,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         Utils.debug(TAG, "delete rows: " + rows);
     }
 
-    private void deleteBusCardRecordsByNumber(String number) {
+    private int deleteBusCardRecordsByNumber(String number) {
         MobclickAgent.onEvent(mActivity, UmengEvent.CARD_DEL_NUMBER, number);
         ContentResolver resolver = mActivity.getContentResolver();
         String where = ITrafficData.KuaiXinData.BusCard.CARD_NUMBER + "=?";
@@ -797,9 +794,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         };
         int row = resolver.delete(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, where,
                 selectionArgs);
-        if (row != -1) {
-            resolver.notifyChange(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null);
-        }
+        return row;
     }
 
     private final class DeleteActionModeCallback implements ActionMode.Callback {
@@ -813,14 +808,15 @@ public class BusCardRecordFragment extends SherlockFragment {
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             isDeleteMode = true;
-            mDeleteCardsList.clear();
-            return false;
+            mDeleteCardsHashSet.clear();
+            return true;
         }
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch(item.getItemId()) {
                 case R.id.delete:
+                    deleteBusCard();
                     mode.finish();
                     break;
             }
@@ -830,9 +826,20 @@ public class BusCardRecordFragment extends SherlockFragment {
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             isDeleteMode = false;
-            mDeleteCardsList.clear();
+            mDeleteCardsHashSet.clear();
             initTab(mBusCards); // re-init tabs to make the tab display normally
             mDeleteMode = null;
+        }
+    }
+
+    private void deleteBusCard() {
+        int deleteRows = 0;
+        for(String card_number : mDeleteCardsHashSet) {
+            deleteRows += deleteBusCardRecordsByNumber(card_number);
+        }
+        mDeleteCardsHashSet.clear();
+        if (deleteRows > 0) {
+            mActivity.getContentResolver().notifyChange(ITrafficData.KuaiXinData.BusCard.CONTENT_URI, null);
         }
     }
 
