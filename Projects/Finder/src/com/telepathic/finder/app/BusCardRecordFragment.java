@@ -101,8 +101,6 @@ public class BusCardRecordFragment extends SherlockFragment {
 
     private ArrayList<View> mViewPagerTabView = new ArrayList<View>();
 
-    private ArrayList<BusCardPageView> mPageViews = new ArrayList<BusCardPageView>();
-
     private int mScreenWidth;
 
     private volatile boolean isClicked;
@@ -130,9 +128,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         @Override
         public void handleMessage(Message msg) {
             mWaitingDialog.cancel();
-            //            for (BusCardPageView page : mPageViews) {
-            //                page.mRecordList.onRefreshComplete();
-            //            }
+
             mViewPagerAdapter.notifyRefreshCompleted();
 
             mConsumptionDetail.requestFocusFromTouch();
@@ -316,18 +312,6 @@ public class BusCardRecordFragment extends SherlockFragment {
                     deleteModeSelected(tv, card_number);
                 }
             }
-            //            ImageView iv = (ImageView)tabView.findViewById(R.id.delete_card);
-            //            iv.setOnClickListener(new OnClickListener() {
-            //                @Override
-            //                public void onClick(View v) {
-            //                    deleteBusCardRecordsByNumber(card_number);
-            //                }
-            //            });
-            //            if (isDeleteMode) {
-            //                iv.setVisibility(View.VISIBLE);
-            //            } else {
-            //                iv.setVisibility(View.GONE);
-            //            }
             mViewPagerTabView.add(tabView);
             mTabContent.addView(tabView);
         }
@@ -661,18 +645,6 @@ public class BusCardRecordFragment extends SherlockFragment {
             startLoadRecords();
         }
 
-        public void refreshPageView(BusCard card) {
-            mCard = card;
-            String count = TextUtils.isEmpty(mCard.getResidualCount())?"0":mCard.getResidualCount();
-            String amount = TextUtils.isEmpty(mCard.getResidualAmount())?"0":mCard.getResidualAmount();
-            mResidualCount.setText(getString(R.string.residual_count, count));
-            mResidualAmount.setText(getString(R.string.residual_amount, amount));
-        }
-
-        public String getCardNumber() {
-            return mCard.getCardNumber();
-        }
-
         public View getView() {
             return mRootView;
         }
@@ -773,7 +745,6 @@ public class BusCardRecordFragment extends SherlockFragment {
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            //            ((ViewPager)container).removeView(mPageViews.get(position).getView());
             container.removeView(mPagerViewList.get(position).getView());
         }
 
