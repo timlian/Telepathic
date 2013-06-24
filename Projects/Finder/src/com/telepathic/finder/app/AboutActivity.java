@@ -79,7 +79,7 @@ public class AboutActivity extends SherlockActivity {
     @Override
     public void onBackPressed() {
         finish();
-        overridePendingTransition(R.anim.back_window_stay, R.anim.push_right_out);
+        overridePendingTransition(R.anim.back_window_forward, R.anim.push_right_out);
     }
 
 }

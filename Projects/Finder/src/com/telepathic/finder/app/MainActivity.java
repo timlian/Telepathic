@@ -345,7 +345,7 @@ public class MainActivity extends SherlockFragmentActivity {
         super.onPause();
         MobclickAgent.onPause(this);
         if (!mIsQuitApp) {
-            overridePendingTransition(R.anim.push_right_in, R.anim.back_window_stay);
+            overridePendingTransition(R.anim.push_right_in, R.anim.back_window_back);
         }
     }
 
