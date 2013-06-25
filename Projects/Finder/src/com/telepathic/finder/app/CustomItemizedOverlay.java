@@ -7,25 +7,24 @@ import android.graphics.drawable.Drawable;
 import android.widget.Toast;
 
 import com.baidu.mapapi.map.ItemizedOverlay;
+import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.OverlayItem;
 
 
 public class CustomItemizedOverlay extends ItemizedOverlay<OverlayItem> {
     private ArrayList<OverlayItem> overlayItemList = new ArrayList<OverlayItem>();
     private Context context;
+    private MapView mMapView;
 
-    public CustomItemizedOverlay(Drawable defaultMarker) {
-        super(defaultMarker);
+    public CustomItemizedOverlay(Drawable defaultMarker, MapView mapView) {
+        super(defaultMarker, mapView);
+        mMapView = mapView;
     }
 
-    public CustomItemizedOverlay(Drawable marker, Context context) {
-        super(marker);
+    public CustomItemizedOverlay(Drawable marker, Context context, MapView mapView) {
+        super(marker, mapView);
         this.context = context;
-    }
-
-    @Override
-    protected OverlayItem createItem(int i) {
-        return overlayItemList.get(i);
+        mMapView = mapView;
     }
 
     @Override
@@ -35,12 +34,12 @@ public class CustomItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 
     public void addOverlay(OverlayItem overlayItem) {
         overlayItemList.add(overlayItem);
-        this.populate();
+        this.addItem(overlayItem);
     }
 
     public void removeAllOverlay() {
         overlayItemList.removeAll(overlayItemList);
-        this.populate();
+        this.removeAll();
     }
 
     @Override

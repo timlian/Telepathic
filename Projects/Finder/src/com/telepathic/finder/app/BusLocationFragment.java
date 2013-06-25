@@ -222,7 +222,7 @@ public class BusLocationFragment extends SherlockFragment {
             /**
              * 创建自定义的ItemizedOverlay
              */
-            mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity);
+            mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity, mMapView);
         }
         if (mLocationOverlay == null) {
             mLocationOverlay = new MyLocationOverlay(mMapView);
@@ -289,7 +289,7 @@ public class BusLocationFragment extends SherlockFragment {
                 /**
                  * 创建一个新的自定义的ItemizedOverlay，以便更新时使用
                  */
-                mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity);
+                mBusLocationOverlay = new CustomItemizedOverlay(marker, mActivity, mMapView);
                 mUpdateLocation.setEnabled(true);
                 mUpdateIcon.setEnabled(true);
                 mUpdateIcon.setVisibility(View.VISIBLE);
