@@ -429,7 +429,11 @@ public class BusCardRecordFragment extends SherlockFragment {
                 .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.ic_card_hint));
-        mSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        if(Utils.hasSpecialInputMethod(mActivity)) {
+            mSearchView.setInputType(InputType.TYPE_CLASS_TEXT);
+        } else {
+            mSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
         mSearchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 

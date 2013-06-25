@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -54,7 +55,35 @@ public class Utils {
 
     private static final SimpleDateFormat HIGH_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSSS");
 
+    private static final String PACKAGENAME_SOGOU_MI_INPUTMETHOD = "com.sogou.inputmethod.mi";
+
+    private static final String PACKAGENAME_SAMSUNG_INPUTMETHOD = "com.samsung.inputmethod";
+
+    private static final String PACKAGENAME_SNDA_INPUTMETHOD = "com.snda.input";
+
+    private static final String PACKAGENAME_GOOGLE_PINYIN_INPUTMETHOD = "com.google.android.inputmethod.pinyin";
+
     private Utils() {
+    }
+
+    /**
+     * Find if the device has installed the input method that can not input character or start search.
+     * @param context
+     * @return
+     */
+    public static boolean hasSpecialInputMethod(Context context) {
+        if (context != null) {
+            List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(0);
+            for(PackageInfo info : packages) {
+                if(info.packageName.equalsIgnoreCase(PACKAGENAME_SOGOU_MI_INPUTMETHOD)
+                        || info.packageName.equalsIgnoreCase(PACKAGENAME_SAMSUNG_INPUTMETHOD)
+                        || info.packageName.equalsIgnoreCase(PACKAGENAME_SNDA_INPUTMETHOD)
+                        || info.packageName.equalsIgnoreCase(PACKAGENAME_GOOGLE_PINYIN_INPUTMETHOD)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void hideSoftKeyboard(Context c, View v) {

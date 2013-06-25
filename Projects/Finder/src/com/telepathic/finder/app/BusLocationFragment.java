@@ -634,7 +634,7 @@ public class BusLocationFragment extends SherlockFragment {
         });
 
         EditText searchEditText = (EditText)mSearchView.findViewById(R.id.abs__search_src_text);
-        if (searchEditText != null) {
+        if (searchEditText != null && !Utils.hasSpecialInputMethod(mActivity)) {
             searchEditText.setEms(10);
             searchEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
             searchEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
