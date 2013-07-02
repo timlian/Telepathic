@@ -19,6 +19,9 @@
     <string name="menu_settings">设置</string>
     <string name="map_not_ready">地图尚未加载完成</string>
     <string name="find">查询</string>
+    <string name="down_offline_map">下载离线地图</string>
+    <string name="remove_offline_map">删除离线地图</string>
+    <string name="update_offline_map">更新离线地图</string>
     <string name="clear_cache">清空历史记录</string>
     <string name="delete_card">删除公交卡</string>
     <string name="delete">删除</string>
@@ -57,6 +60,17 @@
     <string name="transfer_scheme_detail">从<xliff:g id="start_station" example="华阳绕城路口">%1$s</xliff:g>乘坐<xliff:g id="bus_number" example="501">%2$s</xliff:g>路到达<xliff:g id="end_station" example="火车南站">%3$s</xliff:g></string>
     <string name="select_a_station">请按照GPS编号选择一个站台</string>
     <string name="unknown">未知</string>
+    <string name="remove">删除</string>
+    <string name="offline_map_continue">继续</string>
+    <string name="offline_map">离线地图</string>
+    <string name="offline_map_tips">将会下载成都市离线地图数据(大约%1$s), 是否继续?</string>
+    <string name="offline_map_download_title">下载离线地图</string>
+    <string name="offline_map_downloading">下载中…</string>
+    <string name="offline_map_pause">暂停</string>
+    <string name="offline_map_update_tips">成都市离线地图数据需要更新(大约%1$s), 是否继续?</string>
+    <string name="offline_map_continue_down_tips">成都市离线地图数据已下载 %1$s, 还剩%2$s, 是否继续?</string>
+    <string name="offline_map_remove_title">删除离线地图</string>
+    <string name="offline_map_remove_msg">成都市离线地图数据将会被删除, 是否继续?</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>

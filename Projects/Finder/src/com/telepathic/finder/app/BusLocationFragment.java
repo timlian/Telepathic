@@ -1,6 +1,7 @@
 
 package com.telepathic.finder.app;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +49,10 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.LocationData;
+import com.baidu.mapapi.map.MKOLSearchRecord;
+import com.baidu.mapapi.map.MKOLUpdateElement;
+import com.baidu.mapapi.map.MKOfflineMap;
+import com.baidu.mapapi.map.MKOfflineMapListener;
 import com.baidu.mapapi.map.MapController;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationOverlay;
@@ -79,7 +84,15 @@ public class BusLocationFragment extends SherlockFragment {
 
     private static final int CLEAN_CACHE_CONFIRM_DLG = CUSTOM_DIALOG_ID_START + 2;
 
+    private static final int START_DOWNLOAD_OFFLINE_MAP_TIPS_DLG = CUSTOM_DIALOG_ID_START + 3;
+
+    private static final int DOWNLOAD_OFFLINE_MAP_PROGRESS_DLG = CUSTOM_DIALOG_ID_START + 4;
+
+    private static final int REMOVE_OFFLINE_MAP_TIPS_DLG = CUSTOM_DIALOG_ID_START + 5;
+
     private static final int MAP_ZOOM_LEVEL = 14;
+
+    private static final int OFFLINE_MAP_CITY_ID_CHENGDU = 75;
 
     private MainActivity mActivity;
 
@@ -94,6 +107,10 @@ public class BusLocationFragment extends SherlockFragment {
     private ProgressBar mProgress;
 
     private MapController mMapController = null;
+
+    private MKOfflineMap mOffline = null;
+
+    private MKOfflineMapListener mOfflineMapListener = null;
 
     private LocationClient mLocClient;
 
@@ -122,6 +139,8 @@ public class BusLocationFragment extends SherlockFragment {
     private boolean mIsFirstUpdate = true;
 
     private BaiDuDataCache mDataCache;
+
+    private MKOLUpdateElement mOLUpdateElement = null;
 
     private static final String[] BUS_LINE_PROJECTION = {
         ITrafficData.BaiDuData.BusLine._ID, ITrafficData.BaiDuData.BusLine.LINE_NUMBER,
@@ -199,6 +218,13 @@ public class BusLocationFragment extends SherlockFragment {
             mMapController.setZoom(MAP_ZOOM_LEVEL);
             mMapController.enableClick(true);
         }
+
+        mOffline = new MKOfflineMap();
+        if (mOfflineMapListener == null) {
+            mOfflineMapListener = new OfflineMapListener();
+        }
+        mOffline.init(mMapController, mOfflineMapListener);
+
         if (mLocationListener == null) {
             mLocationListener = new MyLocationListenner();
         }
@@ -360,6 +386,8 @@ public class BusLocationFragment extends SherlockFragment {
     // removed.
     @Override
     public void onDestroyView() {
+        mOffline.destroy();
+        mMapView.destroy();
         super.onDestroyView();
     }
 
@@ -396,6 +424,101 @@ public class BusLocationFragment extends SherlockFragment {
                     }
                 }).setNegativeButton(R.string.cancel, null);
                 mDialog = build.create();
+                break;
+            case START_DOWNLOAD_OFFLINE_MAP_TIPS_DLG:
+                Builder tipsBuild = new AlertDialog.Builder(mActivity);
+                String dataSize = "0";
+                if (mOLUpdateElement == null) {
+                    ArrayList<MKOLSearchRecord> cityList = mOffline.searchCity(getString(R.string.default_city));
+                    if (cityList.size() > 0) {
+                        MKOLSearchRecord cityChengdu = cityList.get(0);
+                        if (cityChengdu != null) {
+                            dataSize = formatDataSize(cityChengdu.size);
+                        }
+                    }
+                    tipsBuild.setMessage(getString(R.string.offline_map_tips, dataSize));
+                } else {
+                    if (mOLUpdateElement.update) {
+                        dataSize = formatDataSize(mOLUpdateElement.serversize);
+                        tipsBuild.setMessage(getString(R.string.offline_map_update_tips, dataSize));
+                    } else {
+                        if (mOLUpdateElement.size != mOLUpdateElement.serversize) {
+                            String size = formatDataSize(mOLUpdateElement.size);
+                            String residualsize = formatDataSize(mOLUpdateElement.serversize - mOLUpdateElement.size);
+                            tipsBuild.setMessage(getString(R.string.offline_map_continue_down_tips, size, residualsize));
+                        }
+                    }
+                }
+                tipsBuild.setTitle(R.string.offline_map)
+                .setPositiveButton(R.string.offline_map_continue, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showDialog(DOWNLOAD_OFFLINE_MAP_PROGRESS_DLG);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null);
+                mDialog = tipsBuild.create();
+                break;
+            case DOWNLOAD_OFFLINE_MAP_PROGRESS_DLG:
+                final ProgressDialog downOfflineDlg = new ProgressDialog(mActivity);
+                downOfflineDlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                downOfflineDlg.setIndeterminate(true);
+                downOfflineDlg.setTitle(R.string.offline_map_download_title);
+                downOfflineDlg.setMessage(getString(R.string.offline_map_downloading));
+                mOffline.start(OFFLINE_MAP_CITY_ID_CHENGDU);
+                downOfflineDlg.setCancelable(false);
+                downOfflineDlg.setButton(ProgressDialog.BUTTON_POSITIVE, getString(R.string.offline_map_pause), new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (downOfflineDlg.getButton(ProgressDialog.BUTTON_POSITIVE).getText().equals(getString(R.string.offline_map_pause))) {
+                            mOffline.pause(OFFLINE_MAP_CITY_ID_CHENGDU);
+                            downOfflineDlg.getButton(ProgressDialog.BUTTON_POSITIVE).setText(getString(R.string.offline_map_continue));
+                        } else {
+                            mOffline.start(OFFLINE_MAP_CITY_ID_CHENGDU);
+                            downOfflineDlg.getButton(ProgressDialog.BUTTON_POSITIVE).setText(getString(R.string.offline_map_pause));
+                        }
+                        try
+                        {
+                            Field field = dialog.getClass().getSuperclass().getSuperclass().getDeclaredField("mShowing");
+                            field.setAccessible(true);
+                            field.set(dialog, false);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                downOfflineDlg.setButton(ProgressDialog.BUTTON_NEGATIVE, getString(R.string.cancel), new OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mOffline.pause(OFFLINE_MAP_CITY_ID_CHENGDU);
+                        try
+                        {
+                            Field field = dialog.getClass().getSuperclass().getSuperclass().getDeclaredField("mShowing");
+                            field.setAccessible(true);
+                            field.set(dialog, true);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                mDialog = downOfflineDlg;
+                break;
+            case REMOVE_OFFLINE_MAP_TIPS_DLG:
+                Builder removeDataDuild = new AlertDialog.Builder(mActivity);
+                removeDataDuild.setTitle(R.string.offline_map_remove_title)
+                .setMessage(R.string.offline_map_remove_msg)
+                .setPositiveButton(R.string.remove, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mOffline.remove(OFFLINE_MAP_CITY_ID_CHENGDU);
+                    }
+                }).setNegativeButton(R.string.cancel, null);
+                mDialog = removeDataDuild.create();
                 break;
             default:
                 break;
@@ -561,6 +684,21 @@ public class BusLocationFragment extends SherlockFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.down_offline_map:
+                if (mOLUpdateElement == null) {
+                    showDialog(START_DOWNLOAD_OFFLINE_MAP_TIPS_DLG);
+                } else {
+                    if(mOLUpdateElement.update) {
+                        showDialog(START_DOWNLOAD_OFFLINE_MAP_TIPS_DLG);
+                    } else {
+                        if (mOLUpdateElement.size == mOLUpdateElement.serversize) {
+                            showDialog(REMOVE_OFFLINE_MAP_TIPS_DLG);
+                        } else {
+                            showDialog(START_DOWNLOAD_OFFLINE_MAP_TIPS_DLG);
+                        }
+                    }
+                }
+                return true;
             case R.id.clear_cache:
                 showDialog(CLEAN_CACHE_CONFIRM_DLG);
                 return true;
@@ -570,6 +708,28 @@ public class BusLocationFragment extends SherlockFragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem OLMap = menu.findItem(R.id.down_offline_map);
+        if (mOffline != null && OLMap != null) {
+            mOLUpdateElement = mOffline.getUpdateInfo(OFFLINE_MAP_CITY_ID_CHENGDU);
+            if (mOLUpdateElement != null) {
+                if(mOLUpdateElement.update) {
+                    OLMap.setTitle(R.string.update_offline_map);
+                } else {
+                    if (mOLUpdateElement.size == mOLUpdateElement.serversize) {
+                        OLMap.setTitle(R.string.remove_offline_map);
+                    } else {
+                        OLMap.setTitle(R.string.down_offline_map);
+                    }
+                }
+            } else {
+                OLMap.setTitle(R.string.down_offline_map);
+            }
+        }
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -740,6 +900,54 @@ public class BusLocationFragment extends SherlockFragment {
             mUpdateIcon.setEnabled(true);
             drawRoute(route);
         }
+    }
+
+    private class OfflineMapListener implements MKOfflineMapListener {
+
+        @Override
+        public void onGetOfflineMapState(int type, int state) {
+            switch (type) {
+                case MKOfflineMap.TYPE_DOWNLOAD_UPDATE:
+                    MKOLUpdateElement update = mOffline.getUpdateInfo(state);
+                    //处理下载进度更新提示
+                    if ( update != null ){
+                        ((ProgressDialog)mDialog).setIndeterminate(false);
+                        ((ProgressDialog)mDialog).setMax(update.serversize);
+                        ((ProgressDialog)mDialog).setProgress(update.size);
+                        if (update.size == update.serversize) {
+                            try
+                            {
+                                Field field = mDialog.getClass().getSuperclass().getSuperclass().getDeclaredField("mShowing");
+                                field.setAccessible(true);
+                                field.set(mDialog, true);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                            mDialog.dismiss();
+                        }
+                    }
+                    break;
+                case MKOfflineMap.TYPE_NEW_OFFLINE:
+                    //有新离线地图安装
+                    break;
+                case MKOfflineMap.TYPE_VER_UPDATE:
+                    // 版本更新提示
+                    break;
+            }
+        }
+
+    }
+
+    public  String formatDataSize(int size) {
+        String ret = "";
+        if (size < (1024 * 1024)) {
+            ret = String.format("%dK", size / 1024);
+        } else {
+            ret = String.format("%.2fM", size / (1024 * 1024.0));
+        }
+        return ret;
     }
 
 }
