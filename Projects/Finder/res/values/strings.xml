@@ -79,6 +79,7 @@
     <string name="offline_map_continue_down_tips">The offline map data of Chengdu has been downloaded %1$s, there is %2$s remain, Do you want to continue?</string>
     <string name="offline_map_remove_title">Remove offline map</string>
     <string name="offline_map_remove_msg">The offline map data of Chengdu will be removed, Do you want to continue?</string>
+    <string name="offline_map_no_external_storage">Please insert SD card and then download the offline map data</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>

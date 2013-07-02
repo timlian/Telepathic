@@ -71,6 +71,7 @@
     <string name="offline_map_continue_down_tips">成都市离线地图数据已下载 %1$s, 还剩%2$s, 是否继续?</string>
     <string name="offline_map_remove_title">删除离线地图</string>
     <string name="offline_map_remove_msg">成都市离线地图数据将会被删除, 是否继续?</string>
+    <string name="offline_map_no_external_storage">请插入SD卡再下载离线地图数据</string>
 
     <!-- consumer record retrieve -->
     <string name="card_id_error_notice">请输入正确的公交卡号</string>

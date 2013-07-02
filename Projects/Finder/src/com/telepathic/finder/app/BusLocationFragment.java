@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Message;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
@@ -426,6 +427,10 @@ public class BusLocationFragment extends SherlockFragment {
                 mDialog = build.create();
                 break;
             case START_DOWNLOAD_OFFLINE_MAP_TIPS_DLG:
+                if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                    Toast.makeText(mActivity, R.string.offline_map_no_external_storage, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Builder tipsBuild = new AlertDialog.Builder(mActivity);
                 String dataSize = "0";
                 if (mOLUpdateElement == null) {
