@@ -17,6 +17,10 @@ public class UmengEvent {
 
     public static final String LOCATION_USER_LOC = "LOCATION_USER_LOC";
 
+    public static final String LOCATION_DOWN_OFFLINE_MAP = "LOCATION_DOWN_OFFLINE_MAP";
+
+    public static final String LOCATION_DEL_OFFLINE_MAP = "LOCATION_DEL_OFFLINE_MAP";
+
     public static final String CARD_NUMBER = "CARD_NUMBER";
 
     public static final String CARD_DEL_NUMBER = "CARD_DEL_NUMBER";

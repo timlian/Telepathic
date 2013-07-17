@@ -458,6 +458,7 @@ public class BusLocationFragment extends SherlockFragment {
                 .setPositiveButton(R.string.offline_map_continue, new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        MobclickAgent.onEvent(mActivity, UmengEvent.LOCATION_DOWN_OFFLINE_MAP);
                         showDialog(DOWNLOAD_OFFLINE_MAP_PROGRESS_DLG);
                     }
                 })
@@ -520,6 +521,7 @@ public class BusLocationFragment extends SherlockFragment {
                 .setPositiveButton(R.string.remove, new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        MobclickAgent.onEvent(mActivity, UmengEvent.LOCATION_DEL_OFFLINE_MAP);
                         mOffline.remove(OFFLINE_MAP_CITY_ID_CHENGDU);
                     }
                 }).setNegativeButton(R.string.cancel, null);
