@@ -39,7 +39,7 @@ public class Utils {
 
     private static final boolean DEBUG = false;
 
-    private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([a-zA-Z])?|([k|K])\\d{1,3}";
+    private static final String BUS_LINE_NUM_EXPRESSION = "\\d{1,3}([a-zA-Z])?|([k|K])\\d{1,3}|\\d{4}";
 
     private static final String BUS_CARD_NUM_EXPRESSION = "\\d{8}";
 
