@@ -129,7 +129,9 @@ public class BusCardRecordFragment extends SherlockFragment {
         public void handleMessage(Message msg) {
             mWaitingDialog.cancel();
 
-            mViewPagerAdapter.notifyRefreshCompleted();
+            if (mViewPagerAdapter != null) {
+                mViewPagerAdapter.notifyRefreshCompleted();
+            }
 
             mConsumptionDetail.requestFocusFromTouch();
             switch (msg.arg2) {
