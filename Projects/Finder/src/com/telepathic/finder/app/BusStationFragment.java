@@ -156,6 +156,7 @@ public class BusStationFragment extends SherlockFragment {
     public View getView(int position, KXBusStationLines stationLines) {
         View convertView = mActivity.getLayoutInflater().inflate(R.layout.bus_station_item, null);
         BusInfoHolder holder = new BusInfoHolder();
+        holder.llBusLineTime = (LinearLayout)convertView.findViewById(R.id.bus_line_time);
         holder.tvBusNumber = (TextView)convertView.findViewById(R.id.bus_number);
         holder.tvStartingTime = (TextView)convertView.findViewById(R.id.starting_time);
         holder.tvEndingTime = (TextView)convertView.findViewById(R.id.ending_time);
@@ -172,8 +173,13 @@ public class BusStationFragment extends SherlockFragment {
         BusInfoHolder holder = (BusInfoHolder)view.getTag();
         holder.tvBusNumber.setText(busLine.getLineNumber());
         if (busRoute != null) {
-            holder.tvStartingTime.setText(getString(R.string.starting_time, busRoute.getStartTime()));
-            holder.tvEndingTime.setText(getString(R.string.ending_time, busRoute.getEndTime()));
+            String startTime = busRoute.getStartTime();
+            String endTime = busRoute.getEndTime();
+            holder.tvStartingTime.setText(getString(R.string.starting_time, startTime));
+            holder.tvEndingTime.setText(getString(R.string.ending_time, endTime));
+            if (TextUtils.isEmpty(startTime) || TextUtils.isEmpty(endTime)) {
+                holder.llBusLineTime.setVisibility(View.GONE);
+            }
             holder.lvStationNameList.setAdapter(new StationsAdapter(busRoute.getStations(),
                     stationLines.getName()));
         } else {
@@ -417,6 +423,8 @@ public class BusStationFragment extends SherlockFragment {
     }
 
     private static class BusInfoHolder {
+        LinearLayout llBusLineTime;
+
         TextView tvBusNumber;
 
         TextView tvStartingTime;

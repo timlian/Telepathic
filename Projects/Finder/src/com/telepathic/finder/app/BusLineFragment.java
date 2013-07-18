@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -239,6 +240,7 @@ public class BusLineFragment extends SherlockFragment {
     private View getView(KXBusRoute busRoute) {
         View convertView = mActivity.getLayoutInflater().inflate(R.layout.bus_route_item, null);
         BusRouteHolder holder = new BusRouteHolder();
+        holder.llTime = (LinearLayout)convertView.findViewById(R.id.bus_time);
         holder.tvStartTime = (TextView)convertView.findViewById(R.id.starting_time);
         holder.tvEndTime = (TextView)convertView.findViewById(R.id.ending_time);
         holder.lvStationNameList = (ListView)convertView.findViewById(R.id.station_name_list);
@@ -252,12 +254,18 @@ public class BusLineFragment extends SherlockFragment {
      */
     private void bindView(KXBusRoute busRoute, View view) {
         BusRouteHolder holder = (BusRouteHolder)view.getTag();
-        holder.tvStartTime.setText(getString(R.string.starting_time, busRoute.getStartTime()));
-        holder.tvEndTime.setText(getString(R.string.ending_time, busRoute.getEndTime()));
+        String startTime = busRoute.getStartTime();
+        String endTime = busRoute.getEndTime();
+        holder.tvStartTime.setText(getString(R.string.starting_time, startTime));
+        holder.tvEndTime.setText(getString(R.string.ending_time, endTime));
+        if (TextUtils.isEmpty(startTime) || TextUtils.isEmpty(endTime)) {
+            holder.llTime.setVisibility(View.GONE);
+        }
         holder.lvStationNameList.setAdapter(new StationsAdapter(busRoute.getStations()));
     }
 
     private class BusRouteHolder {
+        LinearLayout llTime;
         TextView tvStartTime;
         TextView tvEndTime;
         ListView lvStationNameList;

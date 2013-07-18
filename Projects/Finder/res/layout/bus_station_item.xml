@@ -33,6 +33,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/bus_line_time"
             android:gravity="center"
             android:orientation="vertical" >
 
