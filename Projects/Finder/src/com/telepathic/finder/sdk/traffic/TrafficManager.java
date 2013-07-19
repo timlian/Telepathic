@@ -157,6 +157,9 @@ public class TrafficManager {
                                 if (tempList == null || tempList.size() == 0) {
                                     errorCode = IErrorCode.ERROR_NO_VALID_DATA;
                                     errorText = "no valid data";
+                                } else if (tempList.size() > 1) {
+                                    notifySuccess(listener, tempList);
+                                    return;
                                 }
                             } else {
                                 errorText = task.getTaskResult().getErrorMessage();

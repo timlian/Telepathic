@@ -446,6 +446,10 @@ public class BusStationFragment extends SherlockFragment {
             stationNameOrGpsNumber = Utils.completeStationName(stationNameOrGpsNumber);
             MobclickAgent.onEvent(mActivity, UmengEvent.STATION_NAME, stationNameOrGpsNumber);
         }
+        searchStationLines(stationNameOrGpsNumber);
+    }
+
+    private void searchStationLines(String stationNameOrGpsNumber) {
         mWaitingDialog.show();
         mTrafficService.getBusStationLines(stationNameOrGpsNumber, new ICompletionListener() {
             @Override
@@ -494,8 +498,7 @@ public class BusStationFragment extends SherlockFragment {
                 final int selectedPosition = ((AlertDialog)dialog).getListView()
                         .getCheckedItemPosition();
                 final KXStationLines stationLine = stationLineList.get(selectedPosition);
-                KXBusStationLines busStationLine = mDataCache.getStationLines(stationLine.getGpsNumber());
-                showStationLines(busStationLine);
+                searchStationLines(stationLine.getGpsNumber());
             }
         }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
