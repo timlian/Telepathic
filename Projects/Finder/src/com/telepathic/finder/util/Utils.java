@@ -53,6 +53,8 @@ public class Utils {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private static final SimpleDateFormat DATE_FORMAT_2 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
     private static final SimpleDateFormat HIGH_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSSS");
 
     private static final String PACKAGENAME_SOGOU_MI_INPUTMETHOD = "com.sogou.inputmethod.mi";
@@ -190,6 +192,11 @@ public class Utils {
             result = DATE_FORMAT.parse(text);
         } catch (ParseException e) {
             e.printStackTrace();
+            try {
+                result = DATE_FORMAT_2.parse(text);
+            } catch (ParseException e2) {
+                e2.printStackTrace();
+            }
         }
         return result;
     }
