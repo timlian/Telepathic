@@ -18,7 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -28,6 +27,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -73,12 +73,14 @@ public class Utils {
      */
     public static boolean hasSpecialInputMethod(Context context) {
         if (context != null) {
-            List<PackageInfo> packages = context.getPackageManager().getInstalledPackages(0);
-            for(PackageInfo info : packages) {
-                if(info.packageName.equalsIgnoreCase(PACKAGENAME_SOGOU_MI_INPUTMETHOD)
-                        || info.packageName.equalsIgnoreCase(PACKAGENAME_SAMSUNG_INPUTMETHOD)
-                        || info.packageName.equalsIgnoreCase(PACKAGENAME_SNDA_INPUTMETHOD)
-                        || info.packageName.equalsIgnoreCase(PACKAGENAME_GOOGLE_PINYIN_INPUTMETHOD)) {
+            InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            List<InputMethodInfo> enabledInputMethodList = imm.getEnabledInputMethodList();
+
+            for(InputMethodInfo info : enabledInputMethodList) {
+                if(info.getPackageName().equalsIgnoreCase(PACKAGENAME_SOGOU_MI_INPUTMETHOD)
+                        || info.getPackageName().equalsIgnoreCase(PACKAGENAME_SAMSUNG_INPUTMETHOD)
+                        || info.getPackageName().equalsIgnoreCase(PACKAGENAME_SNDA_INPUTMETHOD)
+                        || info.getPackageName().equalsIgnoreCase(PACKAGENAME_GOOGLE_PINYIN_INPUTMETHOD)) {
                     return true;
                 }
             }
