@@ -13,10 +13,12 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
@@ -27,6 +29,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -121,6 +124,19 @@ public class BusTransferFragment extends SherlockFragment {
         mEndStation = (AutoCompleteTextView)getView().findViewById(R.id.end_station);
         mEndStation.setThreshold(2);
         mEndStation.addTextChangedListener(new StationNameWatcher(mEndStation));
+        mEndStation.setOnEditorActionListener(new OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String startStationName = mStartStation.getText().toString().trim();
+                    String endStationName = mEndStation.getText().toString().trim();
+                    getBusTransfer(startStationName, endStationName);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
 
         mTransferList = (ListView)getView().findViewById(R.id.transfer_list);
 

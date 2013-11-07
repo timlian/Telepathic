@@ -31,6 +31,7 @@
                     android:background="@drawable/bg_bus_start_station_edit_text"
                     android:hint="@string/start_station_hint"
                     android:singleLine="true"
+                    android:imeOptions="actionNext"
                     android:textColor="@android:color/black" />
 
                 <ProgressBar
@@ -56,6 +57,7 @@
                     android:background="@drawable/bg_bus_end_station_edit_text"
                     android:hint="@string/end_station_hint"
                     android:singleLine="true"
+                    android:imeOptions="actionSearch"
                     android:textColor="@android:color/black" />
 
                 <ProgressBar
