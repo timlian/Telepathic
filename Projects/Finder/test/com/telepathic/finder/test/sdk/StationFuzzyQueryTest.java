@@ -56,7 +56,7 @@ public class StationFuzzyQueryTest extends ApplicationTestCase<FinderApplication
             @Override
             public void onSuccess(Object result) {
                 ArrayList<String> stationNames = (ArrayList<String>) result;
-                assertEquals(1, stationNames.size());
+                assertEquals(2, stationNames.size());// 西门车站、川师成龙校区西门站
                 notifyDone();
             }
 
