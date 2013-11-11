@@ -13,6 +13,11 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -21,16 +26,11 @@ import cn.domob.android.ads.DomobAdManager.ErrorCode;
 import cn.domob.android.ads.DomobAdView;
 import cn.domob.android.ads.DomobUpdater;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.telepathic.finder.R;
 import com.telepathic.finder.util.UmengEvent;
 import com.umeng.analytics.MobclickAgent;
 
-public class MainActivity extends SherlockFragmentActivity {
+public class MainActivity extends ActionBarActivity {
 
     private static final String TAG_LOCATION_FRAGMENT      = "Location";
     private static final String TAG_CARD_INFO_FRAGMENT     = "cardInfo";
@@ -324,7 +324,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
     }

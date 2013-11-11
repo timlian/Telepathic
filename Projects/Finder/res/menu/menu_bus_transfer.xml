@@ -1,13 +1,14 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/get_bus_transfer"
         android:icon="@drawable/ic_menu_search_holo_light"
-        android:showAsAction="always|withText"
+        app:showAsAction="always|withText"
         android:title="@string/find"/>
     <item
         android:id="@+id/about"
-        android:showAsAction="never"
+        app:showAsAction="never"
         android:title="@string/title_activity_about"/>
 
 </menu>

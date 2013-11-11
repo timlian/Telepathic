@@ -20,18 +20,27 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
+import android.support.v7.widget.SearchView.OnSuggestionListener;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -47,14 +56,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
-import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
 import com.telepathic.finder.R;
 import com.telepathic.finder.app.MessageDispatcher.IMessageHandler;
 import com.telepathic.finder.sdk.ICompletionListener;
@@ -69,7 +70,7 @@ import com.telepathic.finder.view.DropRefreshListView;
 import com.telepathic.finder.view.DropRefreshListView.OnRefreshListener;
 import com.umeng.analytics.MobclickAgent;
 
-public class BusCardRecordFragment extends SherlockFragment {
+public class BusCardRecordFragment extends Fragment {
 
     private static final String TAG = BusCardRecordFragment.class.getSimpleName();
 
@@ -158,7 +159,7 @@ public class BusCardRecordFragment extends SherlockFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mActivity = (MainActivity)getSherlockActivity();
+        mActivity = (MainActivity)getActivity();
 
         initView();
         FinderApplication app = (FinderApplication)mActivity.getApplication();
@@ -294,7 +295,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                 @Override
                 public boolean onLongClick(View v) {
                     if (mBusCards != null && mBusCards.size() > 0 && !isDeleteMode) {
-                        mDeleteMode = mActivity.startActionMode(new DeleteActionModeCallback());
+                        mDeleteMode = mActivity.startSupportActionMode(new DeleteActionModeCallback());
                         deleteModeSelected(tv, card_number);
                     } else {
                         if (mDeleteCardsHashSet.contains(card_number)) {
@@ -390,7 +391,7 @@ public class BusCardRecordFragment extends SherlockFragment {
         switch (item.getItemId()) {
             case R.id.delete_card:
                 if (mBusCards != null && mBusCards.size() > 0) {
-                    mDeleteMode = mActivity.startActionMode(new DeleteActionModeCallback());
+                    mDeleteMode = mActivity.startSupportActionMode(new DeleteActionModeCallback());
                     initTab(mBusCards); // Init the card tab display delete mode
                 }
                 return true;
@@ -424,10 +425,11 @@ public class BusCardRecordFragment extends SherlockFragment {
         inflater.inflate(R.menu.menu_card_record, menu);
 
         // Get the SearchView and set the searchable configuration
-        mSearchView = (SearchView)menu.findItem(R.id.search_card_record).getActionView();
-        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(
+        MenuItem searchItem = menu.findItem(R.id.search_card_record);
+        mSearchView = (SearchView)MenuItemCompat.getActionView(searchItem);
+        SearchManager manager = (SearchManager)this.getActivity().getSystemService(
                 Context.SEARCH_SERVICE);
-        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity()
+        SearchableInfo info = manager.getSearchableInfo(this.getActivity()
                 .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.ic_card_hint));
@@ -493,7 +495,7 @@ public class BusCardRecordFragment extends SherlockFragment {
                 return true;
             }
         });
-        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.abs__search_src_text);
+        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.search_src_text);
         if (searchEditText != null) {
             searchEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
                 @Override

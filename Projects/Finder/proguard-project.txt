@@ -17,7 +17,8 @@
 -libraryjars libs/domob_android_sdk.jar
 -libraryjars libs/ksoap2-android-assembly-3.0.0-RC.4-jar-with-dependencies.jar
 -libraryjars libs/locSDK_3.3.jar
--libraryjars ../ActionBarSherlock4.2.0/libs/android-support-v4.jar
+-libraryjars ../appcompat/libs/android-support-v4.jar
+-libraryjars ../appcompat/libs/android-support-v7-appcompat.jar
 
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
@@ -29,7 +30,11 @@
     *;
 }
 
--keep class com.actionbarsherlock.** {
+-keep class android.support.v7.widget.** {
+    public *;
+}
+
+-keep class android.support.v7.appcompat.** {
     public *;
 }
 

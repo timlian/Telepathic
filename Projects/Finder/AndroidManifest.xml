@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.telepathic.finder"
-    android:versionCode="12"
-    android:versionName="1.2" >
+    android:versionCode="13"
+    android:versionName="1.3" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -76,7 +76,7 @@
             android:name="com.telepathic.finder.app.MainActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Sherlock.Light" >
+            android:theme="@style/Theme.AppCompat.Light" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -90,7 +90,7 @@
             android:label="@string/title_activity_about"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Sherlock.Light" >
+            android:theme="@style/Theme.AppCompat.Light" >
         </activity>
         <activity
             android:name="com.telepathic.finder.app.BusLocationActivity"

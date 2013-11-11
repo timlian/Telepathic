@@ -23,11 +23,19 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
+import android.support.v7.widget.SearchView.OnSuggestionListener;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
@@ -38,13 +46,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
-import com.actionbarsherlock.widget.SearchView.OnSuggestionListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -76,7 +77,7 @@ import com.telepathic.finder.util.UmengEvent;
 import com.telepathic.finder.util.Utils;
 import com.umeng.analytics.MobclickAgent;
 
-public class BusLocationFragment extends SherlockFragment {
+public class BusLocationFragment extends Fragment {
     private static final String TAG = BusLocationFragment.class.getSimpleName();
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
@@ -748,11 +749,12 @@ public class BusLocationFragment extends SherlockFragment {
         inflater.inflate(R.menu.menu_bus_location, menu);
 
         // Get the SearchView and set the searchable configuration
-        mSearchView = (SearchView)menu.findItem(R.id.search_bus_location).getActionView();
+        MenuItem searchItem = menu.findItem(R.id.search_bus_location);
+        mSearchView = (SearchView)MenuItemCompat.getActionView(searchItem);
 
-        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(
+        SearchManager manager = (SearchManager)this.getActivity().getSystemService(
                 Context.SEARCH_SERVICE);
-        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity()
+        SearchableInfo info = manager.getSearchableInfo(this.getActivity()
                 .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.bus_number_hint));
@@ -800,7 +802,7 @@ public class BusLocationFragment extends SherlockFragment {
             }
         });
 
-        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.abs__search_src_text);
+        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.search_src_text);
         if (searchEditText != null && !Utils.hasSpecialInputMethod(mActivity)) {
             searchEditText.setEms(10);
             searchEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER);

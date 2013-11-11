@@ -5,18 +5,18 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
+import android.view.MenuItem;
 import android.widget.TextView;
 import cn.domob.android.ads.DomobUpdater;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.telepathic.finder.R;
 import com.telepathic.finder.util.UmengEvent;
 import com.umeng.analytics.MobclickAgent;
 
-public class AboutActivity extends SherlockActivity {
+public class AboutActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

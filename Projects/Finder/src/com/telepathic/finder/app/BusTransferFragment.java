@@ -9,12 +9,16 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -32,10 +36,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.ITrafficService;
@@ -45,7 +45,7 @@ import com.telepathic.finder.util.UmengEvent;
 import com.telepathic.finder.util.Utils;
 import com.umeng.analytics.MobclickAgent;
 
-public class BusTransferFragment extends SherlockFragment {
+public class BusTransferFragment extends Fragment {
     private static final String TAG = BusTransferFragment.class.getSimpleName();
 
     private static final int CUSTOM_DIALOG_ID_START = 100;
@@ -82,7 +82,7 @@ public class BusTransferFragment extends SherlockFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mActivity = (MainActivity)getSherlockActivity();
+        mActivity = (MainActivity)getActivity();
 
         FinderApplication app = (FinderApplication)mActivity.getApplication();
         mTrafficService = app.getTrafficService();

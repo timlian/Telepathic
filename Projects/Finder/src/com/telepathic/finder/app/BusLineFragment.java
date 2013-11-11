@@ -11,10 +11,17 @@ import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -27,12 +34,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.telepathic.finder.R;
 import com.telepathic.finder.sdk.ICompletionListener;
 import com.telepathic.finder.sdk.ITrafficService;
@@ -42,7 +43,7 @@ import com.telepathic.finder.util.UmengEvent;
 import com.telepathic.finder.util.Utils;
 import com.umeng.analytics.MobclickAgent;
 
-public class BusLineFragment extends SherlockFragment {
+public class BusLineFragment extends Fragment {
 
     private static final String TAG = BusLineFragment.class.getSimpleName();
 
@@ -111,11 +112,12 @@ public class BusLineFragment extends SherlockFragment {
         inflater.inflate(R.menu.menu_bus_line, menu);
 
         // Get the SearchView and set the searchable configuration
-        mSearchView = (SearchView)menu.findItem(R.id.search_bus_line).getActionView();
+        MenuItem searchItem = menu.findItem(R.id.search_bus_line);
+        mSearchView = (SearchView)MenuItemCompat.getActionView(searchItem);
 
-        SearchManager manager = (SearchManager)this.getSherlockActivity().getSystemService(
+        SearchManager manager = (SearchManager)this.getActivity().getSystemService(
                 Context.SEARCH_SERVICE);
-        SearchableInfo info = manager.getSearchableInfo(this.getSherlockActivity()
+        SearchableInfo info = manager.getSearchableInfo(this.getActivity()
                 .getComponentName());
         mSearchView.setSearchableInfo(info);
         mSearchView.setQueryHint(getResources().getText(R.string.bus_number_hint));
@@ -141,7 +143,7 @@ public class BusLineFragment extends SherlockFragment {
                 return true;
             }
         });
-        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.abs__search_src_text);
+        EditText searchEditText = (EditText)mSearchView.findViewById(R.id.search_src_text);
         if (searchEditText != null && !Utils.hasSpecialInputMethod(mActivity)) {
             searchEditText.setEms(10);
             searchEditText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
