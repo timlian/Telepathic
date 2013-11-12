@@ -10,17 +10,26 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import cn.domob.android.ads.DomobAdEventListener;
 import cn.domob.android.ads.DomobAdManager.ErrorCode;
 import cn.domob.android.ads.DomobAdView;
@@ -42,6 +51,13 @@ public class MainActivity extends ActionBarActivity {
 
     private RelativeLayout mAdContainer;
 
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private String[] mDrawerTitles;
+    private int[] mDrawerIcons;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
     private LinearLayout mTabLocation;
     private LinearLayout mTabCard;
     private LinearLayout mTabStation;
@@ -49,6 +65,10 @@ public class MainActivity extends ActionBarActivity {
     private LinearLayout mTabBusLine;
     private ActionBar mActionBar;
     private Dialog mExitDialog;
+    private int mPostion = 0;
+    private int mPostionTemp = 0;
+
+    private final int INVALID_POSITION = -1;
 
     private FragmentManager mFragmentManager;
 
@@ -60,7 +80,34 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
+        setupDrawerView();
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                R.drawable.ic_navigation_drawer,
+                R.string.drawer_open,
+                R.string.drawer_close
+                ) {
+            @Override
+            public void onDrawerClosed(View view) {
+                mPostion = mPostionTemp;
+                mActionBar.setTitle(mTitle);
+                supportInvalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                mPostion = INVALID_POSITION;
+                mActionBar.setTitle(mDrawerTitle);
+                supportInvalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
         mFragmentManager = getSupportFragmentManager();
 
         mTabLocation = (LinearLayout)findViewById(R.id.tab_location);
@@ -71,7 +118,9 @@ public class MainActivity extends ActionBarActivity {
 
         initSwitchHandlers();
         setupAdView();
-        navigateToLocation(mTabLocation);
+        if (savedInstanceState == null) {
+            selectItem(0);
+        }
 
         String needUpdate = MobclickAgent.getConfigParams(this, UMENG_PARAM_KEY);
 
@@ -86,6 +135,56 @@ public class MainActivity extends ActionBarActivity {
                 }
             }, 3000);
         }
+    }
+
+    private void setupDrawerView() {
+        mTitle = mDrawerTitle = getTitle();
+        mDrawerTitles = getResources().getStringArray(R.array.drawer_arrays);
+        mDrawerIcons = new int[]{R.drawable.ic_tab_location_selector,R.drawable.ic_tab_card_selector,R.drawable.ic_tab_station_selector,R.drawable.ic_tab_transfer_selector,R.drawable.ic_tab_line_selector};
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.setAdapter(new DrawerAdapter(this, mDrawerIcons, mDrawerTitles));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
+
+    private void selectItem(int position) {
+        mPostionTemp = position;
+        switch (position) {
+            case 0:
+                navigateToLocation(mTabLocation);
+                break;
+            case 1:
+                navigateToCardInfo(mTabCard);
+                break;
+            case 2:
+                navigateToStationLines(mTabStation);
+                break;
+            case 3:
+                navigateToTransfer(mTabTransfer);
+                break;
+            case 4:
+                navigateToBusLine(mTabBusLine);
+                break;
+            default:
+                break;
+        }
+        mDrawerList.setItemChecked(position, true);
+        setTitle(mDrawerTitles[position]);
+        mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        mActionBar.setTitle(mTitle);
     }
 
     private void setupAdView() {
@@ -322,21 +421,86 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    class DrawerAdapter extends BaseAdapter{
+        private LayoutInflater inflater;
+        private String[] texts;
+        private int[] icons;
+        private Context context;
+
+        public DrawerAdapter(Context ctx, int[] icons, String[] texts) {
+            super();
+            this.texts = texts;
+            this.icons = icons;
+            this.context = ctx;
+            inflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public int getCount() {
+            return texts.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return texts[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            convertView = inflater.inflate(R.layout.drawer_item, null);
+            ImageView icon = (ImageView) convertView
+                    .findViewById(R.id.icon);
+            TextView text = (TextView) convertView
+                    .findViewById(R.id.text);
+            icon.setBackgroundResource(icons[position]);
+            text.setText(texts[position]);
+            return convertView;
+        }
+    }
+
+    /**
+     * When using the ActionBarDrawerToggle, you must call it during
+     * onPostCreate() and onConfigurationChanged()...
+     */
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                if (mDrawerToggle.onOptionsItemSelected(item)) {
+                    return true;
+                }
             case R.id.about:
                 startActivity(new Intent(this, AboutActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);;
+        hideMenuItems(menu, !drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void hideMenuItems(Menu menu, boolean visible){
+        for(int i = 0; i < menu.size(); i++){
+            menu.getItem(i).setVisible(visible);
         }
     }
 

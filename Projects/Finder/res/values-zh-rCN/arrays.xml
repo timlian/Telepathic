@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string-array name="drawer_arrays">
+        <item>车辆位置</item>
+        <item>消费记录</item>
+        <item>站台信息</item>
+        <item>公交换乘</item>
+        <item>公交线路</item>
+    </string-array>
+
+</resources>

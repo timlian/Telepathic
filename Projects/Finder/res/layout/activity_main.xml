@@ -1,112 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1" >
-    </FrameLayout>
-
-    <RelativeLayout
-        android:id="@+id/ad_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center" />
+    android:layout_height="match_parent" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/abc_ab_bottom_solid_light_holo"
-        android:orientation="horizontal" >
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1" >
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/ad_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center" />
 
         <LinearLayout
-            android:id="@+id/tab_location"
-            android:layout_width="0dip"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/tab_host_spec_sector"
-            android:onClick="navigateToLocation"
-            android:orientation="vertical" >
+            android:background="@drawable/abc_ab_bottom_solid_light_holo"
+            android:orientation="horizontal"
+            android:visibility="gone" >
 
-            <ImageView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/tab_location"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_tab_location_selector" >
-            </ImageView>
-        </LinearLayout>
+                android:layout_weight="1"
+                android:background="@drawable/tab_host_spec_sector"
+                android:onClick="navigateToLocation"
+                android:orientation="vertical" >
 
-        <LinearLayout
-            android:id="@+id/tab_card"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/tab_host_spec_sector"
-            android:onClick="navigateToCardInfo"
-            android:orientation="vertical" >
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_tab_location_selector" >
+                </ImageView>
+            </LinearLayout>
 
-            <ImageView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/tab_card"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_tab_card_selector" >
-            </ImageView>
-        </LinearLayout>
+                android:layout_weight="1"
+                android:background="@drawable/tab_host_spec_sector"
+                android:onClick="navigateToCardInfo"
+                android:orientation="vertical" >
 
-        <LinearLayout
-            android:id="@+id/tab_station"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/tab_host_spec_sector"
-            android:onClick="navigateToStationLines"
-            android:orientation="vertical" >
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_tab_card_selector" >
+                </ImageView>
+            </LinearLayout>
 
-            <ImageView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/tab_station"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_tab_station_selector" >
-            </ImageView>
-        </LinearLayout>
-        
-        <LinearLayout
-            android:id="@+id/tab_transfer"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/tab_host_spec_sector"
-            android:onClick="navigateToTransfer"
-            android:orientation="vertical" >
+                android:layout_weight="1"
+                android:background="@drawable/tab_host_spec_sector"
+                android:onClick="navigateToStationLines"
+                android:orientation="vertical" >
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_tab_transfer_selector" >
-            </ImageView>
-        </LinearLayout>
-        
-        <LinearLayout
-            android:id="@+id/tab_bus_line"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/tab_host_spec_sector"
-            android:onClick="navigateToBusLine"
-            android:orientation="vertical" >
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_tab_station_selector" >
+                </ImageView>
+            </LinearLayout>
 
-            <ImageView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/tab_transfer"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_tab_line_selector" >
-            </ImageView>
+                android:layout_weight="1"
+                android:background="@drawable/tab_host_spec_sector"
+                android:onClick="navigateToTransfer"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_tab_transfer_selector" >
+                </ImageView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tab_bus_line"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/tab_host_spec_sector"
+                android:onClick="navigateToBusLine"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_tab_line_selector" >
+                </ImageView>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#FFFFFF"
+        android:choiceMode="singleChoice"
+        android:dividerHeight="0.5dp" />
+
+</android.support.v4.widget.DrawerLayout>
