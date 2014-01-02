@@ -1,13 +1,16 @@
 package com.telepathic.finder.app;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -18,10 +21,14 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Display;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -58,6 +65,7 @@ public class MainActivity extends ActionBarActivity {
     private int[] mDrawerIcons;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
+    private LinearLayout mTabContainer;
     private LinearLayout mTabLocation;
     private LinearLayout mTabCard;
     private LinearLayout mTabStation;
@@ -65,8 +73,6 @@ public class MainActivity extends ActionBarActivity {
     private LinearLayout mTabBusLine;
     private ActionBar mActionBar;
     private Dialog mExitDialog;
-    private int mPostion = 0;
-    private int mPostionTemp = 0;
 
     private final int INVALID_POSITION = -1;
 
@@ -75,6 +81,10 @@ public class MainActivity extends ActionBarActivity {
     private boolean mIsQuitApp = false;
 
     private ArrayList<SwitchHandler> mSwitchHandlers = new ArrayList<SwitchHandler>();
+
+    private boolean hasMenuKey = true;
+    private boolean hasBackKey = true;
+    private boolean hasHomeKey = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,14 +104,12 @@ public class MainActivity extends ActionBarActivity {
                 ) {
             @Override
             public void onDrawerClosed(View view) {
-                mPostion = mPostionTemp;
                 mActionBar.setTitle(mTitle);
                 supportInvalidateOptionsMenu();
             }
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                mPostion = INVALID_POSITION;
                 mActionBar.setTitle(mDrawerTitle);
                 supportInvalidateOptionsMenu();
             }
@@ -109,6 +117,22 @@ public class MainActivity extends ActionBarActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mFragmentManager = getSupportFragmentManager();
+
+        mTabContainer = (LinearLayout)findViewById(R.id.tab_container);
+        showOrHideTab();
+
+        // Always show Action Bar overflow
+        if (hasMenuKey) {
+            try {
+                ViewConfiguration mconfig = ViewConfiguration.get(this);
+                Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+                if(menuKeyField != null) {
+                    menuKeyField.setAccessible(true);
+                    menuKeyField.setBoolean(mconfig, false);
+                }
+            } catch (Exception ex) {
+            }
+        }
 
         mTabLocation = (LinearLayout)findViewById(R.id.tab_location);
         mTabCard = (LinearLayout)findViewById(R.id.tab_card);
@@ -137,6 +161,29 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    @SuppressLint("NewApi")
+    private void showOrHideTab() {
+        // we need hide the Tab on small screen devices and the devices which have Navigation Bar
+        Display display = getWindowManager().getDefaultDisplay();
+        int width = display.getWidth();
+        int height = display.getHeight();
+        if (width > height) {
+            int temp = height;
+            height = width;
+            width = temp;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            hasMenuKey = ViewConfiguration.get(this).hasPermanentMenuKey();
+        } else {
+            hasMenuKey = true;
+        }
+        hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+        hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
+        if (height < 800 || (!hasMenuKey && !hasBackKey && !hasHomeKey)) {
+            mTabContainer.setVisibility(View.GONE);
+        }
+    }
+
     private void setupDrawerView() {
         mTitle = mDrawerTitle = getTitle();
         mDrawerTitles = getResources().getStringArray(R.array.drawer_arrays);
@@ -156,7 +203,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void selectItem(int position) {
-        mPostionTemp = position;
         switch (position) {
             case 0:
                 navigateToLocation(mTabLocation);
@@ -176,8 +222,6 @@ public class MainActivity extends ActionBarActivity {
             default:
                 break;
         }
-        mDrawerList.setItemChecked(position, true);
-        setTitle(mDrawerTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
@@ -238,32 +282,37 @@ public class MainActivity extends ActionBarActivity {
 
     public void navigateToLocation(View v) {
         setSelected(v);
-        mActionBar.setTitle(R.string.bus_location);
+        setTitle(R.string.bus_location);
         showFragment(TAG_LOCATION_FRAGMENT);
+        mDrawerList.setItemChecked(0, true);
     }
 
     public void navigateToCardInfo(View v) {
         setSelected(v);
-        mActionBar.setTitle(R.string.card_records);
+        setTitle(R.string.card_records);
         showFragment(TAG_CARD_INFO_FRAGMENT);
+        mDrawerList.setItemChecked(1, true);
     }
 
     public void navigateToStationLines(View v) {
         setSelected(v);
-        mActionBar.setTitle(R.string.bus_stations);
+        setTitle(R.string.bus_stations);
         showFragment(TAG_STATION_LINES_FRAGMENT);
+        mDrawerList.setItemChecked(2, true);
     }
 
     public void navigateToTransfer(View v) {
         setSelected(v);
-        mActionBar.setTitle(R.string.bus_transfer);
+        setTitle(R.string.bus_transfer);
         showFragment(TAG_TRANSFER_FRAGMENT);
+        mDrawerList.setItemChecked(3, true);
     }
 
     public void navigateToBusLine(View v) {
         setSelected(v);
-        mActionBar.setTitle(R.string.bus_line);
+        setTitle(R.string.bus_line);
         showFragment(TAG_BUS_LINE_FRAGMENT);
+        mDrawerList.setItemChecked(4, true);
     }
 
     private Dialog createDialog() {

@@ -23,11 +23,12 @@
             android:gravity="center" />
 
         <LinearLayout
+            android:id="@+id/tab_container"
+            android:baselineAligned="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/abc_ab_bottom_solid_light_holo"
-            android:orientation="horizontal"
-            android:visibility="gone" >
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:id="@+id/tab_location"
